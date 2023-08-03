@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import DashboardRoutes from './pages';
+const DashboardRoutes = lazy(() => import('./pages'));
 import Loader from './components/Loader';
 
 function App() {
