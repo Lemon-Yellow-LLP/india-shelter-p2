@@ -39,13 +39,24 @@ const referenceDropdownOptions = [
 const ReferenceDetails = () => {
   const [selectedReferenceTypeOne, setSelectedReferenceTypeOne] = useState(null);
   const [selectedReferenceTypeTwo, setSelectedReferenceTypeTwo] = useState(null);
-  const [referenceOptions, setReferenceOptions] = useState(referenceDropdownOptions);
+  const [referenceOneOptions, setReferenceOneOptions] = useState(referenceDropdownOptions);
+  const [referenceTwoOptions, setReferenceTwoOptions] = useState(referenceDropdownOptions);
 
-  function disableOption(value) {
-    setReferenceOptions((prev) => {
+  function disableOneOption(value) {
+    setReferenceOneOptions((prev) => {
       return prev.map((option) => {
         if (option.value === value) option['disabled'] = true;
-        else option['disabled'] = false
+        else option['disabled'] = false;
+        return option;
+      });
+    });
+  }
+
+  function disableTwoOption(value) {
+    setReferenceTwoOptions((prev) => {
+      return prev.map((option) => {
+        if (option.value === value) option['disabled'] = true;
+        else option['disabled'] = false;
         return option;
       });
     });
@@ -54,7 +65,7 @@ const ReferenceDetails = () => {
   const handleReferenceTypeChangeOne = useCallback(
     (value) => {
       setSelectedReferenceTypeOne(value);
-      disableOption(value);
+      disableTwoOption(value);
     },
     [selectedReferenceTypeOne],
   );
@@ -62,10 +73,11 @@ const ReferenceDetails = () => {
   const handleReferenceTypeChangeTwo = useCallback(
     (value) => {
       setSelectedReferenceTypeTwo(value);
-      disableOption(value);
+      disableOneOption(value);
     },
-    [selectedReferenceTypeTwo],
+    [selectedReferenceTypeOne],
   );
+
 
   return (
     <div className='bg-mid-grey p-4'>
@@ -73,13 +85,13 @@ const ReferenceDetails = () => {
       <ReferenceForm
         count='1'
         selectedReferenceType={selectedReferenceTypeOne}
-        options={referenceOptions}
+        options={referenceOneOptions}
         callback={handleReferenceTypeChangeOne}
       />
       <ReferenceForm
         count='2'
         selectedReferenceType={selectedReferenceTypeTwo}
-        options={referenceOptions}
+        options={referenceTwoOptions}
         callback={handleReferenceTypeChangeTwo}
       />
     </div>

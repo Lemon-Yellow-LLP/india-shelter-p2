@@ -76,25 +76,30 @@ const DropDown = memo(
             }}
             className='rounded-lg bg-white shadow-secondary p-2 mt-2 absolute top-100 w-full overflow-y-auto z-20 border border-stroke'
           >
-            {options.map((option, index) => (
-              <button
-                key={option.value}
-                onClick={() => handleSelect(option)}
-                className={`${
-                  option.value === selectedOption?.value
-                    ? 'text-primary-red'
-                    : 'text-primary-black hover:bg-grey-white'
-                } 
-              ${
-                index ? 'border-t border-stroke' : 'border-none'
-              } py-3 gap-2 px-4 flex justify-between w-full overflow-y-auto transition-colors duration-300 ease-out
-              ${ option.disabled && 'pointer-events-none opacity-20' }
-              `}
-              >
-                {option.label}
-                {showIcon && selectedOption?.value === option.value ? <IconTick /> : <div></div>}
-              </button>
-            ))}
+            {options.map((option, index) => {
+           
+              let optionClasses =
+                `py-3 gap-2 px-4 flex justify-between w-full overflow-y-auto transition-colors duration-300 ease-out opacity-100
+                  ${index ? 'border-t border-stroke' : 'border-none'}
+                `;
+
+              if (option.value === selectedOption?.value)
+                optionClasses = `${optionClasses} text-primary-red`;
+              else if (option.disabled) {
+                optionClasses = `${optionClasses} pointer-events-none opacity-20`;
+              }
+
+              return (
+                <button
+                  key={option.value}
+                  onClick={() => handleSelect(option)}
+                  className={optionClasses}
+                >
+                  {option.label}
+                  {showIcon && selectedOption?.value === option.value ? <IconTick /> : <div></div>}
+                </button>
+              );
+            })}
           </div>
         )}
         {showError ? (
