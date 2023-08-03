@@ -16,6 +16,7 @@ export default {
         'neutral-white': '#FEFEFE',
         'light-red': '#F1999C',
         'grey-white': '#F3F3F3',
+        'medium-grey': '#FAFAFA',
         stroke: '#D9D9D9',
       },
     },

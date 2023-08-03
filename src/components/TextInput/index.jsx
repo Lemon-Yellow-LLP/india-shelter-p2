@@ -46,7 +46,7 @@ const TextInput = memo(
           tabIndex={-1}
           onClick={() => (ref ? ref.current.focus() : inputRef.current.focus())}
           onKeyDown={() => (ref ? ref.current?.focus() : inputRef.current.focus())}
-          className={`input-container px-4 py-3 border rounded-lg 
+          className={`input-container px-4 py-3 border rounded-lg bg-white
         flex gap-1
         transition-all ease-out duration-150
         focus-within:border-secondary-blue focus-within:shadow-secondary-blue focus-within:shadow-primary
