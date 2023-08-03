@@ -8,6 +8,8 @@ const LntCharges = lazy(() => import('./lnt-charges'));
 const PersonalDetails = lazy(() => import('./personal-details'));
 const ReferenceDetails = lazy(() => import('./reference-details'));
 const WorkIncomeDetails = lazy(() => import('./work-income-details'));
+const PropertyDetails = lazy(() => import('./property-details'));
+const UploadDocuments = lazy(() => import('./upload-documents'));
 
 const LeadCreationRoutes = () => {
   return (
@@ -20,6 +22,8 @@ const LeadCreationRoutes = () => {
       <Route path='personal-details' element={<PersonalDetails />} />
       <Route path='reference-details' element={<ReferenceDetails />} />
       <Route path='work-income-details' element={<WorkIncomeDetails />} />
+      <Route path='property-details' element={<PropertyDetails />} />
+      <Route path='upload-documents' element={<UploadDocuments />} />
     </Routes>
   );
 };
