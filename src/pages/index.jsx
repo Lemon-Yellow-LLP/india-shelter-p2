@@ -1,19 +1,15 @@
-import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
-
-const WelcomeBack = lazy(() => import('./welcome-back'));
-const LeadGeneration = lazy(() => import('./lead-generation'));
 import AuthContextLayout from '../context/AuthContext';
+import Dashboard from './dashboard';
 
-const LeadGenerationRoute = () => {
+const DashboardRoutes = () => {
   return (
     <Routes>
       <Route element={<AuthContextLayout />}>
-        <Route path='/:id' element={<WelcomeBack />} />
-        <Route path='/' element={<LeadGeneration />} />
+        <Route path='/' element={<Dashboard />} />
       </Route>
     </Routes>
   );
 };
 
-export { LeadGenerationRoute };
+export default DashboardRoutes;
