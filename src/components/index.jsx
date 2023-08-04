@@ -11,6 +11,8 @@ import TermsAndConditions from './TermsAndConditions';
 import CurrencyInput from './CurrencyInput';
 import DesktopPopUp from './DesktopPopUp';
 import PanInput from './TextInput/PanInput';
+import MapInput from './MapInput';
+import Map from './Map';
 
 export {
   TextInput,
@@ -26,4 +28,6 @@ export {
   CurrencyInput,
   DesktopPopUp,
   PanInput,
+  MapInput,
+  Map,
 };

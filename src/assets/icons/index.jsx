@@ -11,6 +11,7 @@ import IconLoanAgainstProperty from './loan-against-property';
 import IconResidential from './residential';
 import IconCommercial from './commercial';
 import IconBack from './back';
+import IconArrowRight from './arrow-right';
 
 export {
   IconClose,
@@ -26,4 +27,5 @@ export {
   IconResidential,
   IconCommercial,
   IconBack,
+  IconArrowRight,
 };

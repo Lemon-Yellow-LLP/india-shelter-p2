@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react';
 import { IconPropertyIdentified, IconPropertyUnIdentified } from '../../../../assets/icons';
 import { CardRadio } from '../../../../components';
-import HomeLoanFields from './HomeLoanFields';
-import LoanAgainstPropertyFields from './LoanAgainstPropertyFields';
+import IdentificationDoneFields from './IdentificationDoneFields';
 
 const propertyIdentificationOptions = [
   {
@@ -17,16 +16,7 @@ const propertyIdentificationOptions = [
   },
 ];
 
-const propertyDetailsMap = {
-  'Home Loan': {
-    fields: <HomeLoanFields />,
-  },
-  LAP: {
-    fields: <LoanAgainstPropertyFields />,
-  },
-};
-
-const selectedLoanType = 'Home Loan';
+const selectedLoanType = 'LAP';
 
 const PropertyDetails = () => {
   const [propertyIdentification, setPropertyIdentification] = useState(null);
@@ -58,9 +48,9 @@ const PropertyDetails = () => {
         ))}
       </div>
 
-      {propertyIdentification === 'done'
-        ? propertyDetailsMap[selectedLoanType || 'Home Loan'].fields
-        : null}
+      {propertyIdentification === 'done' ? (
+        <IdentificationDoneFields selectedLoanType={selectedLoanType} />
+      ) : null}
     </div>
   );
 };

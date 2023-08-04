@@ -13,18 +13,20 @@ const UploadDocuments = lazy(() => import('./upload-documents'));
 
 const LeadCreationRoutes = () => {
   return (
-    <Routes>
-      <Route index element={<ApplicantDetails />} />
-      <Route path='applicant-details' element={<ApplicantDetails />} />
-      <Route path='address-details' element={<AddressDetails />} />
-      <Route path='banking-details' element={<BankingDetails />} />
-      <Route path='lnt-charges' element={<LntCharges />} />
-      <Route path='personal-details' element={<PersonalDetails />} />
-      <Route path='reference-details' element={<ReferenceDetails />} />
-      <Route path='work-income-details' element={<WorkIncomeDetails />} />
-      <Route path='property-details' element={<PropertyDetails />} />
-      <Route path='upload-documents' element={<UploadDocuments />} />
-    </Routes>
+    <div className='p-4'>
+      <Routes>
+        <Route index element={<ApplicantDetails />} />
+        <Route path='applicant-details' element={<ApplicantDetails />} />
+        <Route path='address-details' element={<AddressDetails />} />
+        <Route path='banking-details' element={<BankingDetails />} />
+        <Route path='lnt-charges' element={<LntCharges />} />
+        <Route path='personal-details' element={<PersonalDetails />} />
+        <Route path='reference-details' element={<ReferenceDetails />} />
+        <Route path='work-income-details' element={<WorkIncomeDetails />} />
+        <Route path='property-details' element={<PropertyDetails />} />
+        <Route path='upload-documents' element={<UploadDocuments />} />
+      </Routes>
+    </div>
   );
 };
 
