@@ -213,6 +213,30 @@ body {
   max-height: 50px !important;
 }
 
+.MuiTabs-indicator {
+  background-color: #147257 !important;
+}
+
+.tabLabels {
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  line-height: 18px !important;
+  font-family: 'Poppins', sans-serif !important;
+  text-transform: none !important;
+}
+
+.MuiDrawer-root > .MuiPaper-root {
+  border-radius: 8px;
+}
+
+.MuiLinearProgress-root {
+  background-color: #d9d9d9 !important;
+}
+
+.MuiLinearProgress-bar {
+  background-color: #373435 !important;
+}
+
 @media (max-width: 1024px) {
   .indiaShelterLogo {
     max-width: 140px;
