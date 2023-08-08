@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useContext } from 'react';
 import ProgressBar from './ProgressBar';
-import { color } from '@mui/system';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 
-export default function DrawerSteps({ details, steps, toggleDrawer }) {
+export default function DrawerSteps({ details, steps, toggleDrawer, index }) {
+  const { setCurrentStepIndex } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleClick = () => {
     if (steps) {
+      setCurrentStepIndex(index);
       navigate(details.url);
       toggleDrawer();
     }

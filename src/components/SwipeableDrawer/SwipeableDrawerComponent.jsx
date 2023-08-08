@@ -166,6 +166,7 @@ export default function SwipeableDrawerComponent() {
                         details={e}
                         steps={true}
                         toggleDrawer={toggleDrawer}
+                        index={index}
                       />
                     ))}
                 </div>
@@ -181,7 +182,12 @@ export default function SwipeableDrawerComponent() {
                   <div className='flex flex-col gap-[16px] w-[100%]'>
                     {applicants &&
                       applicants.map((e, index) => (
-                        <DrawerSteps key={index} details={e} toggleDrawer={toggleDrawer} />
+                        <DrawerSteps
+                          key={index}
+                          details={e}
+                          toggleDrawer={toggleDrawer}
+                          index={index}
+                        />
                       ))}
                   </div>
 

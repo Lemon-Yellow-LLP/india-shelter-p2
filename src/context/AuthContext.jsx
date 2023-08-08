@@ -9,6 +9,7 @@ export const defaultValues = {};
 export const AuthContext = createContext(defaultValues);
 
 const AuthContextProvider = ({ children }) => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [stepsProgress, setStepProgress] = useState([
     {
       title: 'Applicant Details',
@@ -81,8 +82,6 @@ const AuthContextProvider = ({ children }) => {
     },
   ]);
 
-  console.log(applicants);
-
   const updateProgress = (updateIndex, updateValue) => {
     setStepProgress((prevStepsProgress) => {
       const newData = prevStepsProgress.map((step, index) => {
@@ -127,6 +126,8 @@ const AuthContextProvider = ({ children }) => {
         updateProgress,
         applicants,
         addApplicant,
+        currentStepIndex,
+        setCurrentStepIndex,
       }}
     >
       {children}
