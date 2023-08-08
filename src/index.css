@@ -237,6 +237,25 @@ body {
   background-color: #373435 !important;
 }
 
+.tabPanel > .MuiBox-root {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 15px !important;
+}
+
+.MuiTimeline-root {
+  padding: 0px 5px !important;
+}
+
+.MuiTimelineItem-root {
+  min-height: 100px !important;
+}
+
+.MuiTimelineConnector-root {
+  color: #bdbdbd3b;
+}
+
 @media (max-width: 1024px) {
   .indiaShelterLogo {
     max-width: 140px;
