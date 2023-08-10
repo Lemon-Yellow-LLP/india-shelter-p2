@@ -1,7 +1,42 @@
 import { useCallback, useState } from 'react';
 import ReferenceForm from './ReferenceForm';
 
-const referenceDropdownOptions = [
+const referenceDropdownOneOptions = [
+  {
+    label: 'Relative/Friend',
+    value: 'relative-friend',
+  },
+  {
+    label: 'Current Employer/Contractor',
+    value: 'current-employer-contractor',
+  },
+  {
+    label: 'Colleague',
+    value: 'colleague',
+  },
+  {
+    label: 'Business Neighbour',
+    value: 'business-neighbour',
+  },
+  {
+    label: 'Customer/Client',
+    value: 'customer-client',
+  },
+  {
+    label: 'Supplier',
+    value: 'supplier',
+  },
+  {
+    label: 'Business Place Landlord',
+    value: 'business-place-landlord',
+  },
+  {
+    label: 'Supervisor',
+    value: 'supervisor',
+  },
+];
+
+const referenceDropdownTwoOptions = [
   {
     label: 'Relative/Friend',
     value: 'relative-friend',
@@ -39,8 +74,8 @@ const referenceDropdownOptions = [
 const ReferenceDetails = () => {
   const [selectedReferenceTypeOne, setSelectedReferenceTypeOne] = useState(null);
   const [selectedReferenceTypeTwo, setSelectedReferenceTypeTwo] = useState(null);
-  const [referenceOneOptions, setReferenceOneOptions] = useState(referenceDropdownOptions);
-  const [referenceTwoOptions, setReferenceTwoOptions] = useState(referenceDropdownOptions);
+  const [referenceOneOptions, setReferenceOneOptions] = useState(referenceDropdownOneOptions);
+  const [referenceTwoOptions, setReferenceTwoOptions] = useState(referenceDropdownTwoOptions);
 
   function disableOneOption(value) {
     setReferenceOneOptions((prev) => {
@@ -78,9 +113,8 @@ const ReferenceDetails = () => {
     [selectedReferenceTypeOne],
   );
 
-
   return (
-    <div className='bg-mid-grey p-4'>
+    <div className='bg-medium-grey p-4'>
       <h2 className='text-xs text-dark-grey'>It is mandatory to fill in two reference details.</h2>
       <ReferenceForm
         count='1'

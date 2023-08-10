@@ -10,18 +10,18 @@ function parseDateString(_, originalValue) {
 }
 
 export const signUpSchema = Yup.object({
-  first_name: Yup.string().min(2).max(10).required('Please enter your First name'),
-  middle_name: Yup.string().min(2).max(10),
-  last_name: Yup.string().min(2).max(10),
+  reference_one_full_name: Yup.string().required('Please enter your Full name'),
+  reference_two_full_name: Yup.string().required('Please enter your Full name'),
+  address: Yup.string().max(90, 'Character limit exceeded').required('Please enter your address'),
+  phone_number: Yup.string()
+    .min(10, 'Must be exactly 10 digits')
+    .max(10, 'Must be exactly 10 digits')
+    .required('Please enter your valid 10 digit mobile number'),
   pincode: Yup.string()
     .required('Please enter valid Pincode for your region')
     .matches(/^(0|[1-9]\d*)$/, 'Must be only digits')
     .min(6, 'Must be exactly 6 digits')
     .max(6, 'Must be exactly 6 digits'),
-  phone_number: Yup.string()
-    .min(10, 'Must be exactly 10 digits')
-    .max(10, 'Must be exactly 10 digits')
-    .required('Please enter your valid 10 digit mobile number'),
   pan_number: Yup.string()
     .required('Please enter your valid PAN number')
     .min(10, 'Pan Number must be in the following format ex. ABCDE1234F')

@@ -17,6 +17,7 @@ export default {
         'light-red': '#F1999C',
         'grey-white': '#F3F3F3',
         'medium-grey': '#FAFAFA',
+        'disabled-grey': '#EFEFEF',
         stroke: '#D9D9D9',
       },
     },

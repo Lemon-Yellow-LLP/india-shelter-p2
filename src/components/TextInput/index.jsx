@@ -56,7 +56,7 @@ const TextInput = memo(
             : 'border-light-grey'
         }
         ${!props.value && !error && !touched && 'border-stroke'}
-        ${props.disabled ? 'bg-[#fafafa] pointer-events-none cursor-not-allowed' : ''}
+        ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : ''}
         `}
         >
           {Icon && <Icon />}

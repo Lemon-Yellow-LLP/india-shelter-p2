@@ -1,16 +1,28 @@
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import { DropDown, TextInput } from '../../../../components/index';
+import { AuthContext } from '../../../../context/AuthContext';
 
 const fieldsRequiredForLeadGeneration = ['first_name', 'phone_number', 'pincode'];
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 const disableNextFields = ['loan_request_amount', 'first_name', 'pincode', 'phone_number'];
 
 const ReferenceForm = ({ count, selectedReferenceType, options, callback }) => {
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    handleChange,
+    inputDisabled,
+    setFieldValue,
+    setInputDisabled,
+  } = useContext(AuthContext);
+
   const handleTextInputChange = useCallback((e) => {
     const value = e.currentTarget.value;
     const pattern = /^[A-Za-z]+$/;
     if (pattern.exec(value[value.length - 1])) {
-      // setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+      setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
     }
   }, []);
 
@@ -20,25 +32,22 @@ const ReferenceForm = ({ count, selectedReferenceType, options, callback }) => {
       e.preventDefault();
       return;
     }
-    if (values.length >= 10) {
+    if (phoneNumber.length >= 10) {
       return;
     }
     if (phoneNumber.charAt(0) === '0') {
       e.preventDefault();
       return;
     }
-    // setFieldValue('phone_number', phoneNumber);
-    // if (phoneNumber?.length < 10) {
-    //   setLeadExists(false);
-    //   setShowOTPInput(false);
-    //   return;
-    // }
-    // const data = await getLeadByPhoneNumber(phoneNumber);
-    // if (data.length) {
-    //   setLeadExists(true);
-    //   setShowOTPInput(true);
-    // }
+    setFieldValue('phone_number', phoneNumber);
   }, []);
+
+  // const handleOnEmailBlur = useCallback(
+  //   async (email) => {
+  //     await editLeadById(currentLeadId, { email });
+  //   },
+  //   [currentLeadId],
+  // );
 
   return (
     <div className='flex flex-col gap-2'>
@@ -64,12 +73,12 @@ const ReferenceForm = ({ count, selectedReferenceType, options, callback }) => {
         placeholder='Eg: Pratik Akash Singh'
         required
         name='full_name'
-        // value={values.first_name}
-        // error={errors.first_name}
-        // touched={touched.first_name}
-        // onBlur={handleBlur}
-        // disabled={inputDisabled}
-        onChange={handleTextInputChange}
+        value={values.full_name}
+        error={errors.full_name}
+        touched={touched.full_name}
+        onBlur={handleBlur}
+        disabled={inputDisabled}
+        onChange={handleChange}
         inputClasses='capitalize'
       />
 
@@ -79,10 +88,10 @@ const ReferenceForm = ({ count, selectedReferenceType, options, callback }) => {
         required
         name='phone_number'
         type='tel'
-        // value={values.phone_number}
-        // error={errors.phone_number}
-        // touched={touched.phone_number}
-        // onBlur={handleBlur}
+        value={values.phone_number}
+        error={errors.phone_number}
+        touched={touched.phone_number}
+        onBlur={handleBlur}
         pattern='\d*'
         onFocus={(e) =>
           e.target.addEventListener(
@@ -120,13 +129,6 @@ const ReferenceForm = ({ count, selectedReferenceType, options, callback }) => {
         }}
         // disabled={inputDisabled || disablePhoneNumber}
         inputClasses='hidearrow'
-        // message={
-        //   phoneNumberVerified
-        //     ? `OTP Verfied
-        //   <img src="${otpVerified}" alt='Otp Verified' role='presentation' />
-        //   `
-        //     : null
-        // }
       />
 
       <TextInput
@@ -134,13 +136,14 @@ const ReferenceForm = ({ count, selectedReferenceType, options, callback }) => {
         placeholder='Eg: Near Sanjay hospital'
         required
         name='address'
-        // value={values.first_name}
-        // error={errors.first_name}
-        // touched={touched.first_name}
-        // onBlur={handleBlur}
-        // disabled={inputDisabled}
-        onChange={handleTextInputChange}
+        value={values.address}
+        error={errors.address}
+        touched={touched.address}
+        onBlur={handleBlur}
+        disabled={inputDisabled}
+        onChange={handleChange}
         inputClasses='capitalize'
+        maxLength={90}
       />
 
       <TextInput
@@ -150,14 +153,14 @@ const ReferenceForm = ({ count, selectedReferenceType, options, callback }) => {
         name='pincode'
         type='tel'
         hint='City and State fields will get filled based on Pincode'
-        // value={values.pincode}
-        // error={errors.pincode}
-        // touched={touched.pincode}
-        // disabled={inputDisabled}
-        // onBlur={(e) => {
-        //   handleBlur(e);
-        //   handleOnPincodeChange();
-        // }}
+        value={values.pincode}
+        error={errors.pincode}
+        touched={touched.pincode}
+        disabled={inputDisabled}
+        onBlur={(e) => {
+          handleBlur(e);
+          handleOnPincodeChange();
+        }}
         min='0'
         onInput={(e) => {
           if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
@@ -206,11 +209,11 @@ const ReferenceForm = ({ count, selectedReferenceType, options, callback }) => {
         label='City'
         placeholder='Eg: Nashik'
         name='city'
-        // value={values.first_name}
-        // error={errors.first_name}
-        // touched={touched.first_name}
-        // onBlur={handleBlur}
-        // disabled={inputDisabled}
+        value={values.city}
+        error={errors.city}
+        touched={touched.city}
+        onBlur={handleBlur}
+        disabled={true}
         onChange={handleTextInputChange}
         inputClasses='capitalize'
       />
@@ -219,11 +222,11 @@ const ReferenceForm = ({ count, selectedReferenceType, options, callback }) => {
         label='State'
         placeholder='Eg: Maharashtra'
         name='state'
-        // value={values.first_name}
-        // error={errors.first_name}
-        // touched={touched.first_name}
-        // onBlur={handleBlur}
-        // disabled={inputDisabled}
+        value={values.state}
+        error={errors.state}
+        touched={touched.state}
+        onBlur={handleBlur}
+        disabled={true}
         onChange={handleTextInputChange}
         inputClasses='capitalize'
       />
@@ -231,23 +234,23 @@ const ReferenceForm = ({ count, selectedReferenceType, options, callback }) => {
       <TextInput
         label='Email'
         type='email'
-        // value={email}
+        value={values.email}
         placeholder='Eg: xyz@gmail.com'
         name='email'
         autoComplete='off'
-        // error={errors.email}
-        // touched={touched.email}
-        // onBlur={(e) => {
-        //   const target = e.currentTarget;
-        //   handleOnEmailBlur(target.value);
-        //   handleBlur(e);
-        //   checkEmailValid(e);
-        //   updateLeadDataOnBlur(currentLeadId, target.getAttribute('name'), target.value);
-        // }}
+        error={errors.email}
+        touched={touched.email}
+        onBlur={(e) => {
+          const target = e.currentTarget;
+          handleOnEmailBlur(target.value);
+          handleBlur(e);
+          checkEmailValid(e);
+          updateLeadDataOnBlur(currentLeadId, target.getAttribute('name'), target.value);
+        }}
         // disabled={disableEmailInput}
         // onInput={checkEmailValid}
         onChange={(e) => {
-          checkEmailValid(e);
+          // checkEmailValid(e);
           handleChange(e);
         }}
         // message={
