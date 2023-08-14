@@ -10,14 +10,30 @@ function parseDateString(_, originalValue) {
 }
 
 export const signUpSchema = Yup.object({
+  reference_one_type: Yup.string().required('Please select your reference type'),
+  reference_two_type: Yup.string().required('Please select your reference type'),
   reference_one_full_name: Yup.string().required('Please enter your Full name'),
   reference_two_full_name: Yup.string().required('Please enter your Full name'),
-  address: Yup.string().max(90, 'Character limit exceeded').required('Please enter your address'),
-  phone_number: Yup.string()
+  reference_one_address: Yup.string()
+    .max(90, 'Character limit exceeded')
+    .required('Please enter your address'),
+  reference_two_address: Yup.string()
+    .max(90, 'Character limit exceeded')
+    .required('Please enter your address'),
+  reference_one_phone_number: Yup.string()
     .min(10, 'Must be exactly 10 digits')
     .max(10, 'Must be exactly 10 digits')
     .required('Please enter your valid 10 digit mobile number'),
-  pincode: Yup.string()
+  reference_two_phone_number: Yup.string()
+    .min(10, 'Must be exactly 10 digits')
+    .max(10, 'Must be exactly 10 digits')
+    .required('Please enter your valid 10 digit mobile number'),
+  reference_one_pincode: Yup.string()
+    .required('Please enter valid Pincode for your region')
+    .matches(/^(0|[1-9]\d*)$/, 'Must be only digits')
+    .min(6, 'Must be exactly 6 digits')
+    .max(6, 'Must be exactly 6 digits'),
+  reference_two_pincode: Yup.string()
     .required('Please enter valid Pincode for your region')
     .matches(/^(0|[1-9]\d*)$/, 'Must be only digits')
     .min(6, 'Must be exactly 6 digits')
@@ -46,7 +62,11 @@ export const signUpSchema = Yup.object({
   loan_amount: Yup.string().required('Please enter the loan amount.'),
   purpose_type: Yup.string().required('Property category not selected.'),
 
-  email: Yup.string()
+  reference_one_email: Yup.string()
+    .email()
+    .required('Please enter your email')
+    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
+  reference_two_email: Yup.string()
     .email()
     .required('Please enter your email')
     .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
