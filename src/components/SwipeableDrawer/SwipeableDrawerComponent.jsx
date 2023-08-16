@@ -74,14 +74,14 @@ export default function SwipeableDrawerComponent() {
   };
 
   //For testing progress bar
-  useEffect(() => {
-    const timer = setInterval(() => {
-      updateProgress(2, 20);
-    }, 800);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     updateProgress(2, 20);
+  //   }, 800);
+  //   return () => {
+  //     clearInterval(timer);
+  //   };
+  // }, []);
 
   return (
     <Root>

@@ -4,12 +4,33 @@ import { signUpSchema } from '../schemas/index';
 import PropTypes from 'prop-types';
 import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
-export const defaultValues = {};
+export const defaultValues = {
+  selected_personal_details_mode: null,
+  gender: null,
+  marital_status: null,
+  id_type: null,
+  id_number: '',
+  address_proof: null,
+  address_proof_number: '',
+  date_of_birth: null,
+  mobile_number: '',
+  father_or_husband_name: '',
+  mother_name: '',
+  religion: '',
+  preferred_language: '',
+  qualification: '',
+  email: '',
+  first_name: '',
+  middle_name: '',
+  last_name: '',
+  profession: '',
+};
 
 export const AuthContext = createContext(defaultValues);
 
 const AuthContextProvider = ({ children }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
   const [stepsProgress, setStepProgress] = useState([
     {
       title: 'Applicant Details',
@@ -82,13 +103,22 @@ const AuthContextProvider = ({ children }) => {
     },
   ]);
 
-  const updateProgress = (updateIndex, updateValue) => {
+  const updateProgress = (updateIndex, requiredFieldsStatus) => {
+    let trueCount = 0;
+
+    for (const field in requiredFieldsStatus) {
+      if (requiredFieldsStatus[field] === true) {
+        trueCount++;
+      }
+    }
+
     setStepProgress((prevStepsProgress) => {
       const newData = prevStepsProgress.map((step, index) => {
         if (index === updateIndex && step.progress !== 100) {
           return {
             ...step,
-            progress: step.progress + updateValue,
+            progress:
+              (parseInt(trueCount + 1) / parseInt(Object.keys(requiredFieldsStatus).length)) * 100,
           };
         }
         return step;

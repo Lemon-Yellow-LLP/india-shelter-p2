@@ -6,13 +6,13 @@ import { memo } from 'react';
 
 const CardRadio = memo(({ label, current, children, value, onChange }) => {
   return (
-    <div className={`flex flex-col gap-2 w-full cursor-pointer`}>
+    <div className={`flex flex-col gap-2 w-full cursor-pointer mb-[10px]`}>
       <div
-        className={`w-full border rounded-lg py-4 flex items-center justify-center cursor-pointer
+        className={`w-full border rounded-lg py-4 flex items-center justify-center cursor-pointer 
         ${
           current === value
-            ? 'bg-light-green border-secondary-green stroke-secondary-green'
-            : 'bg-transparent stroke-light-grey border-stroke hover:bg-grey-white'
+            ? 'bg-light-green border-secondary-green stroke-secondary-green fill-[#147257]'
+            : 'bg-transparent stroke-light-grey border-stroke hover:bg-grey-white fill-red'
         } transition-all duration-300 ease-out`}
         tabIndex={0}
         role='radio'

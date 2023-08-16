@@ -256,6 +256,10 @@ body {
   color: #bdbdbd3b;
 }
 
+.react-datepicker-wrapper {
+  margin-bottom: 20px;
+}
+
 @media (max-width: 1024px) {
   .indiaShelterLogo {
     max-width: 140px;
