@@ -4,11 +4,7 @@
 import PropTypes from 'prop-types';
 import { memo } from 'react';
 
-<<<<<<< HEAD
-const CardRadio = memo(({ label, current, children, value, onChange }) => {
-=======
 const CardRadio = memo(({ label, current, children, value, onChange, name }) => {
->>>>>>> master
   return (
     <div className={`flex flex-col gap-2 w-full cursor-pointer mb-[10px]`}>
       <div
@@ -21,13 +17,8 @@ const CardRadio = memo(({ label, current, children, value, onChange, name }) => 
         tabIndex={0}
         role='radio'
         aria-checked={current === value}
-<<<<<<< HEAD
-        onClick={() => onChange(value)}
-        onTouchStart={() => onChange(value)}
-=======
         onClick={() => onChange({ value, name })}
         onTouchStart={() => onChange({ value, name })}
->>>>>>> master
       >
         {children}
       </div>
