@@ -5,6 +5,9 @@ import PropTypes from 'prop-types';
 import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
 export const defaultValues = {
+  first_name: '',
+  middle_name: '',
+  last_name: '',
   reference_one_type: '',
   reference_one_full_name: '',
   reference_one_phone_number: '',
@@ -38,12 +41,15 @@ export const defaultValues = {
   permanent_address_city: '',
   permanent_address_state: '',
   permanent_address_residing_years: '',
+  loan_type: '',
 };
 
 export const AuthContext = createContext(defaultValues);
 
 const AuthContextProvider = ({ children }) => {
   const [inputDisabled, setInputDisabled] = useState(false);
+  const [phoneNumberVerified, setPhoneNumberVerified] = useState(null);
+  const [isLeadGenerated, setIsLeadGenearted] = useState(false);
 
   const formik = useFormik({
     initialValues: { ...defaultValues },
@@ -59,6 +65,10 @@ const AuthContextProvider = ({ children }) => {
         ...formik,
         inputDisabled,
         setInputDisabled,
+        phoneNumberVerified,
+        setPhoneNumberVerified,
+        isLeadGenerated,
+        setIsLeadGenearted,
       }}
     >
       {children}
