@@ -5,33 +5,21 @@ import { AuthContext } from '../../../../context/AuthContext';
 import DropDown from '../../../../components/DropDown';
 import TextInput from '../../../../components/TextInput';
 import DatePicker from '../../../../components/DatePicker';
+import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
 
 export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, setValues, errors, updateProgress } = useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
-  const handleGenderChange = useCallback(
+  const handleRadioChange = useCallback(
     (e) => {
       let newData = values;
-      newData.gender = e;
+      newData[e.name] = e.value;
       setValues(newData);
-      if (!requiredFieldsStatus.gender) {
+      if (!requiredFieldsStatus[e.name]) {
         updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, gender: true }));
-      }
-    },
-    [requiredFieldsStatus],
-  );
-
-  const handleMaritalStatusChange = useCallback(
-    (e) => {
-      let newData = values;
-      newData.marital_status = e;
-      setValues(newData);
-      if (!requiredFieldsStatus.marital_status) {
-        updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, marital_status: true }));
+        setRequiredFieldsStatus((prev) => ({ ...prev, [e.name]: true }));
       }
     },
     [requiredFieldsStatus],
@@ -244,7 +232,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
               name='gender'
               value={option.value}
               current={values.gender}
-              onChange={handleGenderChange}
+              onChange={handleRadioChange}
             >
               {option.icon}
             </CardRadio>
@@ -299,7 +287,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
               name='marital_status'
               value={option.value}
               current={values.marital_status}
-              onChange={handleMaritalStatusChange}
+              onChange={handleRadioChange}
             >
               {option.icon}
             </CardRadio>
@@ -307,7 +295,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         </div>
       </div>
 
-      <TextInput
+      <SearchableTextInput
         label='Religion'
         placeholder='Eg: Hindu'
         required
@@ -316,7 +304,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         onChange={handleTextInputChange}
       />
 
-      <TextInput
+      <SearchableTextInput
         label='Preferred language'
         placeholder='Eg: Hindi'
         required
@@ -325,7 +313,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         onChange={handleTextInputChange}
       />
 
-      <TextInput
+      <SearchableTextInput
         label='Qualification'
         placeholder='Eg: Graduate'
         required

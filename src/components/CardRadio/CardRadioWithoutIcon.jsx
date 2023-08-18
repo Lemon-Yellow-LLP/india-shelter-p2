@@ -4,11 +4,7 @@
 import PropTypes from 'prop-types';
 import { memo } from 'react';
 
-<<<<<<< HEAD
-const CardRadio = memo(({ label, current, children, value, onChange }) => {
-=======
-const CardRadio = memo(({ label, current, children, value, onChange, name }) => {
->>>>>>> master
+const CardRadioWithoutIcon = memo(({ label, current, value, onChange, name }) => {
   return (
     <div className={`flex flex-col gap-2 w-full cursor-pointer mb-[10px]`}>
       <div
@@ -21,35 +17,28 @@ const CardRadio = memo(({ label, current, children, value, onChange, name }) => 
         tabIndex={0}
         role='radio'
         aria-checked={current === value}
-<<<<<<< HEAD
-        onClick={() => onChange(value)}
-        onTouchStart={() => onChange(value)}
-=======
         onClick={() => onChange({ value, name })}
         onTouchStart={() => onChange({ value, name })}
->>>>>>> master
       >
-        {children}
-      </div>
-
-      {label && (
-        <div
-          className={`text-center text-xs  leading-normal
+        {label && (
+          <div
+            className={`text-center text-xs  leading-normal
         ${
           current === value
             ? 'text-secondary-green font-semibold'
             : 'text-primary-black font-normal'
         } transition-colors ease-out duration-300
         `}
-        >
-          {label}
-        </div>
-      )}
+          >
+            {label}
+          </div>
+        )}
+      </div>
     </div>
   );
 });
 
-CardRadio.propTypes = {
+CardRadioWithoutIcon.propTypes = {
   label: PropTypes.string,
   current: PropTypes.string,
   children: PropTypes.element,
@@ -59,4 +48,4 @@ CardRadio.propTypes = {
   containerClasses: PropTypes.string,
 };
 
-export default CardRadio;
+export default CardRadioWithoutIcon;

@@ -72,3 +72,41 @@ export const professionOptions = [
     icon: <IconSelfEmployed />,
   },
 ];
+
+export const noOfDependentsOptions = [
+  {
+    label: '0-1',
+    value: '0-1',
+  },
+  {
+    label: '2-5',
+    value: '2-5',
+  },
+  {
+    label: '6-10',
+    value: '6-10',
+  },
+  {
+    label: '10+',
+    value: '10+',
+  },
+];
+
+export const totalFamilyMembersOptions = [
+  {
+    label: '0-1',
+    value: '0-1',
+  },
+  {
+    label: '2-5',
+    value: '2-5',
+  },
+  {
+    label: '6-10',
+    value: '6-10',
+  },
+  {
+    label: '10+',
+    value: '10+',
+  },
+];

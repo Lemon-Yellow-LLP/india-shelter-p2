@@ -27,14 +27,14 @@ const PersonalDetails = memo(() => {
     last_name: false,
   });
 
-  const handleModeChange = useCallback(
+  const handleRadioChange = useCallback(
     (e) => {
       let newData = values;
-      newData.selected_personal_details_mode = e;
+      newData[e.name] = e.value;
       setValues(newData);
-      if (!requiredFieldsStatus.selected_personal_details_mode) {
+      if (!requiredFieldsStatus[e.name]) {
         updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, selected_personal_details_mode: true }));
+        setRequiredFieldsStatus((prev) => ({ ...prev, [e.name]: true }));
       }
     },
     [requiredFieldsStatus],
@@ -52,10 +52,10 @@ const PersonalDetails = memo(() => {
               <CardRadio
                 key={option.value}
                 label={option.label}
-                name='personal-details-mode'
+                name='selected_personal_details_mode'
                 value={option.value}
                 current={values.selected_personal_details_mode}
-                onChange={handleModeChange}
+                onChange={handleRadioChange}
                 containerClasses='flex-1'
               >
                 {option.icon}

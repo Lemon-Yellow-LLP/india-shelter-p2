@@ -260,6 +260,21 @@ body {
   margin-bottom: 20px;
 }
 
+.MuiOutlinedInput-notchedOutline {
+  outline: none !important;
+  border: none !important;
+}
+
+.MuiFormLabel-root,
+.MuiAutocomplete-endAdornment {
+  display: none !important;
+}
+
+.MuiInputBase-input,
+.MuiInputBase-root {
+  padding: 0 !important;
+}
+
 @media (max-width: 1024px) {
   .indiaShelterLogo {
     max-width: 140px;
