@@ -2,7 +2,8 @@ import { useContext } from 'react';
 import { useState, useCallback } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import { IconHomeLoan, IconLoanAgainstProperty } from '../../../../assets/icons';
-import { CardRadio, TextInput, DropDown } from '../../../../components';
+import DatePicker from '../../../../components/DatePicker';
+import { CardRadio, TextInput, DropDown, OtpInput } from '../../../../components';
 
 const loanTypeOptions = [
   {
@@ -97,13 +98,19 @@ const loanPurposeData = [
   },
 ];
 
+// const fieldsRequiredForLeadGeneration = ['first_name', 'phone_number', 'pincode'];
+const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
+// const disableNextFields = ['loan_request_amount', 'first_name', 'pincode', 'phone_number'];
+
 const ApplicantDetails = () => {
   const [leadExists, setLeadExists] = useState(false);
+  const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [selectedLoanType, setSelectedLoanType] = useState(null);
   const [loanFields, setLoanFields] = useState(loanOptions);
   const [loanPurposeOptions, setLoanPurposeOptions] = useState(loanPurposeData);
   const [loanPurpose, setLoanPurpose] = useState(null);
   const [propertyType, setPropertyType] = useState(null);
+  const [date, setDate] = useState();
 
   const {
     inputDisabled,
@@ -116,10 +123,13 @@ const ApplicantDetails = () => {
     errors,
     touched,
     phoneNumberVerified,
+    setPhoneNumberVerified,
     isLeadGenerated
   } = useContext(AuthContext);
 
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(phoneNumberVerified);
+  const [showOTPInput, setShowOTPInput] = useState(isLeadGenerated);
+  // searchParams.has('li') && !isLeadGenerated
 
   // useEffect(() => {
   //   setLoanPurpose(values.purpose_of_loan);
@@ -176,18 +186,20 @@ const ApplicantDetails = () => {
 
   const handleOnPhoneNumberChange = useCallback(async (e) => {
     const phoneNumber = e.currentTarget.value;
+    console.log(phoneNumber);
     if (phoneNumber < 0) {
       e.preventDefault();
       return;
     }
     if (phoneNumber.length > 10) {
+      console.log("true");
       return;
     }
     if (phoneNumber.charAt(0) === '0') {
       e.preventDefault();
       return;
     }
-    // setFieldValue('phone_number', phoneNumber);
+    setFieldValue('phone_number', phoneNumber);
     // if (phoneNumber?.length < 10) {
     //   setLeadExists(false);
     //   setShowOTPInput(false);
@@ -233,6 +245,29 @@ const ApplicantDetails = () => {
 
   // phone_number, searchParams, setFieldError, setToastMessage,
 
+  const verifyLeadOTP = useCallback(
+    async (otp) => {
+      // try {
+      //   const res = await verifyMobileOtp(phone_number, { otp, sms_link: true });
+      //   if (res.status === 200) {
+      //     setPhoneNumberVerified(true);
+      //     setInputDisabled(false);
+      //     setFieldError('phone_number', undefined);
+      //     setShowOTPInput(false);
+      //     return true;
+      //   }
+      //   setPhoneNumberVerified(false);
+      //   return false;
+      // } catch {
+      //   setPhoneNumberVerified(false);
+      //   return false;
+      // }
+    },
+    [setPhoneNumberVerified],
+  );
+
+  // phone_number, setFieldError, setInputDisabled,
+
   return (
     <div className='bg-medium-grey p-4 flex flex-col gap-2'>
       <div className='flex flex-col gap-2'>
@@ -240,9 +275,8 @@ const ApplicantDetails = () => {
           Loan Type <span className='text-primary-red text-xs'>*</span>
         </label>
         <div
-          className={`flex gap-4 w-full ${
-            inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
-          }`}
+          className={`flex gap-4 w-full ${inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
+            }`}
         >
           {loanTypeOptions.map((data, index) => (
             <CardRadio
@@ -299,6 +333,19 @@ const ApplicantDetails = () => {
           />
         </div>
       </div>
+
+      <DatePicker
+        startDate={date}
+        setStartDate={setDate}
+        required
+        name='date_of_birth'
+        label='Date of Birth'
+      />
+      {/* <span className='text-xs text-primary-red'>
+        {errors.date_of_birth || touched.date_of_birth
+          ? errors.date_of_birth
+          : String.fromCharCode(160)}
+      </span> */}
 
       <DropDown
         label='Purpose of loan'
@@ -383,11 +430,10 @@ const ApplicantDetails = () => {
             />
           </div>
           <button
-            className={`min-w-[93px] self-end font-normal py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
-              disablePhoneNumber
+            className={`min-w-[93px] self-end font-normal py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${disablePhoneNumber
                 ? 'text-dark-grey bg-stroke mb-[22px] pointer-events-none'
                 : 'bg-primary-red text-white'
-            }`}
+              }`}
             disabled={
               !((isLeadGenerated && !phoneNumberVerified && !disablePhoneNumber) || leadExists)
             }
@@ -398,6 +444,22 @@ const ApplicantDetails = () => {
         </div>
         {!disablePhoneNumber && <div className='h-4'></div>}
       </div>
+
+      {console.log(showOTPInput)}
+
+      {showOTPInput && (
+        <OtpInput
+          label='Enter OTP'
+          required
+          verified={phoneNumberVerified}
+          setOTPVerified={setPhoneNumberVerified}
+          onSendOTPClick={onOTPSendClick}
+          defaultResendTime={30}
+          disableSendOTP={(isLeadGenerated && !phoneNumberVerified) || leadExists}
+          verifyOTPCB={verifyLeadOTP}
+          hasSentOTPOnce={hasSentOTPOnce}
+        />
+      )}
     </div>
   );
 };
