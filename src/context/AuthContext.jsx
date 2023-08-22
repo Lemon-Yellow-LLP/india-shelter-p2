@@ -31,6 +31,10 @@ export const AuthContext = createContext(defaultValues);
 const AuthContextProvider = ({ children }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const [stepsProgress, setStepProgress] = useState([
     {
       title: 'Applicant Details',
@@ -158,6 +162,10 @@ const AuthContextProvider = ({ children }) => {
         addApplicant,
         currentStepIndex,
         setCurrentStepIndex,
+        drawerOpen,
+        setDrawerOpen,
+        isAuthenticated,
+        setIsAuthenticated,
       }}
     >
       {children}

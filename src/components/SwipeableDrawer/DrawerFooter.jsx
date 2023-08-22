@@ -3,8 +3,9 @@ import DrawerArrowDownButton from '../../assets/icons/drawerArrowDownButton.svg'
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 
-export default function DrawerFooter({ drawerOpen, toggleDrawer }) {
-  const { currentStepIndex, stepsProgress } = useContext(AuthContext);
+export default function DrawerFooter() {
+  const { currentStepIndex, stepsProgress, drawerOpen, setDrawerOpen } = useContext(AuthContext);
+
   return (
     <div className='flex justify-between p-4 pt-3 rounded-t-2xl bg-white w-full border-solid border absolute bottom-0 z-[5000]'>
       <div className='flex flex-col'>
@@ -18,7 +19,7 @@ export default function DrawerFooter({ drawerOpen, toggleDrawer }) {
       <img
         className='h-8 w-8'
         src={drawerOpen ? DrawerArrowDownButton : DrawerArrowUpButton}
-        onClick={toggleDrawer}
+        onClick={() => setDrawerOpen((prev) => !prev)}
       />
     </div>
   );

@@ -56,8 +56,9 @@ function a11yProps(index) {
 }
 
 export default function SwipeableDrawerComponent() {
-  const { stepsProgress, updateProgress, applicants, addApplicant } = useContext(AuthContext);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const { stepsProgress, updateProgress, applicants, addApplicant, drawerOpen, setDrawerOpen } =
+    useContext(AuthContext);
+
   const theme = useTheme();
   const [value, setValue] = useState(0);
 
@@ -161,13 +162,7 @@ export default function SwipeableDrawerComponent() {
                 <div className='flex flex-col gap-[16px] w-[100%]'>
                   {stepsProgress &&
                     stepsProgress.map((e, index) => (
-                      <DrawerSteps
-                        key={index}
-                        details={e}
-                        steps={true}
-                        toggleDrawer={toggleDrawer}
-                        index={index}
-                      />
+                      <DrawerSteps key={index} details={e} steps={true} index={index} />
                     ))}
                 </div>
               </TabPanel>
@@ -228,11 +223,7 @@ export default function SwipeableDrawerComponent() {
           </Box>
         </StyledBox>
       </SwipeableDrawer>
-      <DrawerFooter
-        drawerOpen={drawerOpen}
-        setDrawerOpen={setDrawerOpen}
-        toggleDrawer={toggleDrawer}
-      />
+      <DrawerFooter />
     </Root>
   );
 }

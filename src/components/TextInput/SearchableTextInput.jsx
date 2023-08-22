@@ -80,10 +80,9 @@ const SearchableTextInput = memo(
             disablePortal
             id={name}
             name={name}
-            onChange={(e) => onChange(e)}
+            onChange={(e, value) => onChange(e, value)}
             options={options}
             sx={{ width: 300, border: 'none' }}
-            {...props}
             renderInput={(params) => <TextField {...params} label='Movie' placeholder='Eg: Idea' />}
           />
           <img src={SearchIcon} />

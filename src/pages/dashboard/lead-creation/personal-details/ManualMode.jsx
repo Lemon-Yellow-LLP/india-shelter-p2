@@ -57,6 +57,24 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
       const field = e.target.name;
       let newData = values;
       newData[e.target.name] = e.target.value;
+      setValues({ ...newData });
+      if (
+        requiredFieldsStatus[e.target.name] !== undefined &&
+        !requiredFieldsStatus[e.target.name]
+      ) {
+        updateProgress(1, requiredFieldsStatus);
+        setRequiredFieldsStatus((prev) => ({ ...prev, [field]: true }));
+      }
+    },
+    [requiredFieldsStatus],
+  );
+
+  const handleSearchableTextInputChange = useCallback(
+    (e, value) => {
+      console.log(value);
+      const field = e.target.name;
+      let newData = values;
+      newData[e.target.name] = value.value;
       setValues(newData);
       if (
         requiredFieldsStatus[e.target.name] !== undefined &&
@@ -301,8 +319,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         placeholder='Eg: Hindu'
         required
         name='religion'
-        value={values.religion}
-        onChange={handleTextInputChange}
+        onChange={handleSearchableTextInputChange}
         options={top100Films}
       />
 
@@ -311,8 +328,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         placeholder='Eg: Hindi'
         required
         name='preferred_language'
-        value={values.preferred_language}
-        onChange={handleTextInputChange}
+        onChange={handleSearchableTextInputChange}
         options={top100Films}
       />
 
@@ -321,8 +337,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         placeholder='Eg: Graduate'
         required
         name='qualification'
-        value={values.qualification}
-        onChange={handleTextInputChange}
+        onChange={handleSearchableTextInputChange}
         options={top100Films}
       />
 
