@@ -6,6 +6,7 @@ import DropDown from '../../../../components/DropDown';
 import TextInput from '../../../../components/TextInput';
 import DatePicker from '../../../../components/DatePicker';
 import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
+import { top100Films } from '../../../../assets/SearchableInputTestJsonData.json';
 
 export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, setValues, errors, updateProgress } = useContext(AuthContext);
@@ -302,6 +303,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='religion'
         value={values.religion}
         onChange={handleTextInputChange}
+        options={top100Films}
       />
 
       <SearchableTextInput
@@ -311,6 +313,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='preferred_language'
         value={values.preferred_language}
         onChange={handleTextInputChange}
+        options={top100Films}
       />
 
       <SearchableTextInput
@@ -320,6 +323,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='qualification'
         value={values.qualification}
         onChange={handleTextInputChange}
+        options={top100Films}
       />
 
       <TextInput

@@ -32,7 +32,9 @@ export default function SelfEmployed() {
     },
   ];
 
-  const changeNoOfLoans = () => {};
+  const handleDropdownChange = () => {
+    console.log(e);
+  };
 
   return (
     <>
@@ -50,7 +52,7 @@ export default function SelfEmployed() {
         required
         options={salaridDropdownOptions[0].options}
         placeholder='Choose industries'
-        onChange={changeNoOfLoans}
+        onChange={handleDropdownChange}
         defaultSelected={values.industries}
       />
 
@@ -68,7 +70,7 @@ export default function SelfEmployed() {
         required
         options={salaridDropdownOptions[0].options}
         placeholder='Choose no. of current loan(s)'
-        onChange={changeNoOfLoans}
+        onChange={handleDropdownChange}
         defaultSelected={values.no_of_current_loans}
       />
 

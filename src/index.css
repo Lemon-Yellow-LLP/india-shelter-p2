@@ -275,6 +275,20 @@ body {
   padding: 0 !important;
 }
 
+.MuiAutocomplete-option {
+  border-bottom: 1px solid #d9d9d9;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.MuiAutocomplete-groupLabel {
+  color: red;
+}
+
+.MuiAutocomplete-popper {
+  margin-top: 20px !important;
+}
+
 @media (max-width: 1024px) {
   .indiaShelterLogo {
     max-width: 140px;

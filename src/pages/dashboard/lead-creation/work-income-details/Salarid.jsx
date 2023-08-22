@@ -3,6 +3,7 @@ import { AuthContext } from '../../../../context/AuthContext';
 import TextInput from '../../../../components/TextInput';
 import DropDown from '../../../../components/DropDown';
 import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
+import { top100Films } from '../../../../assets/SearchableInputTestJsonData.json';
 
 export default function Salarid() {
   const { values, setValues, errors } = useContext(AuthContext);
@@ -33,7 +34,7 @@ export default function Salarid() {
     },
   ];
 
-  const changeNoOfLoans = () => {};
+  const handleDropdownChange = () => {};
 
   return (
     <>
@@ -45,6 +46,7 @@ export default function Salarid() {
         value={values.company_name}
         onChange={handleTextInputChange}
         type='search'
+        options={top100Films}
       />
 
       <TextInput
@@ -69,7 +71,7 @@ export default function Salarid() {
         required
         options={salaridDropdownOptions[0].options}
         placeholder='Choose no. of current loan(s)'
-        onChange={changeNoOfLoans}
+        onChange={handleDropdownChange}
         defaultSelected={values.no_of_current_loans}
       />
 
@@ -88,7 +90,7 @@ export default function Salarid() {
         required
         options={salaridDropdownOptions[0].options}
         placeholder='Choose working since'
-        onChange={changeNoOfLoans}
+        onChange={handleDropdownChange}
         defaultSelected={values.working_since}
       />
 
@@ -97,7 +99,7 @@ export default function Salarid() {
         required
         options={salaridDropdownOptions[0].options}
         placeholder='Choose mode of salary'
-        onChange={changeNoOfLoans}
+        onChange={handleDropdownChange}
         defaultSelected={values.mode_of_salary}
       />
     </>
