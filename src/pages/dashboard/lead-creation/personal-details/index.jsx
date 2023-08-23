@@ -41,7 +41,7 @@ const PersonalDetails = memo(() => {
   );
 
   return (
-    <div className='flex flex-col gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] h-[100vh] pb-[62px]'>
+    <div className='flex flex-col gap-2 h-[95vh] bg-medium-grey overflow-auto max-[480px]:no-scrollbar p-[20px] h-[100vh] pb-[62px]'>
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
           How would you like to proceed <span className='text-primary-red text-xs'>*</span>
