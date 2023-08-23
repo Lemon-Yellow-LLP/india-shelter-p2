@@ -211,6 +211,82 @@ body {
   max-height: 50px !important;
 }
 
+.MuiTabs-indicator {
+  background-color: #147257 !important;
+}
+
+.tabLabels {
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  line-height: 18px !important;
+  font-family: 'Poppins', sans-serif !important;
+  text-transform: none !important;
+}
+
+.MuiDrawer-root > .MuiPaper-root {
+  border-radius: 8px;
+}
+
+.MuiLinearProgress-root {
+  background-color: #d9d9d9 !important;
+}
+
+.MuiLinearProgress-bar {
+  background-color: #373435 !important;
+}
+
+.tabPanel > .MuiBox-root {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 15px !important;
+}
+
+.MuiTimeline-root {
+  padding: 0px 5px !important;
+}
+
+.MuiTimelineItem-root {
+  min-height: 100px !important;
+}
+
+.MuiTimelineConnector-root {
+  color: #bdbdbd3b;
+}
+
+.react-datepicker-wrapper {
+  margin-bottom: 20px;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  outline: none !important;
+  border: none !important;
+}
+
+.MuiFormLabel-root,
+.MuiAutocomplete-endAdornment {
+  display: none !important;
+}
+
+.MuiInputBase-input,
+.MuiInputBase-root {
+  padding: 0 !important;
+}
+
+.MuiAutocomplete-option {
+  border-bottom: 1px solid #d9d9d9;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.MuiAutocomplete-groupLabel {
+  color: red;
+}
+
+.MuiAutocomplete-popper {
+  margin-top: 20px !important;
+}
+
 @media (max-width: 1024px) {
   .indiaShelterLogo {
     max-width: 140px;
