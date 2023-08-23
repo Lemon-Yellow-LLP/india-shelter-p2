@@ -24,11 +24,29 @@ export const defaultValues = {
   middle_name: '',
   last_name: '',
   profession: '',
+  reference_one_type: '',
+  reference_one_full_name: '',
+  reference_one_phone_number: '',
+  reference_one_address: '',
+  reference_one_pincode: '',
+  reference_one_city: '',
+  reference_one_state: '',
+  reference_one_email: '',
+  reference_two_type: '',
+  reference_two_full_name: '',
+  reference_two_phone_number: '',
+  reference_two_address: '',
+  reference_two_pincode: '',
+  reference_two_city: '',
+  reference_two_state: '',
+  reference_two_email: '',
 };
 
 export const AuthContext = createContext(defaultValues);
 
 const AuthContextProvider = ({ children }) => {
+  const [inputDisabled, setInputDisabled] = useState(false);
+
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -166,6 +184,8 @@ const AuthContextProvider = ({ children }) => {
         setDrawerOpen,
         isAuthenticated,
         setIsAuthenticated,
+        inputDisabled,
+        setInputDisabled,
       }}
     >
       {children}
