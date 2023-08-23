@@ -31,7 +31,7 @@ export const AuthContext = createContext(defaultValues);
 const AuthContextProvider = ({ children }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 

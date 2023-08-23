@@ -13,13 +13,13 @@ const DashboardRoutes = () => {
       {isAuthenticated ? (
         <Routes>
           <Route path='/' element={<Dashboard />} />
-          <Route path='/test' element={<FaceAuth />} />
           <Route path='/lead/*' element={<LeadCreationRoutes />} />
           <Route path='*' element={<h1>404, Page not found!</h1>} />
         </Routes>
       ) : (
         <Routes>
-          <Route path='/' element={<FaceAuth />} />
+          {/* <Route path='/' element={<FaceAuth />} /> */}
+          <Route path='/' element={<Dashboard />} />
           <Route path='/manual-login' element={<Login />} />
           <Route path='*' element={<FaceAuth />} />
         </Routes>
