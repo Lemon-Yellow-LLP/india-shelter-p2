@@ -15,6 +15,7 @@ const DropDown = memo(
     disabled,
     showIcon = true,
     showError = true,
+    inputClasses,
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
     const [selectedOption, setSelectedOption] = useState(() =>
@@ -50,7 +51,7 @@ const DropDown = memo(
     }, []);
 
     return (
-      <div ref={containerRef} className='dropdown relative'>
+      <div ref={containerRef} className={`dropdown relative ${inputClasses}`}>
         <h3 className='flex gap-0.5 text-primary-black'>
           {label}
           {required && <span className='text-primary-red text-sm'>*</span>}
@@ -64,34 +65,41 @@ const DropDown = memo(
           }}
           className={`${
             selectedOption ? 'border-dark-grey text-primary-black' : 'border-stroke text-light-grey'
-          } w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1`}
+          } w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white`}
         >
           {selectedOption ? selectedOption.label : placeholder || 'Click me'} <IconArrowDown />
         </button>
         {showDropDown && (
           <div
             style={{
-              maxHeight: optionsMaxHeight ?? 160,
+              maxHeight: optionsMaxHeight ?? 170,
             }}
             className='rounded-lg bg-white shadow-secondary p-2 mt-2 absolute top-100 w-full overflow-y-auto z-20 border border-stroke'
           >
-            {options.map((option, index) => (
-              <button
-                key={option.value}
-                onClick={() => handleSelect(option)}
-                className={`${
-                  option.value === selectedOption?.value
-                    ? 'text-primary-red'
-                    : 'text-primary-black hover:bg-grey-white'
-                } 
-              ${
-                index ? 'border-t border-stroke' : 'border-none'
-              } py-3 gap-2 px-4 flex justify-between w-full overflow-y-auto transition-colors duration-300 ease-out`}
-              >
-                {option.label}
-                {showIcon && selectedOption?.value === option.value ? <IconTick /> : <div></div>}
-              </button>
-            ))}
+            {options.map((option, index) => {
+           
+              let optionClasses =
+                `py-3 gap-2 px-4 flex justify-between w-full overflow-y-auto transition-colors duration-300 ease-out opacity-100
+                  ${index ? 'border-t border-stroke' : 'border-none'}
+                `;
+
+              if (option.value === selectedOption?.value)
+                optionClasses = `${optionClasses} text-primary-red`;
+              else if (option.disabled) {
+                optionClasses = `${optionClasses} pointer-events-none opacity-20`;
+              }
+
+              return (
+                <button
+                  key={option.value}
+                  onClick={() => handleSelect(option)}
+                  className={optionClasses}
+                >
+                  {option.label}
+                  {showIcon && selectedOption?.value === option.value ? <IconTick /> : <div></div>}
+                </button>
+              );
+            })}
           </div>
         )}
         {showError ? (
