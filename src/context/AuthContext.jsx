@@ -40,12 +40,32 @@ export const defaultValues = {
   reference_two_city: '',
   reference_two_state: '',
   reference_two_email: '',
+  residence: '',
+  current_address_flatNoBuidlingNo: '',
+  current_address_streetAreaLocality: '',
+  current_address_town: '',
+  current_address_landmark: '',
+  current_address_pincode: '',
+  current_address_city: '',
+  current_address_state: '',
+  current_address_residing_years: '',
+  permanent_address_flatNoBuidlingNo: '',
+  permanent_address_streetAreaLocality: '',
+  permanent_address_town: '',
+  permanent_address_landmark: '',
+  permanent_address_pincode: '',
+  permanent_address_city: '',
+  permanent_address_state: '',
+  permanent_address_residing_years: '',
+  loan_type: '',
 };
 
 export const AuthContext = createContext(defaultValues);
 
 const AuthContextProvider = ({ children }) => {
   const [inputDisabled, setInputDisabled] = useState(false);
+  const [phoneNumberVerified, setPhoneNumberVerified] = useState(null);
+  const [isLeadGenerated, setIsLeadGenearted] = useState(false);
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
@@ -186,6 +206,10 @@ const AuthContextProvider = ({ children }) => {
         setIsAuthenticated,
         inputDisabled,
         setInputDisabled,
+        phoneNumberVerified,
+        setPhoneNumberVerified,
+        isLeadGenerated,
+        setIsLeadGenearted,
       }}
     >
       {children}
