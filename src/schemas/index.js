@@ -76,14 +76,32 @@ export const signUpSchema = Yup.object({
     .required('Please enter your email')
     .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   address_proof_number: Yup.string().required('Enter a valid address proof number'),
-  first_name: Yup.string().required('First Name is required'),
-  middle_name: Yup.string().required('Middle Name is required'),
-  last_name: Yup.string().required('Last Name is required'),
+  first_name: Yup.string()
+    .min(2, 'Minimum two characters required')
+    .max(10, 'Maximum ten characters allowed')
+    .required('First Name is required')
+    .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
+  middle_name: Yup.string()
+    .min(2, 'Minimum two characters required')
+    .max(10, 'Maximum ten characters allowed')
+    .required('Middle Name is required')
+    .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
+  last_name: Yup.string()
+    .min(2, 'Minimum two characters required')
+    .max(10, 'Maximum ten characters allowed')
+    .required('Last Name is required')
+    .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
   father_or_husband_name: Yup.string().required('Father/Husband Name is required'),
   mother_name: Yup.string().required('Mother Name is required'),
   religion: Yup.string().required('Religion is required'),
   preferred_language: Yup.string().required('Preferred Language is required'),
   qualification: Yup.string().required('Qualification is required'),
+  date_of_birth: Yup.string().required('Date is required'),
+  mobile_number: Yup.string()
+    .matches(/^\d{10}$/, 'Enter a valid 10-digit mobile number')
+    .required('Mobile number is required'),
+  loan_purpose: Yup.string().required('Loan Purpose is required'),
+  property_type: Yup.string().required('Property Type is required'),
 }).shape({
   loan_request_amount: Yup.number()
     .required('Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000')

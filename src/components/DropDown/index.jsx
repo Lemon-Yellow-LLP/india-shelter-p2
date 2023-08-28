@@ -14,8 +14,9 @@ const DropDown = memo(
     optionsMaxHeight,
     disabled,
     showIcon = true,
-    showError = true,
+    error,
     inputClasses,
+    touched,
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
     const [selectedOption, setSelectedOption] = useState(() =>
@@ -51,7 +52,12 @@ const DropDown = memo(
     }, []);
 
     return (
-      <div ref={containerRef} className={`dropdown relative ${inputClasses}`}>
+      <div
+        ref={containerRef}
+        className={`dropdown relative ${inputClasses} ${
+          error && touched ? 'pb-[0px]' : 'pb-[20px]'
+        }`}
+      >
         <h3 className='flex gap-0.5 text-primary-black'>
           {label}
           {required && <span className='text-primary-red text-sm'>*</span>}
@@ -65,7 +71,12 @@ const DropDown = memo(
           }}
           className={`${
             selectedOption ? 'border-dark-grey text-primary-black' : 'border-stroke text-light-grey'
-          } w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white`}
+          } w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white 
+          ${
+            error && touched
+              ? 'border-red-600 shadow-primary shadow-primary-red'
+              : 'border-light-grey'
+          }`}
         >
           {selectedOption ? selectedOption.label : placeholder || 'Click me'} <IconArrowDown />
         </button>
@@ -78,15 +89,13 @@ const DropDown = memo(
           >
             {options.map((option, index) => {
               let optionClasses = `py-3 gap-2 px-4 flex justify-between w-full overflow-y-auto transition-colors duration-300 ease-out opacity-100
-                  ${index ? 'border-t border-stroke' : 'border-none'}
-                `;
+                  ${index ? 'border-t border-stroke' : 'border-none'} `;
 
               if (option.value === selectedOption?.value)
                 optionClasses = `${optionClasses} text-primary-red`;
               else if (option.disabled) {
                 optionClasses = `${optionClasses} pointer-events-none opacity-20`;
               }
-
               return (
                 <button
                   key={option.value}
@@ -100,8 +109,13 @@ const DropDown = memo(
             })}
           </div>
         )}
-        {showError ? (
-          <span className='text-sm text-primary-red mt-1'>{false || String.fromCharCode(160)}</span>
+        {error && touched ? (
+          <span
+            className='text-xs text-primary-red'
+            dangerouslySetInnerHTML={{
+              __html: error && touched ? error : String.fromCharCode(160),
+            }}
+          />
         ) : (
           ''
         )}

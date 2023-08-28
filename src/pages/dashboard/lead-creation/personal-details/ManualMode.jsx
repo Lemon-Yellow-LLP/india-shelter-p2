@@ -9,7 +9,7 @@ import SearchableTextInput from '../../../../components/TextInput/SearchableText
 import { top100Films } from '../../../../assets/SearchableInputTestJsonData.json';
 
 export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus }) {
-  const { values, setValues, errors, updateProgress, touched, handleBlur } =
+  const { values, setValues, errors, updateProgress, touched, handleBlur, handleSubmit } =
     useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
@@ -71,18 +71,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
   );
 
   const handleSearchableTextInputChange = useCallback(
-    (e, value) => {
-      console.log(value);
-      const field = e.target.name;
+    (name, value) => {
       let newData = values;
-      newData[e.target.name] = value.value;
-      setValues(newData);
-      if (
-        requiredFieldsStatus[e.target.name] !== undefined &&
-        !requiredFieldsStatus[e.target.name]
-      ) {
+      newData[name] = value.value;
+      setValues({ ...newData });
+      if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
         updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, [field]: true }));
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
     [requiredFieldsStatus],

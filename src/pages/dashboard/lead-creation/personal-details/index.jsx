@@ -5,8 +5,7 @@ import { AuthContext } from '../../../../context/AuthContext';
 import ManualMode from './ManualMode';
 
 const PersonalDetails = memo(() => {
-  const { values, setValues, updateProgress, errors, touched, handleBlur } =
-    useContext(AuthContext);
+  const { values, setValues, updateProgress } = useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     selected_personal_details_mode: false,
@@ -32,7 +31,7 @@ const PersonalDetails = memo(() => {
     (e) => {
       let newData = values;
       newData[e.name] = e.value;
-      setValues(newData);
+      setValues({ ...newData });
       if (!requiredFieldsStatus[e.name]) {
         updateProgress(1, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [e.name]: true }));
@@ -42,7 +41,7 @@ const PersonalDetails = memo(() => {
   );
 
   return (
-    <div className='flex flex-col gap-2 h-[95vh] bg-medium-grey overflow-auto max-[480px]:no-scrollbar p-[20px] h-[100vh] pb-[62px]'>
+    <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
           How would you like to proceed <span className='text-primary-red text-xs'>*</span>

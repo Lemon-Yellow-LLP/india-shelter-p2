@@ -58,6 +58,8 @@ export const defaultValues = {
   permanent_address_state: '',
   permanent_address_residing_years: '',
   loan_type: '',
+  loan_purpose: '',
+  property_type: '',
 };
 
 export const AuthContext = createContext(defaultValues);

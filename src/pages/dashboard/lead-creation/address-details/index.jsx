@@ -3,6 +3,7 @@ import { AuthContext } from '../../../../context/AuthContext';
 import IconRent from '../../../../assets/icons/rent';
 import { CardRadio, TextInput } from '../../../../components';
 import IconSelfOwned from '../../../../assets/icons/self-owned';
+import CardRadioWithoutIcon from '../../../../components/CardRadio/CardRadioWithoutIcon';
 
 const residenceData = [
   {
@@ -57,41 +58,15 @@ const AddressDetails = () => {
   const [permanentAddressResidingYears, setPermanentAddressResidingYears] = useState(null);
   // const [selectedResidingIndex, setSelectedResidingIndex] = useState(null);
 
-  const onResidenceChange = useCallback(
+  const onRadioChange = useCallback(
     (e) => {
-      const value = e;
-      setSelectedResidence(value);
-      setFieldValue('residence', value);
-      // updateLeadDataOnBlur(currentLeadId, 'gender', value);
+      let newData = values;
+      newData[e.name] = e.value;
+      setSelectedResidence(e.value);
+      setFieldValue({ ...newData });
     },
     [currentLeadId, setFieldValue],
   );
-
-  const currentAddressYearsResidingChange = useCallback(
-    (e) => {
-      const value = e;
-      setCurrentAddressResidingYears(value);
-      // setSelectedResidingIndex(value);
-      setFieldValue('current_address_residing_years', value);
-      // updateLeadDataOnBlur(currentLeadId, 'gender', value);
-    },
-    [currentLeadId, setFieldValue],
-  );
-
-  const permanentAddressYearsResidingChange = useCallback(
-    (e) => {
-      const value = e;
-      setPermanentAddressResidingYears(value);
-      // setSelectedResidingIndex(value);
-      setFieldValue('permanent_address_residing_years', value);
-      // updateLeadDataOnBlur(currentLeadId, 'gender', value);
-    },
-    [currentLeadId, setFieldValue],
-  );
-
-  // useEffect(()=>{
-
-  // },[selectedResidingYears])
 
   const handleTextInputChange = useCallback((e) => {
     const value = e.currentTarget.value;
@@ -114,7 +89,7 @@ const AddressDetails = () => {
   console.log(values);
 
   return (
-    <div className='bg-medium-grey p-4 flex flex-col gap-2'>
+    <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
           Type of residence <span className='text-primary-red text-xs'>*</span>
@@ -131,10 +106,10 @@ const AddressDetails = () => {
             <CardRadio
               key={index}
               label={residence.label}
-              name='gender'
+              name='selectedResidence'
               value={residence.value}
               current={selectedResidence}
-              onChange={onResidenceChange}
+              onChange={onRadioChange}
             >
               {residence.icon}
             </CardRadio>
@@ -303,10 +278,10 @@ const AddressDetails = () => {
           {yearsResidingData.map((data, index) => (
             <CardRadio
               key={index}
-              name='years'
+              name='currentAddressResidingYears'
               value={data.value}
-              current={currentAddressResidingYears}
-              onChange={currentAddressYearsResidingChange}
+              current={values.currentAddressResidingYears}
+              onChange={onRadioChange}
             >
               <span
                 className={`${
@@ -481,10 +456,10 @@ const AddressDetails = () => {
           {yearsResidingData.map((data, index) => (
             <CardRadio
               key={index}
-              name='years'
+              name='permanentAddressResidingYears'
               value={data.value}
               current={permanentAddressResidingYears}
-              onChange={permanentAddressYearsResidingChange}
+              onChange={onRadioChange}
             >
               <span
                 className={`${
