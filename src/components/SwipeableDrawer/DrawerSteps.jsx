@@ -1,17 +1,15 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import ProgressBar from './ProgressBar';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 
 export default function DrawerSteps({ details, steps, index }) {
-  const { setCurrentStepIndex, setDrawerOpen } = useContext(AuthContext);
+  const { setCurrentStepIndex, setDrawerOpen, drawerOpen } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleClick = () => {
     if (steps) {
-      setCurrentStepIndex(index);
-      setDrawerOpen(false);
-      navigate(details.url);
+      setDrawerOpen(false, setCurrentStepIndex(index), navigate(details.url));
     }
   };
 
