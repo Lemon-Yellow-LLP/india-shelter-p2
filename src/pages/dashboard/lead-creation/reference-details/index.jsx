@@ -178,7 +178,7 @@ const ReferenceDetails = () => {
   console.log(values);
 
   return (
-    <div className='bg-medium-grey p-4'>
+    <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] h-[100vh] pb-[62px]'>
       <h2 className='text-xs text-dark-grey'>It is mandatory to fill in two reference details.</h2>
       <div className='flex flex-col gap-2'>
         <label

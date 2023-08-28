@@ -124,7 +124,7 @@ const ApplicantDetails = () => {
     touched,
     phoneNumberVerified,
     setPhoneNumberVerified,
-    isLeadGenerated
+    isLeadGenerated,
   } = useContext(AuthContext);
 
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(phoneNumberVerified);
@@ -192,7 +192,7 @@ const ApplicantDetails = () => {
       return;
     }
     if (phoneNumber.length > 10) {
-      console.log("true");
+      console.log('true');
       return;
     }
     if (phoneNumber.charAt(0) === '0') {
@@ -269,14 +269,15 @@ const ApplicantDetails = () => {
   // phone_number, setFieldError, setInputDisabled,
 
   return (
-    <div className='bg-medium-grey p-4 flex flex-col gap-2'>
+    <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] h-[100vh] pb-[62px]'>
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
           Loan Type <span className='text-primary-red text-xs'>*</span>
         </label>
         <div
-          className={`flex gap-4 w-full ${inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
-            }`}
+          className={`flex gap-4 w-full ${
+            inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
+          }`}
         >
           {loanTypeOptions.map((data, index) => (
             <CardRadio
@@ -430,10 +431,11 @@ const ApplicantDetails = () => {
             />
           </div>
           <button
-            className={`min-w-[93px] self-end font-normal py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${disablePhoneNumber
+            className={`min-w-[93px] self-end font-normal py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
+              disablePhoneNumber
                 ? 'text-dark-grey bg-stroke mb-[22px] pointer-events-none'
                 : 'bg-primary-red text-white'
-              }`}
+            }`}
             disabled={
               !((isLeadGenerated && !phoneNumberVerified && !disablePhoneNumber) || leadExists)
             }
