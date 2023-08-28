@@ -141,7 +141,7 @@ const AddressDetails = () => {
           ))}
         </div>
       </div>
-      
+
       {/* Current Address */}
       <label
         htmlFor='loan-purpose'
@@ -319,7 +319,7 @@ const AddressDetails = () => {
           ))}
         </div>
       </div>
-      
+
       {/* Permanent Address */}
       <label
         htmlFor='loan-purpose'
