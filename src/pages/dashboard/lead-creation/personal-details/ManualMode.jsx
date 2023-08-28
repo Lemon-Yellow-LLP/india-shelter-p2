@@ -9,7 +9,8 @@ import SearchableTextInput from '../../../../components/TextInput/SearchableText
 import { top100Films } from '../../../../assets/SearchableInputTestJsonData.json';
 
 export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus }) {
-  const { values, setValues, errors, updateProgress } = useContext(AuthContext);
+  const { values, setValues, errors, updateProgress, touched, handleBlur } =
+    useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
@@ -197,6 +198,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         value={values.id_number}
         onChange={handleTextInputChange}
         inputClasses='capitalize'
+        error={errors.id_number}
+        touched={touched.id_number}
+        onBlur={handleBlur}
       />
       <DropDown
         label='Select address proof'
@@ -214,6 +218,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         value={values.address_proof_number}
         onChange={handleTextInputChange}
         inputClasses='capitalize'
+        error={errors.address_proof_number}
+        touched={touched.address_proof_number}
+        onBlur={handleBlur}
       />
       <TextInput
         label='First Name'
@@ -222,6 +229,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='first_name'
         value={values.first_name}
         onChange={handleTextInputChange}
+        error={errors.first_name}
+        touched={touched.first_name}
+        onBlur={handleBlur}
       />
       <TextInput
         label='Middle Name'
@@ -230,6 +240,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='middle_name'
         value={values.middle_name}
         onChange={handleTextInputChange}
+        error={errors.middle_name}
+        touched={touched.middle_name}
+        onBlur={handleBlur}
       />
       <TextInput
         label='Last Name'
@@ -238,6 +251,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='last_name'
         value={values.last_name}
         onChange={handleTextInputChange}
+        error={errors.last_name}
+        touched={touched.last_name}
+        onBlur={handleBlur}
       />
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
@@ -265,6 +281,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         required
         name='date_of_birth'
         label='Date of Birth'
+        error={errors.date_of_birth}
+        touched={touched.date_of_birth}
+        onBlur={handleBlur}
       />
 
       <TextInput
@@ -274,6 +293,10 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='mobile_number'
         value={values.mobile_number}
         onChange={handleTextInputChange}
+        error={errors.mobile_number}
+        touched={touched.mobile_number}
+        onBlur={handleBlur}
+        disabled={true}
       />
 
       <TextInput
@@ -283,6 +306,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='father_or_husband_name'
         value={values.father_or_husband_name}
         onChange={handleTextInputChange}
+        error={errors.father_or_husband_name}
+        touched={touched.father_or_husband_name}
+        onBlur={handleBlur}
       />
 
       <TextInput
@@ -292,6 +318,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='mother_name'
         value={values.mother_name}
         onChange={handleTextInputChange}
+        error={errors.mother_name}
+        touched={touched.mother_name}
+        onBlur={handleBlur}
       />
 
       <div className='flex flex-col gap-2'>
@@ -321,6 +350,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='religion'
         onChange={handleSearchableTextInputChange}
         options={top100Films}
+        error={errors.religion}
+        touched={touched.religion}
+        onBlur={handleBlur}
       />
 
       <SearchableTextInput
@@ -330,6 +362,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='preferred_language'
         onChange={handleSearchableTextInputChange}
         options={top100Films}
+        error={errors.preferred_language}
+        touched={touched.preferred_language}
+        onBlur={handleBlur}
       />
 
       <SearchableTextInput
@@ -339,6 +374,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='qualification'
         onChange={handleSearchableTextInputChange}
         options={top100Films}
+        error={errors.qualification}
+        touched={touched.qualification}
+        onBlur={handleBlur}
       />
 
       <TextInput
@@ -347,6 +385,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         name='email'
         value={values.email}
         onChange={handleTextInputChange}
+        error={errors.email}
+        touched={touched.email}
+        onBlur={handleBlur}
       />
 
       <span

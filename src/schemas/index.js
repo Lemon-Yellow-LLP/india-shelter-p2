@@ -70,6 +70,20 @@ export const signUpSchema = Yup.object({
     .email()
     .required('Please enter your email')
     .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
+  id_number: Yup.string().required('Enter a valid ID number'),
+  email: Yup.string()
+    .email()
+    .required('Please enter your email')
+    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
+  address_proof_number: Yup.string().required('Enter a valid address proof number'),
+  first_name: Yup.string().required('First Name is required'),
+  middle_name: Yup.string().required('Middle Name is required'),
+  last_name: Yup.string().required('Last Name is required'),
+  father_or_husband_name: Yup.string().required('Father/Husband Name is required'),
+  mother_name: Yup.string().required('Mother Name is required'),
+  religion: Yup.string().required('Religion is required'),
+  preferred_language: Yup.string().required('Preferred Language is required'),
+  qualification: Yup.string().required('Qualification is required'),
 }).shape({
   loan_request_amount: Yup.number()
     .required('Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000')

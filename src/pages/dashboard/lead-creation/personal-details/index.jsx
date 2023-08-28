@@ -5,7 +5,8 @@ import { AuthContext } from '../../../../context/AuthContext';
 import ManualMode from './ManualMode';
 
 const PersonalDetails = memo(() => {
-  const { values, setValues, updateProgress } = useContext(AuthContext);
+  const { values, setValues, updateProgress, errors, touched, handleBlur } =
+    useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     selected_personal_details_mode: false,
