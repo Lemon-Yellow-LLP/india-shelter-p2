@@ -5,6 +5,25 @@ import PropTypes from 'prop-types';
 import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
 export const defaultValues = {
+  referenceSchema: {
+    reference_1_type: '',
+    reference_1_full_name: '',
+    reference_1_phone_number: '',
+    reference_1_address: '',
+    reference_1_pincode: '',
+    reference_1_city: '',
+    reference_1_state: '',
+    reference_1_email: '',
+
+    reference_2_type: '',
+    reference_2_full_name: '',
+    reference_2_phone_number: '',
+    reference_2_address: '',
+    reference_2_pincode: '',
+    reference_2_city: '',
+    reference_2_state: '',
+    reference_2_email: '',
+  },
   selected_personal_details_mode: null,
   gender: null,
   marital_status: null,
@@ -24,22 +43,6 @@ export const defaultValues = {
   middle_name: '',
   last_name: '',
   profession: '',
-  reference_one_type: '',
-  reference_one_full_name: '',
-  reference_one_phone_number: '',
-  reference_one_address: '',
-  reference_one_pincode: '',
-  reference_one_city: '',
-  reference_one_state: '',
-  reference_one_email: '',
-  reference_two_type: '',
-  reference_two_full_name: '',
-  reference_two_phone_number: '',
-  reference_two_address: '',
-  reference_two_pincode: '',
-  reference_two_city: '',
-  reference_two_state: '',
-  reference_two_email: '',
   residence: '',
   current_address_flatNoBuidlingNo: '',
   current_address_streetAreaLocality: '',
@@ -66,13 +69,10 @@ const AuthContextProvider = ({ children }) => {
   const [inputDisabled, setInputDisabled] = useState(false);
   const [phoneNumberVerified, setPhoneNumberVerified] = useState(null);
   const [isLeadGenerated, setIsLeadGenearted] = useState(false);
-
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-
+  const [showError, setShowError] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
-
   const [drawerOpen, setDrawerOpen] = useState(false);
-
   const [stepsProgress, setStepProgress] = useState([
     {
       title: 'Applicant Details',
@@ -210,6 +210,8 @@ const AuthContextProvider = ({ children }) => {
         setPhoneNumberVerified,
         isLeadGenerated,
         setIsLeadGenearted,
+        showError,
+        setShowError,
       }}
     >
       {children}

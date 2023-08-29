@@ -1,7 +1,7 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'https://scotttiger.in/api';
 const API_LEAD_URL = `${API_URL}/lead`;
 
 const requestOptions = {};
@@ -10,6 +10,11 @@ axiosRetry(axios, { retries: 0 });
 
 async function pingAPI() {
   const res = await axios.get(`${API_URL}`, {}, requestOptions);
+  return res.data;
+}
+
+async function checkIsValidStatePincode(pincode) {
+  const res = await axios.get(`${API_URL}/state-pin/${pincode}`, {}, requestOptions);
   return res.data;
 }
 
@@ -43,4 +48,11 @@ function isEighteenOrAbove(date) {
   return false;
 }
 
-export { API_URL, pingAPI, updateLeadDataOnBlur, NaNorNull, isEighteenOrAbove };
+export {
+  API_URL,
+  pingAPI,
+  updateLeadDataOnBlur,
+  NaNorNull,
+  isEighteenOrAbove,
+  checkIsValidStatePincode,
+};
