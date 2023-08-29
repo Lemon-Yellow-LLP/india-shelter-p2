@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { IconArrowDown, IconTick } from '../../assets/icons';
 
@@ -14,8 +14,11 @@ const DropDown = memo(
     optionsMaxHeight,
     disabled,
     showIcon = true,
-    showError = true,
     inputClasses,
+    error,
+    touched,
+    onBlur,
+    ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
     const [selectedOption, setSelectedOption] = useState(() =>
@@ -50,6 +53,16 @@ const DropDown = memo(
       };
     }, []);
 
+    const getThemes = () => {
+      if (error && touched) {
+        return 'border-primary-red shadow-primary-red shadow-primary';
+      } else if (selectedOption) {
+        return 'border-dark-grey text-primary-black';
+      } else {
+        return 'border-stroke text-light-grey';
+      }
+    };
+
     return (
       <div ref={containerRef} className={`dropdown relative ${inputClasses}`}>
         <h3 className='flex gap-0.5 text-primary-black'>
@@ -63,9 +76,9 @@ const DropDown = memo(
           onClick={() => {
             setShowDropDown(!showDropDown);
           }}
-          className={`${
-            selectedOption ? 'border-dark-grey text-primary-black' : 'border-stroke text-light-grey'
-          } w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white`}
+          {...props}
+          onBlur={onBlur}
+          className={`${getThemes()} w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white disabled:bg-disabled-grey`}
         >
           {selectedOption ? selectedOption.label : placeholder || 'Click me'} <IconArrowDown />
         </button>
@@ -100,11 +113,9 @@ const DropDown = memo(
             })}
           </div>
         )}
-        {showError ? (
-          <span className='text-sm text-primary-red mt-1'>{false || String.fromCharCode(160)}</span>
-        ) : (
-          ''
-        )}
+        <span className='text-sm text-primary-red mt-1'>
+          {error && touched ? error : String.fromCharCode(160)}
+        </span>
       </div>
     );
   },
