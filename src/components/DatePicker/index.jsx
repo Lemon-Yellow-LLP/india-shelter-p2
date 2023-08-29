@@ -10,6 +10,7 @@ const DatePicker = ({ startDate, setStartDate, label, error, touched, onBlur, ..
   return (
     <ReactDatePicker
       {...props}
+      onBlur={onBlur}
       customInput={
         <DatePickerInput
           {...props}

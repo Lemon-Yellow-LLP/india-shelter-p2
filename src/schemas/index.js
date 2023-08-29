@@ -77,18 +77,18 @@ export const signUpSchema = Yup.object({
     .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   address_proof_number: Yup.string().required('Enter a valid address proof number'),
   first_name: Yup.string()
-    .min(2, 'Minimum two characters required')
-    .max(10, 'Maximum ten characters allowed')
+    .min(2, 'First Name must be atleast 2 characters long')
+    .max(10, 'First Name can be max 10 characters long')
     .required('First Name is required')
     .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
   middle_name: Yup.string()
-    .min(2, 'Minimum two characters required')
-    .max(10, 'Maximum ten characters allowed')
+    .min(2, 'Middle Name must be atleast 2 characters long')
+    .max(10, 'Middle Name can be max 10 characters long')
     .required('Middle Name is required')
     .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
   last_name: Yup.string()
-    .min(2, 'Minimum two characters required')
-    .max(10, 'Maximum ten characters allowed')
+    .min(2, 'Last Name must be atleast 2 characters long')
+    .max(10, 'Last Name can be max 10 characters long')
     .required('Last Name is required')
     .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
   father_or_husband_name: Yup.string().required('Father/Husband Name is required'),
@@ -102,7 +102,12 @@ export const signUpSchema = Yup.object({
     .required('Mobile number is required'),
   loan_purpose: Yup.string().required('Loan Purpose is required'),
   property_type: Yup.string().required('Property Type is required'),
-}).shape({
+  id_type: Yup.string().required('This field is mandatory.'),
+  address_proof: Yup.string().required('This field is mandatory.'),
+  selected_personal_details_mode: Yup.string().required('This field is mandatory.'),
+  gender: Yup.string().required('This field is mandatory.'),
+  marital_status: Yup.string().required('This field is mandatory.'),
+
   loan_request_amount: Yup.number()
     .required('Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000')
     .typeError('Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000')

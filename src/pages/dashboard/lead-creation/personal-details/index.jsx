@@ -5,7 +5,8 @@ import { AuthContext } from '../../../../context/AuthContext';
 import ManualMode from './ManualMode';
 
 const PersonalDetails = memo(() => {
-  const { values, setValues, updateProgress } = useContext(AuthContext);
+  const { values, setValues, updateProgress, errors, touched, handleSubmit } =
+    useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     selected_personal_details_mode: false,
@@ -63,6 +64,16 @@ const PersonalDetails = memo(() => {
             );
           })}
         </div>
+        {errors.selected_personal_details_mode && touched.selected_personal_details_mode ? (
+          <span
+            className='text-xs text-primary-red'
+            dangerouslySetInnerHTML={{
+              __html: errors.selected_personal_details_mode,
+            }}
+          />
+        ) : (
+          ''
+        )}
       </div>
       {values.selected_personal_details_mode === 'Manual' && (
         <ManualMode

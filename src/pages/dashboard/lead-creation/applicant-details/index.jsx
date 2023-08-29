@@ -3,7 +3,14 @@ import { useState, useCallback } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import { IconHomeLoan, IconLoanAgainstProperty } from '../../../../assets/icons';
 import DatePicker from '../../../../components/DatePicker';
-import { CardRadio, TextInput, DropDown, OtpInput } from '../../../../components';
+import {
+  CardRadio,
+  TextInput,
+  DropDown,
+  OtpInput,
+  CurrencyInput,
+  RangeSlider,
+} from '../../../../components';
 
 const loanTypeOptions = [
   {
@@ -120,6 +127,7 @@ const ApplicantDetails = () => {
     setPhoneNumberVerified,
     isLeadGenerated,
     setFieldValue,
+    handleSubmit,
   } = useContext(AuthContext);
 
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(phoneNumberVerified);
@@ -193,6 +201,12 @@ const ApplicantDetails = () => {
 
   const verifyLeadOTP = useCallback(async (otp) => {}, [setPhoneNumberVerified]);
 
+  const handleLoanAmountChange = useCallback((e) => {
+    let newData = values;
+    newData['applied_amount'] = e.currentTarget.value;
+    setValues(newData);
+  }, []);
+
   return (
     <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
       <div className='flex flex-col gap-2'>
@@ -219,6 +233,34 @@ const ApplicantDetails = () => {
           ))}
         </div>
       </div>
+
+      <CurrencyInput
+        label='Required loan amount'
+        placeholder='5,00,000'
+        required
+        name='applied_amount'
+        value={values.applied_amount}
+        onBlur={handleBlur}
+        onChange={handleLoanAmountChange}
+        displayError={false}
+        disabled={inputDisabled}
+        inputClasses='font-semibold'
+      />
+
+      <RangeSlider
+        minValueLabel='1 L'
+        maxValueLabel='50 L'
+        onChange={handleLoanAmountChange}
+        initialValue={values.applied_amount}
+        min={100000}
+        max={5000000}
+        disabled={inputDisabled}
+        step={50000}
+      />
+
+      {errors.applied_amount && touched.applied_amount ? (
+        <span className='text-xs text-primary-red'>{errors.applied_amount}</span>
+      ) : null}
 
       <TextInput
         label='First Name'
@@ -276,6 +318,7 @@ const ApplicantDetails = () => {
 
       <DropDown
         label='Purpose of loan'
+        name='loan_purpose'
         required
         options={loanPurposeOptions}
         placeholder='Choose reference type'
@@ -290,6 +333,7 @@ const ApplicantDetails = () => {
       {values?.loan_purpose ? (
         <DropDown
           label='Property Type'
+          name='property_type'
           required
           placeholder='Eg: Residential'
           options={loanFields[values.loan_purpose] || ['Home Purchase']}

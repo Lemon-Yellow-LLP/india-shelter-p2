@@ -16,11 +16,7 @@ const DatePickerInput = forwardRef(function DatePickerInput(
       </label>
       <div
         className={`input-container px-4 py-3 border justify-between border-stroke rounded-lg flex w-full items-center bg-white     
-        ${
-          error && touched
-            ? 'border-red-600 shadow-primary shadow-primary-red'
-            : 'border-light-grey'
-        }`}
+        ${error && touched ? 'border-[red] shadow-primary shadow-[#E33439]' : 'border-light-grey'}`}
       >
         <input
           {...props}

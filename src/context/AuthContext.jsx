@@ -60,6 +60,7 @@ export const defaultValues = {
   loan_type: '',
   loan_purpose: '',
   property_type: '',
+  applied_amount: '500000',
 };
 
 export const AuthContext = createContext(defaultValues);
