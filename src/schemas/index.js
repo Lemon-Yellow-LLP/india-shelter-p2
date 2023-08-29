@@ -10,6 +10,18 @@ function parseDateString(_, originalValue) {
 }
 
 export const signUpSchema = Yup.object({
+  propertySchema: Yup.object().shape({
+    property_identification_is: Yup.string().required('This field is mandatory'),
+    property_value_estimate: Yup.string().required('This field is mandatory'),
+    owner_name: Yup.string().required('This field is mandatory'),
+    plot_house_flat: Yup.string().required('This field is mandatory'),
+    project_society_colony: Yup.string().required('This field is mandatory'),
+    pincode: Yup.string().required('This field is mandatory'),
+    city: Yup.string().required('This field is mandatory'),
+    state: Yup.string().required('This field is mandatory'),
+    geo_lat: '',
+    geo_long: '',
+  }),
   referenceSchema: Yup.object().shape({
     reference_1_type: Yup.string().required('This field is mandatory'),
     reference_1_full_name: Yup.string()
