@@ -5,7 +5,7 @@ import { AuthContext } from '../../../../context/AuthContext';
 import ManualMode from './ManualMode';
 
 const PersonalDetails = memo(() => {
-  const { values, setValues, updateProgress, errors, touched, handleBlur } =
+  const { values, setValues, updateProgress, errors, touched, handleSubmit } =
     useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
@@ -32,7 +32,7 @@ const PersonalDetails = memo(() => {
     (e) => {
       let newData = values;
       newData[e.name] = e.value;
-      setValues(newData);
+      setValues({ ...newData });
       if (!requiredFieldsStatus[e.name]) {
         updateProgress(1, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [e.name]: true }));
@@ -42,7 +42,7 @@ const PersonalDetails = memo(() => {
   );
 
   return (
-    <div className='flex flex-col gap-2 h-[95vh] bg-medium-grey overflow-auto max-[480px]:no-scrollbar p-[20px] h-[100vh] pb-[62px]'>
+    <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
           How would you like to proceed <span className='text-primary-red text-xs'>*</span>
@@ -64,6 +64,16 @@ const PersonalDetails = memo(() => {
             );
           })}
         </div>
+        {errors.selected_personal_details_mode && touched.selected_personal_details_mode ? (
+          <span
+            className='text-xs text-primary-red'
+            dangerouslySetInnerHTML={{
+              __html: errors.selected_personal_details_mode,
+            }}
+          />
+        ) : (
+          ''
+        )}
       </div>
       {values.selected_personal_details_mode === 'Manual' && (
         <ManualMode

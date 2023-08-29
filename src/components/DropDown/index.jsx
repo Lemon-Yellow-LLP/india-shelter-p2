@@ -1,5 +1,6 @@
 /* eslint-disable react/display-name */
 import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { IconArrowDown, IconTick } from '../../assets/icons';
 
@@ -18,6 +19,7 @@ const DropDown = memo(
     error,
     touched,
     onBlur,
+    disableOption,
     ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -63,6 +65,16 @@ const DropDown = memo(
       }
     };
 
+    const getThemes = () => {
+      if (error && touched) {
+        return 'border-primary-red shadow-primary-red shadow-primary';
+      } else if (selectedOption) {
+        return 'border-dark-grey text-primary-black';
+      } else {
+        return 'border-stroke text-light-grey';
+      }
+    };
+
     return (
       <div ref={containerRef} className={`dropdown relative ${inputClasses}`}>
         <h3 className='flex gap-0.5 text-primary-black'>
@@ -76,6 +88,9 @@ const DropDown = memo(
           onClick={() => {
             setShowDropDown(!showDropDown);
           }}
+          {...props}
+          onBlur={onBlur}
+          className={`${getThemes()} w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white disabled:bg-disabled-grey`}
           {...props}
           onBlur={onBlur}
           className={`${getThemes()} w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white disabled:bg-disabled-grey`}
@@ -101,19 +116,25 @@ const DropDown = memo(
               }
 
               return (
-                <button
-                  key={option.value}
-                  onClick={() => handleSelect(option)}
-                  className={optionClasses}
-                >
-                  {option.label}
-                  {showIcon && selectedOption?.value === option.value ? <IconTick /> : <div></div>}
-                </button>
+                disableOption !== option.value && (
+                  <button
+                    key={option.value}
+                    onClick={() => handleSelect(option)}
+                    className={optionClasses}
+                  >
+                    {option.label}
+                    {showIcon && selectedOption?.value === option.value ? (
+                      <IconTick />
+                    ) : (
+                      <div></div>
+                    )}
+                  </button>
+                )
               );
             })}
           </div>
         )}
-        <span className='text-sm text-primary-red mt-1'>
+        <span className='text-xs text-primary-red mt-1'>
           {error && touched ? error : String.fromCharCode(160)}
         </span>
       </div>

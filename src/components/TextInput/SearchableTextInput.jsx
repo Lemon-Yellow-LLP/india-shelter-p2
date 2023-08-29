@@ -80,7 +80,7 @@ const SearchableTextInput = memo(
             disablePortal
             id={name}
             name={name}
-            onChange={(e, value) => onChange(e, value)}
+            onChange={(e, value) => onChange(name, value)}
             options={options}
             sx={{ width: 300, border: 'none' }}
             renderInput={(params) => <TextField {...params} label='Movie' placeholder='Eg: Idea' />}

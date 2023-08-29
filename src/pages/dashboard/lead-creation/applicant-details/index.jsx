@@ -3,7 +3,14 @@ import { useState, useCallback } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import { IconHomeLoan, IconLoanAgainstProperty } from '../../../../assets/icons';
 import DatePicker from '../../../../components/DatePicker';
-import { CardRadio, TextInput, DropDown, OtpInput } from '../../../../components';
+import {
+  CardRadio,
+  TextInput,
+  DropDown,
+  OtpInput,
+  CurrencyInput,
+  RangeSlider,
+} from '../../../../components';
 
 const loanTypeOptions = [
   {
@@ -73,7 +80,6 @@ const arr = [
 ];
 
 for (let i of arr) {
-  // console.log(i);
   for (let j in i) {
     console.log(j);
   }
@@ -98,25 +104,20 @@ const loanPurposeData = [
   },
 ];
 
-// const fieldsRequiredForLeadGeneration = ['first_name', 'phone_number', 'pincode'];
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
-// const disableNextFields = ['loan_request_amount', 'first_name', 'pincode', 'phone_number'];
 
 const ApplicantDetails = () => {
   const [leadExists, setLeadExists] = useState(false);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
-  const [selectedLoanType, setSelectedLoanType] = useState(null);
   const [loanFields, setLoanFields] = useState(loanOptions);
   const [loanPurposeOptions, setLoanPurposeOptions] = useState(loanPurposeData);
-  const [loanPurpose, setLoanPurpose] = useState(null);
   const [propertyType, setPropertyType] = useState(null);
   const [date, setDate] = useState();
 
   const {
     inputDisabled,
     currentLeadId,
-    setFieldValue,
-    setFieldError,
+    setValues,
     values,
     handleBlur,
     handleChange,
@@ -125,68 +126,53 @@ const ApplicantDetails = () => {
     phoneNumberVerified,
     setPhoneNumberVerified,
     isLeadGenerated,
+    setFieldValue,
+    handleSubmit,
   } = useContext(AuthContext);
 
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(phoneNumberVerified);
   const [showOTPInput, setShowOTPInput] = useState(isLeadGenerated);
-  // searchParams.has('li') && !isLeadGenerated
-
-  // useEffect(() => {
-  //   setLoanPurpose(values.purpose_of_loan);
-  // }, [values.purpose_of_loan]);
-
-  // useEffect(() => {
-  //   setPropertyType(values.property_type);
-  // }, [values.property_type]);
 
   const onLoanTypeChange = useCallback(
     (e) => {
-      const value = e;
-      setSelectedLoanType(value);
-      setFieldValue('loan_type', value);
-      // updateLeadDataOnBlur(currentLeadId, 'gender', value);
+      let newData = values;
+      newData[e.name] = e.value;
+      setValues({ ...newData });
     },
-    [currentLeadId, setFieldValue],
+    [currentLeadId, setValues],
   );
 
   const handleTextInputChange = useCallback((e) => {
     const value = e.currentTarget.value;
     const pattern = /^[A-Za-z]+$/;
     if (pattern.exec(value[value.length - 1])) {
-      setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+      let newData = values;
+      newData[e.currentTarget.name] = value.charAt(0).toUpperCase() + value.slice(1);
+      setValues({ ...newData });
     }
   }, []);
 
   const handleLoanPurposeChange = useCallback(
     (value) => {
-      setLoanPurpose(value);
-      // disableOneOption(value);
-      // setFieldValue('reference_two_type', value);
+      let newData = values;
+      newData.loan_purpose = value;
+      setValues({ ...newData });
     },
-    [currentLeadId, setFieldValue, loanPurpose],
+    [setValues],
   );
 
   const handlePropertyType = useCallback(
     (value) => {
-      // setPropertyType(value);
-      // setFieldValue('property_type', value);
-      // updateLeadDataOnBlur(currentLeadId, 'property_type', value);
+      let newData = values;
+      newData.property_type = value;
+      setValues({ ...newData });
     },
-    [currentLeadId, setFieldValue, propertyType],
+    [currentLeadId, setValues, values.property_type],
   );
-
-  // const handlePropertyTypeChange = useCallback(
-  //   (value) => {
-  //     setPropertyTypeOptions(value);
-  //     // disableOneOption(value);
-  //     // setFieldValue('reference_two_type', value);
-  //   },
-  //   [propertyTypeOptions],
-  // );
 
   const handleOnPhoneNumberChange = useCallback(async (e) => {
     const phoneNumber = e.currentTarget.value;
-    console.log(phoneNumber);
+
     if (phoneNumber < 0) {
       e.preventDefault();
       return;
@@ -199,77 +185,30 @@ const ApplicantDetails = () => {
       e.preventDefault();
       return;
     }
-    setFieldValue('phone_number', phoneNumber);
-    // if (phoneNumber?.length < 10) {
-    //   setLeadExists(false);
-    //   setShowOTPInput(false);
-    //   return;
-    // }
-    // const data = await getLeadByPhoneNumber(phoneNumber);
-    // if (data.length) {
-    //   setLeadExists(true);
-    //   setShowOTPInput(true);
-    // }
+    // let newData = values;
+    // newData.mobile_number = phoneNumber;
+    // setValues({ ...newData });
+    setFieldValue('mobile_number', phoneNumber);
   }, []);
 
-  const onOTPSendClick = useCallback(() => {
-    // setHasSentOTPOnce(true);
-    // setDisablePhoneNumber(true);
-    // setToastMessage('OTP has been sent to your mobile number');
-    // const continueJourney = searchParams.has('li') || leadExists;
-    // sendMobileOTP(phone_number, continueJourney).then((res) => {
-    //   if (res.status === 500) {
-    //     setFieldError('otp', res.data.message);
-    //     return;
-    //   }
-    //   if ('OTPCredential' in window) {
-    //     window.addEventListener('DOMContentLoaded', (_) => {
-    //       const ac = new AbortController();
-    //       navigator.credentials
-    //         .get({
-    //           otp: { transport: ['sms'] },
-    //           signal: ac.signal,
-    //         })
-    //         .then((otp) => {
-    //           console.log(otp.code);
-    //         })
-    //         .catch((err) => {
-    //           console.log(err);
-    //         });
-    //     });
-    //   } else {
-    //     console.error('WebOTP is not supported in this browser');
-    //   }
-    // });
-  }, [leadExists, disablePhoneNumber]);
+  const handleDateChange = useCallback((e) => {
+    let newData = values;
+    newData.date_of_birth = e;
+    setValues(newData);
+  }, []);
 
-  // phone_number, searchParams, setFieldError, setToastMessage,
+  const onOTPSendClick = useCallback(() => {}, [leadExists, disablePhoneNumber]);
 
-  const verifyLeadOTP = useCallback(
-    async (otp) => {
-      // try {
-      //   const res = await verifyMobileOtp(phone_number, { otp, sms_link: true });
-      //   if (res.status === 200) {
-      //     setPhoneNumberVerified(true);
-      //     setInputDisabled(false);
-      //     setFieldError('phone_number', undefined);
-      //     setShowOTPInput(false);
-      //     return true;
-      //   }
-      //   setPhoneNumberVerified(false);
-      //   return false;
-      // } catch {
-      //   setPhoneNumberVerified(false);
-      //   return false;
-      // }
-    },
-    [setPhoneNumberVerified],
-  );
+  const verifyLeadOTP = useCallback(async (otp) => {}, [setPhoneNumberVerified]);
 
-  // phone_number, setFieldError, setInputDisabled,
+  const handleLoanAmountChange = useCallback((e) => {
+    let newData = values;
+    newData['applied_amount'] = e.currentTarget.value;
+    setValues(newData);
+  }, []);
 
   return (
-    <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] h-[100vh] pb-[62px]'>
+    <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
           Loan Type <span className='text-primary-red text-xs'>*</span>
@@ -282,17 +221,46 @@ const ApplicantDetails = () => {
           {loanTypeOptions.map((data, index) => (
             <CardRadio
               key={index}
-              name='years'
+              name='loan_type'
               label={data.label}
               value={data.value}
-              current={selectedLoanType}
+              current={values.loan_type}
               onChange={onLoanTypeChange}
+              containerClasses='flex-1'
             >
               {data.icon}
             </CardRadio>
           ))}
         </div>
       </div>
+
+      <CurrencyInput
+        label='Required loan amount'
+        placeholder='5,00,000'
+        required
+        name='applied_amount'
+        value={values.applied_amount}
+        onBlur={handleBlur}
+        onChange={handleLoanAmountChange}
+        displayError={false}
+        disabled={inputDisabled}
+        inputClasses='font-semibold'
+      />
+
+      <RangeSlider
+        minValueLabel='1 L'
+        maxValueLabel='50 L'
+        onChange={handleLoanAmountChange}
+        initialValue={values.applied_amount}
+        min={100000}
+        max={5000000}
+        disabled={inputDisabled}
+        step={50000}
+      />
+
+      {errors.applied_amount && touched.applied_amount ? (
+        <span className='text-xs text-primary-red'>{errors.applied_amount}</span>
+      ) : null}
 
       <TextInput
         label='First Name'
@@ -315,6 +283,7 @@ const ApplicantDetails = () => {
             label='Middle Name'
             placeholder='Eg: Ramji, Sreenath'
             name='middle_name'
+            values={values.middle_name}
             disabled={inputDisabled}
             onBlur={handleBlur}
             onChange={handleTextInputChange}
@@ -326,6 +295,7 @@ const ApplicantDetails = () => {
             value={values.last_name}
             onBlur={handleBlur}
             label='Last Name'
+            values={values.last_name}
             placeholder='Eg: Swami, Singh'
             disabled={inputDisabled}
             name='last_name'
@@ -336,52 +306,57 @@ const ApplicantDetails = () => {
       </div>
 
       <DatePicker
-        startDate={date}
-        setStartDate={setDate}
+        startDate={values.date_of_birth}
+        setStartDate={handleDateChange}
         required
         name='date_of_birth'
         label='Date of Birth'
+        error={errors.date_of_birth}
+        touched={touched.date_of_birth}
+        onBlur={handleBlur}
       />
-      {/* <span className='text-xs text-primary-red'>
-        {errors.date_of_birth || touched.date_of_birth
-          ? errors.date_of_birth
-          : String.fromCharCode(160)}
-      </span> */}
 
       <DropDown
         label='Purpose of loan'
+        name='loan_purpose'
         required
         options={loanPurposeOptions}
         placeholder='Choose reference type'
         onChange={handleLoanPurposeChange}
-        defaultSelected={loanPurpose}
+        touched={touched.loan_purpose}
+        error={errors.loan_purpose}
+        onBlur={handleBlur}
+        defaultSelected={values.loan_purpose}
         inputClasses='mt-2'
       />
 
-      {loanPurpose ? (
+      {values?.loan_purpose ? (
         <DropDown
           label='Property Type'
+          name='property_type'
           required
           placeholder='Eg: Residential'
-          options={loanFields[loanPurpose] || ['Home Purchase']}
+          options={loanFields[values.loan_purpose] || ['Home Purchase']}
           onChange={handlePropertyType}
-          defaultSelected={propertyType}
-          disabled={!loanPurpose}
+          defaultSelected={values.property_type}
+          disabled={!values.loan_purpose}
+          touched={touched.property_type}
+          error={errors.property_type}
         />
       ) : null}
 
       <div>
-        <div className='flex justify-between gap-2'>
+        <div className='flex justify-between gap-2 items-center'>
           <div className='w-full'>
             <TextInput
               label='Mobile number'
               placeholder='Eg: 1234567890'
               required
-              name='phone_number'
+              name='mobile_number'
               type='tel'
-              value={values.phone_number}
-              error={errors.phone_number}
-              touched={touched.phone_number}
+              value={values.mobile_number}
+              error={errors.mobile_number}
+              touched={touched.mobile_number}
               onBlur={handleBlur}
               pattern='\d*'
               onFocus={(e) =>
@@ -406,7 +381,7 @@ const ApplicantDetails = () => {
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Backspace') {
-                  setFieldValue(
+                  setValues(
                     'phone_number',
                     values.phone_number.slice(0, values.phone_number.length - 1),
                   );
@@ -430,6 +405,7 @@ const ApplicantDetails = () => {
               displayError={disablePhoneNumber}
             />
           </div>
+
           <button
             className={`min-w-[93px] self-end font-normal py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
               disablePhoneNumber
@@ -446,8 +422,6 @@ const ApplicantDetails = () => {
         </div>
         {!disablePhoneNumber && <div className='h-4'></div>}
       </div>
-
-      {console.log(showOTPInput)}
 
       {showOTPInput && (
         <OtpInput

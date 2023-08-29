@@ -2,21 +2,29 @@ import { forwardRef, useRef } from 'react';
 import { IconCalendar } from '../../assets/icons';
 import PropTypes from 'prop-types';
 
-const DatePickerInput = forwardRef(function DatePickerInput({ name, ...props }, _ref) {
+const DatePickerInput = forwardRef(function DatePickerInput(
+  { name, error, touched, onBlur, ...props },
+  _ref,
+) {
   const inputRef = useRef(null);
+
   return (
-    <div className='flex flex-col gap-1'>
+    <div className={`flex flex-col gap-1 ${error && touched ? 'pb-[0px]' : 'pb-[12px]'}`}>
       <label htmlFor={name} className='flex gap-0.5 items-center text-primary-black w-fit'>
         {props.label}
         {true && <span className='text-primary-red text-sm'>*</span>}
       </label>
-      <div className='input-container px-4 py-3 border justify-between border-stroke rounded-lg flex w-full items-center bg-white'>
+      <div
+        className={`input-container px-4 py-3 border justify-between border-stroke rounded-lg flex w-full items-center bg-white     
+        ${error && touched ? 'border-[red] shadow-primary shadow-[#E33439]' : 'border-light-grey'}`}
+      >
         <input
           {...props}
           placeholder='DD/MM/YYYY'
           className='w-full'
           name={name}
           ref={inputRef}
+          onBlur={onBlur}
           onInput={(e) => {
             let value = e.currentTarget.value;
             if (value.length >= 2 && value.charAt(2) !== '/') {
@@ -62,6 +70,16 @@ const DatePickerInput = forwardRef(function DatePickerInput({ name, ...props }, 
           <IconCalendar />
         </button>
       </div>
+      {error && touched ? (
+        <span
+          className='text-xs text-primary-red'
+          dangerouslySetInnerHTML={{
+            __html: error && touched ? error : String.fromCharCode(160),
+          }}
+        />
+      ) : (
+        ''
+      )}
     </div>
   );
 });
@@ -72,6 +90,5 @@ DatePickerInput.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
   error: PropTypes.string,
-  touched: PropTypes.string,
   datepickerref: PropTypes.object,
 };

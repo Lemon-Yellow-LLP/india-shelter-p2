@@ -3,7 +3,6 @@ import { forwardRef, useState } from 'react';
 
 const Checkbox = forwardRef(function Checkbox({ name, ...props }, ref) {
   const [checked, setChecked] = useState(props.checked);
-
   return (
     <label htmlFor={name} className='relative block'>
       <svg
@@ -18,7 +17,11 @@ const Checkbox = forwardRef(function Checkbox({ name, ...props }, ref) {
           <path
             d='M4 0.75H12C13.7949 0.75 15.25 2.20507 15.25 4V12C15.25 13.7949 13.7949 15.25 12 15.25H4C2.20507 15.25 0.75 13.7949 0.75 12V4C0.75 2.20507 2.20507 0.75 4 0.75Z'
             className={`${
-              checked ? 'stroke-primary-red fill-primary-red' : 'stroke-black fill-transparent'
+              checked
+                ? 'stroke-primary-red fill-primary-red'
+                : !props.disabled
+                ? 'stroke-black fill-transparent'
+                : 'stroke-[#808080] fill-transparent'
             } transition-colors ease-out duration-300`}
             strokeWidth='1.5'
           />
