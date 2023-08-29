@@ -10,7 +10,7 @@ const DatePickerInput = forwardRef(function DatePickerInput({ name, ...props }, 
         {props.label}
         {true && <span className='text-primary-red text-sm'>*</span>}
       </label>
-      <div className='input-container px-4 py-3 border justify-between border-stroke rounded-lg flex w-full items-center'>
+      <div className='input-container px-4 py-3 border justify-between border-stroke rounded-lg flex w-full items-center bg-white'>
         <input
           {...props}
           placeholder='DD/MM/YYYY'

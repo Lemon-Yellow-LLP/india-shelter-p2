@@ -46,7 +46,7 @@ const TextInput = memo(
           tabIndex={-1}
           onClick={() => (ref ? ref.current.focus() : inputRef.current.focus())}
           onKeyDown={() => (ref ? ref.current?.focus() : inputRef.current.focus())}
-          className={`input-container px-4 py-3 border rounded-lg 
+          className={`input-container px-4 py-3 border rounded-lg
         flex gap-1
         transition-all ease-out duration-150
         focus-within:border-secondary-blue focus-within:shadow-secondary-blue focus-within:shadow-primary
@@ -56,7 +56,7 @@ const TextInput = memo(
             : 'border-light-grey'
         }
         ${!props.value && !error && !touched && 'border-stroke'}
-        ${props.disabled ? 'bg-[#fafafa] pointer-events-none cursor-not-allowed' : ''}
+        ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
         `}
         >
           {Icon && <Icon />}

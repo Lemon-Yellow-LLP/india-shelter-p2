@@ -10,18 +10,46 @@ function parseDateString(_, originalValue) {
 }
 
 export const signUpSchema = Yup.object({
-  first_name: Yup.string().min(2).max(10).required('Please enter your First name'),
-  middle_name: Yup.string().min(2).max(10),
-  last_name: Yup.string().min(2).max(10),
-  pincode: Yup.string()
-    .required('Please enter valid Pincode for your region')
-    .matches(/^(0|[1-9]\d*)$/, 'Must be only digits')
-    .min(6, 'Must be exactly 6 digits')
-    .max(6, 'Must be exactly 6 digits'),
-  phone_number: Yup.string()
-    .min(10, 'Must be exactly 10 digits')
-    .max(10, 'Must be exactly 10 digits')
-    .required('Please enter your valid 10 digit mobile number'),
+  referenceSchema: Yup.object().shape({
+    reference_1_type: Yup.string().required('This field is mandatory'),
+    reference_1_full_name: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Name must be atleast 2 characters long')
+      .max(90, 'Name can be max 90 characters long'),
+    reference_1_address: Yup.string()
+      .min(10, 'Address must be atleast 10 characters long')
+      .max(90, 'Address can be max 90 characters long')
+      .required('This field is mandatory'),
+    reference_1_phone_number: Yup.string()
+      .min(10, 'Enter a valid 10 digit mobile number')
+      .max(10, 'Enter a valid 10 digit mobile number')
+      .required('This field is mandatory'),
+    reference_1_pincode: Yup.string()
+      .required('This field is mandatory')
+      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
+      .min(6, 'Enter a valid Pincode')
+      .max(6, 'Enter a valid Pincode'),
+
+    reference_2_type: Yup.string().required('This field is mandatory'),
+    reference_2_full_name: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Name must be atleast 2 characters long')
+      .max(90, 'Name can be max 90 characters long'),
+    reference_2_address: Yup.string()
+      .min(10, 'Address must be atleast 10 characters long')
+      .max(90, 'Address can be max 90 characters long')
+      .required('This field is mandatory'),
+    reference_2_phone_number: Yup.string()
+      .min(10, 'Enter a valid 10 digit mobile number')
+      .max(10, 'Enter a valid 10 digit mobile number')
+      .required('This field is mandatory'),
+    reference_2_pincode: Yup.string()
+      .required('This field is mandatory')
+      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
+      .min(6, 'Enter a valid Pincode')
+      .max(6, 'Enter a valid Pincode'),
+  }),
+
   pan_number: Yup.string()
     .required('Please enter your valid PAN number')
     .min(10, 'Pan Number must be in the following format ex. ABCDE1234F')
@@ -32,8 +60,8 @@ export const signUpSchema = Yup.object({
   property_pincode: Yup.string()
     .required('Please enter your property pincode')
     .matches(/^[0-9]+$/, 'Must be only digits')
-    .min(6, 'Must be exactly 6 digits')
-    .max(6, 'Must be exactly 6 digits'),
+    .min(6, 'Enter a valid Pincode')
+    .max(6, 'Enter a valid Pincode'),
   banker_name: Yup.string().required(
     'Please enter a right Bank Name. Entered Bank name was not found',
   ),
@@ -46,10 +74,26 @@ export const signUpSchema = Yup.object({
   loan_amount: Yup.string().required('Please enter the loan amount.'),
   purpose_type: Yup.string().required('Property category not selected.'),
 
+  reference_1_email: Yup.string()
+    .email('Enter a valid Email')
+    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
+  reference_2_email: Yup.string()
+    .email('Enter a valid Email')
+    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
+  id_number: Yup.string().required('Enter a valid ID number'),
   email: Yup.string()
     .email()
     .required('Please enter your email')
     .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
+  address_proof_number: Yup.string().required('Enter a valid address proof number'),
+  first_name: Yup.string().required('First Name is required'),
+  middle_name: Yup.string().required('Middle Name is required'),
+  last_name: Yup.string().required('Last Name is required'),
+  father_or_husband_name: Yup.string().required('Father/Husband Name is required'),
+  mother_name: Yup.string().required('Mother Name is required'),
+  religion: Yup.string().required('Religion is required'),
+  preferred_language: Yup.string().required('Preferred Language is required'),
+  qualification: Yup.string().required('Qualification is required'),
 }).shape({
   loan_request_amount: Yup.number()
     .required('Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000')

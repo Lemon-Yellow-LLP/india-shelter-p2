@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import SwipeableDrawerComponent from '../../../components/SwipeableDrawer/SwipeableDrawerComponent';
 
 const AddressDetails = lazy(() => import('./address-details'));
 const ApplicantDetails = lazy(() => import('./applicant-details'));
@@ -13,7 +14,8 @@ const UploadDocuments = lazy(() => import('./upload-documents'));
 
 const LeadCreationRoutes = () => {
   return (
-    <div className='p-4'>
+    <>
+      <SwipeableDrawerComponent />
       <Routes>
         <Route index element={<ApplicantDetails />} />
         <Route path='applicant-details' element={<ApplicantDetails />} />
@@ -26,7 +28,7 @@ const LeadCreationRoutes = () => {
         <Route path='property-details' element={<PropertyDetails />} />
         <Route path='upload-documents' element={<UploadDocuments />} />
       </Routes>
-    </div>
+    </>
   );
 };
 
