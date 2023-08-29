@@ -1,6 +1,5 @@
 /* eslint-disable react/display-name */
 import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
-import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { IconArrowDown, IconTick } from '../../assets/icons';
 
@@ -65,16 +64,6 @@ const DropDown = memo(
       }
     };
 
-    const getThemes = () => {
-      if (error && touched) {
-        return 'border-primary-red shadow-primary-red shadow-primary';
-      } else if (selectedOption) {
-        return 'border-dark-grey text-primary-black';
-      } else {
-        return 'border-stroke text-light-grey';
-      }
-    };
-
     return (
       <div ref={containerRef} className={`dropdown relative ${inputClasses}`}>
         <h3 className='flex gap-0.5 text-primary-black'>
@@ -88,9 +77,6 @@ const DropDown = memo(
           onClick={() => {
             setShowDropDown(!showDropDown);
           }}
-          {...props}
-          onBlur={onBlur}
-          className={`${getThemes()} w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white disabled:bg-disabled-grey`}
           {...props}
           onBlur={onBlur}
           className={`${getThemes()} w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white disabled:bg-disabled-grey`}
