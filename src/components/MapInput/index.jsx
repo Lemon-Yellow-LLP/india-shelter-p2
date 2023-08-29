@@ -55,7 +55,7 @@ const MapInput = forwardRef(function TextInput(
             : 'border-light-grey'
         }
         ${!props.value && !error && !touched && 'border-stroke'}
-        ${props.disabled ? 'bg-[#fafafa] pointer-events-none cursor-not-allowed' : ''}
+        ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
         `}
       >
         <input
