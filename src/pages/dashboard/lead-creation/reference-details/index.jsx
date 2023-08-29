@@ -1,6 +1,7 @@
 import { useCallback, useContext, useState } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import { DropDown, TextInput } from '../../../../components';
+import { checkIsValidStatePincode } from '../../../../global';
 
 const referenceDropdownOneOptions = [
   {
@@ -72,9 +73,7 @@ const referenceDropdownTwoOptions = [
   },
 ];
 
-// const fieldsRequiredForLeadGeneration = ['first_name', 'phone_number', 'pincode'];
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
-// const disableNextFields = ['loan_request_amount', 'first_name', 'pincode', 'phone_number'];
 
 const ReferenceDetails = () => {
   const [selectedReferenceTypeOne, setSelectedReferenceTypeOne] = useState(null);
@@ -116,7 +115,7 @@ const ReferenceDetails = () => {
     (value) => {
       setSelectedReferenceTypeOne(value);
       disableTwoOption(value);
-      setFieldValue('reference_one_type', value);
+      setFieldValue('referenceSchema.reference_1_type', value);
     },
     [selectedReferenceTypeOne],
   );
@@ -125,14 +124,14 @@ const ReferenceDetails = () => {
     (value) => {
       setSelectedReferenceTypeTwo(value);
       disableOneOption(value);
-      setFieldValue('reference_two_type', value);
+      setFieldValue('referenceSchema.reference_2_type', value);
     },
     [selectedReferenceTypeOne],
   );
 
   const handleTextInputChange = useCallback((e) => {
     const value = e.currentTarget.value;
-    const pattern = /^[A-Za-z]+$/;
+    const pattern = /^[A-Za-z\/-\s]+$/;
     if (pattern.exec(value[value.length - 1])) {
       setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
     }
@@ -140,42 +139,52 @@ const ReferenceDetails = () => {
 
   const handleOnPincodeChangeOne = useCallback(async () => {
     if (
-      !values.reference_one_pincode ||
-      values.reference_one_pincode.toString().length < 5 ||
-      errors.reference_one_pincode
+      !values.referenceSchema.reference_1_pincode ||
+      values.referenceSchema.reference_1_pincode.toString().length < 5
+      // errors.referenceSchema.reference_1_pincode
     )
       return;
 
-    // const validStatePin = await checkIsValidStatePincode(values.reference_one_pincode);
-    // if (!validStatePin) {
-    //   setFieldError('reference_one_pincode', 'Invalid Pincode');
-    //   return;
-    // }
-  }, [errors.reference_one_pincode, values.reference_one_pincode, setFieldError, setFieldValue]);
+    const res = await checkIsValidStatePincode(values.referenceSchema.reference_1_pincode);
+    if (!res) {
+      setFieldError('referenceSchema.reference_1_pincode', 'Invalid Pincode');
+      return;
+    }
+
+    setFieldValue('referenceSchema.reference_1_city', res.city);
+    setFieldValue('referenceSchema.reference_1_state', res.state);
+  }, [
+    errors.referenceSchema?.reference_1_pincode,
+    values.referenceSchema?.reference_1_pincode,
+    setFieldError,
+    setFieldValue,
+  ]);
 
   const handleOnPincodeChangeTwo = useCallback(async () => {
     if (
-      !values.reference_two_pincode ||
-      values.reference_two_pincode.toString().length < 5 ||
-      errors.reference_two_pincode
+      !values.referenceSchema.reference_2_pincode ||
+      values.referenceSchema.reference_2_pincode.toString().length < 5
+      // errors.referenceSchema.reference_2_pincode
     )
       return;
 
-    // const validStatePin = await checkIsValidStatePincode(values.reference_two_pincode);
-    // if (!validStatePin) {
-    //   setFieldError('reference_two_pincode', 'Invalid Pincode');
-    //   return;
-    // }
-  }, [errors.reference_two_pincode, values.reference_two_pincode, setFieldError, setFieldValue]);
+    const res = await checkIsValidStatePincode(values.referenceSchema.reference_2_pincode);
+    if (!res) {
+      setFieldError('referenceSchema.reference_2_pincode', 'Invalid Pincode');
+      return;
+    }
 
-  // const handleOnEmailBlur = useCallback(
-  //   async (email) => {
-  //     await editLeadById(currentLeadId, { email });
-  //   },
-  //   [currentLeadId],
-  // );
+    setFieldValue('referenceSchema.reference_2_city', res.city);
+    setFieldValue('referenceSchema.reference_2_state', res.state);
+  }, [
+    errors.referenceSchema?.reference_2_pincode,
+    values.referenceSchema?.reference_2_pincode,
+    setFieldError,
+    setFieldValue,
+  ]);
 
-  console.log(values);
+  // console.log(values);
+  // console.log(errors);
 
   return (
     <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
@@ -196,19 +205,23 @@ const ReferenceDetails = () => {
           onChange={handleReferenceTypeChangeOne}
           defaultSelected={selectedReferenceTypeOne}
           inputClasses='mt-2'
+          name='referenceSchema.reference_1_type'
+          error={errors.referenceSchema?.reference_1_type}
+          touched={touched.referenceSchema?.reference_1_type}
+          onBlur={handleBlur}
         />
 
         <TextInput
           label='Full Name'
           placeholder='Eg: Pratik Akash Singh'
           required
-          name='reference_one_full_name'
-          value={values.reference_one_full_name}
-          error={errors.reference_one_full_name}
-          touched={touched.reference_one_full_name}
+          name='referenceSchema.reference_1_full_name'
+          value={values.referenceSchema.reference_1_full_name}
+          error={errors.referenceSchema?.reference_1_full_name}
+          touched={touched.referenceSchema?.reference_1_full_name}
           onBlur={handleBlur}
           disabled={inputDisabled}
-          onChange={handleChange}
+          onChange={handleTextInputChange}
           inputClasses='capitalize'
         />
 
@@ -216,11 +229,11 @@ const ReferenceDetails = () => {
           label='Mobile number'
           placeholder='Please enter 10 digit mobile no'
           required
-          name='reference_one_phone_number'
+          name='referenceSchema.reference_1_phone_number'
           type='tel'
-          value={values.reference_one_phone_number}
-          error={errors.reference_one_phone_number}
-          touched={touched.reference_one_phone_number}
+          value={values.referenceSchema.reference_1_phone_number}
+          error={errors.referenceSchema?.reference_1_phone_number}
+          touched={touched.referenceSchema?.reference_1_phone_number}
           onBlur={handleBlur}
           pattern='\d*'
           onFocus={(e) =>
@@ -279,13 +292,19 @@ const ReferenceDetails = () => {
           label='Address'
           placeholder='Eg: Near Sanjay hospital'
           required
-          name='reference_one_address'
-          value={values.reference_one_address}
-          error={errors.reference_one_address}
-          touched={touched.reference_one_address}
+          name='referenceSchema.reference_1_address'
+          value={values.referenceSchema.reference_1_address}
+          error={errors.referenceSchema?.reference_1_address}
+          touched={touched.referenceSchema?.reference_1_address}
           onBlur={handleBlur}
           disabled={inputDisabled}
-          onChange={handleChange}
+          onChange={(e) => {
+            const value = e.currentTarget.value;
+            const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+            if (address_pattern.exec(value[value.length - 1])) {
+              setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            }
+          }}
           inputClasses='capitalize'
           maxLength={90}
         />
@@ -294,12 +313,12 @@ const ReferenceDetails = () => {
           label='Pincode'
           placeholder='Eg: 123456'
           required
-          name='reference_one_pincode'
+          name='referenceSchema.reference_1_pincode'
           type='tel'
           hint='City and State fields will get filled based on Pincode'
-          value={values.reference_one_pincode}
-          error={errors.reference_one_pincode}
-          touched={touched.reference_one_pincode}
+          value={values.referenceSchema.reference_1_pincode}
+          error={errors.referenceSchema?.reference_1_pincode}
+          touched={touched.referenceSchema?.reference_1_pincode}
           disabled={inputDisabled}
           onBlur={(e) => {
             handleBlur(e);
@@ -352,10 +371,10 @@ const ReferenceDetails = () => {
         <TextInput
           label='City'
           placeholder='Eg: Nashik'
-          name='reference_one_city'
-          value={values.reference_one_city}
-          error={errors.reference_one_city}
-          touched={touched.reference_one_city}
+          name='referenceSchema.reference_1_city'
+          value={values.referenceSchema.reference_1_city}
+          error={errors.referenceSchema?.reference_1_city}
+          touched={touched.referenceSchema?.reference_1_city}
           onBlur={handleBlur}
           disabled={true}
           onChange={handleTextInputChange}
@@ -365,10 +384,10 @@ const ReferenceDetails = () => {
         <TextInput
           label='State'
           placeholder='Eg: Maharashtra'
-          name='reference_one_state'
-          value={values.reference_one_state}
-          error={errors.reference_one_state}
-          touched={touched.reference_one_state}
+          name='referenceSchema.reference_1_state'
+          value={values.referenceSchema.reference_1_state}
+          error={errors.referenceSchema?.reference_1_state}
+          touched={touched.referenceSchema?.reference_1_state}
           onBlur={handleBlur}
           disabled={true}
           onChange={handleTextInputChange}
@@ -379,22 +398,20 @@ const ReferenceDetails = () => {
           label='Email'
           type='email'
           placeholder='Eg: xyz@gmail.com'
-          name='reference_one_email'
+          name='referenceSchema.reference_1_email'
           autoComplete='off'
-          value={values.reference_one_email}
-          error={errors.reference_one_email}
-          touched={touched.reference_one_email}
+          value={values.referenceSchema.reference_1_email}
+          error={errors.referenceSchema?.reference_1_email}
+          touched={touched.referenceSchema?.reference_1_email}
           onBlur={(e) => {
             const target = e.currentTarget;
-            handleOnEmailBlur(target.value);
+            // handleOnEmailBlur(target.value);
             handleBlur(e);
-            checkEmailValid(e);
-            updateLeadDataOnBlur(currentLeadId, target.getAttribute('name'), target.value);
+            // editReferenceById(currentLeadId, {reference_1_email: target.value});
+            // updateLeadDataOnBlur(currentLeadId, target.getAttribute('name'), target.value);
           }}
           // disabled={disableEmailInput}
-          // onInput={checkEmailValid}
           onChange={(e) => {
-            // checkEmailValid(e);
             handleChange(e);
           }}
         />
@@ -416,19 +433,23 @@ const ReferenceDetails = () => {
           onChange={handleReferenceTypeChangeTwo}
           defaultSelected={selectedReferenceTypeTwo}
           inputClasses='mt-2'
+          name='referenceSchema.reference_2_type'
+          error={errors.referenceSchema?.reference_2_type}
+          touched={touched.referenceSchema?.reference_2_type}
+          onBlur={handleBlur}
         />
 
         <TextInput
           label='Full Name'
           placeholder='Eg: Pratik Akash Singh'
           required
-          name='reference_two_full_name'
-          value={values.reference_two_full_name}
-          error={errors.reference_two_full_name}
-          touched={touched.reference_two_full_name}
+          name='referenceSchema.reference_2_full_name'
+          value={values.referenceSchema.reference_2_full_name}
+          error={errors.referenceSchema?.reference_2_full_name}
+          touched={touched.referenceSchema?.reference_2_full_name}
           onBlur={handleBlur}
           disabled={inputDisabled}
-          onChange={handleChange}
+          onChange={handleTextInputChange}
           inputClasses='capitalize'
         />
 
@@ -436,11 +457,11 @@ const ReferenceDetails = () => {
           label='Mobile number'
           placeholder='Please enter 10 digit mobile no'
           required
-          name='reference_two_phone_number'
+          name='referenceSchema.reference_2_phone_number'
           type='tel'
-          value={values.reference_two_phone_number}
-          error={errors.reference_two_phone_number}
-          touched={touched.reference_two_phone_number}
+          value={values.referenceSchema.reference_2_phone_number}
+          error={errors.referenceSchema?.reference_2_phone_number}
+          touched={touched.referenceSchema?.reference_2_phone_number}
           onBlur={handleBlur}
           pattern='\d*'
           onFocus={(e) =>
@@ -470,7 +491,6 @@ const ReferenceDetails = () => {
               return;
             }
             handleChange(e);
-            // setFieldValue('reference_two_phone_number', phoneNumber);
           }}
           onPaste={(e) => {
             e.preventDefault();
@@ -500,13 +520,19 @@ const ReferenceDetails = () => {
           label='Address'
           placeholder='Eg: Near Sanjay hospital'
           required
-          name='reference_two_address'
-          value={values.reference_two_address}
-          error={errors.reference_two_address}
-          touched={touched.reference_two_address}
+          name='referenceSchema.reference_2_address'
+          value={values.referenceSchema.reference_2_address}
+          error={errors.referenceSchema?.reference_2_address}
+          touched={touched.referenceSchema?.reference_2_address}
           onBlur={handleBlur}
           disabled={inputDisabled}
-          onChange={handleChange}
+          onChange={(e) => {
+            const value = e.currentTarget.value;
+            const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+            if (address_pattern.exec(value[value.length - 1])) {
+              setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            }
+          }}
           inputClasses='capitalize'
           maxLength={90}
         />
@@ -515,12 +541,12 @@ const ReferenceDetails = () => {
           label='Pincode'
           placeholder='Eg: 123456'
           required
-          name='reference_two_pincode'
+          name='referenceSchema.reference_2_pincode'
           type='tel'
           hint='City and State fields will get filled based on Pincode'
-          value={values.reference_two_pincode}
-          error={errors.reference_two_pincode}
-          touched={touched.reference_two_pincode}
+          value={values.referenceSchema.reference_2_pincode}
+          error={errors.referenceSchema?.reference_2_pincode}
+          touched={touched.referenceSchema?.reference_2_pincode}
           disabled={inputDisabled}
           onBlur={(e) => {
             handleBlur(e);
@@ -573,10 +599,10 @@ const ReferenceDetails = () => {
         <TextInput
           label='City'
           placeholder='Eg: Nashik'
-          name='reference_two_city'
-          value={values.reference_two_city}
-          error={errors.reference_two_city}
-          touched={touched.reference_two_city}
+          name='referenceSchema.reference_2_city'
+          value={values.referenceSchema.reference_2_city}
+          error={errors.referenceSchema?.reference_2_city}
+          touched={touched.referenceSchema?.reference_2_city}
           onBlur={handleBlur}
           disabled={true}
           onChange={handleTextInputChange}
@@ -586,10 +612,10 @@ const ReferenceDetails = () => {
         <TextInput
           label='State'
           placeholder='Eg: Maharashtra'
-          name='reference_two_state'
-          value={values.reference_two_state}
-          error={errors.reference_two_state}
-          touched={touched.reference_two_state}
+          name='referenceSchema.reference_2_state'
+          value={values.referenceSchema.reference_2_state}
+          error={errors.referenceSchema?.reference_2_state}
+          touched={touched.referenceSchema?.reference_2_state}
           onBlur={handleBlur}
           disabled={true}
           onChange={handleTextInputChange}
@@ -600,25 +626,22 @@ const ReferenceDetails = () => {
           label='Email'
           type='email'
           placeholder='Eg: xyz@gmail.com'
-          name='reference_two_email'
+          name='referenceSchema.reference_2_email'
           autoComplete='off'
-          value={values.reference_two_email}
-          error={errors.reference_two_email}
-          touched={touched.reference_two_email}
+          value={values.referenceSchema.reference_2_email}
+          error={errors.referenceSchema?.reference_2_email}
+          touched={touched.referenceSchema?.reference_2_email}
           onBlur={(e) => {
             const target = e.currentTarget;
-            handleOnEmailBlur(target.value);
+            // handleOnEmailBlur(target.value);
             handleBlur(e);
-            checkEmailValid(e);
-            updateLeadDataOnBlur(currentLeadId, target.getAttribute('name'), target.value);
+            // updateLeadDataOnBlur(currentLeadId, target.getAttribute('name'), target.value);
           }}
           // disabled={disableEmailInput}
-          // onInput={checkEmailValid}
-          onChange={(e) => {
-            // checkEmailValid(e);
-            handleChange(e);
-          }}
+          onChange={handleChange}
         />
+
+        <span className='mt-1'></span>
       </div>
     </div>
   );
