@@ -74,16 +74,6 @@ export default function SwipeableDrawerComponent() {
     setDrawerOpen((prev) => !prev);
   };
 
-  //For testing progress bar
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     updateProgress(2, 20);
-  //   }, 800);
-  //   return () => {
-  //     clearInterval(timer);
-  //   };
-  // }, []);
-
   return (
     <Root>
       <SwipeableDrawer
