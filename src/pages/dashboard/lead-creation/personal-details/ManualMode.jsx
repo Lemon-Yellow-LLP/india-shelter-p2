@@ -282,6 +282,15 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
     }
   }, [checkbox]);
 
+  useEffect(() => {
+    if (checkbox) {
+      let newData = values;
+      newData.address_proof = values.id_type;
+      newData.address_proof_number = values.id_number;
+      setValues({ ...newData });
+    }
+  }, [values.id_type, values.id_number]);
+
   return (
     <>
       <DropDown
