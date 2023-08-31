@@ -254,9 +254,9 @@ body {
   color: #bdbdbd3b;
 }
 
-.react-datepicker-wrapper {
+/* .react-datepicker-wrapper {
   margin-bottom: 20px;
-}
+} */
 
 .MuiOutlinedInput-notchedOutline {
   outline: none !important;

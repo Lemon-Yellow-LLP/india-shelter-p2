@@ -4,13 +4,23 @@ import DatePickerHeader from './DatePickerHeader';
 import { useRef } from 'react';
 import DatePickerInput from './DatePickerInput';
 
-const DatePicker = ({ startDate, setStartDate, label, ...props }) => {
+const DatePicker = ({ startDate, setStartDate, label, error, touched, onBlur, ...props }) => {
   const datePickerRef = useRef(null);
 
   return (
     <ReactDatePicker
       {...props}
-      customInput={<DatePickerInput {...props} label={label} datepickerref={datePickerRef} />}
+      onBlur={onBlur}
+      customInput={
+        <DatePickerInput
+          {...props}
+          label={label}
+          datepickerref={datePickerRef}
+          error={error}
+          touched={touched}
+          onBlur={onBlur}
+        />
+      }
       ref={datePickerRef}
       className='bg-white z-50'
       // Close popper when date is selected

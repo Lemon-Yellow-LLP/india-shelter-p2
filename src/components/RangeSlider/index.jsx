@@ -11,7 +11,7 @@ const RangeSlider = memo(({ initialValue, onChange, minValueLabel, maxValueLabel
   }, [initialValue, props.max]);
 
   return (
-    <div className='flex flex-col gap-1'>
+    <div className='flex flex-col gap-1 mb-[15px]'>
       <input
         {...props}
         className='w-full'

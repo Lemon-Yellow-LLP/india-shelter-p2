@@ -18,6 +18,7 @@ const DropDown = memo(
     error,
     touched,
     onBlur,
+    disableOption,
     ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -101,19 +102,25 @@ const DropDown = memo(
               }
 
               return (
-                <button
-                  key={option.value}
-                  onClick={() => handleSelect(option)}
-                  className={optionClasses}
-                >
-                  {option.label}
-                  {showIcon && selectedOption?.value === option.value ? <IconTick /> : <div></div>}
-                </button>
+                disableOption !== option.value && (
+                  <button
+                    key={option.value}
+                    onClick={() => handleSelect(option)}
+                    className={optionClasses}
+                  >
+                    {option.label}
+                    {showIcon && selectedOption?.value === option.value ? (
+                      <IconTick />
+                    ) : (
+                      <div></div>
+                    )}
+                  </button>
+                )
               );
             })}
           </div>
         )}
-        <span className='text-sm text-primary-red mt-1'>
+        <span className='text-xs text-primary-red mt-1'>
           {error && touched ? error : String.fromCharCode(160)}
         </span>
       </div>

@@ -1,18 +1,21 @@
 import { personalDetailsGenderOption, personalMaritalStatusOptions } from '../utils';
 import CardRadio from '../../../../components/CardRadio';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import DropDown from '../../../../components/DropDown';
 import TextInput from '../../../../components/TextInput';
 import DatePicker from '../../../../components/DatePicker';
 import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
 import { top100Films } from '../../../../assets/SearchableInputTestJsonData.json';
+import Checkbox from '../../../../components/Checkbox';
 
 export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus }) {
-  const { values, setValues, errors, updateProgress, touched, handleBlur } =
+  const { values, setValues, errors, updateProgress, touched, handleBlur, handleSubmit } =
     useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
+
+  const [checkbox, setCheckbox] = useState(false);
 
   const handleRadioChange = useCallback(
     (e) => {
@@ -71,18 +74,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
   );
 
   const handleSearchableTextInputChange = useCallback(
-    (e, value) => {
-      console.log(value);
-      const field = e.target.name;
+    (name, value) => {
       let newData = values;
-      newData[e.target.name] = value.value;
-      setValues(newData);
-      if (
-        requiredFieldsStatus[e.target.name] !== undefined &&
-        !requiredFieldsStatus[e.target.name]
-      ) {
+      newData[name] = value;
+      setValues({ ...newData });
+      if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
         updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, [field]: true }));
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
     [requiredFieldsStatus],
@@ -121,6 +119,14 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
           label: 'Driving license',
           value: 'Driving license',
         },
+        {
+          label: 'Voter ID',
+          value: 'Voter ID',
+        },
+        {
+          label: 'Passport',
+          value: 'Passport',
+        },
       ],
     },
     {
@@ -130,17 +136,67 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
           label: 'Aadhar',
           value: 'Aadhar',
         },
-
         {
           label: 'Driving license',
           value: 'Driving license',
         },
         {
-          label: 'Voter Id',
-          value: 'Voter Id',
+          label: 'Voter ID',
+          value: 'Voter ID',
+        },
+        {
+          label: 'Passport',
+          value: 'Passport',
+        },
+        {
+          label: 'Gas bill',
+          value: 'Gas bill',
+        },
+        {
+          label: 'Rent agreement',
+          value: 'Rent agreement',
+        },
+        {
+          label: 'Electricity bill',
+          value: 'Electricity bill',
         },
       ],
     },
+    {
+      title: 'Religion',
+      options: [
+        {
+          label: 'Hindu',
+          value: 'Hindu',
+        },
+
+        {
+          label: 'Buddhist',
+          value: 'Buddhist',
+        },
+        {
+          label: 'Christian',
+          value: 'Christian',
+        },
+        {
+          label: 'Jain',
+          value: 'Jain',
+        },
+        {
+          label: 'Muslim',
+          value: 'Muslim',
+        },
+        {
+          label: 'Sikh',
+          value: 'Sikh',
+        },
+        {
+          label: 'Others',
+          value: 'Others',
+        },
+      ],
+    },
+
     {
       title: 'Language',
       options: [
@@ -156,6 +212,18 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         {
           label: 'Marathi',
           value: 'Marathi',
+        },
+        {
+          label: 'Gujarati',
+          value: 'Gujarati',
+        },
+        {
+          label: 'Kannada',
+          value: 'Kannada',
+        },
+        {
+          label: 'Tamil',
+          value: 'Tamil',
         },
       ],
     },
@@ -176,20 +244,68 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
           label: 'Matriculate',
           value: 'Matriculate',
         },
+        {
+          label: 'Non-Metric',
+          value: 'Non-Metric',
+        },
+        {
+          label: 'Post Graduate',
+          value: 'Post Graduate',
+        },
+        {
+          label: 'Professional',
+          value: 'Professional',
+        },
+        {
+          label: 'Student',
+          value: 'Student',
+        },
+        {
+          label: 'Under Graduate',
+          value: 'Under Graduate',
+        },
       ],
     },
   ];
+
+  useEffect(() => {
+    if (checkbox) {
+      let newData = values;
+      newData.address_proof = values.id_type;
+      newData.address_proof_number = values.id_number;
+      setValues({ ...newData });
+    } else {
+      let newData = values;
+      newData.address_proof = '';
+      newData.address_proof_number = '';
+      setValues({ ...newData });
+    }
+  }, [checkbox]);
+
+  useEffect(() => {
+    if (checkbox) {
+      let newData = values;
+      newData.address_proof = values.id_type;
+      newData.address_proof_number = values.id_number;
+      setValues({ ...newData });
+    }
+  }, [values.id_type, values.id_number]);
 
   return (
     <>
       <DropDown
         label='Select ID type'
+        name='id_type'
         required
         options={manualModeDropdownOptions[0].options}
         placeholder='Choose ID type'
         onChange={changeIdType}
         defaultSelected={values.id_type}
+        error={errors.id_type}
+        touched={touched.id_type}
+        onBlur={handleBlur}
       />
+
       <TextInput
         label='Enter ID number'
         placeholder='Eg: SABCD67120'
@@ -201,15 +317,52 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         error={errors.id_number}
         touched={touched.id_number}
         onBlur={handleBlur}
+        disabled={!values.id_type}
       />
+
+      <div className='flex items-center gap-2'>
+        {values.id_type !== 'PAN Card' ? (
+          <>
+            <Checkbox
+              checked={checkbox}
+              name='terms-agreed'
+              onChange={() => setCheckbox((prev) => !prev)}
+              disabled={!values.id_type}
+            />
+
+            <span className={`${values.id_type ? 'text-[black]' : 'text-[gray]'}`}>
+              Address proof will be as same as ID type
+            </span>
+          </>
+        ) : (
+          <>
+            <Checkbox
+              checked={checkbox}
+              name='terms-agreed'
+              onChange={() => setCheckbox((prev) => !prev)}
+              disabled={true}
+            />
+
+            <span className='text-[gray]'>Address proof will be as same as ID type</span>
+          </>
+        )}
+      </div>
+
       <DropDown
         label='Select address proof'
+        name='address_proof'
         required
         options={manualModeDropdownOptions[1].options}
         placeholder='Choose address proof'
         onChange={changeAddressProof}
         defaultSelected={values.address_proof}
+        error={errors.address_proof}
+        touched={touched.address_proof}
+        onBlur={handleBlur}
+        disabled={checkbox}
+        disableOption={values.id_type}
       />
+
       <TextInput
         label='Enter address proof number'
         placeholder='Eg: 32432432423'
@@ -221,7 +374,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         error={errors.address_proof_number}
         touched={touched.address_proof_number}
         onBlur={handleBlur}
+        disabled={!values.address_proof || checkbox}
       />
+
       <TextInput
         label='First Name'
         placeholder='Eg: Sanjay'
@@ -274,6 +429,17 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
           ))}
         </div>
       </div>
+
+      {errors.gender && touched.gender ? (
+        <span
+          className='text-xs text-primary-red'
+          dangerouslySetInnerHTML={{
+            __html: errors.gender,
+          }}
+        />
+      ) : (
+        ''
+      )}
 
       <DatePicker
         startDate={values.date_of_birth}
@@ -343,37 +509,51 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         </div>
       </div>
 
-      <SearchableTextInput
+      {errors.marital_status && touched.marital_status ? (
+        <span
+          className='text-xs text-primary-red'
+          dangerouslySetInnerHTML={{
+            __html: errors.marital_status,
+          }}
+        />
+      ) : (
+        ''
+      )}
+
+      <DropDown
         label='Religion'
-        placeholder='Eg: Hindu'
-        required
         name='religion'
-        onChange={handleSearchableTextInputChange}
-        options={top100Films}
+        required
+        options={manualModeDropdownOptions[2].options}
+        placeholder='Eg: Hindu'
+        onChange={(e) => handleSearchableTextInputChange('religion', e)}
+        defaultSelected={values.religion}
         error={errors.religion}
         touched={touched.religion}
         onBlur={handleBlur}
       />
 
-      <SearchableTextInput
+      <DropDown
         label='Preferred language'
-        placeholder='Eg: Hindi'
-        required
         name='preferred_language'
-        onChange={handleSearchableTextInputChange}
-        options={top100Films}
+        required
+        options={manualModeDropdownOptions[3].options}
+        placeholder='Eg: Hindi'
+        onChange={(e) => handleSearchableTextInputChange('preferred_language', e)}
+        defaultSelected={values.preferred_language}
         error={errors.preferred_language}
         touched={touched.preferred_language}
         onBlur={handleBlur}
       />
 
-      <SearchableTextInput
+      <DropDown
         label='Qualification'
-        placeholder='Eg: Graduate'
-        required
         name='qualification'
-        onChange={handleSearchableTextInputChange}
-        options={top100Films}
+        required
+        options={manualModeDropdownOptions[4].options}
+        placeholder='Eg: Graduate'
+        onChange={(e) => handleSearchableTextInputChange('qualification', e)}
+        defaultSelected={values.qualification}
         error={errors.qualification}
         touched={touched.qualification}
         onBlur={handleBlur}

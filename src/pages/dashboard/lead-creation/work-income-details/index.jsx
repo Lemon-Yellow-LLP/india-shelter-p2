@@ -23,7 +23,7 @@ const WorkIncomeDetails = () => {
   }, []);
 
   return (
-    <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] h-[100vh] pb-[62px]'>
+    <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
           Profession <span className='text-primary-red text-xs'>*</span>
