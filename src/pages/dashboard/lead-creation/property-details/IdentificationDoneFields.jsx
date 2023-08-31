@@ -6,14 +6,43 @@ import { checkIsValidStatePincode } from '../../../../global';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
-const IdentificationDoneFields = ({ selectedLoanType }) => {
-  const { values, errors, touched, handleBlur, handleChange, setFieldValue, setFieldError } =
-    useContext(AuthContext);
+const IdentificationDoneFields = ({
+  selectedLoanType,
+  requiredFieldsStatus,
+  setRequiredFieldsStatus,
+}) => {
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    handleChange,
+    setFieldValue,
+    setFieldError,
+    updateProgress,
+  } = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
 
   const onMapButtonClick = useCallback(() => {
     setShowMap((prev) => !prev);
   }, []);
+
+  const handleTextInputChange = useCallback(
+    (e) => {
+      const value = e.currentTarget.value;
+      const pattern = /^[A-Za-z\s]+$/;
+      if (pattern.exec(value[value.length - 1])) {
+        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+      }
+
+      const name = e.target.name.split('.')[1];
+      if (!requiredFieldsStatus[name]) {
+        updateProgress(4, requiredFieldsStatus);
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+      }
+    },
+    [requiredFieldsStatus],
+  );
 
   const handleOnPincodeChange = useCallback(async () => {
     if (
@@ -49,7 +78,15 @@ const IdentificationDoneFields = ({ selectedLoanType }) => {
           value={values.propertySchema.property_value_estimate}
           error={errors.propertySchema?.property_value_estimate}
           touched={touched.propertySchema?.property_value_estimate}
-          onChange={handleChange}
+          onChange={(e) => {
+            handleChange(e);
+
+            const name = e.target.name.split('.')[1];
+            if (!requiredFieldsStatus[name]) {
+              updateProgress(4, requiredFieldsStatus);
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
+          }}
           onBlur={handleBlur}
         />
       ) : null}
@@ -62,7 +99,7 @@ const IdentificationDoneFields = ({ selectedLoanType }) => {
         value={values.propertySchema.owner_name}
         error={errors.propertySchema?.owner_name}
         touched={touched.propertySchema?.owner_name}
-        onChange={handleChange}
+        onChange={handleTextInputChange}
         onBlur={handleBlur}
       />
 
@@ -74,7 +111,19 @@ const IdentificationDoneFields = ({ selectedLoanType }) => {
         value={values.propertySchema.plot_house_flat}
         error={errors.propertySchema?.plot_house_flat}
         touched={touched.propertySchema?.plot_house_flat}
-        onChange={handleChange}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+
+          const name = e.target.name.split('.')[1];
+          if (!requiredFieldsStatus[name]) {
+            updateProgress(4, requiredFieldsStatus);
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+          }
+        }}
         onBlur={handleBlur}
       />
 
@@ -91,6 +140,12 @@ const IdentificationDoneFields = ({ selectedLoanType }) => {
           const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+
+          const name = e.target.name.split('.')[1];
+          if (!requiredFieldsStatus[name]) {
+            updateProgress(4, requiredFieldsStatus);
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
           }
         }}
         inputClasses='capitalize'
@@ -126,6 +181,12 @@ const IdentificationDoneFields = ({ selectedLoanType }) => {
             return;
           }
           handleChange(e);
+
+          const name = e.target.name.split('.')[1];
+          if (!requiredFieldsStatus[name]) {
+            updateProgress(4, requiredFieldsStatus);
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+          }
         }}
         onKeyDown={(e) => {
           //capturing ctrl V and ctrl C
