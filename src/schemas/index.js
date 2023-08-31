@@ -10,6 +10,38 @@ function parseDateString(_, originalValue) {
 }
 
 export const signUpSchema = Yup.object({
+  propertySchema: Yup.object().shape({
+    property_identification_is: Yup.string()
+      .required('This field is mandatory')
+      .test({
+        name: 'min',
+        exclusive: false,
+        params: {},
+        message: 'Property estimation value should be greater than Loan Amount',
+        test: function (value) {
+          // You can access the price field with `this.parent`.
+          return parseInt(value) >= parseInt(this.parent.loan_request_amount);
+        },
+      }),
+    property_value_estimate: Yup.string().required('This field is mandatory'),
+    owner_name: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Name must be atleast 2 characters long')
+      .max(90, 'Name can be max 90 characters long'),
+    plot_house_flat: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Address must be atleast 10 characters long')
+      .max(90, 'Address can be max 90 characters long'),
+    project_society_colony: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Address must be atleast 10 characters long')
+      .max(90, 'Address can be max 90 characters long'),
+    pincode: Yup.string()
+      .required('This field is mandatory')
+      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
+      .min(6, 'Enter a valid Pincode')
+      .max(6, 'Enter a valid Pincode'),
+  }),
   referenceSchema: Yup.object().shape({
     reference_1_type: Yup.string().required('This field is mandatory'),
     reference_1_full_name: Yup.string()

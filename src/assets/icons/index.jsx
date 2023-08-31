@@ -11,6 +11,7 @@ import IconLoanAgainstProperty from './loan-against-property';
 import IconResidential from './residential';
 import IconCommercial from './commercial';
 import IconBack from './back';
+import IconArrowRight from './arrow-right';
 import IconEkyc from './eKyc.jsx';
 import IconOcr from './ocr.jsx';
 import IconManual from './manual.jsx';
@@ -36,6 +37,7 @@ export {
   IconResidential,
   IconCommercial,
   IconBack,
+  IconArrowRight,
   IconEkyc,
   IconOcr,
   IconManual,

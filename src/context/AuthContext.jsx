@@ -5,6 +5,18 @@ import PropTypes from 'prop-types';
 import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
 export const defaultValues = {
+  propertySchema: {
+    property_identification_is: '',
+    property_value_estimate: '',
+    owner_name: '',
+    plot_house_flat: '',
+    project_society_colony: '',
+    pincode: '',
+    city: '',
+    state: '',
+    geo_lat: '',
+    geo_long: '',
+  },
   referenceSchema: {
     reference_1_type: '',
     reference_1_full_name: '',
