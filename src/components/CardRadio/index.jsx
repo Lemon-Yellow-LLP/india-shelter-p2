@@ -12,7 +12,7 @@ const CardRadio = memo(({ label, current, children, value, onChange, name }) => 
         ${
           current === value
             ? 'bg-light-green border-secondary-green stroke-secondary-green fill-[#147257]'
-            : 'bg-white stroke-light-grey border-stroke stroke-[#96989A] hover:bg-grey-white fill-red'
+            : 'bg-white border-stroke stroke-light-grey hover:bg-grey-white fill-red'
         } transition-all duration-300 ease-out`}
         tabIndex={0}
         role='radio'
