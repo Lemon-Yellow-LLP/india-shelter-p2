@@ -1,8 +1,9 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { useState, useCallback } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import { IconHomeLoan, IconLoanAgainstProperty } from '../../../../assets/icons';
 import DatePicker from '../../../../components/DatePicker';
+import { isEighteenOrAbove } from '../../../../global/index';
 import {
   CardRadio,
   TextInput,
@@ -11,6 +12,7 @@ import {
   CurrencyInput,
   RangeSlider,
 } from '../../../../components';
+import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWithSendOtp';
 
 const loanTypeOptions = [
   {
@@ -104,15 +106,14 @@ const loanPurposeData = [
   },
 ];
 
-const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
-
 const ApplicantDetails = () => {
   const [leadExists, setLeadExists] = useState(false);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [loanFields, setLoanFields] = useState(loanOptions);
   const [loanPurposeOptions, setLoanPurposeOptions] = useState(loanPurposeData);
-  const [propertyType, setPropertyType] = useState(null);
   const [date, setDate] = useState();
+
+  const dateInputRef = useRef(null);
 
   const {
     inputDisabled,
@@ -127,6 +128,7 @@ const ApplicantDetails = () => {
     setPhoneNumberVerified,
     isLeadGenerated,
     setFieldValue,
+    setFieldError,
     handleSubmit,
   } = useContext(AuthContext);
 
@@ -135,9 +137,7 @@ const ApplicantDetails = () => {
 
   const onLoanTypeChange = useCallback(
     (e) => {
-      let newData = values;
-      newData[e.name] = e.value;
-      setValues({ ...newData });
+      setFieldValue(e.name, e.value.charAt(0).toUpperCase() + e.value.slice(1));
     },
     [currentLeadId, setValues],
   );
@@ -146,29 +146,17 @@ const ApplicantDetails = () => {
     const value = e.currentTarget.value;
     const pattern = /^[A-Za-z]+$/;
     if (pattern.exec(value[value.length - 1])) {
-      let newData = values;
-      newData[e.currentTarget.name] = value.charAt(0).toUpperCase() + value.slice(1);
-      setValues({ ...newData });
+      setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
     }
   }, []);
 
-  const handleLoanPurposeChange = useCallback(
-    (value) => {
-      let newData = values;
-      newData.loan_purpose = value;
-      setValues({ ...newData });
-    },
-    [setValues],
-  );
+  const handleLoanPurposeChange = useCallback((value) => {
+    setFieldValue('applicant_details.purpose_of_loan', value);
+  }, []);
 
-  const handlePropertyType = useCallback(
-    (value) => {
-      let newData = values;
-      newData.property_type = value;
-      setValues({ ...newData });
-    },
-    [currentLeadId, setValues, values.property_type],
-  );
+  const handlePropertyType = useCallback((value) => {
+    setFieldValue('applicant_details.property_type', value);
+  }, []);
 
   const handleOnPhoneNumberChange = useCallback(async (e) => {
     const phoneNumber = e.currentTarget.value;
@@ -178,23 +166,21 @@ const ApplicantDetails = () => {
       return;
     }
     if (phoneNumber.length > 10) {
-      console.log('true');
       return;
     }
-    if (phoneNumber.charAt(0) === '0') {
+    if (
+      phoneNumber.charAt(0) === '0' ||
+      phoneNumber.charAt(0) === '1' ||
+      phoneNumber.charAt(0) === '2' ||
+      phoneNumber.charAt(0) === '3' ||
+      phoneNumber.charAt(0) === '4' ||
+      phoneNumber.charAt(0) === '5'
+    ) {
       e.preventDefault();
       return;
     }
-    // let newData = values;
-    // newData.mobile_number = phoneNumber;
-    // setValues({ ...newData });
-    setFieldValue('mobile_number', phoneNumber);
-  }, []);
 
-  const handleDateChange = useCallback((e) => {
-    let newData = values;
-    newData.date_of_birth = e;
-    setValues(newData);
+    setFieldValue('applicant_details.mobile_number', phoneNumber);
   }, []);
 
   const onOTPSendClick = useCallback(() => {}, [leadExists, disablePhoneNumber]);
@@ -202,13 +188,43 @@ const ApplicantDetails = () => {
   const verifyLeadOTP = useCallback(async (otp) => {}, [setPhoneNumberVerified]);
 
   const handleLoanAmountChange = useCallback((e) => {
-    let newData = values;
-    newData['applied_amount'] = e.currentTarget.value;
-    setValues(newData);
+    setFieldValue('applicant_details.applied_amount', e.currentTarget.value);
   }, []);
 
+  useEffect(() => {
+    if (!date) return;
+    if (!isEighteenOrAbove(date)) {
+      setFieldError(
+        'applicant_details.date_of_birth',
+        'To apply for loan the minimum age must be 18 or 18+',
+      );
+      return;
+    }
+    setFieldValue('applicant_details.date_of_birth', date);
+
+    let returnDate = new Date(date.toString());
+    // Get the month (0-11, where 0 represents January)
+    let month = returnDate.getMonth() + 1;
+    month = month.toString().padStart(2, '0');
+    // Get the day of the month
+    const dayOfMonth = returnDate.getDate().toString().padStart(2, '0');
+    // Get the year from the Date object
+    const year = returnDate.getFullYear();
+    const finalDate = `${year}-${month}-${dayOfMonth}T00:00:00.000Z`;
+  }, [date, setFieldError, setFieldValue]);
+
+  const datePickerScrollToTop = () => {
+    if (dateInputRef.current) {
+      dateInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  console.log('values', values);
+  console.log(errors);
+  console.log(touched);
+
   return (
-    <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
+    <div className='flex flex-col bg-medium-grey gap-2 h-[92vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px]'>
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
           Loan Type <span className='text-primary-red text-xs'>*</span>
@@ -221,10 +237,10 @@ const ApplicantDetails = () => {
           {loanTypeOptions.map((data, index) => (
             <CardRadio
               key={index}
-              name='loan_type'
+              name='applicant_details.loan_type'
               label={data.label}
               value={data.value}
-              current={values.loan_type}
+              current={values.applicant_details?.loan_type}
               onChange={onLoanTypeChange}
               containerClasses='flex-1'
             >
@@ -238,8 +254,8 @@ const ApplicantDetails = () => {
         label='Required loan amount'
         placeholder='5,00,000'
         required
-        name='applied_amount'
-        value={values.applied_amount}
+        name='applicant_details.applied_amount'
+        value={values.applicant_details?.applied_amount}
         onBlur={handleBlur}
         onChange={handleLoanAmountChange}
         displayError={false}
@@ -251,25 +267,27 @@ const ApplicantDetails = () => {
         minValueLabel='1 L'
         maxValueLabel='50 L'
         onChange={handleLoanAmountChange}
-        initialValue={values.applied_amount}
+        initialValue={values.applicant_details?.applied_amount}
         min={100000}
         max={5000000}
         disabled={inputDisabled}
         step={50000}
       />
 
-      {errors.applied_amount && touched.applied_amount ? (
-        <span className='text-xs text-primary-red'>{errors.applied_amount}</span>
+      {errors?.applicant_details?.applied_amount && touched?.applicant_details?.applied_amount ? (
+        <span className='text-xs text-primary-red'>
+          {errors?.applicant_details?.applied_amount}
+        </span>
       ) : null}
 
       <TextInput
         label='First Name'
         placeholder='Eg: Suresh, Priya'
         required
-        name='first_name'
-        value={values.first_name}
-        error={errors.first_name}
-        touched={touched.first_name}
+        name='applicant_details.first_name'
+        value={values.applicant_details?.first_name}
+        error={errors?.applicant_details?.first_name}
+        touched={touched?.applicant_details?.first_name}
         onBlur={handleBlur}
         disabled={inputDisabled}
         onChange={handleTextInputChange}
@@ -279,11 +297,12 @@ const ApplicantDetails = () => {
       <div className='flex flex-col md:flex-row gap-2 md:gap-6'>
         <div className='w-full'>
           <TextInput
-            value={values.middle_name}
             label='Middle Name'
             placeholder='Eg: Ramji, Sreenath'
-            name='middle_name'
-            values={values.middle_name}
+            name='applicant_details.middle_name'
+            value={values.applicant_details?.middle_name}
+            error={errors?.applicant_details?.middle_name}
+            touched={touched?.applicant_details?.middle_name}
             disabled={inputDisabled}
             onBlur={handleBlur}
             onChange={handleTextInputChange}
@@ -292,13 +311,14 @@ const ApplicantDetails = () => {
         </div>
         <div className='w-full'>
           <TextInput
-            value={values.last_name}
             onBlur={handleBlur}
             label='Last Name'
-            values={values.last_name}
+            value={values.applicant_details?.last_name}
+            error={errors?.applicant_details?.last_name}
+            touched={touched?.applicant_details?.last_name}
             placeholder='Eg: Swami, Singh'
             disabled={inputDisabled}
-            name='last_name'
+            name='applicant_details.last_name'
             onChange={handleTextInputChange}
             inputClasses='capitalize'
           />
@@ -306,122 +326,91 @@ const ApplicantDetails = () => {
       </div>
 
       <DatePicker
-        startDate={values.date_of_birth}
-        setStartDate={handleDateChange}
+        startDate={date}
+        setStartDate={setDate}
         required
-        name='date_of_birth'
+        name='applicant_details.date_of_birth'
         label='Date of Birth'
-        error={errors.date_of_birth}
-        touched={touched.date_of_birth}
+        error={errors?.applicant_details?.date_of_birth}
+        touched={touched?.applicant_details?.date_of_birth}
         onBlur={handleBlur}
+        reference={dateInputRef}
+        datePickerScrollToTop={datePickerScrollToTop}
       />
 
       <DropDown
         label='Purpose of loan'
-        name='loan_purpose'
+        name='applicant_details.purpose_of_loan'
         required
         options={loanPurposeOptions}
-        placeholder='Choose reference type'
+        placeholder='Eg: Choose reference type'
         onChange={handleLoanPurposeChange}
-        touched={touched.loan_purpose}
-        error={errors.loan_purpose}
+        touched={touched?.applicant_details?.purpose_of_loan}
+        error={errors?.applicant_details?.purpose_of_loan}
         onBlur={handleBlur}
-        defaultSelected={values.loan_purpose}
+        defaultSelected={values.applicant_details?.purpose_of_loan}
         inputClasses='mt-2'
       />
 
-      {values?.loan_purpose ? (
-        <DropDown
-          label='Property Type'
-          name='property_type'
-          required
-          placeholder='Eg: Residential'
-          options={loanFields[values.loan_purpose] || ['Home Purchase']}
-          onChange={handlePropertyType}
-          defaultSelected={values.property_type}
-          disabled={!values.loan_purpose}
-          touched={touched.property_type}
-          error={errors.property_type}
-        />
-      ) : null}
+      <DropDown
+        label='Property Type'
+        name='applicant_details.property_type'
+        required
+        placeholder='Eg: Residential'
+        options={
+          loanFields[values.applicant_details?.purpose_of_loan] || [
+            {
+              label: 'Residential House',
+              value: 'Residential House',
+            },
+          ]
+        }
+        onChange={handlePropertyType}
+        defaultSelected={values.applicant_details?.property_type}
+        touched={touched?.applicant_details?.property_type}
+        error={errors?.applicant_details?.property_type}
+        onBlur={handleBlur}
+      />
 
-      <div>
-        <div className='flex justify-between gap-2 items-center'>
-          <div className='w-full'>
-            <TextInput
-              label='Mobile number'
-              placeholder='Eg: 1234567890'
-              required
-              name='mobile_number'
-              type='tel'
-              value={values.mobile_number}
-              error={errors.mobile_number}
-              touched={touched.mobile_number}
-              onBlur={handleBlur}
-              pattern='\d*'
-              onFocus={(e) =>
-                e.target.addEventListener(
-                  'wheel',
-                  function (e) {
-                    e.preventDefault();
-                  },
-                  { passive: false },
-                )
-              }
-              min='0'
-              onInput={(e) => {
-                if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
-              }}
-              onChange={handleOnPhoneNumberChange}
-              onPaste={(e) => {
-                e.preventDefault();
-                const text = (e.originalEvent || e).clipboardData.getData('text/plain').replace('');
-                e.target.value = text;
-                handleChange(e);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Backspace') {
-                  setValues(
-                    'phone_number',
-                    values.phone_number.slice(0, values.phone_number.length - 1),
-                  );
-                  e.preventDefault();
-                  return;
-                }
-                if (DISALLOW_CHAR.includes(e.key)) {
-                  e.preventDefault();
-                  return;
-                }
-              }}
-              disabled={inputDisabled || disablePhoneNumber}
-              inputClasses='hidearrow'
-              message={
-                phoneNumberVerified
-                  ? `OTP Verfied
+      <TextInputWithSendOtp
+        label='Mobile number'
+        placeholder='Eg: 1234567890'
+        required
+        name='applicant_details.mobile_number'
+        type='tel'
+        value={values.applicant_details?.mobile_number}
+        error={errors?.applicant_details?.mobile_number}
+        touched={touched?.applicant_details?.mobile_number}
+        onBlur={handleBlur}
+        onOTPSendClick={onOTPSendClick}
+        disabledOtpButton={
+          !((isLeadGenerated && !phoneNumberVerified && !disablePhoneNumber) || leadExists)
+        }
+        pattern='\d*'
+        onFocus={(e) =>
+          e.target.addEventListener(
+            'wheel',
+            function (e) {
+              e.preventDefault();
+            },
+            { passive: false },
+          )
+        }
+        min='0'
+        onInput={(e) => {
+          if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
+        }}
+        onChange={handleOnPhoneNumberChange}
+        disabled={inputDisabled || disablePhoneNumber}
+        inputClasses='hidearrow'
+        message={
+          phoneNumberVerified
+            ? `OTP Verfied
           <img src="${otpVerified}" alt='Otp Verified' role='presentation' />
           `
-                  : null
-              }
-              displayError={disablePhoneNumber}
-            />
-          </div>
-
-          <button
-            className={`min-w-[93px] self-end font-normal py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
-              disablePhoneNumber
-                ? 'text-dark-grey bg-stroke mb-[22px] pointer-events-none'
-                : 'bg-primary-red text-white'
-            }`}
-            disabled={
-              !((isLeadGenerated && !phoneNumberVerified && !disablePhoneNumber) || leadExists)
-            }
-            onClick={onOTPSendClick}
-          >
-            Send OTP
-          </button>
-        </div>
-        {!disablePhoneNumber && <div className='h-4'></div>}
-      </div>
+            : null
+        }
+      />
 
       {showOTPInput && (
         <OtpInput

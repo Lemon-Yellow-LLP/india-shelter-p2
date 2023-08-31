@@ -183,8 +183,9 @@ const ReferenceDetails = () => {
     setFieldValue,
   ]);
 
-  // console.log(values);
-  // console.log(errors);
+  console.log('values', values);
+  console.log(errors);
+  console.log(touched);
 
   return (
     <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>

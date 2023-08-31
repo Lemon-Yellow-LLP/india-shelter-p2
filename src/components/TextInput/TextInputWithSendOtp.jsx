@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
  * @param error - String
  * @param Icon React JSX Element
  */
-const TextInput = memo(
+const TextInputWithSendOtp = memo(
   forwardRef(function TextInput(
     {
       label,
@@ -21,6 +21,8 @@ const TextInput = memo(
       displayError = true,
       message,
       onChange,
+      onOTPSendClick,
+      disabledOtpButton,
       ...props
     },
     ref,
@@ -41,12 +43,13 @@ const TextInput = memo(
             }}
           />
         )}
-        <div
-          role='button'
-          tabIndex={-1}
-          onClick={() => (ref ? ref.current.focus() : inputRef.current.focus())}
-          onKeyDown={() => (ref ? ref.current?.focus() : inputRef.current.focus())}
-          className={`input-container px-4 py-3 border rounded-lg
+        <div className='flex gap-[10px]'>
+          <div
+            role='button'
+            tabIndex={-1}
+            onClick={() => (ref ? ref.current.focus() : inputRef.current.focus())}
+            onKeyDown={() => (ref ? ref.current?.focus() : inputRef.current.focus())}
+            className={`input-container px-4 py-3 border rounded-lg
         flex gap-1
         transition-all ease-out duration-150
         focus-within:border-secondary-blue focus-within:shadow-secondary-blue focus-within:shadow-primary
@@ -54,17 +57,31 @@ const TextInput = memo(
         ${error && touched && 'border-primary-red shadow-primary shadow-primary-red'}
         ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
         `}
-        >
-          {Icon && <Icon />}
-          <input
-            className={`w-full focus:outline-none ${inputClasses}`}
-            ref={ref || inputRef}
-            id={name}
-            name={name}
-            onChange={(e) => onChange(e)}
-            {...props}
-          />
+          >
+            {Icon && <Icon />}
+            <input
+              className={`w-full focus:outline-none ${inputClasses}`}
+              ref={ref || inputRef}
+              id={name}
+              name={name}
+              onChange={(e) => onChange(e)}
+              {...props}
+            />
+          </div>
+
+          <button
+            className={`min-w-[93px] self-end font-normal py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
+              disabledOtpButton
+                ? 'text-dark-grey bg-stroke pointer-events-none'
+                : 'bg-primary-red text-white'
+            }`}
+            disabled={disabledOtpButton}
+            onClick={onOTPSendClick}
+          >
+            Send OTP
+          </button>
         </div>
+
         {displayError && !message ? (
           <span
             className='text-xs text-primary-red'
@@ -90,9 +107,9 @@ const TextInput = memo(
   }),
 );
 
-export default TextInput;
+export default TextInputWithSendOtp;
 
-TextInput.propTypes = {
+TextInputWithSendOtp.propTypes = {
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   hint: PropTypes.string,

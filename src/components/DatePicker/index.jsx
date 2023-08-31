@@ -4,7 +4,17 @@ import DatePickerHeader from './DatePickerHeader';
 import { useRef } from 'react';
 import DatePickerInput from './DatePickerInput';
 
-const DatePicker = ({ startDate, setStartDate, label, error, touched, onBlur, ...props }) => {
+const DatePicker = ({
+  startDate,
+  setStartDate,
+  label,
+  error,
+  touched,
+  onBlur,
+  reference,
+  datePickerScrollToTop,
+  ...props
+}) => {
   const datePickerRef = useRef(null);
 
   return (
@@ -19,6 +29,8 @@ const DatePicker = ({ startDate, setStartDate, label, error, touched, onBlur, ..
           error={error}
           touched={touched}
           onBlur={onBlur}
+          reference={reference}
+          datePickerScrollToTop={datePickerScrollToTop}
         />
       }
       ref={datePickerRef}
@@ -56,6 +68,22 @@ const DatePicker = ({ startDate, setStartDate, label, error, touched, onBlur, ..
       onChange={(date) => setStartDate(date)}
       // maxDate={today}
       dateFormat='dd/MM/yyyy'
+      popperModifiers={[
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 0],
+          },
+        },
+        {
+          name: 'preventOverflow',
+          options: {
+            rootBoundary: 'viewport',
+            tether: true,
+            altAxis: true,
+          },
+        },
+      ]}
     ></ReactDatePicker>
   );
 };

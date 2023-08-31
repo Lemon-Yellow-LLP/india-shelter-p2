@@ -8,20 +8,31 @@ import DatePicker from '../../../../components/DatePicker';
 import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
 import { top100Films } from '../../../../assets/SearchableInputTestJsonData.json';
 import Checkbox from '../../../../components/Checkbox';
+import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWithSendOtp';
 
 export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus }) {
-  const { values, setValues, errors, updateProgress, touched, handleBlur, handleSubmit } =
-    useContext(AuthContext);
+  const {
+    values,
+    setValues,
+    errors,
+    updateProgress,
+    touched,
+    handleBlur,
+    handleSubmit,
+    setFieldValue,
+  } = useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
+  const [emailVerified, setEmailVerified] = useState(false);
+
   const [checkbox, setCheckbox] = useState(false);
+
+  const [showOTPInput, setShowOTPInput] = useState(false);
 
   const handleRadioChange = useCallback(
     (e) => {
-      let newData = values;
-      newData[e.name] = e.value;
-      setValues(newData);
+      setFieldValue(e.name, e.value);
       if (!requiredFieldsStatus[e.name]) {
         updateProgress(1, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [e.name]: true }));
@@ -32,9 +43,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
 
   const changeIdType = useCallback(
     (e) => {
-      let newData = values;
-      newData.id_type = e;
-      setValues(newData);
+      setFieldValue('personal_details.id_type', e);
       if (!requiredFieldsStatus.id_type) {
         updateProgress(1, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true }));
@@ -43,14 +52,12 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
     [requiredFieldsStatus],
   );
 
-  const changeAddressProof = useCallback(
+  const changeSelectedAddressProof = useCallback(
     (e) => {
-      let newData = values;
-      newData.address_proof = e;
-      setValues(newData);
-      if (!requiredFieldsStatus.address_proof) {
+      setFieldValue('personal_details.selected_address_proof', e);
+      if (!requiredFieldsStatus.selected_address_proof) {
         updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, address_proof: true }));
+        setRequiredFieldsStatus((prev) => ({ ...prev, selected_address_proof: true }));
       }
     },
     [requiredFieldsStatus],
@@ -58,16 +65,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
 
   const handleTextInputChange = useCallback(
     (e) => {
-      const field = e.target.name;
-      let newData = values;
-      newData[e.target.name] = e.target.value;
-      setValues({ ...newData });
+      setFieldValue(e.target.name, e.target.value);
       if (
         requiredFieldsStatus[e.target.name] !== undefined &&
         !requiredFieldsStatus[e.target.name]
       ) {
         updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, [field]: true }));
+        setRequiredFieldsStatus((prev) => ({ ...prev, [e.target.name]: true }));
       }
     },
     [requiredFieldsStatus],
@@ -75,9 +79,8 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
 
   const handleSearchableTextInputChange = useCallback(
     (name, value) => {
-      let newData = values;
-      newData[name] = value;
-      setValues({ ...newData });
+      setFieldValue(name, value);
+
       if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
         updateProgress(1, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
@@ -91,6 +94,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
       let newData = values;
       newData.date_of_birth = e;
       setValues(newData);
+
+      setFieldValue('personal_details.date_of_birth', e);
+
       if (!requiredFieldsStatus.date_of_birth) {
         updateProgress(1, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, date_of_birth: true }));
@@ -270,39 +276,35 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
 
   useEffect(() => {
     if (checkbox) {
-      let newData = values;
-      newData.address_proof = values.id_type;
-      newData.address_proof_number = values.id_number;
-      setValues({ ...newData });
+      setFieldValue('personal_details.selected_address_proof', values.personal_details?.id_type);
+      setFieldValue('personal_details.address_proof_number', values.personal_details?.id_number);
     } else {
-      let newData = values;
-      newData.address_proof = '';
-      newData.address_proof_number = '';
-      setValues({ ...newData });
+      setFieldValue('personal_details.selected_address_proof', '');
+      setFieldValue('personal_details.address_proof_number', '');
     }
   }, [checkbox]);
 
   useEffect(() => {
     if (checkbox) {
-      let newData = values;
-      newData.address_proof = values.id_type;
-      newData.address_proof_number = values.id_number;
-      setValues({ ...newData });
+      setFieldValue('personal_details.selected_address_proof', values.personal_details?.id_type);
+      setFieldValue('personal_details.address_proof_number', values.personal_details?.id_number);
     }
-  }, [values.id_type, values.id_number]);
+  }, [values.personal_details?.id_type, values.personal_details?.id_number]);
+
+  const onOTPSendClick = useCallback(() => {}, []);
 
   return (
     <>
       <DropDown
         label='Select ID type'
-        name='id_type'
+        name='personal_details.id_type'
         required
         options={manualModeDropdownOptions[0].options}
         placeholder='Choose ID type'
         onChange={changeIdType}
-        defaultSelected={values.id_type}
-        error={errors.id_type}
-        touched={touched.id_type}
+        defaultSelected={values.personal_details?.id_type}
+        error={errors.personal_details?.id_type}
+        touched={touched.personal_details?.id_type}
         onBlur={handleBlur}
       />
 
@@ -310,27 +312,29 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         label='Enter ID number'
         placeholder='Eg: SABCD67120'
         required
-        name='id_number'
-        value={values.id_number}
+        name='personal_details.id_number'
+        value={values.personal_details?.id_number}
         onChange={handleTextInputChange}
         inputClasses='capitalize'
-        error={errors.id_number}
-        touched={touched.id_number}
+        error={errors.personal_details?.id_number}
+        touched={touched.personal_details?.id_number}
         onBlur={handleBlur}
-        disabled={!values.id_type}
+        disabled={!values.personal_details?.id_type}
       />
 
       <div className='flex items-center gap-2'>
-        {values.id_type !== 'PAN Card' ? (
+        {values.personal_details?.id_type !== 'PAN Card' ? (
           <>
             <Checkbox
               checked={checkbox}
               name='terms-agreed'
               onChange={() => setCheckbox((prev) => !prev)}
-              disabled={!values.id_type}
+              disabled={!values.personal_details?.id_type}
             />
 
-            <span className={`${values.id_type ? 'text-[black]' : 'text-[gray]'}`}>
+            <span
+              className={`${values.personal_details?.id_type ? 'text-[black]' : 'text-[gray]'}`}
+            >
               Address proof will be as same as ID type
             </span>
           </>
@@ -350,64 +354,62 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
 
       <DropDown
         label='Select address proof'
-        name='address_proof'
+        name='personal_details.address_proof'
         required
         options={manualModeDropdownOptions[1].options}
         placeholder='Choose address proof'
-        onChange={changeAddressProof}
-        defaultSelected={values.address_proof}
-        error={errors.address_proof}
-        touched={touched.address_proof}
+        onChange={changeSelectedAddressProof}
+        defaultSelected={values.personal_details?.selected_address_proof}
+        error={errors.personal_details?.selected_address_proof}
+        touched={touched.personal_details?.selected_address_proof}
         onBlur={handleBlur}
         disabled={checkbox}
-        disableOption={values.id_type}
+        disableOption={values.personal_details?.id_type}
       />
 
       <TextInput
         label='Enter address proof number'
         placeholder='Eg: 32432432423'
         required
-        name='address_proof_number'
-        value={values.address_proof_number}
+        name='personal_details.address_proof_number'
+        value={values.personal_details?.address_proof_number}
         onChange={handleTextInputChange}
         inputClasses='capitalize'
-        error={errors.address_proof_number}
-        touched={touched.address_proof_number}
+        error={errors.personal_details?.address_proof_number}
+        touched={touched.personal_details?.address_proof_number}
         onBlur={handleBlur}
-        disabled={!values.address_proof || checkbox}
+        disabled={!values.personal_details?.selected_address_proof || checkbox}
       />
 
       <TextInput
         label='First Name'
         placeholder='Eg: Sanjay'
         required
-        name='first_name'
-        value={values.first_name}
+        name='personal_details.first_name'
+        value={values.personal_details?.first_name}
         onChange={handleTextInputChange}
-        error={errors.first_name}
-        touched={touched.first_name}
+        error={errors.personal_details?.first_name}
+        touched={touched.personal_details?.first_name}
         onBlur={handleBlur}
       />
       <TextInput
         label='Middle Name'
         placeholder='Eg: Sham'
-        required
-        name='middle_name'
-        value={values.middle_name}
+        name='personal_details.middle_name'
+        value={values.personal_details?.middle_name}
         onChange={handleTextInputChange}
-        error={errors.middle_name}
-        touched={touched.middle_name}
+        error={errors.personal_details?.middle_name}
+        touched={touched.personal_details?.middle_name}
         onBlur={handleBlur}
       />
       <TextInput
         label='Last Name'
         placeholder='Eg: Picha'
-        required
-        name='last_name'
-        value={values.last_name}
+        name='personal_details.last_name'
+        value={values.personal_details?.last_name}
         onChange={handleTextInputChange}
-        error={errors.last_name}
-        touched={touched.last_name}
+        error={errors.personal_details?.last_name}
+        touched={touched.personal_details?.last_name}
         onBlur={handleBlur}
       />
       <div className='flex flex-col gap-2'>
@@ -419,9 +421,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
             <CardRadio
               key={index}
               label={option.label}
-              name='gender'
+              name='personal_details.gender'
               value={option.value}
-              current={values.gender}
+              current={values.personal_details?.gender}
               onChange={handleRadioChange}
             >
               {option.icon}
@@ -430,11 +432,11 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         </div>
       </div>
 
-      {errors.gender && touched.gender ? (
+      {errors.personal_details?.gender && touched.personal_details?.gender ? (
         <span
           className='text-xs text-primary-red'
           dangerouslySetInnerHTML={{
-            __html: errors.gender,
+            __html: errors.personal_details?.gender,
           }}
         />
       ) : (
@@ -442,13 +444,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
       )}
 
       <DatePicker
-        startDate={values.date_of_birth}
+        startDate={values.personal_details?.date_of_birth}
         setStartDate={handleDateChange}
         required
-        name='date_of_birth'
+        name='personal_details.date_of_birth'
         label='Date of Birth'
-        error={errors.date_of_birth}
-        touched={touched.date_of_birth}
+        error={errors.personal_details?.date_of_birth}
+        touched={touched.personal_details?.date_of_birth}
         onBlur={handleBlur}
       />
 
@@ -456,11 +458,11 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         label='Mobile number'
         placeholder='1234567890'
         required
-        name='mobile_number'
-        value={values.mobile_number}
+        name='personal_details.mobile_number'
+        value={values.personal_details?.mobile_number}
         onChange={handleTextInputChange}
-        error={errors.mobile_number}
-        touched={touched.mobile_number}
+        error={errors.personal_details?.mobile_number}
+        touched={touched.personal_details?.mobile_number}
         onBlur={handleBlur}
         disabled={true}
       />
@@ -469,11 +471,11 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         label='Father/Husbands name'
         placeholder='Eg: Akash'
         required
-        name='father_or_husband_name'
-        value={values.father_or_husband_name}
+        name='personal_details.father_husband_name'
+        value={values.personal_details?.father_husband_name}
         onChange={handleTextInputChange}
-        error={errors.father_or_husband_name}
-        touched={touched.father_or_husband_name}
+        error={errors.personal_details?.father_husband_name}
+        touched={touched.personal_details?.father_husband_name}
         onBlur={handleBlur}
       />
 
@@ -481,11 +483,11 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         label='Mothers name'
         placeholder='Eg: Rupali'
         required
-        name='mother_name'
-        value={values.mother_name}
+        name='personal_details.mother_name'
+        value={values.personal_details?.mother_name}
         onChange={handleTextInputChange}
-        error={errors.mother_name}
-        touched={touched.mother_name}
+        error={errors.personal_details?.mother_name}
+        touched={touched.personal_details?.mother_name}
         onBlur={handleBlur}
       />
 
@@ -498,9 +500,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
             <CardRadio
               key={index}
               label={option.label}
-              name='marital_status'
+              name='personal_details.marital_status'
               value={option.value}
-              current={values.marital_status}
+              current={values.personal_details?.marital_status}
               onChange={handleRadioChange}
             >
               {option.icon}
@@ -509,11 +511,11 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         </div>
       </div>
 
-      {errors.marital_status && touched.marital_status ? (
+      {errors.personal_details?.marital_status && touched.personal_details?.marital_status ? (
         <span
           className='text-xs text-primary-red'
           dangerouslySetInnerHTML={{
-            __html: errors.marital_status,
+            __html: errors.personal_details?.marital_status,
           }}
         />
       ) : (
@@ -522,63 +524,77 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
 
       <DropDown
         label='Religion'
-        name='religion'
+        name='personal_details.religion'
         required
         options={manualModeDropdownOptions[2].options}
         placeholder='Eg: Hindu'
         onChange={(e) => handleSearchableTextInputChange('religion', e)}
-        defaultSelected={values.religion}
-        error={errors.religion}
-        touched={touched.religion}
+        defaultSelected={values.personal_details?.religion}
+        error={errors.personal_details?.religion}
+        touched={touched.personal_details?.religion}
         onBlur={handleBlur}
       />
 
       <DropDown
         label='Preferred language'
-        name='preferred_language'
+        name='personal_details.preferred_language'
         required
         options={manualModeDropdownOptions[3].options}
         placeholder='Eg: Hindi'
         onChange={(e) => handleSearchableTextInputChange('preferred_language', e)}
-        defaultSelected={values.preferred_language}
-        error={errors.preferred_language}
-        touched={touched.preferred_language}
+        defaultSelected={values.personal_details?.preferred_language}
+        error={errors.personal_details?.preferred_language}
+        touched={touched.personal_details?.preferred_language}
         onBlur={handleBlur}
       />
 
       <DropDown
         label='Qualification'
-        name='qualification'
+        name='personal_details.qualification'
         required
         options={manualModeDropdownOptions[4].options}
         placeholder='Eg: Graduate'
         onChange={(e) => handleSearchableTextInputChange('qualification', e)}
-        defaultSelected={values.qualification}
-        error={errors.qualification}
-        touched={touched.qualification}
+        defaultSelected={values.personal_details?.qualification}
+        error={errors.personal_details?.qualification}
+        touched={touched.personal_details?.qualification}
         onBlur={handleBlur}
       />
 
-      <TextInput
+      <TextInputWithSendOtp
         label='Email'
         placeholder='Eg: xyz@gmail.com'
-        name='email'
-        value={values.email}
+        name='personal_details.email'
+        value={values.personal_details?.email}
         onChange={handleTextInputChange}
-        error={errors.email}
-        touched={touched.email}
+        error={errors.personal_details?.email}
+        touched={touched.personal_details?.email}
         onBlur={handleBlur}
+        onOTPSendClick={sendEmailOTP}
+        disabledOtpButton={!!errors.personal_details?.email || emailVerified}
+        disabled={disableEmailInput}
+        message={
+          emailVerified
+            ? `OTP Verfied
+          <img src="${otpVerified}" alt='Otp Verified' role='presentation' />
+          `
+            : null
+        }
       />
 
-      <span
-        className={`text-right text-[16px] font-semibold ${
-          disableEmailInput ? 'text-[#96989A]' : 'text-[#E33439]'
-        }`}
-        disabled={!!errors.email}
-        onClick={sendEmailOTP}
-      >
-        Send OTP
-      </span>
+      {showOTPInput && (
+        <OtpInput
+          label='Enter OTP'
+          required
+          verified={emailVerified}
+          setOTPVerified={setPhoneNumberVerified}
+          onSendOTPClick={onOTPSendClick}
+          defaultResendTime={30}
+          disableSendOTP={(isLeadGenerated && !emailVerified) || leadExists}
+          verifyOTPCB={verifyLeadOTP}
+          hasSentOTPOnce={hasSentOTPOnce}
+        />
+      )}
     </>
   );
 }

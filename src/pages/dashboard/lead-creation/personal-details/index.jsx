@@ -5,7 +5,7 @@ import { AuthContext } from '../../../../context/AuthContext';
 import ManualMode from './ManualMode';
 
 const PersonalDetails = memo(() => {
-  const { values, setValues, updateProgress, errors, touched, handleSubmit } =
+  const { values, setValues, updateProgress, errors, touched, handleSubmit, setFieldValue } =
     useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
@@ -30,9 +30,7 @@ const PersonalDetails = memo(() => {
 
   const handleRadioChange = useCallback(
     (e) => {
-      let newData = values;
-      newData[e.name] = e.value;
-      setValues({ ...newData });
+      setFieldValue(e.name, e.value);
       if (!requiredFieldsStatus[e.name]) {
         updateProgress(1, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [e.name]: true }));
@@ -42,7 +40,7 @@ const PersonalDetails = memo(() => {
   );
 
   return (
-    <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
+    <div className='flex flex-col bg-medium-grey gap-2 h-[92vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px]'>
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
           How would you like to proceed <span className='text-primary-red text-xs'>*</span>
@@ -53,9 +51,9 @@ const PersonalDetails = memo(() => {
               <CardRadio
                 key={option.value}
                 label={option.label}
-                name='selected_personal_details_mode'
+                name='personal_details.how_would_you_like_to_proceed'
                 value={option.value}
-                current={values.selected_personal_details_mode}
+                current={values.personal_details?.how_would_you_like_to_proceed}
                 onChange={handleRadioChange}
                 containerClasses='flex-1'
               >
@@ -64,18 +62,19 @@ const PersonalDetails = memo(() => {
             );
           })}
         </div>
-        {errors.selected_personal_details_mode && touched.selected_personal_details_mode ? (
+        {errors.personal_details?.how_would_you_like_to_proceed &&
+        touched.personal_details?.how_would_you_like_to_proceed ? (
           <span
             className='text-xs text-primary-red'
             dangerouslySetInnerHTML={{
-              __html: errors.selected_personal_details_mode,
+              __html: errors.personal_details?.how_would_you_like_to_proceed,
             }}
           />
         ) : (
           ''
         )}
       </div>
-      {values.selected_personal_details_mode === 'Manual' && (
+      {values.personal_details?.how_would_you_like_to_proceed === 'Manual' && (
         <ManualMode
           requiredFieldsStatus={requiredFieldsStatus}
           setRequiredFieldsStatus={setRequiredFieldsStatus}
