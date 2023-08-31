@@ -50,12 +50,8 @@ const TextInput = memo(
         flex gap-1
         transition-all ease-out duration-150
         focus-within:border-secondary-blue focus-within:shadow-secondary-blue focus-within:shadow-primary
-        ${
-          error && touched
-            ? 'border-primary-red shadow-primary shadow-primary-red'
-            : 'border-light-grey'
-        }
-        ${!props.value && !error && !touched && 'border-stroke'}
+        ${!props.value && !touched ? 'border-stroke' : 'border-light-grey'}
+        ${error && touched && 'border-primary-red shadow-primary shadow-primary-red'}
         ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
         `}
         >

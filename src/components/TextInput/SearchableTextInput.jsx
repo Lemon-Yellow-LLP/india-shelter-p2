@@ -64,13 +64,9 @@ const SearchableTextInput = memo(
         flex justify-between gap-1
         transition-all ease-out duration-150
         focus-within:border-secondary-blue focus-within:shadow-secondary-blue focus-within:shadow-primary
-        ${
-          error && touched
-            ? 'border-primary-red shadow-primary shadow-primary-red'
-            : 'border-light-grey'
-        }
-        ${!props.value && !error && !touched && 'border-stroke'}
-        ${props.disabled ? 'bg-[#fafafa] pointer-events-none cursor-not-allowed' : ''}
+        ${!props.value && !touched ? 'border-stroke' : 'border-light-grey'}
+        ${error && touched && 'border-primary-red shadow-primary shadow-primary-red'}
+        ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
         `}
         >
           {Icon && <Icon />}
