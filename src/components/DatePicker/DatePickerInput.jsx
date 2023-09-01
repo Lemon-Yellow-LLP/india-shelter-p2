@@ -8,6 +8,8 @@ const DatePickerInput = forwardRef(function DatePickerInput(
 ) {
   const inputRef = useRef(null);
 
+  console.log(error, touched);
+
   return (
     <div
       ref={reference}
@@ -18,11 +20,14 @@ const DatePickerInput = forwardRef(function DatePickerInput(
         {true && <span className='text-primary-red text-sm'>*</span>}
       </label>
       <div
-        className={`input-container px-4 py-3 border justify-between border-stroke rounded-lg flex w-full items-center bg-white     
-        ${error && touched ? 'border-[red] shadow-primary shadow-[#E33439]' : 'border-light-grey'}`}
+        className={`input-container px-4 py-3 border justify-between border-stroke rounded-lg flex w-full items-center    
+        ${error && touched ? 'border-[red] shadow-primary shadow-[#E33439]' : 'border-light-grey'}
+        ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
+        `}
       >
         <input
           {...props}
+          disabled={props.disabled}
           placeholder='DD/MM/YYYY'
           className='w-full'
           name={name}

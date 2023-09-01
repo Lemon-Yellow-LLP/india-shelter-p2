@@ -34,6 +34,7 @@ const DatePicker = ({
         />
       }
       ref={datePickerRef}
+      // onFocus={datePickerScrollToTop}
       className='bg-white z-50'
       // Close popper when date is selected
       shouldCloseOnSelect={true}
@@ -68,22 +69,6 @@ const DatePicker = ({
       onChange={(date) => setStartDate(date)}
       // maxDate={today}
       dateFormat='dd/MM/yyyy'
-      popperModifiers={[
-        {
-          name: 'offset',
-          options: {
-            offset: [0, 0],
-          },
-        },
-        {
-          name: 'preventOverflow',
-          options: {
-            rootBoundary: 'viewport',
-            tether: true,
-            altAxis: true,
-          },
-        },
-      ]}
     ></ReactDatePicker>
   );
 };

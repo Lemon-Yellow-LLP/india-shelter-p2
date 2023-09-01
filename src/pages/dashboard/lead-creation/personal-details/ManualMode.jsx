@@ -30,12 +30,16 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
 
   const [showOTPInput, setShowOTPInput] = useState(false);
 
+  useEffect(() => {
+    updateProgress(1, requiredFieldsStatus);
+  }, [requiredFieldsStatus]);
+
   const handleRadioChange = useCallback(
     (e) => {
       setFieldValue(e.name, e.value);
-      if (!requiredFieldsStatus[e.name]) {
-        updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, [e.name]: true }));
+      const name = e.name.split('.')[1];
+      if (!requiredFieldsStatus[name]) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
     [requiredFieldsStatus],
@@ -45,7 +49,6 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
     (e) => {
       setFieldValue('personal_details.id_type', e);
       if (!requiredFieldsStatus.id_type) {
-        updateProgress(1, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true }));
       }
     },
@@ -56,7 +59,6 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
     (e) => {
       setFieldValue('personal_details.selected_address_proof', e);
       if (!requiredFieldsStatus.selected_address_proof) {
-        updateProgress(1, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, selected_address_proof: true }));
       }
     },
@@ -66,12 +68,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
   const handleTextInputChange = useCallback(
     (e) => {
       setFieldValue(e.target.name, e.target.value);
+      const name = e.target.name.split('.')[1];
       if (
-        requiredFieldsStatus[e.target.name] !== undefined &&
-        !requiredFieldsStatus[e.target.name]
+        requiredFieldsStatus[name] !== undefined &&
+        !requiredFieldsStatus[name] &&
+        e.target.value.length > 1
       ) {
-        updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, [e.target.name]: true }));
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
     [requiredFieldsStatus],
@@ -80,10 +83,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
   const handleSearchableTextInputChange = useCallback(
     (name, value) => {
       setFieldValue(name, value);
-
-      if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
-        updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+      const fieldName = name.split('.')[0];
+      if (
+        requiredFieldsStatus[fieldName] !== undefined &&
+        !requiredFieldsStatus[fieldName] &&
+        value.length > 1
+      ) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, [fieldName]: true }));
       }
     },
     [requiredFieldsStatus],
@@ -91,14 +97,8 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
 
   const handleDateChange = useCallback(
     (e) => {
-      let newData = values;
-      newData.date_of_birth = e;
-      setValues(newData);
-
       setFieldValue('personal_details.date_of_birth', e);
-
       if (!requiredFieldsStatus.date_of_birth) {
-        updateProgress(1, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, date_of_birth: true }));
       }
     },
@@ -323,7 +323,9 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
       />
 
       <div className='flex items-center gap-2'>
-        {values.personal_details?.id_type !== 'PAN Card' ? (
+        {values.personal_details?.id_type &&
+        values.personal_details?.id_type !== 'PAN Card' &&
+        values.personal_details?.id_number ? (
           <>
             <Checkbox
               checked={checkbox}
@@ -452,6 +454,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         error={errors.personal_details?.date_of_birth}
         touched={touched.personal_details?.date_of_birth}
         onBlur={handleBlur}
+        disabled={true}
       />
 
       <TextInput

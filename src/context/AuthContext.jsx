@@ -169,13 +169,15 @@ const AuthContextProvider = ({ children }) => {
       }
     }
 
+    console.log(trueCount, Object.keys(requiredFieldsStatus).length);
+
     setStepProgress((prevStepsProgress) => {
       const newData = prevStepsProgress.map((step, index) => {
         if (index === updateIndex && step.progress !== 100) {
           return {
             ...step,
             progress:
-              (parseInt(trueCount + 1) / parseInt(Object.keys(requiredFieldsStatus).length)) * 100,
+              (parseInt(trueCount) / parseInt(Object.keys(requiredFieldsStatus).length)) * 100,
           };
         }
         return step;
