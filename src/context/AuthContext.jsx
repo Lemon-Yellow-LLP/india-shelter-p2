@@ -184,8 +184,6 @@ const AuthContextProvider = ({ children }) => {
       }
     }
 
-    console.log(trueCount, Object.keys(requiredFieldsStatus).length);
-
     setStepProgress((prevStepsProgress) => {
       const newData = prevStepsProgress.map((step, index) => {
         if (index === updateIndex && step.progress !== 100) {
