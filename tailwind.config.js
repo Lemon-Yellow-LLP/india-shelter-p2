@@ -11,7 +11,7 @@ export default {
         'natural-black': '#212121',
         secondary: { green: '#147257', blue: '#065381' },
         'dark-grey': '#727376',
-        'light-grey': '#D9D9D9',
+        'light-grey': '#96989A',
         'light-green': '#D9F2CB',
         'neutral-white': '#FEFEFE',
         'light-red': '#F1999C',

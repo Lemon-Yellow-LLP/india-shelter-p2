@@ -1,7 +1,8 @@
+import { reference } from '@popperjs/core';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://scotttiger.in/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://lo.scotttiger.in/api';
 const API_LEAD_URL = `${API_URL}/lead`;
 
 const requestOptions = {};
@@ -15,6 +16,13 @@ async function pingAPI() {
 
 async function checkIsValidStatePincode(pincode) {
   const res = await axios.get(`${API_URL}/state-pin/${pincode}`, {}, requestOptions);
+  return res.data;
+}
+
+async function editReferenceById(id, referenceData) {
+  if (!id) return;
+
+  const res = await axios.patch(`${API_URL}/reference/edit/${id}`, referenceData, requestOptions);
   return res.data;
 }
 
@@ -55,4 +63,5 @@ export {
   NaNorNull,
   isEighteenOrAbove,
   checkIsValidStatePincode,
+  editReferenceById,
 };
