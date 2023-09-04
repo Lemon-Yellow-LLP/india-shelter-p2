@@ -1,7 +1,7 @@
 import { useCallback, useContext, useState } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import { DropDown, TextInput } from '../../../../components';
-import { checkIsValidStatePincode } from '../../../../global';
+import { checkIsValidStatePincode, editReferenceById } from '../../../../global';
 
 const referenceDropdownOneOptions = [
   {
@@ -89,7 +89,21 @@ const ReferenceDetails = () => {
     inputDisabled,
     setFieldValue,
     setFieldError,
+    updateProgress,
   } = useContext(AuthContext);
+  const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
+    reference_1_type: false,
+    reference_1_full_name: false,
+    reference_1_phone_number: false,
+    reference_1_address: false,
+    reference_1_pincode: false,
+
+    reference_2_type: false,
+    reference_2_full_name: false,
+    reference_2_phone_number: false,
+    reference_2_address: false,
+    reference_2_pincode: false,
+  });
 
   function disableOneOption(value) {
     setReferenceOneOptions((prev) => {
@@ -116,8 +130,17 @@ const ReferenceDetails = () => {
       setSelectedReferenceTypeOne(value);
       disableTwoOption(value);
       setFieldValue('referenceSchema.reference_1_type', value);
+
+      if (!requiredFieldsStatus['reference_1_type']) {
+        updateProgress(6, requiredFieldsStatus);
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_type']: true }));
+      }
+
+      editReferenceById(2, {
+        reference_1_type: value,
+      });
     },
-    [selectedReferenceTypeOne],
+    [selectedReferenceTypeOne, requiredFieldsStatus],
   );
 
   const handleReferenceTypeChangeTwo = useCallback(
@@ -125,25 +148,46 @@ const ReferenceDetails = () => {
       setSelectedReferenceTypeTwo(value);
       disableOneOption(value);
       setFieldValue('referenceSchema.reference_2_type', value);
+
+      if (!requiredFieldsStatus['reference_2_type']) {
+        updateProgress(6, requiredFieldsStatus);
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_type']: true }));
+      }
+
+      editReferenceById(2, {
+        reference_2_type: value,
+      });
     },
-    [selectedReferenceTypeOne],
+    [selectedReferenceTypeOne, requiredFieldsStatus],
   );
 
-  const handleTextInputChange = useCallback((e) => {
-    const value = e.currentTarget.value;
-    const pattern = /^[A-Za-z\/-\s]+$/;
-    if (pattern.exec(value[value.length - 1])) {
-      setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-    }
-  }, []);
+  const handleTextInputChange = useCallback(
+    (e) => {
+      const value = e.currentTarget.value;
+      const pattern = /^[A-Za-z\s]+$/;
+      if (pattern.exec(value[value.length - 1])) {
+        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+      }
+
+      const name = e.target.name.split('.')[1];
+      if (!requiredFieldsStatus[name]) {
+        updateProgress(6, requiredFieldsStatus);
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+      }
+    },
+    [requiredFieldsStatus],
+  );
 
   const handleOnPincodeChangeOne = useCallback(async () => {
     if (
       !values.referenceSchema.reference_1_pincode ||
-      values.referenceSchema.reference_1_pincode.toString().length < 5
-      // errors.referenceSchema.reference_1_pincode
-    )
+      values.referenceSchema.reference_1_pincode.toString().length < 5 ||
+      errors.referenceSchema?.reference_1_pincode
+    ) {
+      setFieldValue('referenceSchema.reference_1_city', '');
+      setFieldValue('referenceSchema.reference_1_state', '');
       return;
+    }
 
     const res = await checkIsValidStatePincode(values.referenceSchema.reference_1_pincode);
     if (!res) {
@@ -151,22 +195,36 @@ const ReferenceDetails = () => {
       return;
     }
 
+    editReferenceById(2, {
+      reference_1_city: res.city,
+      reference_1_state: res.state,
+    });
+
     setFieldValue('referenceSchema.reference_1_city', res.city);
     setFieldValue('referenceSchema.reference_1_state', res.state);
+
+    if (!requiredFieldsStatus['reference_1_pincode']) {
+      updateProgress(6, requiredFieldsStatus);
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_pincode']: true }));
+    }
   }, [
     errors.referenceSchema?.reference_1_pincode,
     values.referenceSchema?.reference_1_pincode,
     setFieldError,
     setFieldValue,
+    requiredFieldsStatus,
   ]);
 
   const handleOnPincodeChangeTwo = useCallback(async () => {
     if (
       !values.referenceSchema.reference_2_pincode ||
-      values.referenceSchema.reference_2_pincode.toString().length < 5
-      // errors.referenceSchema.reference_2_pincode
-    )
+      values.referenceSchema.reference_2_pincode.toString().length < 5 ||
+      errors.referenceSchema?.reference_2_pincode
+    ) {
+      setFieldValue('referenceSchema.reference_2_city', '');
+      setFieldValue('referenceSchema.reference_2_state', '');
       return;
+    }
 
     const res = await checkIsValidStatePincode(values.referenceSchema.reference_2_pincode);
     if (!res) {
@@ -174,18 +232,25 @@ const ReferenceDetails = () => {
       return;
     }
 
+    editReferenceById(2, {
+      reference_2_city: res.city,
+      reference_2_state: res.state,
+    });
+
     setFieldValue('referenceSchema.reference_2_city', res.city);
     setFieldValue('referenceSchema.reference_2_state', res.state);
+
+    if (!requiredFieldsStatus['reference_2_pincode']) {
+      updateProgress(6, requiredFieldsStatus);
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_pincode']: true }));
+    }
   }, [
     errors.referenceSchema?.reference_2_pincode,
     values.referenceSchema?.reference_2_pincode,
     setFieldError,
     setFieldValue,
+    requiredFieldsStatus,
   ]);
-
-  console.log('values', values);
-  console.log(errors);
-  console.log(touched);
 
   return (
     <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
@@ -209,7 +274,9 @@ const ReferenceDetails = () => {
           name='referenceSchema.reference_1_type'
           error={errors.referenceSchema?.reference_1_type}
           touched={touched.referenceSchema?.reference_1_type}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+          }}
         />
 
         <TextInput
@@ -220,7 +287,17 @@ const ReferenceDetails = () => {
           value={values.referenceSchema.reference_1_full_name}
           error={errors.referenceSchema?.reference_1_full_name}
           touched={touched.referenceSchema?.reference_1_full_name}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+            if (
+              !errors.referenceSchema?.reference_1_full_name &&
+              values.referenceSchema.reference_1_full_name
+            ) {
+              editReferenceById(2, {
+                reference_1_full_name: values.referenceSchema.reference_1_full_name,
+              });
+            }
+          }}
           disabled={inputDisabled}
           onChange={handleTextInputChange}
           inputClasses='capitalize'
@@ -235,7 +312,17 @@ const ReferenceDetails = () => {
           value={values.referenceSchema.reference_1_phone_number}
           error={errors.referenceSchema?.reference_1_phone_number}
           touched={touched.referenceSchema?.reference_1_phone_number}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+            if (
+              !errors.referenceSchema?.reference_1_phone_number &&
+              values.referenceSchema.reference_1_phone_number
+            ) {
+              editReferenceById(2, {
+                reference_1_phone_number: values.referenceSchema.reference_1_phone_number,
+              });
+            }
+          }}
           pattern='\d*'
           onFocus={(e) =>
             e.target.addEventListener(
@@ -259,11 +346,24 @@ const ReferenceDetails = () => {
             if (phoneNumber.length > 10) {
               return;
             }
-            if (phoneNumber.charAt(0) === '0') {
+            if (
+              phoneNumber.charAt(0) === '0' ||
+              phoneNumber.charAt(0) === '1' ||
+              phoneNumber.charAt(0) === '2' ||
+              phoneNumber.charAt(0) === '3' ||
+              phoneNumber.charAt(0) === '4' ||
+              phoneNumber.charAt(0) === '5'
+            ) {
               e.preventDefault();
               return;
             }
             handleChange(e);
+
+            const name = e.target.name.split('.')[1];
+            if (!requiredFieldsStatus[name]) {
+              updateProgress(6, requiredFieldsStatus);
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
           }}
           onPaste={(e) => {
             e.preventDefault();
@@ -274,8 +374,11 @@ const ReferenceDetails = () => {
           onKeyDown={(e) => {
             if (e.key === 'Backspace') {
               setFieldValue(
-                'phone_number',
-                values.phone_number.slice(0, values.phone_number.length - 1),
+                'referenceSchema.reference_1_phone_number',
+                values.referenceSchema.reference_1_phone_number.slice(
+                  0,
+                  values.referenceSchema.reference_1_phone_number.length - 1,
+                ),
               );
               e.preventDefault();
               return;
@@ -297,13 +400,29 @@ const ReferenceDetails = () => {
           value={values.referenceSchema.reference_1_address}
           error={errors.referenceSchema?.reference_1_address}
           touched={touched.referenceSchema?.reference_1_address}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+            if (
+              !errors.referenceSchema?.reference_1_address &&
+              values.referenceSchema.reference_1_address
+            ) {
+              editReferenceById(2, {
+                reference_1_address: values.referenceSchema.reference_1_address,
+              });
+            }
+          }}
           disabled={inputDisabled}
           onChange={(e) => {
             const value = e.currentTarget.value;
             const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
             if (address_pattern.exec(value[value.length - 1])) {
               setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            }
+
+            const name = e.target.name.split('.')[1];
+            if (!requiredFieldsStatus[name]) {
+              updateProgress(6, requiredFieldsStatus);
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
             }
           }}
           inputClasses='capitalize'
@@ -324,6 +443,14 @@ const ReferenceDetails = () => {
           onBlur={(e) => {
             handleBlur(e);
             handleOnPincodeChangeOne();
+            if (
+              !errors.referenceSchema?.reference_1_pincode &&
+              values.referenceSchema.reference_1_pincode
+            ) {
+              editReferenceById(2, {
+                reference_1_pincode: values.referenceSchema.reference_1_pincode,
+              });
+            }
           }}
           min='0'
           onInput={(e) => {
@@ -340,6 +467,12 @@ const ReferenceDetails = () => {
               return;
             }
             handleChange(e);
+
+            const name = e.target.name.split('.')[1];
+            if (!requiredFieldsStatus[name]) {
+              updateProgress(6, requiredFieldsStatus);
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
           }}
           onKeyDown={(e) => {
             //capturing ctrl V and ctrl C
@@ -405,15 +538,24 @@ const ReferenceDetails = () => {
           error={errors.referenceSchema?.reference_1_email}
           touched={touched.referenceSchema?.reference_1_email}
           onBlur={(e) => {
-            const target = e.currentTarget;
-            // handleOnEmailBlur(target.value);
             handleBlur(e);
-            // editReferenceById(currentLeadId, {reference_1_email: target.value});
-            // updateLeadDataOnBlur(currentLeadId, target.getAttribute('name'), target.value);
+            if (
+              !errors.referenceSchema?.reference_1_email &&
+              values.referenceSchema.reference_1_email
+            ) {
+              editReferenceById(2, {
+                reference_1_email: values.referenceSchema.reference_1_email,
+              });
+            }
           }}
-          // disabled={disableEmailInput}
           onChange={(e) => {
             handleChange(e);
+
+            const name = e.target.name.split('.')[1];
+            if (!requiredFieldsStatus[name]) {
+              updateProgress(6, requiredFieldsStatus);
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
           }}
         />
       </div>
@@ -437,7 +579,9 @@ const ReferenceDetails = () => {
           name='referenceSchema.reference_2_type'
           error={errors.referenceSchema?.reference_2_type}
           touched={touched.referenceSchema?.reference_2_type}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+          }}
         />
 
         <TextInput
@@ -448,7 +592,17 @@ const ReferenceDetails = () => {
           value={values.referenceSchema.reference_2_full_name}
           error={errors.referenceSchema?.reference_2_full_name}
           touched={touched.referenceSchema?.reference_2_full_name}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+            if (
+              !errors.referenceSchema?.reference_2_full_name &&
+              values.referenceSchema.reference_2_full_name
+            ) {
+              editReferenceById(2, {
+                reference_2_full_name: values.referenceSchema.reference_2_full_name,
+              });
+            }
+          }}
           disabled={inputDisabled}
           onChange={handleTextInputChange}
           inputClasses='capitalize'
@@ -463,7 +617,17 @@ const ReferenceDetails = () => {
           value={values.referenceSchema.reference_2_phone_number}
           error={errors.referenceSchema?.reference_2_phone_number}
           touched={touched.referenceSchema?.reference_2_phone_number}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+            if (
+              !errors.referenceSchema?.reference_2_phone_number &&
+              values.referenceSchema.reference_2_phone_number
+            ) {
+              editReferenceById(2, {
+                reference_2_phone_number: values.referenceSchema.reference_2_phone_number,
+              });
+            }
+          }}
           pattern='\d*'
           onFocus={(e) =>
             e.target.addEventListener(
@@ -487,11 +651,24 @@ const ReferenceDetails = () => {
             if (phoneNumber.length > 10) {
               return;
             }
-            if (phoneNumber.charAt(0) === '0') {
+            if (
+              phoneNumber.charAt(0) === '0' ||
+              phoneNumber.charAt(0) === '1' ||
+              phoneNumber.charAt(0) === '2' ||
+              phoneNumber.charAt(0) === '3' ||
+              phoneNumber.charAt(0) === '4' ||
+              phoneNumber.charAt(0) === '5'
+            ) {
               e.preventDefault();
               return;
             }
             handleChange(e);
+
+            const name = e.target.name.split('.')[1];
+            if (!requiredFieldsStatus[name]) {
+              updateProgress(6, requiredFieldsStatus);
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
           }}
           onPaste={(e) => {
             e.preventDefault();
@@ -502,8 +679,11 @@ const ReferenceDetails = () => {
           onKeyDown={(e) => {
             if (e.key === 'Backspace') {
               setFieldValue(
-                'phone_number',
-                values.phone_number.slice(0, values.phone_number.length - 1),
+                'referenceSchema.reference_2_phone_number',
+                values.referenceSchema.reference_2_phone_number.slice(
+                  0,
+                  values.referenceSchema.reference_2_phone_number.length - 1,
+                ),
               );
               e.preventDefault();
               return;
@@ -525,13 +705,29 @@ const ReferenceDetails = () => {
           value={values.referenceSchema.reference_2_address}
           error={errors.referenceSchema?.reference_2_address}
           touched={touched.referenceSchema?.reference_2_address}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+            if (
+              !errors.referenceSchema?.reference_2_address &&
+              values.referenceSchema.reference_2_address
+            ) {
+              editReferenceById(2, {
+                reference_2_address: values.referenceSchema.reference_2_address,
+              });
+            }
+          }}
           disabled={inputDisabled}
           onChange={(e) => {
             const value = e.currentTarget.value;
             const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
             if (address_pattern.exec(value[value.length - 1])) {
               setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            }
+
+            const name = e.target.name.split('.')[1];
+            if (!requiredFieldsStatus[name]) {
+              updateProgress(6, requiredFieldsStatus);
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
             }
           }}
           inputClasses='capitalize'
@@ -552,6 +748,14 @@ const ReferenceDetails = () => {
           onBlur={(e) => {
             handleBlur(e);
             handleOnPincodeChangeTwo();
+            if (
+              !errors.referenceSchema?.reference_2_pincode &&
+              values.referenceSchema.reference_2_pincode
+            ) {
+              editReferenceById(2, {
+                reference_2_pincode: values.referenceSchema.reference_2_pincode,
+              });
+            }
           }}
           min='0'
           onInput={(e) => {
@@ -568,6 +772,12 @@ const ReferenceDetails = () => {
               return;
             }
             handleChange(e);
+
+            const name = e.target.name.split('.')[1];
+            if (!requiredFieldsStatus[name]) {
+              updateProgress(6, requiredFieldsStatus);
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
           }}
           onKeyDown={(e) => {
             //capturing ctrl V and ctrl C
@@ -633,16 +843,26 @@ const ReferenceDetails = () => {
           error={errors.referenceSchema?.reference_2_email}
           touched={touched.referenceSchema?.reference_2_email}
           onBlur={(e) => {
-            const target = e.currentTarget;
-            // handleOnEmailBlur(target.value);
             handleBlur(e);
-            // updateLeadDataOnBlur(currentLeadId, target.getAttribute('name'), target.value);
+            if (
+              !errors.referenceSchema?.reference_2_email &&
+              values.referenceSchema.reference_2_email
+            ) {
+              editReferenceById(2, {
+                reference_2_email: values.referenceSchema.reference_2_email,
+              });
+            }
           }}
-          // disabled={disableEmailInput}
-          onChange={handleChange}
-        />
+          onChange={(e) => {
+            handleChange(e);
 
-        <span className='mt-1'></span>
+            const name = e.target.name.split('.')[1];
+            if (!requiredFieldsStatus[name]) {
+              updateProgress(6, requiredFieldsStatus);
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
+          }}
+        />
       </div>
     </div>
   );

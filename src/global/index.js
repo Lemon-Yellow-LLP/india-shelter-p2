@@ -1,3 +1,4 @@
+import { reference } from '@popperjs/core';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
@@ -14,6 +15,13 @@ async function pingAPI() {
 
 async function checkIsValidStatePincode(pincode) {
   const res = await axios.get(`${API_URL}/state-pin/${pincode}`, {}, requestOptions);
+  return res.data;
+}
+
+async function editReferenceById(id, referenceData) {
+  if (!id) return;
+
+  const res = await axios.patch(`${API_URL}/reference/edit/${id}`, referenceData, requestOptions);
   return res.data;
 }
 
@@ -71,4 +79,5 @@ export {
   checkIsValidStatePincode,
   getEmailOtp,
   verifyEmailOtp,
+  editReferenceById,
 };
