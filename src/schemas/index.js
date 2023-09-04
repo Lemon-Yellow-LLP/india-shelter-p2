@@ -61,6 +61,9 @@ export const signUpSchema = Yup.object({
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
       .max(6, 'Enter a valid Pincode'),
+    reference_1_email: Yup.string()
+      .email('Enter a valid Email')
+      .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
 
     reference_2_type: Yup.string().required('This field is mandatory'),
     reference_2_full_name: Yup.string()
@@ -80,6 +83,9 @@ export const signUpSchema = Yup.object({
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
       .max(6, 'Enter a valid Pincode'),
+    reference_2_email: Yup.string()
+      .email('Enter a valid Email')
+      .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   }),
 
   pan_number: Yup.string()
@@ -106,12 +112,6 @@ export const signUpSchema = Yup.object({
   loan_amount: Yup.string().required('Please enter the loan amount.'),
   purpose_type: Yup.string().required('Property category not selected.'),
 
-  reference_1_email: Yup.string()
-    .email('Enter a valid Email')
-    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
-  reference_2_email: Yup.string()
-    .email('Enter a valid Email')
-    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   id_number: Yup.string().required('Enter a valid ID number'),
   email: Yup.string()
     .email()
