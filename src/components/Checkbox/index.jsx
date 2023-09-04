@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import { forwardRef, useState } from 'react';
 
-const Checkbox = forwardRef(function Checkbox({ name, ...props }, ref) {
-  const [checked, setChecked] = useState(props.checked);
+const Checkbox = forwardRef(function Checkbox({ name, checked, setChecked, ...props }, ref) {
   return (
     <label htmlFor={name} className='relative block'>
       <svg
@@ -47,7 +46,7 @@ const Checkbox = forwardRef(function Checkbox({ name, ...props }, ref) {
         name={name}
         type='checkbox'
         onChange={(e) => {
-          setChecked(e.currentTarget.checked);
+          // setChecked(e.currentTarget.checked);
           props.onChange(e);
         }}
         ref={ref}

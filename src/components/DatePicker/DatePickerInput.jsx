@@ -3,23 +3,30 @@ import { IconCalendar } from '../../assets/icons';
 import PropTypes from 'prop-types';
 
 const DatePickerInput = forwardRef(function DatePickerInput(
-  { name, error, touched, onBlur, ...props },
+  { name, error, touched, onBlur, reference, value, ...props },
   _ref,
 ) {
   const inputRef = useRef(null);
 
   return (
-    <div className={`flex flex-col gap-1 ${error && touched ? 'pb-[0px]' : 'pb-[12px]'}`}>
+    <div
+      ref={reference}
+      className={`flex flex-col gap-1 ${error && touched ? 'pb-[0px]' : 'pb-[12px]'}`}
+    >
       <label htmlFor={name} className='flex gap-0.5 items-center text-primary-black w-fit'>
         {props.label}
         {true && <span className='text-primary-red text-sm'>*</span>}
       </label>
       <div
-        className={`input-container px-4 py-3 border justify-between border-stroke rounded-lg flex w-full items-center bg-white     
-        ${error && touched ? 'border-[red] shadow-primary shadow-[#E33439]' : 'border-light-grey'}`}
+        className={`input-container px-4 py-3 border justify-between border-stroke rounded-lg flex w-full items-center    
+        ${error && touched ? 'border-[red] shadow-primary shadow-[#E33439]' : 'border-light-grey'}
+        ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
+        `}
       >
         <input
           {...props}
+          value={value}
+          disabled={props.disabled}
           placeholder='DD/MM/YYYY'
           className='w-full'
           name={name}

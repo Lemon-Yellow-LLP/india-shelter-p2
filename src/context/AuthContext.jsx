@@ -26,7 +26,6 @@ export const defaultValues = {
     reference_1_city: '',
     reference_1_state: '',
     reference_1_email: '',
-
     reference_2_type: '',
     reference_2_full_name: '',
     reference_2_phone_number: '',
@@ -36,24 +35,19 @@ export const defaultValues = {
     reference_2_state: '',
     reference_2_email: '',
   },
-  selected_personal_details_mode: null,
-  gender: null,
-  marital_status: null,
-  id_type: null,
-  id_number: '',
-  address_proof: null,
-  address_proof_number: '',
-  date_of_birth: null,
-  mobile_number: '',
-  father_or_husband_name: '',
-  mother_name: '',
-  religion: '',
-  preferred_language: '',
-  qualification: '',
-  email: '',
-  first_name: '',
-  middle_name: '',
-  last_name: '',
+
+  applicant_details: {
+    loan_type: '',
+    applied_amount: '500000',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
+    date_of_birth: null,
+    purpose_of_loan: '',
+    property_type: '',
+    mobile_number: '',
+  },
+
   profession: '',
   residence: '',
   current_address_flatNoBuidlingNo: '',
@@ -72,10 +66,29 @@ export const defaultValues = {
   permanent_address_city: '',
   permanent_address_state: '',
   permanent_address_residing_years: '',
-  loan_type: '',
-  loan_purpose: '',
-  property_type: '',
-  applied_amount: '500000',
+
+  personal_details: {
+    applicant_type: 'Primary Applicant',
+    how_would_you_like_to_proceed: null,
+    id_type: null,
+    id_number: '',
+    selected_address_proof: null,
+    address_proof_number: '',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
+    gender: null,
+    date_of_birth: null,
+    mobile_number: '',
+    father_husband_name: '',
+    mother_name: '',
+    marital_status: null,
+    religion: '',
+    preferred_language: '',
+    qualification: '',
+    email: '',
+    is_email_verified: false,
+  },
 };
 
 export const AuthContext = createContext(defaultValues);
@@ -88,6 +101,7 @@ const AuthContextProvider = ({ children }) => {
   const [showError, setShowError] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [addressProofcheckbox, setAddressProofCheckbox] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [stepsProgress, setStepProgress] = useState([
     {
@@ -176,7 +190,7 @@ const AuthContextProvider = ({ children }) => {
           return {
             ...step,
             progress:
-              (parseInt(trueCount + 1) / parseInt(Object.keys(requiredFieldsStatus).length)) * 100,
+              (parseInt(trueCount) / parseInt(Object.keys(requiredFieldsStatus).length)) * 100,
           };
         }
         return step;
@@ -228,6 +242,8 @@ const AuthContextProvider = ({ children }) => {
         setIsLeadGenearted,
         showError,
         setShowError,
+        addressProofcheckbox,
+        setAddressProofCheckbox,
         toastMessage,
         setToastMessage,
       }}

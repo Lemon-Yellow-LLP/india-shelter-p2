@@ -135,7 +135,7 @@ DropDown.propTypes = {
   placeholder: PropTypes.string,
   label: PropTypes.string,
   required: PropTypes.bool,
-  options: PropTypes.arrayOf(PropTypes.shape({ label: PropTypes.string, value: PropTypes.any })),
+  options: PropTypes.arrayOf(PropTypes.shape({ label: PropTypes.any, value: PropTypes.any })),
   onChange: PropTypes.func,
   optionsMaxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   showIcon: PropTypes.bool,
