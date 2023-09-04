@@ -88,6 +88,7 @@ const AuthContextProvider = ({ children }) => {
   const [showError, setShowError] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
   const [stepsProgress, setStepProgress] = useState([
     {
       title: 'Applicant Details',
@@ -227,6 +228,8 @@ const AuthContextProvider = ({ children }) => {
         setIsLeadGenearted,
         showError,
         setShowError,
+        toastMessage,
+        setToastMessage,
       }}
     >
       {children}
