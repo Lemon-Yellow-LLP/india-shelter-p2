@@ -1,8 +1,7 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://scotttiger.in/api';
-const API_LEAD_URL = `${API_URL}/lead`;
+const API_URL = import.meta.env.VITE_API_URL || 'https://lo.scotttiger.in/api';
 
 const requestOptions = {};
 
@@ -35,8 +34,12 @@ const MAX_ALLOWED_YEAR = 18;
 function isEighteenOrAbove(date) {
   const today = new Date();
 
-  const differenceInYear = today.getFullYear() - date.getFullYear();
-  const differenceInMonth = today.getMonth() - date.getMonth();
+  const dateString = date;
+  const parts = dateString.split('/');
+  const year = parts[2];
+  const month = parts[1];
+  const differenceInYear = today.getFullYear() - year;
+  const differenceInMonth = today.getMonth() - month;
 
   if (differenceInYear > MAX_ALLOWED_YEAR) {
     return true;
@@ -48,6 +51,17 @@ function isEighteenOrAbove(date) {
   return false;
 }
 
+async function getEmailOtp(id) {
+  const res = await axios.get(`${API_URL}/personal/send-email/${id}`, {}, requestOptions);
+  return res;
+}
+
+async function verifyEmailOtp(id, otp) {
+  console.log(otp);
+  const res = await axios.post(`${API_URL}/personal/verify-email/${id}`, { otp }, requestOptions);
+  return res;
+}
+
 export {
   API_URL,
   pingAPI,
@@ -55,4 +69,6 @@ export {
   NaNorNull,
   isEighteenOrAbove,
   checkIsValidStatePincode,
+  getEmailOtp,
+  verifyEmailOtp,
 };

@@ -75,6 +75,7 @@ export const defaultValues = {
     preferred_language: '',
     qualification: '',
     email: '',
+    is_email_verified: false,
   },
 };
 
@@ -88,6 +89,7 @@ const AuthContextProvider = ({ children }) => {
   const [showError, setShowError] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [addressProofcheckbox, setAddressProofCheckbox] = useState(false);
   const [stepsProgress, setStepProgress] = useState([
     {
       title: 'Applicant Details',
@@ -229,6 +231,8 @@ const AuthContextProvider = ({ children }) => {
         setIsLeadGenearted,
         showError,
         setShowError,
+        addressProofcheckbox,
+        setAddressProofCheckbox,
       }}
     >
       {children}

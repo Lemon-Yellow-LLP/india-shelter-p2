@@ -112,7 +112,6 @@ const ApplicantDetails = () => {
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [loanFields, setLoanFields] = useState(loanOptions);
   const [loanPurposeOptions, setLoanPurposeOptions] = useState(loanPurposeData);
-  const [date, setDate] = useState();
 
   const dateInputRef = useRef(null);
 
@@ -133,6 +132,8 @@ const ApplicantDetails = () => {
     handleSubmit,
     updateProgress,
   } = useContext(AuthContext);
+
+  const [date, setDate] = useState(values?.applicant_details?.date_of_birth);
 
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(phoneNumberVerified);
   const [showOTPInput, setShowOTPInput] = useState(isLeadGenerated);
@@ -274,23 +275,6 @@ const ApplicantDetails = () => {
       return;
     }
     setFieldValue('applicant_details.date_of_birth', date);
-
-    if (
-      requiredFieldsStatus['date_of_birth'] !== undefined &&
-      !requiredFieldsStatus['date_of_birth']
-    ) {
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['date_of_birth']: true }));
-    }
-
-    let returnDate = new Date(date.toString());
-    // Get the month (0-11, where 0 represents January)
-    let month = returnDate.getMonth() + 1;
-    month = month.toString().padStart(2, '0');
-    // Get the day of the month
-    const dayOfMonth = returnDate.getDate().toString().padStart(2, '0');
-    // Get the year from the Date object
-    const year = returnDate.getFullYear();
-    const finalDate = `${year}-${month}-${dayOfMonth}T00:00:00.000Z`;
   }, [date, setFieldError, setFieldValue]);
 
   const datePickerScrollToTop = () => {
@@ -299,9 +283,9 @@ const ApplicantDetails = () => {
     }
   };
 
-  // console.log('values', values);
-  // console.log(errors);
-  // console.log(touched);
+  console.log('values', values);
+  console.log(errors);
+  console.log(touched);
 
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
@@ -404,12 +388,13 @@ const ApplicantDetails = () => {
               name='applicant_details.last_name'
               onChange={handleTextInputChange}
               inputClasses='capitalize'
+              onFocus={datePickerScrollToTop}
             />
           </div>
         </div>
 
         <DatePicker
-          startDate={date}
+          value={values?.applicant_details?.date_of_birth}
           setStartDate={setDate}
           required
           name='applicant_details.date_of_birth'
@@ -418,7 +403,6 @@ const ApplicantDetails = () => {
           touched={touched?.applicant_details?.date_of_birth}
           onBlur={handleBlur}
           reference={dateInputRef}
-          datePickerScrollToTop={datePickerScrollToTop}
         />
 
         <DropDown

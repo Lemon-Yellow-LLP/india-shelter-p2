@@ -9,7 +9,7 @@ export default function PreviousNextButtons({
 }) {
   return (
     <div
-      className='flex w-[100vw] p-[18px] bg-white h-[142px] gap-[20px]'
+      className='flex w-[100vw] p-[18px] bg-white h-[142px] gap-[20px] justify-center'
       style={{ boxShadow: '0px -5px 10px #E5E5E580' }}
     >
       {disablePrevious ? (

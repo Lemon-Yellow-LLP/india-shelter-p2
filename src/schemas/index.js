@@ -139,9 +139,9 @@ export const signUpSchema = Yup.object({
       .min(2, 'Last Name must be atleast 2 characters long')
       .max(10, 'Last Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
-    date_of_birth: Yup.date()
+    date_of_birth: Yup.string()
       .nullable()
-      .transform(parseDateString)
+      .min(10, 'Enter valid date')
       .required('Date of birth is required'),
     purpose_of_loan: Yup.string().required('Loan Purpose is required'),
     property_type: Yup.string().required('Property Type is required'),

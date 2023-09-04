@@ -5,10 +5,13 @@ import { AuthContext } from '../../../../context/AuthContext';
 import DropDown from '../../../../components/DropDown';
 import TextInput from '../../../../components/TextInput';
 import DatePicker from '../../../../components/DatePicker';
-import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
-import { top100Films } from '../../../../assets/SearchableInputTestJsonData.json';
 import Checkbox from '../../../../components/Checkbox';
 import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWithSendOtp';
+import { manualModeDropdownOptions } from './manualModeDropdownOptions';
+import OtpInput from '../../../../components/OtpInput/index';
+import otpVerified from '../../../../assets/icons/otp-verified.svg';
+import axios from 'axios';
+import { getEmailOtp, verifyEmailOtp } from '../../../../global';
 
 export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const {
@@ -20,15 +23,17 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
     handleBlur,
     handleSubmit,
     setFieldValue,
+    addressProofcheckbox,
+    setAddressProofCheckbox,
   } = useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
   const [emailVerified, setEmailVerified] = useState(false);
 
-  const [checkbox, setCheckbox] = useState(false);
-
   const [showOTPInput, setShowOTPInput] = useState(false);
+
+  const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
 
   useEffect(() => {
     updateProgress(1, requiredFieldsStatus);
@@ -105,193 +110,54 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
     [requiredFieldsStatus],
   );
 
-  const sendEmailOTP = () => {
-    setDisableEmailInput((prev) => !prev);
-  };
-
-  const manualModeDropdownOptions = [
-    {
-      title: 'Id Type',
-      options: [
-        {
-          label: 'PAN Card',
-          value: 'PAN Card',
-        },
-        {
-          label: 'Aadhar',
-          value: 'Aadhar',
-        },
-        {
-          label: 'Driving license',
-          value: 'Driving license',
-        },
-        {
-          label: 'Voter ID',
-          value: 'Voter ID',
-        },
-        {
-          label: 'Passport',
-          value: 'Passport',
-        },
-      ],
-    },
-    {
-      title: 'Address Proof',
-      options: [
-        {
-          label: 'Aadhar',
-          value: 'Aadhar',
-        },
-        {
-          label: 'Driving license',
-          value: 'Driving license',
-        },
-        {
-          label: 'Voter ID',
-          value: 'Voter ID',
-        },
-        {
-          label: 'Passport',
-          value: 'Passport',
-        },
-        {
-          label: 'Gas bill',
-          value: 'Gas bill',
-        },
-        {
-          label: 'Rent agreement',
-          value: 'Rent agreement',
-        },
-        {
-          label: 'Electricity bill',
-          value: 'Electricity bill',
-        },
-      ],
-    },
-    {
-      title: 'Religion',
-      options: [
-        {
-          label: 'Hindu',
-          value: 'Hindu',
-        },
-
-        {
-          label: 'Buddhist',
-          value: 'Buddhist',
-        },
-        {
-          label: 'Christian',
-          value: 'Christian',
-        },
-        {
-          label: 'Jain',
-          value: 'Jain',
-        },
-        {
-          label: 'Muslim',
-          value: 'Muslim',
-        },
-        {
-          label: 'Sikh',
-          value: 'Sikh',
-        },
-        {
-          label: 'Others',
-          value: 'Others',
-        },
-      ],
-    },
-
-    {
-      title: 'Language',
-      options: [
-        {
-          label: 'Hindi',
-          value: 'Hindi',
-        },
-
-        {
-          label: 'English',
-          value: 'English',
-        },
-        {
-          label: 'Marathi',
-          value: 'Marathi',
-        },
-        {
-          label: 'Gujarati',
-          value: 'Gujarati',
-        },
-        {
-          label: 'Kannada',
-          value: 'Kannada',
-        },
-        {
-          label: 'Tamil',
-          value: 'Tamil',
-        },
-      ],
-    },
-
-    {
-      title: 'Qualification',
-      options: [
-        {
-          label: 'Graduate',
-          value: 'Graduate',
-        },
-
-        {
-          label: 'Illetrate',
-          value: 'Illetrate',
-        },
-        {
-          label: 'Matriculate',
-          value: 'Matriculate',
-        },
-        {
-          label: 'Non-Metric',
-          value: 'Non-Metric',
-        },
-        {
-          label: 'Post Graduate',
-          value: 'Post Graduate',
-        },
-        {
-          label: 'Professional',
-          value: 'Professional',
-        },
-        {
-          label: 'Student',
-          value: 'Student',
-        },
-        {
-          label: 'Under Graduate',
-          value: 'Under Graduate',
-        },
-      ],
-    },
-  ];
-
   useEffect(() => {
-    if (checkbox) {
+    if (addressProofcheckbox) {
       setFieldValue('personal_details.selected_address_proof', values.personal_details?.id_type);
       setFieldValue('personal_details.address_proof_number', values.personal_details?.id_number);
-    } else {
+    }
+  }, [addressProofcheckbox]);
+
+  useEffect(() => {
+    if (addressProofcheckbox) {
+      setFieldValue('personal_details.selected_address_proof', values.personal_details?.id_type);
+      setFieldValue('personal_details.address_proof_number', values.personal_details?.id_number);
+    }
+
+    if (values.personal_details?.id_type === 'PAN Card') {
       setFieldValue('personal_details.selected_address_proof', '');
       setFieldValue('personal_details.address_proof_number', '');
-    }
-  }, [checkbox]);
-
-  useEffect(() => {
-    if (checkbox) {
-      setFieldValue('personal_details.selected_address_proof', values.personal_details?.id_type);
-      setFieldValue('personal_details.address_proof_number', values.personal_details?.id_number);
+      setAddressProofCheckbox(false);
     }
   }, [values.personal_details?.id_type, values.personal_details?.id_number]);
 
-  const onOTPSendClick = useCallback(() => {}, []);
+  const sendEmailOTP = () => {
+    getEmailOtp(1)
+      .then((res) => {
+        console.log(res);
+        setHasSentOTPOnce(true);
+        setDisableEmailInput((prev) => !prev);
+        setShowOTPInput(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const verifyOTP = useCallback((otp) => {
+    verifyEmailOtp(1, otp)
+      .then((res) => {
+        console.log(res);
+        setEmailVerified(true);
+        setShowOTPInput(false);
+        return true;
+      })
+      .catch((err) => {
+        console.log(err);
+        setEmailVerified(false);
+        setShowOTPInput(true);
+        return false;
+      });
+  }, []);
 
   return (
     <>
@@ -328,9 +194,16 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         values.personal_details?.id_number ? (
           <>
             <Checkbox
-              checked={checkbox}
+              checked={addressProofcheckbox}
+              setChecked={setAddressProofCheckbox}
               name='terms-agreed'
-              onChange={() => setCheckbox((prev) => !prev)}
+              onChange={(e) => {
+                if (!e.target.checked) {
+                  setFieldValue('personal_details.selected_address_proof', '');
+                  setFieldValue('personal_details.address_proof_number', '');
+                }
+                setAddressProofCheckbox(e.target.checked);
+              }}
               disabled={!values.personal_details?.id_type}
             />
 
@@ -343,9 +216,16 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         ) : (
           <>
             <Checkbox
-              checked={checkbox}
+              checked={addressProofcheckbox}
+              setChecked={setAddressProofCheckbox}
               name='terms-agreed'
-              onChange={() => setCheckbox((prev) => !prev)}
+              onChange={(e) => {
+                if (!e.target.checked) {
+                  setFieldValue('personal_details.selected_address_proof', '');
+                  setFieldValue('personal_details.address_proof_number', '');
+                }
+                setAddressProofCheckbox(e.target.checked);
+              }}
               disabled={true}
             />
 
@@ -365,7 +245,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         error={errors.personal_details?.selected_address_proof}
         touched={touched.personal_details?.selected_address_proof}
         onBlur={handleBlur}
-        disabled={checkbox}
+        disabled={addressProofcheckbox}
         disableOption={values.personal_details?.id_type}
       />
 
@@ -380,7 +260,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         error={errors.personal_details?.address_proof_number}
         touched={touched.personal_details?.address_proof_number}
         onBlur={handleBlur}
-        disabled={!values.personal_details?.selected_address_proof || checkbox}
+        disabled={!values.personal_details?.selected_address_proof || addressProofcheckbox}
       />
 
       <TextInput
@@ -574,7 +454,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         touched={touched.personal_details?.email}
         onBlur={handleBlur}
         onOTPSendClick={sendEmailOTP}
-        disabledOtpButton={!!errors.personal_details?.email || emailVerified}
+        disabledOtpButton={!!errors.personal_details?.email || emailVerified || hasSentOTPOnce}
         disabled={disableEmailInput}
         message={
           emailVerified
@@ -590,11 +470,11 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
           label='Enter OTP'
           required
           verified={emailVerified}
-          setOTPVerified={setPhoneNumberVerified}
-          onSendOTPClick={onOTPSendClick}
+          setOTPVerified={setEmailVerified}
+          onSendOTPClick={sendEmailOTP}
           defaultResendTime={30}
-          disableSendOTP={(isLeadGenerated && !emailVerified) || leadExists}
-          verifyOTPCB={verifyLeadOTP}
+          disableSendOTP={!emailVerified}
+          verifyOTPCB={verifyOTP}
           hasSentOTPOnce={hasSentOTPOnce}
         />
       )}

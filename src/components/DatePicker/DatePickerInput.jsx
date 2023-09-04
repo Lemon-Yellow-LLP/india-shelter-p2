@@ -3,12 +3,10 @@ import { IconCalendar } from '../../assets/icons';
 import PropTypes from 'prop-types';
 
 const DatePickerInput = forwardRef(function DatePickerInput(
-  { name, error, touched, onBlur, reference, datePickerScrollToTop, ...props },
+  { name, error, touched, onBlur, reference, value, ...props },
   _ref,
 ) {
   const inputRef = useRef(null);
-
-  console.log(error, touched);
 
   return (
     <div
@@ -27,13 +25,13 @@ const DatePickerInput = forwardRef(function DatePickerInput(
       >
         <input
           {...props}
+          value={value}
           disabled={props.disabled}
           placeholder='DD/MM/YYYY'
           className='w-full'
           name={name}
           ref={inputRef}
           onBlur={onBlur}
-          onFocus={datePickerScrollToTop}
           onInput={(e) => {
             let value = e.currentTarget.value;
             if (value.length >= 2 && value.charAt(2) !== '/') {
