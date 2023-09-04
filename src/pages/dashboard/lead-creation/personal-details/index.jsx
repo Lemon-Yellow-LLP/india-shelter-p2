@@ -1,86 +1,95 @@
 import { personalDetailsModeOption } from '../utils';
 import CardRadio from '../../../../components/CardRadio';
-import { memo, useCallback, useContext, useState } from 'react';
+import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import ManualMode from './ManualMode';
+import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 
 const PersonalDetails = memo(() => {
-  const { values, setValues, updateProgress, errors, touched, handleSubmit } =
+  const { values, setValues, updateProgress, errors, touched, handleSubmit, setFieldValue } =
     useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    selected_personal_details_mode: false,
+    how_would_you_like_to_proceed: false,
     id_type: false,
     id_number: false,
-    address_proof: false,
+    selected_address_proof: false,
     address_proof_number: false,
+    first_name: false,
+    gender: false,
     date_of_birth: false,
     mobile_number: false,
-    father_or_husband_name: false,
+    father_husband_name: false,
     mother_name: false,
+    marital_status: false,
     religion: false,
     preferred_language: false,
     qualification: false,
-    marital_status: false,
-    gender: false,
-    first_name: false,
-    middle_name: false,
-    last_name: false,
   });
 
   const handleRadioChange = useCallback(
     (e) => {
-      let newData = values;
-      newData[e.name] = e.value;
-      setValues({ ...newData });
-      if (!requiredFieldsStatus[e.name]) {
-        updateProgress(1, requiredFieldsStatus);
-        setRequiredFieldsStatus((prev) => ({ ...prev, [e.name]: true }));
+      setFieldValue(e.name, e.value);
+      const name = e.name.split('.')[0];
+      if (!requiredFieldsStatus[name]) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
     [requiredFieldsStatus],
   );
 
+  useEffect(() => {
+    updateProgress(1, requiredFieldsStatus);
+  }, [requiredFieldsStatus]);
+
   return (
-    <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
-          How would you like to proceed <span className='text-primary-red text-xs'>*</span>
-        </label>
-        <div className={`flex gap-4 w-full`}>
-          {personalDetailsModeOption.map((option) => {
-            return (
-              <CardRadio
-                key={option.value}
-                label={option.label}
-                name='selected_personal_details_mode'
-                value={option.value}
-                current={values.selected_personal_details_mode}
-                onChange={handleRadioChange}
-                containerClasses='flex-1'
-              >
-                {option.icon}
-              </CardRadio>
-            );
-          })}
+    <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
+        <div className='flex flex-col gap-2'>
+          <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
+            How would you like to proceed <span className='text-primary-red text-xs'>*</span>
+          </label>
+          <div className={`flex gap-4 w-full`}>
+            {personalDetailsModeOption.map((option) => {
+              return (
+                <CardRadio
+                  key={option.value}
+                  label={option.label}
+                  name='personal_details.how_would_you_like_to_proceed'
+                  value={option.value}
+                  current={values.personal_details?.how_would_you_like_to_proceed}
+                  onChange={handleRadioChange}
+                  containerClasses='flex-1'
+                >
+                  {option.icon}
+                </CardRadio>
+              );
+            })}
+          </div>
+          {errors.personal_details?.how_would_you_like_to_proceed &&
+          touched.personal_details?.how_would_you_like_to_proceed ? (
+            <span
+              className='text-xs text-primary-red'
+              dangerouslySetInnerHTML={{
+                __html: errors.personal_details?.how_would_you_like_to_proceed,
+              }}
+            />
+          ) : (
+            ''
+          )}
         </div>
-        {errors.selected_personal_details_mode && touched.selected_personal_details_mode ? (
-          <span
-            className='text-xs text-primary-red'
-            dangerouslySetInnerHTML={{
-              __html: errors.selected_personal_details_mode,
-            }}
+        {values.personal_details?.how_would_you_like_to_proceed === 'Manual' && (
+          <ManualMode
+            requiredFieldsStatus={requiredFieldsStatus}
+            setRequiredFieldsStatus={setRequiredFieldsStatus}
           />
-        ) : (
-          ''
         )}
       </div>
-      {values.selected_personal_details_mode === 'Manual' && (
-        <ManualMode
-          requiredFieldsStatus={requiredFieldsStatus}
-          setRequiredFieldsStatus={setRequiredFieldsStatus}
-        />
-      )}
+
+      <PreviousNextButtons
+        linkPrevious='/lead/applicant-details'
+        linkNext='/lead/personal-details'
+      />
     </div>
   );
 });

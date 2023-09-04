@@ -112,59 +112,72 @@ export const signUpSchema = Yup.object({
   loan_amount: Yup.string().required('Please enter the loan amount.'),
   purpose_type: Yup.string().required('Property category not selected.'),
 
-  id_number: Yup.string().required('Enter a valid ID number'),
-  email: Yup.string()
-    .email()
-    .required('Please enter your email')
-    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
-  address_proof_number: Yup.string().required('Enter a valid address proof number'),
-  first_name: Yup.string()
-    .min(2, 'First Name must be atleast 2 characters long')
-    .max(10, 'First Name can be max 10 characters long')
-    .required('First Name is required')
-    .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
-  middle_name: Yup.string()
-    .min(2, 'Middle Name must be atleast 2 characters long')
-    .max(10, 'Middle Name can be max 10 characters long')
-    .required('Middle Name is required')
-    .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
-  last_name: Yup.string()
-    .min(2, 'Last Name must be atleast 2 characters long')
-    .max(10, 'Last Name can be max 10 characters long')
-    .required('Last Name is required')
-    .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
-  father_or_husband_name: Yup.string().required('Father/Husband Name is required'),
-  mother_name: Yup.string().required('Mother Name is required'),
-  religion: Yup.string().required('Religion is required'),
-  preferred_language: Yup.string().required('Preferred Language is required'),
-  qualification: Yup.string().required('Qualification is required'),
-  date_of_birth: Yup.string().required('Date is required'),
-  mobile_number: Yup.string()
-    .matches(/^\d{10}$/, 'Enter a valid 10-digit mobile number')
-    .required('Mobile number is required'),
-  loan_purpose: Yup.string().required('Loan Purpose is required'),
-  property_type: Yup.string().required('Property Type is required'),
-  id_type: Yup.string().required('This field is mandatory.'),
-  address_proof: Yup.string().required('This field is mandatory.'),
-  selected_personal_details_mode: Yup.string().required('This field is mandatory.'),
-  gender: Yup.string().required('This field is mandatory.'),
-  marital_status: Yup.string().required('This field is mandatory.'),
+  personal_details: Yup.object().shape({
+    how_would_you_like_to_proceed: Yup.string().required('This field is mandatory.'),
+    id_type: Yup.string().required('This field is mandatory.'),
+    id_number: Yup.string().required('Enter a valid ID number'),
+    selected_address_proof: Yup.string().required('This field is mandatory.'),
+    address_proof_number: Yup.string().required('Enter a valid address proof number'),
+    first_name: Yup.string()
+      .min(2, 'First Name must be atleast 2 characters long')
+      .max(10, 'First Name can be max 10 characters long')
+      .required('First Name is required')
+      .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
+    middle_name: Yup.string()
+      .min(2, 'Middle Name must be atleast 2 characters long')
+      .max(10, 'Middle Name can be max 10 characters long')
+      .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
+    last_name: Yup.string()
+      .min(2, 'Last Name must be atleast 2 characters long')
+      .max(10, 'Last Name can be max 10 characters long')
+      .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
+    gender: Yup.string().required('This field is mandatory.'),
+    date_of_birth: Yup.string().required('Date of birth is required'),
+    mobile_number: Yup.string()
+      .matches(/^(?!.*(\d{5}).*\1)\d{10}$/, 'Enter a valid 10-digit mobile number')
+      .required('Mobile number is required'),
+    father_husband_name: Yup.string().required('Father/Husband Name is required'),
+    mother_name: Yup.string().required('Mother Name is required'),
+    marital_status: Yup.string().required('This field is mandatory.'),
+    religion: Yup.string().required('Religion is required'),
+    preferred_language: Yup.string().required('Preferred Language is required'),
+    qualification: Yup.string().required('Qualification is required'),
+    email: Yup.string()
+      .email()
+      .required('Please enter your email')
+      .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
+  }),
 
-  loan_request_amount: Yup.number()
-    .required('Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000')
-    .typeError('Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000')
-    .min(100000, 'Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000')
-    .max(5000000, 'Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000'),
-  property_estimation: Yup.string()
-    .required('Please enter you property estimation')
-    .test({
-      name: 'min',
-      exclusive: false,
-      params: {},
-      message: 'Property estimation value should be greater than Loan Amount',
-      test: function (value) {
-        // You can access the price field with `this.parent`.
-        return parseInt(value) >= parseInt(this.parent.loan_request_amount);
-      },
-    }),
+  applicant_details: Yup.object().shape({
+    loan_type: Yup.string().required('This field is mandatory field.'),
+    applied_amount: Yup.number()
+      .min(100000, 'Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000')
+      .max(
+        5000000,
+        'Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000',
+      )
+      .required('This field is mandatory.'),
+    first_name: Yup.string()
+      .min(2, 'First Name must be atleast 2 characters long')
+      .max(10, 'First Name can be max 10 characters long')
+      .required('First Name is required')
+      .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
+    middle_name: Yup.string()
+      .min(2, 'Middle Name must be atleast 2 characters long')
+      .max(10, 'Middle Name can be max 10 characters long')
+      .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
+    last_name: Yup.string()
+      .min(2, 'Last Name must be atleast 2 characters long')
+      .max(10, 'Last Name can be max 10 characters long')
+      .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
+    date_of_birth: Yup.string()
+      .nullable()
+      .min(10, 'Enter valid date')
+      .required('Date of birth is required'),
+    purpose_of_loan: Yup.string().required('Loan Purpose is required'),
+    property_type: Yup.string().required('Property Type is required'),
+    mobile_number: Yup.string()
+      .matches(/^(?!.*(\d)\1{4})(?!.*(\d{5}).*\2)\d{10}$/, 'Enter a valid 10-digit mobile number')
+      .required('Mobile number is required'),
+  }),
 });
