@@ -24,14 +24,13 @@ const OtpInput = ({
   const inputRef = useRef(null);
 
   const handleOnChange = useCallback(
-    (e) => {
+    async (e) => {
       const { value } = e.target;
       setOtp(value);
       if (value.length >= 5) {
         setInputDisabled(true);
-        verifyOTPCB(value).then((isVerifed) => {
-          setInputDisabled(isVerifed);
-        });
+        let res = await verifyOTPCB(value);
+        setInputDisabled(res);
         setTimer(false);
       }
     },

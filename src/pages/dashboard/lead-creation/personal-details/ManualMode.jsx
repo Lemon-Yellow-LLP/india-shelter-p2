@@ -29,7 +29,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
-  const [emailVerified, setEmailVerified] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(values?.personal_details?.is_email_verified);
 
   const [showOTPInput, setShowOTPInput] = useState(false);
 
@@ -38,6 +38,12 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
   useEffect(() => {
     updateProgress(1, requiredFieldsStatus);
   }, [requiredFieldsStatus]);
+
+  useEffect(() => {
+    if (emailVerified) {
+      setFieldValue('personal_details.is_email_verified', true);
+    }
+  }, [emailVerified]);
 
   const handleRadioChange = useCallback(
     (e) => {
@@ -131,28 +137,20 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
   }, [values.personal_details?.id_type, values.personal_details?.id_number]);
 
   const sendEmailOTP = () => {
-    getEmailOtp(1)
-      .then((res) => {
-        console.log(res);
-        setHasSentOTPOnce(true);
-        setDisableEmailInput((prev) => !prev);
-        setShowOTPInput(true);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    setDisableEmailInput((prev) => !prev);
+    setShowOTPInput(true);
+    setHasSentOTPOnce(true);
+    getEmailOtp(1);
   };
 
   const verifyOTP = useCallback((otp) => {
     verifyEmailOtp(1, otp)
       .then((res) => {
-        console.log(res);
         setEmailVerified(true);
         setShowOTPInput(false);
         return true;
       })
       .catch((err) => {
-        console.log(err);
         setEmailVerified(false);
         setShowOTPInput(true);
         return false;
