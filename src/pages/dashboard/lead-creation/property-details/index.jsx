@@ -3,6 +3,8 @@ import { IconPropertyIdentified, IconPropertyUnIdentified } from '../../../../as
 import { CardRadio } from '../../../../components';
 import IdentificationDoneFields from './IdentificationDoneFields';
 import { AuthContext } from '../../../../context/AuthContext';
+import { editPropertyById } from '../../../../global';
+import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 
 const propertyIdentificationOptions = [
   {
@@ -42,53 +44,62 @@ const PropertyDetails = () => {
       setFieldValue('propertySchema.property_identification_is', e.value);
 
       const name = e.name.split('.')[0];
+
       if (!requiredFieldsStatus[name]) {
         updateProgress(4, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
+
+      editPropertyById(1, {
+        property_identification_is: e.value,
+      });
     },
     [requiredFieldsStatus, setFieldValue],
   );
 
   return (
-    <div className='flex flex-col bg-medium-grey gap-2 h-[92vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px]'>
-      <label
-        htmlFor='property-identification'
-        className='flex gap-0.5 font-medium text-primary-black'
-      >
-        The Property identification is <span className='text-primary-red text-xs'>*</span>
-      </label>
-      <div className='flex gap-4'>
-        {propertyIdentificationOptions.map((option) => (
-          <CardRadio
-            key={option.value}
-            label={option.label}
-            name='property_identification_is'
-            value={option.value}
-            current={propertyIdentification}
-            onChange={handleRadioChange}
-            containerClasses='flex-1'
-          >
-            {option.icon}
-          </CardRadio>
-        ))}
+    <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
+        <label
+          htmlFor='property-identification'
+          className='flex gap-0.5 font-medium text-primary-black'
+        >
+          The Property identification is <span className='text-primary-red text-xs'>*</span>
+        </label>
+        <div className='flex gap-4'>
+          {propertyIdentificationOptions.map((option) => (
+            <CardRadio
+              key={option.value}
+              label={option.label}
+              name='property_identification_is'
+              value={option.value}
+              current={propertyIdentification}
+              onChange={handleRadioChange}
+              containerClasses='flex-1'
+            >
+              {option.icon}
+            </CardRadio>
+          ))}
+        </div>
+
+        {errors.propertySchema?.property_identification_is &&
+          touched.propertySchema?.property_identification_is &&
+          !values.property_identification_is && (
+            <span className='text-sm text-primary-red'>
+              {errors.propertySchema.property_identification_is}
+            </span>
+          )}
+
+        {propertyIdentification === 'done' ? (
+          <IdentificationDoneFields
+            selectedLoanType={selectedLoanType}
+            requiredFieldsStatus={requiredFieldsStatus}
+            setRequiredFieldsStatus={setRequiredFieldsStatus}
+          />
+        ) : null}
       </div>
 
-      {errors.propertySchema?.property_identification_is &&
-        touched.propertySchema?.property_identification_is &&
-        !values.property_identification_is && (
-          <span className='text-sm text-primary-red'>
-            {errors.propertySchema.property_identification_is}
-          </span>
-        )}
-
-      {propertyIdentification === 'done' ? (
-        <IdentificationDoneFields
-          selectedLoanType={selectedLoanType}
-          requiredFieldsStatus={requiredFieldsStatus}
-          setRequiredFieldsStatus={setRequiredFieldsStatus}
-        />
-      ) : null}
+      <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' />
     </div>
   );
 };
