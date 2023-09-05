@@ -98,7 +98,7 @@ const DropDown = memo(
               if (option.value === selectedOption?.value)
                 optionClasses = `${optionClasses} text-primary-red`;
               else if (option.disabled) {
-                optionClasses = `${optionClasses} pointer-events-none opacity-20`;
+                optionClasses = `${optionClasses} pointer-events-none`;
               }
 
               return (
@@ -108,7 +108,7 @@ const DropDown = memo(
                     onClick={() => handleSelect(option)}
                     className={optionClasses}
                   >
-                    {option.label}
+                    <div className={option.disabled && 'opacity-20'}>{option.label}</div>
                     {showIcon && selectedOption?.value === option.value ? (
                       <IconTick />
                     ) : (
