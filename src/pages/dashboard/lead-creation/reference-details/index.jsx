@@ -75,6 +75,7 @@ const referenceDropdownTwoOptions = [
 ];
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
+const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
 const ReferenceDetails = () => {
   const [selectedReferenceTypeOne, setSelectedReferenceTypeOne] = useState(null);
@@ -350,14 +351,7 @@ const ReferenceDetails = () => {
               if (phoneNumber.length > 10) {
                 return;
               }
-              if (
-                phoneNumber.charAt(0) === '0' ||
-                phoneNumber.charAt(0) === '1' ||
-                phoneNumber.charAt(0) === '2' ||
-                phoneNumber.charAt(0) === '3' ||
-                phoneNumber.charAt(0) === '4' ||
-                phoneNumber.charAt(0) === '5'
-              ) {
+              if (DISALLOW_NUM.includes(phoneNumber)) {
                 e.preventDefault();
                 return;
               }
@@ -655,14 +649,7 @@ const ReferenceDetails = () => {
               if (phoneNumber.length > 10) {
                 return;
               }
-              if (
-                phoneNumber.charAt(0) === '0' ||
-                phoneNumber.charAt(0) === '1' ||
-                phoneNumber.charAt(0) === '2' ||
-                phoneNumber.charAt(0) === '3' ||
-                phoneNumber.charAt(0) === '4' ||
-                phoneNumber.charAt(0) === '5'
-              ) {
+              if (DISALLOW_NUM.includes(phoneNumber)) {
                 e.preventDefault();
                 return;
               }
