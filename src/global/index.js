@@ -25,6 +25,13 @@ async function editReferenceById(id, referenceData) {
   return res.data;
 }
 
+async function editPropertyById(id, propertyData) {
+  if (!id) return;
+
+  const res = await axios.patch(`${API_URL}/property/edit/${id}`, propertyData, requestOptions);
+  return res.data;
+}
+
 async function updateLeadDataOnBlur(leadId, fieldName, value) {
   if (!leadId) return;
   const inputName = fieldName;
@@ -80,4 +87,5 @@ export {
   getEmailOtp,
   verifyEmailOtp,
   editReferenceById,
+  editPropertyById,
 };
