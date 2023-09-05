@@ -2,7 +2,7 @@ import { useCallback, useState, useContext } from 'react';
 import { TextInput, CurrencyInput, MapInput, Map } from '../../../../components';
 import propTypes from 'prop-types';
 import { AuthContext } from '../../../../context/AuthContext';
-import { checkIsValidStatePincode } from '../../../../global';
+import { checkIsValidStatePincode, editPropertyById } from '../../../../global';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -23,9 +23,9 @@ const IdentificationDoneFields = ({
   } = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
 
-  const onMapButtonClick = useCallback(() => {
-    setShowMap((prev) => !prev);
-  }, []);
+  // const onMapButtonClick = useCallback(() => {
+  //   setShowMap((prev) => !prev);
+  // }, []);
 
   const handleTextInputChange = useCallback(
     (e) => {
@@ -47,10 +47,13 @@ const IdentificationDoneFields = ({
   const handleOnPincodeChange = useCallback(async () => {
     if (
       !values.propertySchema.pincode ||
-      values.propertySchema.pincode.toString().length < 5
-      // errors.propertySchema.pincode
-    )
+      values.propertySchema.pincode.toString().length < 5 ||
+      errors.propertySchema.pincode
+    ) {
+      setFieldValue('propertySchema.city', '');
+      setFieldValue('propertySchema.state', '');
       return;
+    }
 
     const res = await checkIsValidStatePincode(values.propertySchema.pincode);
     if (!res) {
@@ -58,13 +61,24 @@ const IdentificationDoneFields = ({
       return;
     }
 
+    editPropertyById(1, {
+      city: res.city,
+      state: res.state,
+    });
+
     setFieldValue('propertySchema.city', res.city);
     setFieldValue('propertySchema.state', res.state);
+
+    if (!requiredFieldsStatus['pincode']) {
+      updateProgress(4, requiredFieldsStatus);
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: true }));
+    }
   }, [
     errors.propertySchema?.pincode,
     values.propertySchema?.pincode,
     setFieldError,
     setFieldValue,
+    requiredFieldsStatus,
   ]);
 
   return (
@@ -87,7 +101,18 @@ const IdentificationDoneFields = ({
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
             }
           }}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+
+            if (
+              !errors.propertySchema?.property_value_estimate &&
+              values.propertySchema.property_value_estimate
+            ) {
+              editPropertyById(1, {
+                property_value_estimate: values.propertySchema.property_value_estimate,
+              });
+            }
+          }}
         />
       ) : null}
 
@@ -100,7 +125,15 @@ const IdentificationDoneFields = ({
         error={errors.propertySchema?.owner_name}
         touched={touched.propertySchema?.owner_name}
         onChange={handleTextInputChange}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (!errors.propertySchema?.owner_name && values.propertySchema.owner_name) {
+            editPropertyById(1, {
+              owner_name: values.propertySchema.owner_name,
+            });
+          }
+        }}
       />
 
       <TextInput
@@ -124,10 +157,54 @@ const IdentificationDoneFields = ({
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
           }
         }}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (!errors.propertySchema?.plot_house_flat && values.propertySchema.plot_house_flat) {
+            editPropertyById(1, {
+              plot_house_flat: values.propertySchema.plot_house_flat,
+            });
+          }
+        }}
       />
 
-      <MapInput
+      <TextInput
+        name='propertySchema.project_society_colony'
+        label='Project/Society/Colony name'
+        required
+        placeholder='Eg: G Groups of Real Estate'
+        value={values.propertySchema.project_society_colony}
+        error={errors.propertySchema?.project_society_colony}
+        touched={touched.propertySchema?.project_society_colony}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+
+          const name = e.target.name.split('.')[1];
+          if (!requiredFieldsStatus[name]) {
+            updateProgress(4, requiredFieldsStatus);
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+          }
+        }}
+        inputClasses='capitalize'
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (
+            !errors.propertySchema?.project_society_colony &&
+            values.propertySchema.project_society_colony
+          ) {
+            editPropertyById(1, {
+              project_society_colony: values.propertySchema.project_society_colony,
+            });
+          }
+        }}
+      />
+
+      {/* <MapInput
         name='propertySchema.project_society_colony'
         label='Project/Society/Colony name'
         required
@@ -152,7 +229,7 @@ const IdentificationDoneFields = ({
         maxLength={90}
         onBlur={handleBlur}
         onMapButtonClick={onMapButtonClick}
-      />
+      /> */}
 
       <TextInput
         name='propertySchema.pincode'
@@ -165,6 +242,12 @@ const IdentificationDoneFields = ({
         onBlur={(e) => {
           handleBlur(e);
           handleOnPincodeChange();
+
+          if (!errors.propertySchema?.pincode && values.propertySchema.pincode) {
+            editPropertyById(1, {
+              pincode: parseInt(values.propertySchema.pincode),
+            });
+          }
         }}
         min='0'
         onInput={(e) => {
@@ -181,12 +264,6 @@ const IdentificationDoneFields = ({
             return;
           }
           handleChange(e);
-
-          const name = e.target.name.split('.')[1];
-          if (!requiredFieldsStatus[name]) {
-            updateProgress(4, requiredFieldsStatus);
-            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-          }
         }}
         onKeyDown={(e) => {
           //capturing ctrl V and ctrl C
