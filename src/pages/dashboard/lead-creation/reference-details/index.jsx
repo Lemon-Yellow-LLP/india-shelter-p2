@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import { DropDown, TextInput } from '../../../../components';
 import { checkIsValidStatePincode, editReferenceById } from '../../../../global';
@@ -254,6 +254,41 @@ const ReferenceDetails = () => {
     requiredFieldsStatus,
   ]);
 
+  useEffect(() => {
+    if (
+      values.referenceSchema.reference_1_phone_number ===
+        values.referenceSchema.reference_2_phone_number &&
+      values.referenceSchema.reference_2_phone_number
+    ) {
+      setFieldError(
+        'referenceSchema.reference_1_phone_number',
+        'Reference phone number must be unique',
+      );
+    }
+  }, [
+    values.referenceSchema.reference_1_phone_number,
+    setFieldError,
+    errors.referenceSchema?.reference_1_phone_number,
+  ]);
+
+  useEffect(() => {
+    if (
+      values.referenceSchema.reference_2_phone_number ===
+        values.referenceSchema.reference_1_phone_number &&
+      values.referenceSchema.reference_1_phone_number
+    ) {
+      setFieldError(
+        'referenceSchema.reference_2_phone_number',
+        'Reference phone number must be unique',
+      );
+    }
+  }, [
+    values.referenceSchema.reference_2_phone_number,
+    setFieldError,
+    errors.referenceSchema?.reference_2_phone_number,
+  ]);
+
+  console.log(errors.referenceSchema?.reference_2_phone_number);
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
       <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
@@ -318,18 +353,7 @@ const ReferenceDetails = () => {
             error={errors.referenceSchema?.reference_1_phone_number}
             touched={touched.referenceSchema?.reference_1_phone_number}
             onBlur={(e) => {
-              if (
-                values.referenceSchema.reference_2_phone_number === e.target.value &&
-                values.referenceSchema.reference_1_phone_number
-              ) {
-                setFieldError(
-                  'referenceSchema.reference_1_phone_number',
-                  'Reference phone number must be unique',
-                );
-                return;
-              } else {
-                handleBlur(e);
-              }
+              handleBlur(e);
 
               if (
                 !errors.referenceSchema?.reference_1_phone_number &&
@@ -355,9 +379,6 @@ const ReferenceDetails = () => {
               if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
             }}
             onChange={(e) => {
-              if (values.referenceSchema.reference_2_phone_number === e.currentTarget.value) {
-                setFieldError('referenceSchema.reference_1_phone_number', '');
-              }
               const phoneNumber = e.currentTarget.value;
               if (phoneNumber < 0) {
                 e.preventDefault();
@@ -632,18 +653,7 @@ const ReferenceDetails = () => {
             error={errors.referenceSchema?.reference_2_phone_number}
             touched={touched.referenceSchema?.reference_2_phone_number}
             onBlur={(e) => {
-              if (
-                values.referenceSchema.reference_1_phone_number === e.target.value &&
-                values.referenceSchema.reference_2_phone_number
-              ) {
-                setFieldError(
-                  'referenceSchema.reference_2_phone_number',
-                  'Reference phone number must be unique',
-                );
-                return;
-              } else {
-                handleBlur(e);
-              }
+              handleBlur(e);
 
               if (
                 !errors.referenceSchema?.reference_2_phone_number &&
@@ -669,9 +679,6 @@ const ReferenceDetails = () => {
               if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
             }}
             onChange={(e) => {
-              if (values.referenceSchema.reference_1_phone_number === e.currentTarget.value) {
-                setFieldError('referenceSchema.reference_2_phone_number', '');
-              }
               const phoneNumber = e.currentTarget.value;
               if (phoneNumber < 0) {
                 e.preventDefault();
