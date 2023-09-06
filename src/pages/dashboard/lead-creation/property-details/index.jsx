@@ -22,7 +22,8 @@ const propertyIdentificationOptions = [
 const selectedLoanType = 'LAP';
 
 const PropertyDetails = () => {
-  const { values, updateProgress, errors, touched, setFieldValue } = useContext(AuthContext);
+  const { values, updateProgress, errors, touched, setFieldValue, handleSubmit } =
+    useContext(AuthContext);
   const [propertyIdentification, setPropertyIdentification] = useState(null);
 
   useEffect(() => {
@@ -46,7 +47,6 @@ const PropertyDetails = () => {
       const name = e.name.split('.')[0];
 
       if (!requiredFieldsStatus[name]) {
-        updateProgress(4, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
 
@@ -57,6 +57,10 @@ const PropertyDetails = () => {
     [requiredFieldsStatus, setFieldValue],
   );
 
+  useEffect(() => {
+    updateProgress(4, requiredFieldsStatus);
+  }, [requiredFieldsStatus]);
+
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
       <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
@@ -66,6 +70,9 @@ const PropertyDetails = () => {
         >
           The Property identification is <span className='text-primary-red text-xs'>*</span>
         </label>
+        <h2 className='text-xs font-normal text-light-grey'>
+          To know more about property related details if it’s identified
+        </h2>
         <div className='flex gap-4'>
           {propertyIdentificationOptions.map((option) => (
             <CardRadio
@@ -83,7 +90,6 @@ const PropertyDetails = () => {
         </div>
 
         {errors.propertySchema?.property_identification_is &&
-          touched.propertySchema?.property_identification_is &&
           !values.property_identification_is && (
             <span className='text-sm text-primary-red'>
               {errors.propertySchema.property_identification_is}
@@ -98,6 +104,8 @@ const PropertyDetails = () => {
           />
         ) : null}
       </div>
+
+      <button onClick={handleSubmit}>submit</button>
 
       <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' />
     </div>
