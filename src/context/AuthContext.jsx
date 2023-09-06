@@ -88,6 +88,9 @@ export const defaultValues = {
     qualification: '',
     email: '',
     is_email_verified: false,
+    extra_params: {
+      same_as_id_type: false,
+    },
   },
 };
 
@@ -101,7 +104,6 @@ const AuthContextProvider = ({ children }) => {
   const [showError, setShowError] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [addressProofcheckbox, setAddressProofCheckbox] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [stepsProgress, setStepProgress] = useState([
     {
@@ -184,7 +186,7 @@ const AuthContextProvider = ({ children }) => {
       }
     }
 
-    console.log(trueCount, Object.keys(requiredFieldsStatus).length);
+    // console.log(trueCount, Object.keys(requiredFieldsStatus).length);
 
     setStepProgress((prevStepsProgress) => {
       const newData = prevStepsProgress.map((step, index) => {
@@ -244,8 +246,6 @@ const AuthContextProvider = ({ children }) => {
         setIsLeadGenearted,
         showError,
         setShowError,
-        addressProofcheckbox,
-        setAddressProofCheckbox,
         toastMessage,
         setToastMessage,
       }}
