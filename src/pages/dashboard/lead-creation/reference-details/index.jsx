@@ -75,6 +75,7 @@ const referenceDropdownTwoOptions = [
 ];
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
+const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
 const ReferenceDetails = () => {
   const [selectedReferenceTypeOne, setSelectedReferenceTypeOne] = useState(null);
@@ -262,9 +263,9 @@ const ReferenceDetails = () => {
         <div className='flex flex-col gap-2'>
           <label
             htmlFor='loan-purpose'
-            className='flex gap-0.5 font-medium text-primary-black text-xl mt-3'
+            className='flex gap-0.5 font-semibold text-primary-black text-xl mt-3'
           >
-            Reference detail 1 <span className='text-primary-red text-xs'>*</span>
+            Reference detail 1 <span className='text-primary-red text-xs pt-1'>*</span>
           </label>
 
           <DropDown
@@ -309,7 +310,7 @@ const ReferenceDetails = () => {
 
           <TextInput
             label='Mobile number'
-            placeholder='Please enter 10 digit mobile no'
+            placeholder='Eg: 123456789'
             required
             name='referenceSchema.reference_1_phone_number'
             type='tel'
@@ -317,7 +318,19 @@ const ReferenceDetails = () => {
             error={errors.referenceSchema?.reference_1_phone_number}
             touched={touched.referenceSchema?.reference_1_phone_number}
             onBlur={(e) => {
-              handleBlur(e);
+              if (
+                values.referenceSchema.reference_2_phone_number === e.target.value &&
+                values.referenceSchema.reference_1_phone_number
+              ) {
+                setFieldError(
+                  'referenceSchema.reference_1_phone_number',
+                  'Reference phone number must be unique',
+                );
+                return;
+              } else {
+                handleBlur(e);
+              }
+
               if (
                 !errors.referenceSchema?.reference_1_phone_number &&
                 values.referenceSchema.reference_1_phone_number
@@ -342,6 +355,9 @@ const ReferenceDetails = () => {
               if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
             }}
             onChange={(e) => {
+              if (values.referenceSchema.reference_2_phone_number === e.currentTarget.value) {
+                setFieldError('referenceSchema.reference_1_phone_number', '');
+              }
               const phoneNumber = e.currentTarget.value;
               if (phoneNumber < 0) {
                 e.preventDefault();
@@ -350,14 +366,7 @@ const ReferenceDetails = () => {
               if (phoneNumber.length > 10) {
                 return;
               }
-              if (
-                phoneNumber.charAt(0) === '0' ||
-                phoneNumber.charAt(0) === '1' ||
-                phoneNumber.charAt(0) === '2' ||
-                phoneNumber.charAt(0) === '3' ||
-                phoneNumber.charAt(0) === '4' ||
-                phoneNumber.charAt(0) === '5'
-              ) {
+              if (DISALLOW_NUM.includes(phoneNumber)) {
                 e.preventDefault();
                 return;
               }
@@ -430,7 +439,6 @@ const ReferenceDetails = () => {
               }
             }}
             inputClasses='capitalize'
-            maxLength={90}
           />
 
           <TextInput
@@ -508,6 +516,7 @@ const ReferenceDetails = () => {
 
           <TextInput
             label='City'
+            required
             placeholder='Eg: Nashik'
             name='referenceSchema.reference_1_city'
             value={values.referenceSchema.reference_1_city}
@@ -521,6 +530,7 @@ const ReferenceDetails = () => {
 
           <TextInput
             label='State'
+            required
             placeholder='Eg: Maharashtra'
             name='referenceSchema.reference_1_state'
             value={values.referenceSchema.reference_1_state}
@@ -567,9 +577,9 @@ const ReferenceDetails = () => {
         <div className='flex flex-col gap-2'>
           <label
             htmlFor='loan-purpose'
-            className='flex gap-0.5 font-medium text-primary-black text-xl mt-3'
+            className='flex gap-0.5 font-semibold text-primary-black text-xl mt-3'
           >
-            Reference detail 2 <span className='text-primary-red text-xs'>*</span>
+            Reference detail 2 <span className='text-primary-red text-xs pt-1'>*</span>
           </label>
 
           <DropDown
@@ -614,7 +624,7 @@ const ReferenceDetails = () => {
 
           <TextInput
             label='Mobile number'
-            placeholder='Please enter 10 digit mobile no'
+            placeholder='Eg: 123456789'
             required
             name='referenceSchema.reference_2_phone_number'
             type='tel'
@@ -622,7 +632,19 @@ const ReferenceDetails = () => {
             error={errors.referenceSchema?.reference_2_phone_number}
             touched={touched.referenceSchema?.reference_2_phone_number}
             onBlur={(e) => {
-              handleBlur(e);
+              if (
+                values.referenceSchema.reference_1_phone_number === e.target.value &&
+                values.referenceSchema.reference_2_phone_number
+              ) {
+                setFieldError(
+                  'referenceSchema.reference_2_phone_number',
+                  'Reference phone number must be unique',
+                );
+                return;
+              } else {
+                handleBlur(e);
+              }
+
               if (
                 !errors.referenceSchema?.reference_2_phone_number &&
                 values.referenceSchema.reference_2_phone_number
@@ -647,6 +669,9 @@ const ReferenceDetails = () => {
               if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
             }}
             onChange={(e) => {
+              if (values.referenceSchema.reference_1_phone_number === e.currentTarget.value) {
+                setFieldError('referenceSchema.reference_2_phone_number', '');
+              }
               const phoneNumber = e.currentTarget.value;
               if (phoneNumber < 0) {
                 e.preventDefault();
@@ -655,14 +680,7 @@ const ReferenceDetails = () => {
               if (phoneNumber.length > 10) {
                 return;
               }
-              if (
-                phoneNumber.charAt(0) === '0' ||
-                phoneNumber.charAt(0) === '1' ||
-                phoneNumber.charAt(0) === '2' ||
-                phoneNumber.charAt(0) === '3' ||
-                phoneNumber.charAt(0) === '4' ||
-                phoneNumber.charAt(0) === '5'
-              ) {
+              if (DISALLOW_NUM.includes(phoneNumber)) {
                 e.preventDefault();
                 return;
               }
@@ -735,7 +753,6 @@ const ReferenceDetails = () => {
               }
             }}
             inputClasses='capitalize'
-            maxLength={90}
           />
 
           <TextInput
@@ -813,6 +830,7 @@ const ReferenceDetails = () => {
 
           <TextInput
             label='City'
+            required
             placeholder='Eg: Nashik'
             name='referenceSchema.reference_2_city'
             value={values.referenceSchema.reference_2_city}
@@ -826,6 +844,7 @@ const ReferenceDetails = () => {
 
           <TextInput
             label='State'
+            required
             placeholder='Eg: Maharashtra'
             name='referenceSchema.reference_2_state'
             value={values.referenceSchema.reference_2_state}
@@ -870,7 +889,7 @@ const ReferenceDetails = () => {
         </div>
       </div>
 
-      <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' />
+      {/* <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' /> */}
     </div>
   );
 };

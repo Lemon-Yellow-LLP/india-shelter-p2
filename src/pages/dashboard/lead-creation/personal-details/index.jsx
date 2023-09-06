@@ -1,11 +1,12 @@
 import { personalDetailsModeOption } from '../utils';
 import CardRadio from '../../../../components/CardRadio';
-import { memo, useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import ManualMode from './ManualMode';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
+import { editFieldsById } from '../../../../global';
 
-const PersonalDetails = memo(() => {
+const PersonalDetails = () => {
   const { values, setValues, updateProgress, errors, touched, handleSubmit, setFieldValue } =
     useContext(AuthContext);
 
@@ -27,10 +28,17 @@ const PersonalDetails = memo(() => {
     qualification: false,
   });
 
+  const updateFields = async (name, value) => {
+    let newData = values.personal_details;
+    newData[name] = value;
+    await editFieldsById(1, 'personal', newData);
+  };
+
   const handleRadioChange = useCallback(
     (e) => {
       setFieldValue(e.name, e.value);
-      const name = e.name.split('.')[0];
+      const name = e.name.split('.')[1];
+      updateFields(name, e.value);
       if (!requiredFieldsStatus[name]) {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
@@ -41,6 +49,10 @@ const PersonalDetails = memo(() => {
   useEffect(() => {
     updateProgress(1, requiredFieldsStatus);
   }, [requiredFieldsStatus]);
+
+  const handleNextClick = () => {
+    updateFields();
+  };
 
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
@@ -82,16 +94,18 @@ const PersonalDetails = memo(() => {
           <ManualMode
             requiredFieldsStatus={requiredFieldsStatus}
             setRequiredFieldsStatus={setRequiredFieldsStatus}
+            updateFields={updateFields}
           />
         )}
       </div>
 
-      <PreviousNextButtons
+      {/* <PreviousNextButtons
         linkPrevious='/lead/applicant-details'
-        linkNext='/lead/personal-details'
-      />
+        linkNext='/lead/address-details'
+        onNextClick={handleNextClick}
+      /> */}
     </div>
   );
-});
+};
 
 export default PersonalDetails;

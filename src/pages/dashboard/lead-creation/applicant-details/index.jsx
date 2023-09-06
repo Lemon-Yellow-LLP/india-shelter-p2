@@ -75,19 +75,6 @@ const loanOptions = {
   ],
 };
 
-const arr = [
-  { 'Home Purchase': [1, 2] },
-  { 'Home Construction': [3, 4] },
-  { 'Home Renovation/Extension': [5, 6] },
-  { 'BT+Top-up': [7, 8] },
-];
-
-for (let i of arr) {
-  for (let j in i) {
-    console.log(j);
-  }
-}
-
 const loanPurposeData = [
   {
     label: 'Home Purchase',
@@ -283,9 +270,9 @@ const ApplicantDetails = () => {
     }
   };
 
-  console.log('values', values);
-  console.log(errors);
-  console.log(touched);
+  // console.log('values', values);
+  // console.log(errors);
+  // console.log(touched);
 
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
@@ -493,7 +480,9 @@ const ApplicantDetails = () => {
           />
         )}
       </div>
-      <PreviousNextButtons disablePrevious={true} linkNext='/lead/personal-details' />
+      <div className='position absolute '>
+        <PreviousNextButtons disablePrevious={true} linkNext='/lead/personal-details' />
+      </div>
     </div>
   );
 };
