@@ -1,4 +1,4 @@
-import { useCallback, useState, useContext } from 'react';
+import { useCallback, useState, useContext, useEffect } from 'react';
 import { TextInput, CurrencyInput, MapInput, Map } from '../../../../components';
 import propTypes from 'prop-types';
 import { AuthContext } from '../../../../context/AuthContext';
@@ -48,7 +48,7 @@ const IdentificationDoneFields = ({
     if (
       !values.propertySchema.pincode ||
       values.propertySchema.pincode.toString().length < 5 ||
-      errors.propertySchema.pincode
+      errors.propertySchema?.pincode
     ) {
       setFieldValue('propertySchema.city', '');
       setFieldValue('propertySchema.state', '');
@@ -81,6 +81,22 @@ const IdentificationDoneFields = ({
     requiredFieldsStatus,
   ]);
 
+  useEffect(() => {
+    if (
+      parseInt(values.applicant_details.applied_amount) >
+      parseInt(values.propertySchema.property_value_estimate)
+    ) {
+      setFieldError(
+        'propertySchema.property_value_estimate',
+        'Property estimation value should be greater than Loan Amount',
+      );
+    }
+  }, [
+    values.propertySchema.property_value_estimate,
+    setFieldError,
+    errors.propertySchema?.property_value_estimate,
+  ]);
+
   return (
     <>
       {selectedLoanType === 'LAP' ? (
@@ -102,11 +118,24 @@ const IdentificationDoneFields = ({
             }
           }}
           onBlur={(e) => {
-            handleBlur(e);
+            if (
+              parseInt(values.applicant_details.applied_amount) >
+                parseInt(values.propertySchema.property_value_estimate) &&
+              !errors.propertySchema.property_value_estimate
+            ) {
+              setFieldError(
+                'propertySchema.property_value_estimate',
+                'Property estimation value should be greater than Loan Amount',
+              );
+            } else {
+              handleBlur(e);
+            }
 
             if (
               !errors.propertySchema?.property_value_estimate &&
-              values.propertySchema.property_value_estimate
+              values.propertySchema.property_value_estimate &&
+              parseInt(values.applicant_details.applied_amount) <
+                parseInt(values.propertySchema.property_value_estimate)
             ) {
               editPropertyById(1, {
                 property_value_estimate: values.propertySchema.property_value_estimate,
@@ -235,6 +264,7 @@ const IdentificationDoneFields = ({
         name='propertySchema.pincode'
         label='Pincode'
         required
+        hint='City and State fields will get filled based on Pincode'
         placeholder='Eg: 123456'
         value={values.propertySchema.pincode}
         error={errors.propertySchema?.pincode}
