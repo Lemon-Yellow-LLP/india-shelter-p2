@@ -15,7 +15,7 @@ const UploadDocuments = lazy(() => import('./upload-documents'));
 const LeadCreationRoutes = () => {
   return (
     <>
-      <SwipeableDrawerComponent />
+      {/* <SwipeableDrawerComponent /> */}
       <Routes>
         <Route index element={<ApplicantDetails />} />
         <Route path='applicant-details' element={<ApplicantDetails />} />

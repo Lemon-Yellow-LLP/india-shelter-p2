@@ -11,9 +11,13 @@ import { manualModeDropdownOptions } from './manualModeDropdownOptions';
 import OtpInput from '../../../../components/OtpInput/index';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import axios from 'axios';
-import { getEmailOtp, verifyEmailOtp } from '../../../../global';
+import { editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
 
-export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus }) {
+export default function ManualMode({
+  requiredFieldsStatus,
+  setRequiredFieldsStatus,
+  updateFields,
+}) {
   const {
     values,
     setValues,
@@ -23,13 +27,11 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
     handleBlur,
     handleSubmit,
     setFieldValue,
-    addressProofcheckbox,
-    setAddressProofCheckbox,
   } = useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
-  const [emailVerified, setEmailVerified] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(values?.personal_details?.is_email_verified);
 
   const [showOTPInput, setShowOTPInput] = useState(false);
 
@@ -39,10 +41,18 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
     updateProgress(1, requiredFieldsStatus);
   }, [requiredFieldsStatus]);
 
+  useEffect(() => {
+    if (emailVerified) {
+      setFieldValue('personal_details.is_email_verified', true);
+      updateFields('is_email_verified', true);
+    }
+  }, [emailVerified]);
+
   const handleRadioChange = useCallback(
     (e) => {
       setFieldValue(e.name, e.value);
       const name = e.name.split('.')[1];
+      updateFields(name, e.value);
       if (!requiredFieldsStatus[name]) {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
@@ -53,6 +63,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
   const changeIdType = useCallback(
     (e) => {
       setFieldValue('personal_details.id_type', e);
+      updateFields('id_type', e);
       if (!requiredFieldsStatus.id_type) {
         setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true }));
       }
@@ -63,6 +74,7 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
   const changeSelectedAddressProof = useCallback(
     (e) => {
       setFieldValue('personal_details.selected_address_proof', e);
+      updateFields('selected_address_proof', e);
       if (!requiredFieldsStatus.selected_address_proof) {
         setRequiredFieldsStatus((prev) => ({ ...prev, selected_address_proof: true }));
       }
@@ -85,10 +97,11 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
     [requiredFieldsStatus],
   );
 
-  const handleSearchableTextInputChange = useCallback(
+  const handleDropdownChange = useCallback(
     (name, value) => {
       setFieldValue(name, value);
-      const fieldName = name.split('.')[0];
+      const fieldName = name.split('.')[1];
+      updateFields(fieldName, value);
       if (
         requiredFieldsStatus[fieldName] !== undefined &&
         !requiredFieldsStatus[fieldName] &&
@@ -111,48 +124,40 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
   );
 
   useEffect(() => {
-    if (addressProofcheckbox) {
-      setFieldValue('personal_details.selected_address_proof', values.personal_details?.id_type);
-      setFieldValue('personal_details.address_proof_number', values.personal_details?.id_number);
-    }
-  }, [addressProofcheckbox]);
+    updateFields();
+  }, [values?.personal_details?.extra_params?.same_as_id_type]);
 
   useEffect(() => {
-    if (addressProofcheckbox) {
+    if (values?.personal_details?.extra_params?.same_as_id_type) {
       setFieldValue('personal_details.selected_address_proof', values.personal_details?.id_type);
       setFieldValue('personal_details.address_proof_number', values.personal_details?.id_number);
     }
 
-    if (values.personal_details?.id_type === 'PAN Card') {
+    if (
+      values?.personal_details?.extra_params?.same_as_id_type &&
+      values.personal_details?.id_type === 'PAN Card'
+    ) {
       setFieldValue('personal_details.selected_address_proof', '');
       setFieldValue('personal_details.address_proof_number', '');
-      setAddressProofCheckbox(false);
+      setFieldValue('personal_details.extra_params.same_as_id_type', false);
     }
   }, [values.personal_details?.id_type, values.personal_details?.id_number]);
 
   const sendEmailOTP = () => {
-    getEmailOtp(1)
-      .then((res) => {
-        console.log(res);
-        setHasSentOTPOnce(true);
-        setDisableEmailInput((prev) => !prev);
-        setShowOTPInput(true);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    setDisableEmailInput((prev) => !prev);
+    setShowOTPInput(true);
+    setHasSentOTPOnce(true);
+    getEmailOtp(1);
   };
 
   const verifyOTP = useCallback((otp) => {
     verifyEmailOtp(1, otp)
       .then((res) => {
-        console.log(res);
         setEmailVerified(true);
         setShowOTPInput(false);
         return true;
       })
       .catch((err) => {
-        console.log(err);
         setEmailVerified(false);
         setShowOTPInput(true);
         return false;
@@ -171,7 +176,10 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         defaultSelected={values.personal_details?.id_type}
         error={errors.personal_details?.id_type}
         touched={touched.personal_details?.id_type}
-        onBlur={handleBlur}
+        disableOption={values.personal_details?.selected_address_proof}
+        onBlur={(e) => {
+          handleBlur(e);
+        }}
       />
 
       <TextInput
@@ -180,12 +188,21 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         required
         name='personal_details.id_number'
         value={values.personal_details?.id_number}
-        onChange={handleTextInputChange}
+        onChange={(e) => {
+          e.target.value = e.target.value.toUpperCase();
+          handleTextInputChange(e);
+        }}
         inputClasses='capitalize'
         error={errors.personal_details?.id_number}
         touched={touched.personal_details?.id_number}
-        onBlur={handleBlur}
         disabled={!values.personal_details?.id_type}
+        onBlur={(e) => {
+          handleBlur(e);
+          const name = e.target.name.split('.')[1];
+          if (!errors.personal_details[name] && values.personal_details[name]) {
+            updateFields(name, values.personal_details[name]);
+          }
+        }}
       />
 
       <div className='flex items-center gap-2'>
@@ -194,15 +211,24 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         values.personal_details?.id_number ? (
           <>
             <Checkbox
-              checked={addressProofcheckbox}
-              setChecked={setAddressProofCheckbox}
+              checked={values?.personal_details?.extra_params?.same_as_id_type}
               name='terms-agreed'
               onChange={(e) => {
                 if (!e.target.checked) {
                   setFieldValue('personal_details.selected_address_proof', '');
                   setFieldValue('personal_details.address_proof_number', '');
+                } else {
+                  setFieldValue(
+                    'personal_details.selected_address_proof',
+                    values.personal_details?.id_type,
+                  );
+                  setFieldValue(
+                    'personal_details.address_proof_number',
+                    values.personal_details?.id_number,
+                  );
                 }
-                setAddressProofCheckbox(e.target.checked);
+                setFieldValue('personal_details.extra_params.same_as_id_type', e.target.checked);
+                updateFields();
               }}
               disabled={!values.personal_details?.id_type}
             />
@@ -216,15 +242,23 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         ) : (
           <>
             <Checkbox
-              checked={addressProofcheckbox}
-              setChecked={setAddressProofCheckbox}
+              checked={values?.personal_details?.extra_params?.same_as_id_type}
               name='terms-agreed'
               onChange={(e) => {
                 if (!e.target.checked) {
                   setFieldValue('personal_details.selected_address_proof', '');
                   setFieldValue('personal_details.address_proof_number', '');
+                } else {
+                  setFieldValue(
+                    'personal_details.selected_address_proof',
+                    values.personal_details?.id_type,
+                  );
+                  setFieldValue(
+                    'personal_details.address_proof_number',
+                    values.personal_details?.id_number,
+                  );
                 }
-                setAddressProofCheckbox(e.target.checked);
+                setFieldValue('personal_details.extra_params.same_as_id_type', e.target.checked);
               }}
               disabled={true}
             />
@@ -244,9 +278,11 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         defaultSelected={values.personal_details?.selected_address_proof}
         error={errors.personal_details?.selected_address_proof}
         touched={touched.personal_details?.selected_address_proof}
-        onBlur={handleBlur}
-        disabled={addressProofcheckbox}
+        disabled={values?.personal_details?.extra_params?.same_as_id_type}
         disableOption={values.personal_details?.id_type}
+        onBlur={(e) => {
+          handleBlur(e);
+        }}
       />
 
       <TextInput
@@ -255,12 +291,24 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         required
         name='personal_details.address_proof_number'
         value={values.personal_details?.address_proof_number}
-        onChange={handleTextInputChange}
+        onChange={(e) => {
+          e.target.value = e.target.value.toUpperCase();
+          handleTextInputChange(e);
+        }}
         inputClasses='capitalize'
         error={errors.personal_details?.address_proof_number}
         touched={touched.personal_details?.address_proof_number}
-        onBlur={handleBlur}
-        disabled={!values.personal_details?.selected_address_proof || addressProofcheckbox}
+        disabled={
+          !values.personal_details?.selected_address_proof ||
+          values?.personal_details?.extra_params?.same_as_id_type
+        }
+        onBlur={(e) => {
+          handleBlur(e);
+          const name = e.target.name.split('.')[1];
+          if (!errors.personal_details[name] && values.personal_details[name]) {
+            updateFields(name, values.personal_details[name]);
+          }
+        }}
       />
 
       <TextInput
@@ -272,7 +320,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         onChange={handleTextInputChange}
         error={errors.personal_details?.first_name}
         touched={touched.personal_details?.first_name}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+          const name = e.target.name.split('.')[1];
+          if (!errors.personal_details[name] && values.personal_details[name]) {
+            updateFields(name, values.personal_details[name]);
+          }
+        }}
       />
       <TextInput
         label='Middle Name'
@@ -282,7 +336,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         onChange={handleTextInputChange}
         error={errors.personal_details?.middle_name}
         touched={touched.personal_details?.middle_name}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+          const name = e.target.name.split('.')[1];
+          if (!errors.personal_details[name] && values.personal_details[name]) {
+            updateFields(name, values.personal_details[name]);
+          }
+        }}
       />
       <TextInput
         label='Last Name'
@@ -292,7 +352,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         onChange={handleTextInputChange}
         error={errors.personal_details?.last_name}
         touched={touched.personal_details?.last_name}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+          const name = e.target.name.split('.')[1];
+          if (!errors.personal_details[name] && values.personal_details[name]) {
+            updateFields(name, values.personal_details[name]);
+          }
+        }}
       />
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
@@ -333,8 +399,14 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         label='Date of Birth'
         error={errors.personal_details?.date_of_birth}
         touched={touched.personal_details?.date_of_birth}
-        onBlur={handleBlur}
         disabled={true}
+        onBlur={(e) => {
+          handleBlur(e);
+          const name = e.target.name.split('.')[1];
+          if (!errors.personal_details[name] && values.personal_details[name]) {
+            updateFields(name, personal_details[name]);
+          }
+        }}
       />
 
       <TextInput
@@ -346,8 +418,14 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         onChange={handleTextInputChange}
         error={errors.personal_details?.mobile_number}
         touched={touched.personal_details?.mobile_number}
-        onBlur={handleBlur}
         disabled={true}
+        onBlur={(e) => {
+          handleBlur(e);
+          const name = e.target.name.split('.')[1];
+          if (!errors.personal_details[name] && values.personal_details[name]) {
+            updateFields(name, values.personal_details[name]);
+          }
+        }}
       />
 
       <TextInput
@@ -359,7 +437,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         onChange={handleTextInputChange}
         error={errors.personal_details?.father_husband_name}
         touched={touched.personal_details?.father_husband_name}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+          const name = e.target.name.split('.')[1];
+          if (!errors.personal_details[name] && values.personal_details[name]) {
+            updateFields(name, values.personal_details[name]);
+          }
+        }}
       />
 
       <TextInput
@@ -371,7 +455,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         onChange={handleTextInputChange}
         error={errors.personal_details?.mother_name}
         touched={touched.personal_details?.mother_name}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+          const name = e.target.name.split('.')[1];
+          if (!errors.personal_details[name] && values.personal_details[name]) {
+            updateFields(name, values.personal_details[name]);
+          }
+        }}
       />
 
       <div className='flex flex-col gap-2'>
@@ -411,11 +501,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         required
         options={manualModeDropdownOptions[2].options}
         placeholder='Eg: Hindu'
-        onChange={(e) => handleSearchableTextInputChange('religion', e)}
+        onChange={(e) => handleDropdownChange('personal_details.religion', e)}
         defaultSelected={values.personal_details?.religion}
         error={errors.personal_details?.religion}
         touched={touched.personal_details?.religion}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+        }}
       />
 
       <DropDown
@@ -424,11 +516,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         required
         options={manualModeDropdownOptions[3].options}
         placeholder='Eg: Hindi'
-        onChange={(e) => handleSearchableTextInputChange('preferred_language', e)}
+        onChange={(e) => handleDropdownChange('personal_details.preferred_language', e)}
         defaultSelected={values.personal_details?.preferred_language}
         error={errors.personal_details?.preferred_language}
         touched={touched.personal_details?.preferred_language}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+        }}
       />
 
       <DropDown
@@ -437,11 +531,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         required
         options={manualModeDropdownOptions[4].options}
         placeholder='Eg: Graduate'
-        onChange={(e) => handleSearchableTextInputChange('qualification', e)}
+        onChange={(e) => handleDropdownChange('personal_details.qualification', e)}
         defaultSelected={values.personal_details?.qualification}
         error={errors.personal_details?.qualification}
         touched={touched.personal_details?.qualification}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+        }}
       />
 
       <TextInputWithSendOtp
@@ -452,7 +548,6 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
         onChange={handleTextInputChange}
         error={errors.personal_details?.email}
         touched={touched.personal_details?.email}
-        onBlur={handleBlur}
         onOTPSendClick={sendEmailOTP}
         disabledOtpButton={!!errors.personal_details?.email || emailVerified || hasSentOTPOnce}
         disabled={disableEmailInput}
@@ -463,6 +558,13 @@ export default function ManualMode({ requiredFieldsStatus, setRequiredFieldsStat
           `
             : null
         }
+        onBlur={(e) => {
+          handleBlur(e);
+          const name = e.target.name.split('.')[1];
+          if (!errors.personal_details[name] && values.personal_details[name]) {
+            updateFields(name, values.personal_details[name]);
+          }
+        }}
       />
 
       {showOTPInput && (

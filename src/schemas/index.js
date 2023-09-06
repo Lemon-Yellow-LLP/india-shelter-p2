@@ -104,9 +104,49 @@ export const signUpSchema = Yup.object({
   personal_details: Yup.object().shape({
     how_would_you_like_to_proceed: Yup.string().required('This field is mandatory.'),
     id_type: Yup.string().required('This field is mandatory.'),
-    id_number: Yup.string().required('Enter a valid ID number'),
+    id_number: Yup.string().when('id_type', (value, schema) => {
+      if (value[0] === 'Passport') {
+        return schema
+          .matches(
+            /^[A-Z]{1}[A-Z0-9]{7}[A-Z]{1}$/,
+            'Invalid Passport number. Format should be P1234567B',
+          )
+          .required('Enter a valid ID number');
+      } else if (value[0] === 'PAN Card') {
+        return schema
+          .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid Pan number. Format should be AAAPB2117A')
+          .required('Enter a valid ID number');
+      } else if (value[0] === 'Aadhar') {
+        return schema
+          .matches(/^\d{12}$/, 'Enter Valid 12 digit Aadhar number')
+          .required('Enter a valid ID number');
+      } else {
+        return schema.required('Enter a valid ID number');
+      }
+    }),
+
     selected_address_proof: Yup.string().required('This field is mandatory.'),
-    address_proof_number: Yup.string().required('Enter a valid address proof number'),
+    address_proof_number: Yup.string().when('selected_address_proof', (value, schema) => {
+      if (value[0] === 'Passport') {
+        return schema
+          .matches(
+            /^[A-Z]{1}[A-Z0-9]{7}[A-Z]{1}$/,
+            'Invalid Passport number. Format should be P1234567B',
+          )
+          .required('Enter a valid address proof number');
+      } else if (value[0] === 'PAN Card') {
+        return schema
+          .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid Pan number. Format should be AAAPB2117A')
+          .required('Enter a valid address proof number');
+      } else if (value[0] === 'Aadhar') {
+        return schema
+          .matches(/^\d{12}$/, 'Enter Valid 12 digit Aadhar number')
+          .required('Enter a valid address proof number');
+      } else {
+        return schema.required('Enter a valid address proof number');
+      }
+    }),
+
     first_name: Yup.string()
       .min(2, 'First Name must be atleast 2 characters long')
       .max(10, 'First Name can be max 10 characters long')
@@ -125,8 +165,16 @@ export const signUpSchema = Yup.object({
     mobile_number: Yup.string()
       .matches(/^(?!.*(\d{5}).*\1)\d{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),
-    father_husband_name: Yup.string().required('Father/Husband Name is required'),
-    mother_name: Yup.string().required('Mother Name is required'),
+    father_husband_name: Yup.string()
+      .min(2, 'Father/Husbands Name must be atleast 2 characters long')
+      .max(10, 'Father/Husbands Name can be max 10 characters long')
+      .required('Father/Husbands Name is required')
+      .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
+    mother_name: Yup.string()
+      .min(2, 'Mother Name must be atleast 2 characters long')
+      .max(10, 'Mother Name can be max 10 characters long')
+      .required('Mother Name is required')
+      .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     marital_status: Yup.string().required('This field is mandatory.'),
     religion: Yup.string().required('Religion is required'),
     preferred_language: Yup.string().required('Preferred Language is required'),
