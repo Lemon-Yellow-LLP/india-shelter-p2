@@ -104,6 +104,7 @@ const AuthContextProvider = ({ children }) => {
   const [showError, setShowError] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [addressProofcheckbox, setAddressProofCheckbox] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [stepsProgress, setStepProgress] = useState([
     {
@@ -246,6 +247,8 @@ const AuthContextProvider = ({ children }) => {
         setIsLeadGenearted,
         showError,
         setShowError,
+        addressProofcheckbox,
+        setAddressProofCheckbox,
         toastMessage,
         setToastMessage,
       }}

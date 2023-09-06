@@ -83,6 +83,8 @@ export {
   checkIsValidStatePincode,
   getEmailOtp,
   verifyEmailOtp,
+  getEmailOtp,
+  verifyEmailOtp,
   editReferenceById,
   editFieldsById,
 };

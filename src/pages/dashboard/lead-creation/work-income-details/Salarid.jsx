@@ -3,7 +3,7 @@ import { AuthContext } from '../../../../context/AuthContext';
 import TextInput from '../../../../components/TextInput';
 import DropDown from '../../../../components/DropDown';
 import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
-import { top100Films } from '../../../../assets/SearchableInputTestJsonData.json';
+// import { top100Films } from '../../../../assets/SearchableInputTestJsonData.json';
 
 export default function Salarid() {
   const { values, setValues, errors } = useContext(AuthContext);
@@ -38,7 +38,7 @@ export default function Salarid() {
 
   return (
     <>
-      <SearchableTextInput
+      {/* <SearchableTextInput
         label='Company name'
         placeholder='Eg: Idea'
         required
@@ -47,7 +47,7 @@ export default function Salarid() {
         onChange={handleTextInputChange}
         type='search'
         options={top100Films}
-      />
+      /> */}
 
       <TextInput
         label='Total income'
