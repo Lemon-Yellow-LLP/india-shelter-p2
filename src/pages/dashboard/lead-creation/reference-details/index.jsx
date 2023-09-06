@@ -889,7 +889,7 @@ const ReferenceDetails = () => {
         </div>
       </div>
 
-      <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' />
+      {/* <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' /> */}
     </div>
   );
 };
