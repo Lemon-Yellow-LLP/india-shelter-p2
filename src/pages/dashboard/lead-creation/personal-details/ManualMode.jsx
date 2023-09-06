@@ -133,7 +133,10 @@ export default function ManualMode({
       setFieldValue('personal_details.address_proof_number', values.personal_details?.id_number);
     }
 
-    if (values.personal_details?.id_type === 'PAN Card') {
+    if (
+      values?.personal_details?.extra_params?.same_as_id_type &&
+      values.personal_details?.id_type === 'PAN Card'
+    ) {
       setFieldValue('personal_details.selected_address_proof', '');
       setFieldValue('personal_details.address_proof_number', '');
       setFieldValue('personal_details.extra_params.same_as_id_type', false);
@@ -173,6 +176,7 @@ export default function ManualMode({
         defaultSelected={values.personal_details?.id_type}
         error={errors.personal_details?.id_type}
         touched={touched.personal_details?.id_type}
+        disableOption={values.personal_details?.selected_address_proof}
         onBlur={(e) => {
           handleBlur(e);
         }}
