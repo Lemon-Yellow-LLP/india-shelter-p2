@@ -65,8 +65,12 @@ async function getEmailOtp(id) {
 }
 
 async function verifyEmailOtp(id, otp) {
-  console.log(otp);
   const res = await axios.post(`${API_URL}/personal/verify-email/${id}`, { otp }, requestOptions);
+  return res;
+}
+
+async function editFieldsById(id, page, values) {
+  const res = await axios.patch(`${API_URL}/${page}/edit/${id}`, values, requestOptions);
   return res;
 }
 
@@ -80,4 +84,5 @@ export {
   getEmailOtp,
   verifyEmailOtp,
   editReferenceById,
+  editFieldsById,
 };
