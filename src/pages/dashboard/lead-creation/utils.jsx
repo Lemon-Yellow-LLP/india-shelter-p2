@@ -10,6 +10,8 @@ import {
   IconSalarid,
   IconSelfEmployed,
 } from '../../../assets/icons';
+import IconRetired from '../../../assets/icons/retired';
+import IconUnemployed from '../../../assets/icons/unemployed';
 
 export const personalDetailsModeOption = [
   {
@@ -62,14 +64,24 @@ export const personalMaritalStatusOptions = [
 
 export const professionOptions = [
   {
-    label: 'Salarid',
-    value: 'Salarid',
+    label: 'Salaried',
+    value: 'Salaried',
     icon: <IconSalarid />,
   },
   {
     label: 'Self employed',
     value: 'SelfEmployed',
     icon: <IconSelfEmployed />,
+  },
+  {
+    label: 'Un employed',
+    value: 'Unemployed',
+    icon: <IconUnemployed />,
+  },
+  {
+    label: 'Retired',
+    value: 'Retired',
+    icon: <IconRetired />,
   },
 ];
 
