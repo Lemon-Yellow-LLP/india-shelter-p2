@@ -85,7 +85,12 @@ export default function ManualMode({
     (e) => {
       const value = e.target.value;
       const pattern = /^[A-Za-z]+$/;
-      if (pattern.exec(value[value.length - 1]) && e.target.name !== 'personal_details.email') {
+      if (
+        pattern.exec(value[value.length - 1]) &&
+        e.target.name !== 'personal_details.email' &&
+        e.target.name !== 'personal_details.id_number' &&
+        e.target.name !== 'personal_details.address_proof_number'
+      ) {
         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
 
@@ -97,9 +102,35 @@ export default function ManualMode({
         e.target.name === 'personal_details.id_number' ||
         e.target.name === 'personal_details.address_proof_number'
       ) {
-        const pattern2 = /^[A-Za-z0-9]+$/;
-        if (pattern2.exec(value[value.length - 1])) {
-          setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+        if (
+          e.target.name === 'personal_details.id_number' &&
+          values.personal_details.id_type === 'Aadhar'
+        ) {
+          let aadharPattern = /^\d$/;
+          if (aadharPattern.exec(value[value.length - 1])) {
+            const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
+            const maskedAadhar = maskedPortion + value.slice(8);
+            setFieldValue(e.target.name, maskedAadhar);
+          } else if (value.length < values.personal_details.id_number.length) {
+            setFieldValue(e.target.name, value);
+          }
+        } else if (
+          e.target.name === 'personal_details.address_proof_number' &&
+          values.personal_details.selected_address_proof === 'Aadhar'
+        ) {
+          let aadharPattern = /^\d$/;
+          if (aadharPattern.exec(value[value.length - 1])) {
+            const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
+            const maskedAadhar = maskedPortion + value.slice(8);
+            setFieldValue(e.target.name, maskedAadhar);
+          } else if (value.length < values.personal_details.address_proof_number.length) {
+            setFieldValue(e.target.name, value);
+          }
+        } else {
+          const pattern2 = /^[A-Za-z0-9]+$/;
+          if (pattern2.exec(value[value.length - 1])) {
+            setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
         }
       }
 
@@ -112,7 +143,13 @@ export default function ManualMode({
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus],
+    [
+      requiredFieldsStatus,
+      values.personal_details.id_number,
+      values.personal_details.address_proof_number,
+      values.personal_details.id_type,
+      values.personal_details.selected_address_proof,
+    ],
   );
 
   const handleDropdownChange = useCallback(
