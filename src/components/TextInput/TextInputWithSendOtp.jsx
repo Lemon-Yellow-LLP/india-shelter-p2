@@ -28,7 +28,7 @@ const TextInputWithSendOtp = memo(
     ref,
   ) {
     const inputRef = useRef();
-
+    console.log(message, error);
     return (
       <div className='flex flex-col gap-1'>
         <label htmlFor={name} className='flex gap-0.5 items-center text-primary-black'>

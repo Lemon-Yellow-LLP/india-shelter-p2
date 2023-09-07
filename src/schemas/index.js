@@ -11,18 +11,7 @@ function parseDateString(_, originalValue) {
 
 export const signUpSchema = Yup.object({
   propertySchema: Yup.object().shape({
-    property_identification_is: Yup.string()
-      .required('This field is mandatory')
-      .test({
-        name: 'min',
-        exclusive: false,
-        params: {},
-        message: 'Property estimation value should be greater than Loan Amount',
-        test: function (value) {
-          // You can access the price field with `this.parent`.
-          return parseInt(value) >= parseInt(this.parent.loan_request_amount);
-        },
-      }),
+    property_identification_is: Yup.string().required('This field is mandatory'),
     property_value_estimate: Yup.string().required('This field is mandatory'),
     owner_name: Yup.string()
       .required('This field is mandatory')
@@ -30,11 +19,11 @@ export const signUpSchema = Yup.object({
       .max(90, 'Name can be max 90 characters long'),
     plot_house_flat: Yup.string()
       .required('This field is mandatory')
-      .min(2, 'Address must be atleast 10 characters long')
+      .min(2, 'Address must be atleast 2 characters long')
       .max(90, 'Address can be max 90 characters long'),
     project_society_colony: Yup.string()
       .required('This field is mandatory')
-      .min(2, 'Address must be atleast 10 characters long')
+      .min(10, 'Address must be atleast 10 characters long')
       .max(90, 'Address can be max 90 characters long'),
     pincode: Yup.string()
       .required('This field is mandatory')
@@ -119,8 +108,8 @@ export const signUpSchema = Yup.object({
       if (value[0] === 'Passport') {
         return schema
           .matches(
-            /^[A-Z]{1}[A-Z0-9]{7}[A-Z]{1}$/,
-            'Invalid Passport number. Format should be P1234567B',
+            /^[A-PR-WY-Za-pr-wy-z][0-9]{7}$/,
+            'Invalid Passport number. Format should be J1234567',
           )
           .required('Enter a valid ID number');
       } else if (value[0] === 'PAN Card') {
@@ -130,6 +119,17 @@ export const signUpSchema = Yup.object({
       } else if (value[0] === 'Aadhar') {
         return schema
           .matches(/^\d{12}$/, 'Enter Valid 12 digit Aadhar number')
+          .required('Enter a valid ID number');
+      } else if (value[0] === 'Driving license') {
+        return schema
+          .matches(
+            /^[A-Za-z]{2}\d{13}$/,
+            'Enter Valid Driving license number. Format should be DL1234567891012',
+          )
+          .required('Enter a valid ID number');
+      } else if (value[0] === 'Voter ID') {
+        return schema
+          .matches(/^[A-Za-z]{3}\d{7}$/, 'Enter Valid Voter ID number. Format should be XGS1234567')
           .required('Enter a valid ID number');
       } else {
         return schema.required('Enter a valid ID number');
@@ -141,8 +141,8 @@ export const signUpSchema = Yup.object({
       if (value[0] === 'Passport') {
         return schema
           .matches(
-            /^[A-Z]{1}[A-Z0-9]{7}[A-Z]{1}$/,
-            'Invalid Passport number. Format should be P1234567B',
+            /^[A-PR-WY-Za-pr-wy-z][0-9]{7}$/,
+            'Invalid Passport number. Format should be J1234567',
           )
           .required('Enter a valid address proof number');
       } else if (value[0] === 'PAN Card') {
@@ -152,6 +152,17 @@ export const signUpSchema = Yup.object({
       } else if (value[0] === 'Aadhar') {
         return schema
           .matches(/^\d{12}$/, 'Enter Valid 12 digit Aadhar number')
+          .required('Enter a valid address proof number');
+      } else if (value[0] === 'Driving license') {
+        return schema
+          .matches(
+            /^[A-Za-z]{2}\d{13}$/,
+            'Enter Valid Driving license number. Format should be DL1234567891012',
+          )
+          .required('Enter a valid address proof number');
+      } else if (value[0] === 'Voter ID') {
+        return schema
+          .matches(/^[A-Za-z]{3}\d{7}$/, 'Enter Valid Voter ID number. Format should be XGS1234567')
           .required('Enter a valid address proof number');
       } else {
         return schema.required('Enter a valid address proof number');
@@ -191,7 +202,6 @@ export const signUpSchema = Yup.object({
     preferred_language: Yup.string().required('Preferred Language is required'),
     qualification: Yup.string().required('Qualification is required'),
     email: Yup.string()
-      .email()
       .required('Please enter your email')
       .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   }),
