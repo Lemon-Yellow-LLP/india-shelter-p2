@@ -118,7 +118,8 @@ export const signUpSchema = Yup.object({
           .required('Enter a valid ID number');
       } else if (value[0] === 'Aadhar') {
         return schema
-          .matches(/^\d{12}$/, 'Enter Valid 12 digit Aadhar number')
+          .min(12, 'Enter Valid 12 digit Aadhar number')
+          .max(12, 'Enter Valid 12 digit Aadhar number')
           .required('Enter a valid ID number');
       } else if (value[0] === 'Driving license') {
         return schema
@@ -151,7 +152,8 @@ export const signUpSchema = Yup.object({
           .required('Enter a valid address proof number');
       } else if (value[0] === 'Aadhar') {
         return schema
-          .matches(/^\d{12}$/, 'Enter Valid 12 digit Aadhar number')
+          .min(12, 'Enter Valid 12 digit Aadhar number')
+          .max(12, 'Enter Valid 12 digit Aadhar number')
           .required('Enter a valid address proof number');
       } else if (value[0] === 'Driving license') {
         return schema
