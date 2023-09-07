@@ -105,9 +105,9 @@ const PropertyDetails = () => {
         ) : null}
       </div>
 
-      <button onClick={handleSubmit}>submit</button>
+      {/* <button onClick={handleSubmit}>submit</button> */}
 
-      <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' />
+      {/* <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' /> */}
     </div>
   );
 };
