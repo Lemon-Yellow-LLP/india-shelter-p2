@@ -76,7 +76,29 @@ export const signUpSchema = Yup.object({
       .email('Enter a valid Email')
       .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   }),
-
+  work_income_details: Yup.object().shape({
+    profession: Yup.string().required('This field is mandatory'),
+    company_name: Yup.string().required('This field is mandatory'),
+    business_name: Yup.string().required('This field is mandatory'),
+    industries: Yup.string().required('This field is mandatory'),
+    gst_number: Yup.string().required('This field is mandatory'),
+    total_income: Yup.string().required('This field is mandatory'),
+    pf_uan: Yup.string().required('This field is mandatory'),
+    no_current_loan: Yup.string().required('This field is mandatory'),
+    ongoing_emi: Yup.string().required('This field is mandatory'),
+    working_since: Yup.string().required('This field is mandatory'),
+    mode_of_salary: Yup.string().required('This field is mandatory'),
+    flat_no_building_name: Yup.string().required('This field is mandatory'),
+    street_area_locality: Yup.string().required('This field is mandatory'),
+    town: Yup.string().required('This field is mandatory'),
+    landmark: Yup.string().required('This field is mandatory'),
+    pincode: Yup.string().required('This field is mandatory'),
+    city: Yup.string().required('This field is mandatory'),
+    state: Yup.string().required('This field is mandatory'),
+    total_family_number: Yup.string().required('This field is mandatory'),
+    total_household_income: Yup.string().required('This field is mandatory'),
+    no_of_dependents: Yup.string().required('This field is mandatory'),
+  }),
   pan_number: Yup.string()
     .required('Please enter your valid PAN number')
     .min(10, 'Pan Number must be in the following format ex. ABCDE1234F')
