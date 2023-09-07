@@ -35,7 +35,7 @@ const TextInput = memo(
         </label>
         {hint && (
           <span
-            className='mb-1.5 text-light-grey text-sm font-normal'
+            className='mb-1.5 text-light-grey text-xs font-normal'
             dangerouslySetInnerHTML={{
               __html: hint,
             }}
