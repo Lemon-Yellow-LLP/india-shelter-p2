@@ -74,8 +74,10 @@ const SearchableTextInput = memo(
           <Autocomplete
             ref={ref || inputRef}
             disablePortal
+            className={`w-full focus:outline-none ${inputClasses}`}
             id={name}
             name={name}
+            onBlur={props.onBlur}
             onChange={(e, value) => onChange(name, value)}
             options={options}
             sx={{ width: 300, border: 'none' }}
