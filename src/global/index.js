@@ -81,6 +81,16 @@ async function editFieldsById(id, page, values) {
   return res;
 }
 
+async function getMobileOtp(id) {
+  const res = await axios.get(`${API_URL}/applicant/send-sms/${id}`, {}, requestOptions);
+  return res;
+}
+
+async function verifyMobileOtp(id, otp) {
+  const res = await axios.post(`${API_URL}/applicant/verify-sms/${id}`, { otp }, requestOptions);
+  return res;
+}
+
 export {
   API_URL,
   pingAPI,
@@ -93,4 +103,6 @@ export {
   editReferenceById,
   editPropertyById,
   editFieldsById,
+  getMobileOtp,
+  verifyMobileOtp,
 };

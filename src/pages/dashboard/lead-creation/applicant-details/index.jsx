@@ -3,7 +3,14 @@ import { useState, useCallback } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import { IconHomeLoan, IconLoanAgainstProperty } from '../../../../assets/icons';
 import DatePicker from '../../../../components/DatePicker';
-import { isEighteenOrAbove } from '../../../../global/index';
+import otpVerified from '../../../../assets/icons/otp-verified.svg';
+import {
+  editFieldsById,
+  isEighteenOrAbove,
+  getMobileOtp,
+  verifyMobileOtp,
+} from '../../../../global/index';
+
 import {
   CardRadio,
   TextInput,
@@ -95,35 +102,32 @@ const loanPurposeData = [
 ];
 
 const ApplicantDetails = () => {
-  const [leadExists, setLeadExists] = useState(false);
+  const {
+    inputDisabled,
+    values,
+    handleBlur,
+    errors,
+    touched,
+    setFieldValue,
+    setFieldError,
+    updateProgress,
+  } = useContext(AuthContext);
+
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
+  const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
+
+  const [mobileVerified, setMobileVerified] = useState(
+    values?.applicant_details?.is_mobile_verified,
+  );
+
+  const [showOTPInput, setShowOTPInput] = useState(false);
+
   const [loanFields, setLoanFields] = useState(loanOptions);
   const [loanPurposeOptions, setLoanPurposeOptions] = useState(loanPurposeData);
 
   const dateInputRef = useRef(null);
 
-  const {
-    inputDisabled,
-    currentLeadId,
-    setValues,
-    values,
-    handleBlur,
-    handleChange,
-    errors,
-    touched,
-    phoneNumberVerified,
-    setPhoneNumberVerified,
-    isLeadGenerated,
-    setFieldValue,
-    setFieldError,
-    handleSubmit,
-    updateProgress,
-  } = useContext(AuthContext);
-
   const [date, setDate] = useState(values?.applicant_details?.date_of_birth);
-
-  const [disablePhoneNumber, setDisablePhoneNumber] = useState(phoneNumberVerified);
-  const [showOTPInput, setShowOTPInput] = useState(isLeadGenerated);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     loan_type: false,
@@ -135,20 +139,32 @@ const ApplicantDetails = () => {
     mobile_number: false,
   });
 
+  const updateFields = async (name, value) => {
+    let newData = values.applicant_details;
+    newData[name] = value;
+    await editFieldsById(1, 'applicant', newData);
+  };
+
+  const updateFieldsLead = async (name, value) => {
+    let newData = values.lead;
+    newData[name] = value;
+    await editFieldsById(1, 'lead', newData);
+  };
+
   useEffect(() => {
     updateProgress(0, requiredFieldsStatus);
   }, [requiredFieldsStatus]);
 
   const onLoanTypeChange = useCallback(
     (e) => {
-      setFieldValue(e.name, e.value.charAt(0).toUpperCase() + e.value.slice(1));
-
+      setFieldValue(e.name, e.value);
       const name = e.name.split('.')[1];
+      updateFieldsLead(name, e.value);
       if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [currentLeadId, setValues, requiredFieldsStatus],
+    [requiredFieldsStatus],
   );
 
   const handleTextInputChange = useCallback(
@@ -158,6 +174,7 @@ const ApplicantDetails = () => {
       if (pattern.exec(value[value.length - 1])) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
         const name = e.currentTarget.name.split('.')[1];
+        updateFields(name, value);
         if (
           requiredFieldsStatus[name] !== undefined &&
           !requiredFieldsStatus[name] &&
@@ -172,8 +189,8 @@ const ApplicantDetails = () => {
 
   const handleLoanPurposeChange = useCallback(
     (value) => {
-      setFieldValue('applicant_details.purpose_of_loan', value);
-
+      setFieldValue('lead.purpose_of_loan', value);
+      updateFieldsLead('purpose_of_loan', value);
       if (
         requiredFieldsStatus['purpose_of_loan'] !== undefined &&
         !requiredFieldsStatus['purpose_of_loan']
@@ -186,8 +203,8 @@ const ApplicantDetails = () => {
 
   const handlePropertyType = useCallback(
     (value) => {
-      setFieldValue('applicant_details.property_type', value);
-
+      setFieldValue('lead.property_type', value);
+      updateFieldsLead('property_type', value);
       if (
         requiredFieldsStatus['property_type'] !== undefined &&
         !requiredFieldsStatus['property_type']
@@ -223,6 +240,7 @@ const ApplicantDetails = () => {
 
       setFieldValue('applicant_details.mobile_number', phoneNumber);
 
+      updateFields('mobile_number', phoneNumber);
       if (
         phoneNumber.length === 10 &&
         requiredFieldsStatus['mobile_number'] !== undefined &&
@@ -236,8 +254,8 @@ const ApplicantDetails = () => {
 
   const handleLoanAmountChange = useCallback(
     (e) => {
-      setFieldValue('applicant_details.applied_amount', e.currentTarget.value);
-
+      setFieldValue('lead.applied_amount', e.currentTarget.value);
+      updateFieldsLead('applied_amount', e.currentTarget.value);
       if (
         requiredFieldsStatus['applied_amount'] !== undefined &&
         !requiredFieldsStatus['applied_amount']
@@ -247,10 +265,6 @@ const ApplicantDetails = () => {
     },
     [requiredFieldsStatus],
   );
-
-  const onOTPSendClick = useCallback(() => {}, [leadExists, disablePhoneNumber]);
-
-  const verifyLeadOTP = useCallback(async (otp) => {}, [setPhoneNumberVerified]);
 
   useEffect(() => {
     if (!date) return;
@@ -262,6 +276,7 @@ const ApplicantDetails = () => {
       return;
     }
     setFieldValue('applicant_details.date_of_birth', date);
+    updateFields('date_of_birth', date);
   }, [date, setFieldError, setFieldValue]);
 
   const datePickerScrollToTop = () => {
@@ -270,9 +285,33 @@ const ApplicantDetails = () => {
     }
   };
 
-  // console.log('values', values);
-  // console.log(errors);
-  // console.log(touched);
+  const sendMobileOtp = () => {
+    setDisablePhoneNumber((prev) => !prev);
+    setShowOTPInput(true);
+    setHasSentOTPOnce(true);
+    getMobileOtp(1);
+    setToastMessage('OTP has been sent to your mail id');
+  };
+
+  const verifyOTP = useCallback((otp) => {
+    verifyMobileOtp(1, otp)
+      .then((res) => {
+        setMobileVerified(true);
+        setFieldValue('applicant_details.is_mobile_verified', true);
+        updateFields('is_mobile_verified', true);
+        setShowOTPInput(false);
+        return true;
+      })
+      .catch((err) => {
+        setMobileVerified(false);
+        setShowOTPInput(true);
+        return false;
+      });
+  }, []);
+
+  console.log('values', values.applicant_details);
+  // console.log('errors',errors.applicant_details);
+  // console.log('touched',touched.applicant_details);
 
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
@@ -291,10 +330,10 @@ const ApplicantDetails = () => {
             {loanTypeOptions.map((data, index) => (
               <CardRadio
                 key={index}
-                name='applicant_details.loan_type'
+                name='lead.loan_type'
                 label={data.label}
                 value={data.value}
-                current={values.applicant_details?.loan_type}
+                current={values.lead?.loan_type}
                 onChange={onLoanTypeChange}
                 containerClasses='flex-1'
               >
@@ -308,8 +347,8 @@ const ApplicantDetails = () => {
           label='Required loan amount'
           placeholder='5,00,000'
           required
-          name='applicant_details.applied_amount'
-          value={values.applicant_details?.applied_amount}
+          name='lead.applied_amount'
+          value={values.lead?.applied_amount}
           onBlur={handleBlur}
           onChange={handleLoanAmountChange}
           displayError={false}
@@ -321,17 +360,15 @@ const ApplicantDetails = () => {
           minValueLabel='1 L'
           maxValueLabel='50 L'
           onChange={handleLoanAmountChange}
-          initialValue={values.applicant_details?.applied_amount}
+          initialValue={values.lead?.applied_amount}
           min={100000}
           max={5000000}
           disabled={inputDisabled}
           step={50000}
         />
 
-        {errors?.applicant_details?.applied_amount && touched?.applicant_details?.applied_amount ? (
-          <span className='text-xs text-primary-red'>
-            {errors?.applicant_details?.applied_amount}
-          </span>
+        {errors?.lead?.applied_amount && touched?.lead?.applied_amount ? (
+          <span className='text-xs text-primary-red'>{errors?.lead?.applied_amount}</span>
         ) : null}
 
         <TextInput
@@ -394,25 +431,25 @@ const ApplicantDetails = () => {
 
         <DropDown
           label='Purpose of loan'
-          name='applicant_details.purpose_of_loan'
+          name='lead.purpose_of_loan'
           required
           options={loanPurposeOptions}
           placeholder='Eg: Choose reference type'
           onChange={handleLoanPurposeChange}
-          touched={touched?.applicant_details?.purpose_of_loan}
-          error={errors?.applicant_details?.purpose_of_loan}
+          touched={touched?.lead?.purpose_of_loan}
+          error={errors?.lead?.purpose_of_loan}
           onBlur={handleBlur}
-          defaultSelected={values.applicant_details?.purpose_of_loan}
+          defaultSelected={values.lead?.purpose_of_loan}
           inputClasses='mt-2'
         />
 
         <DropDown
           label='Property Type'
-          name='applicant_details.property_type'
+          name='lead.property_type'
           required
           placeholder='Eg: Residential'
           options={
-            loanFields[values.applicant_details?.purpose_of_loan] || [
+            loanFields[values.lead?.purpose_of_loan] || [
               {
                 label: 'Residential House',
                 value: 'Residential House',
@@ -420,26 +457,42 @@ const ApplicantDetails = () => {
             ]
           }
           onChange={handlePropertyType}
-          defaultSelected={values.applicant_details?.property_type}
-          touched={touched?.applicant_details?.property_type}
-          error={errors?.applicant_details?.property_type}
+          defaultSelected={values.lead?.property_type}
+          touched={touched?.lead?.property_type}
+          error={errors?.lead?.property_type}
           onBlur={handleBlur}
         />
 
         <TextInputWithSendOtp
-          label='Mobile number'
+          type='tel'
+          inputClasses='hidearrow'
+          label='Mobile Number'
           placeholder='Eg: 1234567890'
           required
           name='applicant_details.mobile_number'
-          type='tel'
           value={values.applicant_details?.mobile_number}
-          error={errors?.applicant_details?.mobile_number}
-          touched={touched?.applicant_details?.mobile_number}
-          onBlur={handleBlur}
-          onOTPSendClick={onOTPSendClick}
+          onChange={handleOnPhoneNumberChange}
+          error={errors.applicant_details?.mobile_number}
+          touched={touched.applicant_details?.mobile_number}
+          onOTPSendClick={sendMobileOtp}
           disabledOtpButton={
-            !((isLeadGenerated && !phoneNumberVerified && !disablePhoneNumber) || leadExists)
+            !!errors.applicant_details?.mobile_number || mobileVerified || hasSentOTPOnce
           }
+          disabled={disablePhoneNumber || mobileVerified}
+          message={
+            mobileVerified
+              ? `OTP Verfied
+          <img src="${otpVerified}" alt='Otp Verified' role='presentation' />
+          `
+              : null
+          }
+          onBlur={(e) => {
+            handleBlur(e);
+            const name = e.target.name.split('.')[1];
+            if (!errors.applicant_details[name] && values.applicant_details[name]) {
+              updateFields(name, values.applicant_details[name]);
+            }
+          }}
           pattern='\d*'
           onFocus={(e) =>
             e.target.addEventListener(
@@ -454,35 +507,25 @@ const ApplicantDetails = () => {
           onInput={(e) => {
             if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
           }}
-          onChange={handleOnPhoneNumberChange}
-          disabled={inputDisabled || disablePhoneNumber}
-          inputClasses='hidearrow'
-          message={
-            phoneNumberVerified
-              ? `OTP Verfied
-          <img src="${otpVerified}" alt='Otp Verified' role='presentation' />
-          `
-              : null
-          }
         />
 
         {showOTPInput && (
           <OtpInput
             label='Enter OTP'
             required
-            verified={phoneNumberVerified}
-            setOTPVerified={setPhoneNumberVerified}
-            onSendOTPClick={onOTPSendClick}
+            verified={mobileVerified}
+            setOTPVerified={setMobileVerified}
+            onSendOTPClick={sendMobileOtp}
             defaultResendTime={30}
-            disableSendOTP={(isLeadGenerated && !phoneNumberVerified) || leadExists}
-            verifyOTPCB={verifyLeadOTP}
+            disableSendOTP={!mobileVerified}
+            verifyOTPCB={verifyOTP}
             hasSentOTPOnce={hasSentOTPOnce}
           />
         )}
       </div>
-      <div className='position absolute '>
+      {/* <div className='bottom-0 absolute '>
         <PreviousNextButtons disablePrevious={true} linkNext='/lead/personal-details' />
-      </div>
+      </div> */}
     </div>
   );
 };

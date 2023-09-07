@@ -213,6 +213,7 @@ export default function ManualMode({
     setShowOTPInput(true);
     setHasSentOTPOnce(true);
     getEmailOtp(1);
+    setToastMessage('OTP has been sent to your mail id');
   };
 
   const verifyOTP = useCallback((otp) => {

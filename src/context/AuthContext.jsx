@@ -17,6 +17,7 @@ export const defaultValues = {
     geo_lat: '',
     geo_long: '',
   },
+
   referenceSchema: {
     reference_1_type: '',
     reference_1_full_name: '',
@@ -36,16 +37,20 @@ export const defaultValues = {
     reference_2_email: '',
   },
 
-  applicant_details: {
+  lead: {
     loan_type: '',
+    purpose_of_loan: '',
+    property_type: '',
     applied_amount: '500000',
+  },
+
+  applicant_details: {
     first_name: '',
     middle_name: '',
     last_name: '',
     date_of_birth: null,
-    purpose_of_loan: '',
-    property_type: '',
     mobile_number: '',
+    is_mobile_verified: false,
   },
 
   profession: '',
@@ -98,7 +103,6 @@ export const AuthContext = createContext(defaultValues);
 
 const AuthContextProvider = ({ children }) => {
   const [inputDisabled, setInputDisabled] = useState(false);
-  const [phoneNumberVerified, setPhoneNumberVerified] = useState(null);
   const [isLeadGenerated, setIsLeadGenearted] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showError, setShowError] = useState(false);
@@ -241,8 +245,6 @@ const AuthContextProvider = ({ children }) => {
         setIsAuthenticated,
         inputDisabled,
         setInputDisabled,
-        phoneNumberVerified,
-        setPhoneNumberVerified,
         isLeadGenerated,
         setIsLeadGenearted,
         showError,
