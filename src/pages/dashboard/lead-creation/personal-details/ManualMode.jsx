@@ -10,8 +10,7 @@ import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWith
 import { manualModeDropdownOptions } from './manualModeDropdownOptions';
 import OtpInput from '../../../../components/OtpInput/index';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
-import axios from 'axios';
-import { editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
+import { getEmailOtp, verifyEmailOtp } from '../../../../global';
 
 export default function ManualMode({
   requiredFieldsStatus,
@@ -90,12 +89,18 @@ export default function ManualMode({
         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
 
+      if (e.target.name === 'personal_details.email') {
+        setFieldValue(e.target.name, value);
+      }
+
       if (
         e.target.name === 'personal_details.id_number' ||
-        e.target.name === 'personal_details.address_proof_number' ||
-        e.target.name === 'personal_details.email'
+        e.target.name === 'personal_details.address_proof_number'
       ) {
-        setFieldValue(e.target.name, value);
+        const pattern2 = /^[A-Za-z0-9]+$/;
+        if (pattern2.exec(value[value.length - 1])) {
+          setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+        }
       }
 
       const name = e.target.name.split('.')[1];
