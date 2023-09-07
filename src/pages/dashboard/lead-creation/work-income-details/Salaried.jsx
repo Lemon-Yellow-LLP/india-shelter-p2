@@ -7,13 +7,11 @@ import CardRadioWithoutIcon from '../../../../components/CardRadio/CardRadioWith
 import { noOfDependentsOptions, totalFamilyMembersOptions } from '../utils';
 // import { top100Films } from '../../../../assets/SearchableInputTestJsonData.json';
 
-export default function Salarid() {
-  const { values, setValues, errors } = useContext(AuthContext);
+export default function Salaried() {
+  const { values, setValues, errors, touched, handleBlur, setFieldValue } = useContext(AuthContext);
 
-  const handleTextInputChange = useCallback((e) => {
-    let newData = values;
-    newData[e.target.name] = e.target.value;
-    setValues(newData);
+  const searchableTextInputChange = useCallback((name, value) => {
+    setFieldValue(name, value.value);
   }, []);
 
   const handleRadioChange = useCallback((e) => {
@@ -22,13 +20,13 @@ export default function Salarid() {
     setValues(newData);
   }, []);
 
-  const salaridDropdownOptions = [
+  const salariedDropdownOptions = [
     {
       title: 'No of Current Loans',
       options: [
         {
-          label: '1',
-          value: 1,
+          label: 'Others',
+          value: 'Others',
         },
         {
           label: '2',
@@ -46,130 +44,274 @@ export default function Salarid() {
 
   return (
     <>
-      {/* <SearchableTextInput
+      <SearchableTextInput
         label='Company name'
-        placeholder='Eg: Idea'
+        placeholder='Search company name'
         required
-        name='company_name'
-        value={values.company_name}
-        onChange={handleTextInputChange}
+        name='work_income_details.company_name'
+        value={values.work_income_details.company_name}
+        error={errors.work_income_details?.company_name}
+        touched={touched.work_income_details?.company_name}
+        onBlur={handleBlur}
+        onChange={searchableTextInputChange}
         type='search'
-        options={top100Films}
-      /> */}
+        options={salariedDropdownOptions[0].options}
+      />
 
       <TextInput
         label='Total income'
-        placeholder='Eg: 10,000'
+        placeholder='Eg: 1,00,000'
         required
-        name='total_income'
-        value={values.total_income}
-        onChange={handleTextInputChange}
+        name='work_income_details.total_income'
+        value={values.work_income_details.total_income}
+        error={errors.work_income_details?.total_income}
+        touched={touched.work_income_details?.total_income}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+
+          // const name = e.target.name.split('.')[1];
+          // if (!requiredFieldsStatus[name]) {
+          //   updateProgress(6, requiredFieldsStatus);
+          //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+          // }
+        }}
+      />
+
+      {values.work_income_details.company_name === 'Others' && (
+        <TextInput
+          label='Total income'
+          placeholder='Eg: 1,00,000'
+          required
+          name='work_income_details.total_income'
+          value={values.work_income_details.total_income}
+          error={errors.work_income_details?.total_income}
+          touched={touched.work_income_details?.total_income}
+          onBlur={handleBlur}
+          onChange={(e) => {
+            const value = e.currentTarget.value;
+            const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+            if (address_pattern.exec(value[value.length - 1])) {
+              setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            }
+
+            // const name = e.target.name.split('.')[1];
+            // if (!requiredFieldsStatus[name]) {
+            //   updateProgress(6, requiredFieldsStatus);
+            //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            // }
+          }}
+        />
+      )}
+
+      <TextInput
+        label='PF UAN'
+        placeholder='Eg: 100563503285'
+        name='work_income_details.pf_uan'
+        value={values.work_income_details.pf_uan}
+        error={errors.work_income_details?.pf_uan}
+        touched={touched.work_income_details?.pf_uan}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <TextInput
-        label='UTRN'
-        placeholder='Eg: 1234567'
-        name='utrn'
-        value={values.utrn}
-        onChange={handleTextInputChange}
-      />
-
-      <DropDown
         label='No. of current loan(s)'
-        required
-        options={salaridDropdownOptions[0].options}
         placeholder='Choose no. of current loan(s)'
-        onChange={handleDropdownChange}
-        defaultSelected={values.no_of_current_loans}
+        required
+        name='work_income_details.no_current_loan'
+        value={values.work_income_details.no_current_loan}
+        error={errors.work_income_details?.no_current_loan}
+        touched={touched.work_income_details?.no_current_loan}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <TextInput
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'
         required
-        name='ongoing_emi'
-        value={values.ongoing_emi}
-        onChange={handleTextInputChange}
+        name='work_income_details.ongoing_emi'
+        value={values.work_income_details.ongoing_emi}
+        error={errors.work_income_details?.ongoing_emi}
+        touched={touched.work_income_details?.ongoing_emi}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
       />
 
       <DropDown
         label='Working since'
         required
-        options={salaridDropdownOptions[0].options}
+        options={salariedDropdownOptions[0].options}
         placeholder='Choose working since'
         onChange={handleDropdownChange}
-        defaultSelected={values.working_since}
+        name='work_income_details.working_since'
+        defaultSelected={values.work_income_details.working_since}
+        value={values.work_income_details.working_since}
+        error={errors.work_income_details?.working_since}
+        touched={touched.work_income_details?.working_since}
+        onBlur={handleBlur}
       />
 
       <DropDown
         label='Mode of salary'
         required
-        options={salaridDropdownOptions[0].options}
+        options={salariedDropdownOptions[0].options}
         placeholder='Choose mode of salary'
         onChange={handleDropdownChange}
-        defaultSelected={values.mode_of_salary}
+        name='work_income_details.mode_of_salary'
+        defaultSelected={values.work_income_details.mode_of_salary}
+        value={values.work_income_details.mode_of_salary}
+        error={errors.work_income_details?.mode_of_salary}
+        touched={touched.work_income_details?.mode_of_salary}
+        onBlur={handleBlur}
       />
 
       <TextInput
         label='Flat no/Building name'
         placeholder='Eg: C-101'
         required
-        name='flat_no'
-        value={values.flat_no}
-        onChange={handleTextInputChange}
+        name='work_income_details.flat_no_building_name'
+        value={values.work_income_details.flat_no_building_name}
+        error={errors.work_income_details?.flat_no_building_name}
+        touched={touched.work_income_details?.flat_no_building_name}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <TextInput
         label='Street/Area/Locality'
         placeholder='Eg: Senapati road'
         required
-        name='street_area_locality'
-        value={values.street_area_locality}
-        onChange={handleTextInputChange}
+        name='work_income_details.street_area_locality'
+        value={values.work_income_details.street_area_locality}
+        error={errors.work_income_details?.street_area_locality}
+        touched={touched.work_income_details?.street_area_locality}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <TextInput
         label='Town'
         placeholder='Eg: Igatpuri'
-        name='town'
-        value={values.town}
-        onChange={handleTextInputChange}
+        name='work_income_details.town'
+        value={values.work_income_details.town}
+        error={errors.work_income_details?.town}
+        touched={touched.work_income_details?.town}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <TextInput
         label='Landmark'
         placeholder='Eg: Near apollo hospital'
         required
-        name='landmark'
-        value={values.landmark}
-        onChange={handleTextInputChange}
+        name='work_income_details.landmark'
+        value={values.work_income_details.landmark}
+        error={errors.work_income_details?.landmark}
+        touched={touched.work_income_details?.landmark}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <TextInput
         label='Pincode'
         placeholder='Eg: 123456'
         required
-        name='pincode'
-        value={values.pincode}
-        onChange={handleTextInputChange}
+        name='work_income_details.pincode'
+        value={values.work_income_details.pincode}
+        error={errors.work_income_details?.pincode}
+        touched={touched.work_income_details?.pincode}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
         hint='City and State fields will get filled based on Pincode'
       />
 
       <TextInput
         label='City'
         placeholder='Eg: Nashik'
-        name='city'
-        value={values.city}
-        onChange={handleTextInputChange}
+        name='work_income_details.city'
+        value={values.work_income_details.city}
+        error={errors.work_income_details?.city}
+        touched={touched.work_income_details?.city}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <TextInput
         label='State'
         placeholder='Eg: Maharashtra'
-        name='state'
-        value={values.state}
-        onChange={handleTextInputChange}
+        name='work_income_details.state'
+        value={values.work_income_details.state}
+        error={errors.work_income_details?.state}
+        touched={touched.work_income_details?.state}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <div className='flex flex-col gap-2'>
@@ -197,9 +339,18 @@ export default function Salarid() {
         label='Total household income'
         placeholder='₹ 1,00,000'
         required
-        name='total_household_income'
-        value={values.total_household_income}
-        onChange={handleTextInputChange}
+        name='work_income_details.total_household_income'
+        value={values.work_income_details.total_household_income}
+        error={errors.work_income_details?.total_household_income}
+        touched={touched.work_income_details?.total_household_income}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <div className='flex flex-col gap-2'>

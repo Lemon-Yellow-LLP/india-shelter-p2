@@ -5,7 +5,7 @@ import CardRadioWithoutIcon from '../../../../components/CardRadio/CardRadioWith
 import TextInput from '../../../../components/TextInput';
 
 export default function Retired() {
-  const { values, setValues, errors } = useContext(AuthContext);
+  const { values, setValues, errors, handleBlur, touched } = useContext(AuthContext);
 
   const handleTextInputChange = useCallback((e) => {
     let newData = values;
@@ -21,22 +21,52 @@ export default function Retired() {
 
   return (
     <>
-      <DropDown
-        label='No. of current loan(s)'
+      <TextInput
+        label='Total pension amount'
+        placeholder='Eg: 1,00,000'
         required
-        options={salaridDropdownOptions[0].options}
+        name='work_income_details.no_current_loans'
+        value={values.work_income_details.no_current_loans}
+        error={errors.work_income_details?.no_current_loans}
+        touched={touched.work_income_details?.no_current_loansn}
+        onBlur={handleBlur}
+        onChange={handleTextInputChange}
+      />
+
+      <TextInput
+        label='No. of current loan(s)'
         placeholder='Choose no. of current loan(s)'
-        onChange={handleDropdownChange}
-        defaultSelected={values.no_of_current_loans}
+        required
+        name='work_income_details.no_current_loan'
+        value={values.work_income_details.no_current_loan}
+        error={errors.work_income_details?.no_current_loan}
+        touched={touched.work_income_details?.no_current_loan}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <TextInput
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'
         required
-        name='ongoing_emi'
-        value={values.ongoing_emi}
-        onChange={handleTextInputChange}
+        name='work_income_details.ongoing_emi'
+        value={values.work_income_details.ongoing_emi}
+        error={errors.work_income_details?.ongoing_emi}
+        touched={touched.work_income_details?.ongoing_emi}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
       />
 
@@ -65,9 +95,18 @@ export default function Retired() {
         label='Total household income'
         placeholder='₹ 1,00,000'
         required
-        name='total_household_income'
-        value={values.total_household_income}
-        onChange={handleTextInputChange}
+        name='work_income_details.total_household_income'
+        value={values.work_income_details.total_household_income}
+        error={errors.work_income_details?.total_household_income}
+        touched={touched.work_income_details?.total_household_income}
+        onBlur={handleBlur}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
       />
 
       <div className='flex flex-col gap-2'>
