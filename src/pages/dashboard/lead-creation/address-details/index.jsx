@@ -268,7 +268,7 @@ const AddressDetails = () => {
 
           <TextInput
             label='Flat no/Building name'
-            placeholder='C-101'
+            placeholder='Eg: C-101'
             required
             name='addressSchema.current_flat_no_building_name'
             value={values.addressSchema.current_flat_no_building_name}
@@ -318,7 +318,7 @@ const AddressDetails = () => {
 
           <TextInput
             label='Street/Area/Locality'
-            placeholder='Senapati road'
+            placeholder='Eg: Senapati road'
             required
             name='addressSchema.current_street_area_locality'
             value={values.addressSchema.current_street_area_locality}
@@ -366,7 +366,7 @@ const AddressDetails = () => {
 
           <TextInput
             label='Town'
-            placeholder='Igatpuri'
+            placeholder='Eg: Igatpuri'
             required
             name='addressSchema.current_town'
             value={values.addressSchema.current_town}
@@ -407,7 +407,7 @@ const AddressDetails = () => {
 
           <TextInput
             label='Landmark'
-            placeholder='Near apollo hospital'
+            placeholder='Eg: Near apollo hospital'
             required
             name='addressSchema.current_landmark'
             value={values.addressSchema.current_landmark}
@@ -619,7 +619,7 @@ const AddressDetails = () => {
 
           <TextInput
             label='Flat no/Building name'
-            placeholder='C-101'
+            placeholder='Eg: C-101'
             required
             name='addressSchema.permanent_flat_no_building_name'
             value={values.addressSchema.permanent_flat_no_building_name}
@@ -658,7 +658,7 @@ const AddressDetails = () => {
 
           <TextInput
             label='Street/Area/Locality'
-            placeholder='Senapati road'
+            placeholder='Eg: Senapati road'
             required
             name='addressSchema.permanent_street_area_locality'
             value={values.addressSchema.permanent_street_area_locality}
@@ -697,7 +697,7 @@ const AddressDetails = () => {
 
           <TextInput
             label='Town'
-            placeholder='Igatpuri'
+            placeholder='Eg: Igatpuri'
             required
             name='addressSchema.permanent_town'
             value={values.addressSchema.permanent_town}
@@ -732,7 +732,7 @@ const AddressDetails = () => {
 
           <TextInput
             label='Landmark'
-            placeholder='Near apollo hospital'
+            placeholder='Eg: Near apollo hospital'
             required
             name='addressSchema.permanent_landmark'
             value={values.addressSchema.permanent_landmark}
