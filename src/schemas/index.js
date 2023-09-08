@@ -79,12 +79,21 @@ export const signUpSchema = Yup.object({
   work_income_details: Yup.object().shape({
     profession: Yup.string().required('This field is mandatory'),
     company_name: Yup.string().required('This field is mandatory'),
+    extra_params: Yup.object().shape({
+      extra_company_name: Yup.string()
+        .required('This field is mandatory')
+        .min(2, 'Company name must be atleast 2 characters long')
+        .max(90, 'Company name can be max 90 characters long'),
+    }),
     business_name: Yup.string().required('This field is mandatory'),
     industries: Yup.string().required('This field is mandatory'),
     gst_number: Yup.string().required('This field is mandatory'),
     total_income: Yup.string().required('This field is mandatory'),
     pf_uan: Yup.string().required('This field is mandatory'),
-    no_current_loan: Yup.string().required('This field is mandatory'),
+    no_current_loan: Yup.number()
+      .required('This field is mandatory')
+      .min(0, 'No. of Current loan(s) can be min 0')
+      .max(99, 'No. of Current loan(s) can be max 99'),
     ongoing_emi: Yup.string().required('This field is mandatory'),
     working_since: Yup.string().required('This field is mandatory'),
     mode_of_salary: Yup.string().required('This field is mandatory'),
@@ -92,9 +101,11 @@ export const signUpSchema = Yup.object({
     street_area_locality: Yup.string().required('This field is mandatory'),
     town: Yup.string().required('This field is mandatory'),
     landmark: Yup.string().required('This field is mandatory'),
-    pincode: Yup.string().required('This field is mandatory'),
-    city: Yup.string().required('This field is mandatory'),
-    state: Yup.string().required('This field is mandatory'),
+    pincode: Yup.string()
+      .required('This field is mandatory')
+      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
+      .min(6, 'Enter a valid Pincode')
+      .max(6, 'Enter a valid Pincode'),
     total_family_number: Yup.string().required('This field is mandatory'),
     total_household_income: Yup.string().required('This field is mandatory'),
     no_of_dependents: Yup.string().required('This field is mandatory'),
