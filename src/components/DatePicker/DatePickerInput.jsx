@@ -7,7 +7,7 @@ const DatePickerInput = forwardRef(function DatePickerInput(
   _ref,
 ) {
   const inputRef = useRef(null);
-
+  console.log(value);
   return (
     <div
       ref={reference}
@@ -18,8 +18,14 @@ const DatePickerInput = forwardRef(function DatePickerInput(
         {true && <span className='text-primary-red text-sm'>*</span>}
       </label>
       <div
-        className={`input-container px-4 py-3 border justify-between border-stroke rounded-lg flex w-full items-center    
-        ${error && touched ? 'border-[red] shadow-primary shadow-[#E33439]' : 'border-light-grey'}
+        className={`input-container px-4 py-3 border justify-between  rounded-lg flex w-full items-center    
+        ${
+          error && touched
+            ? 'border-[#E33439] shadow-primary shadow-[#E33439]'
+            : value
+            ? 'border-dark-grey'
+            : 'border-[#D9D9D9]'
+        }
         ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
         `}
       >

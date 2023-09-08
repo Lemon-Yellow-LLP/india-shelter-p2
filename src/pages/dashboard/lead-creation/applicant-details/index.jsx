@@ -127,7 +127,7 @@ const ApplicantDetails = () => {
 
   const dateInputRef = useRef(null);
 
-  const [date, setDate] = useState(values?.applicant_details?.date_of_birth);
+  const [date, setDate] = useState(null);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     loan_type: false,
@@ -266,7 +266,7 @@ const ApplicantDetails = () => {
     [requiredFieldsStatus],
   );
 
-  useEffect(() => {
+  const checkDate = () => {
     if (!date) return;
     if (!isEighteenOrAbove(date)) {
       setFieldError(
@@ -277,6 +277,10 @@ const ApplicantDetails = () => {
     }
     setFieldValue('applicant_details.date_of_birth', date);
     updateFields('date_of_birth', date);
+  };
+
+  useEffect(() => {
+    checkDate();
   }, [date, setFieldError, setFieldValue]);
 
   const datePickerScrollToTop = () => {
@@ -418,14 +422,18 @@ const ApplicantDetails = () => {
         </div>
 
         <DatePicker
-          value={values?.applicant_details?.date_of_birth}
-          setStartDate={setDate}
+          // value={values?.applicant_details?.date_of_birth}
+          value={date}
+          setDate={setDate}
           required
           name='applicant_details.date_of_birth'
           label='Date of Birth'
           error={errors?.applicant_details?.date_of_birth}
           touched={touched?.applicant_details?.date_of_birth}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+            checkDate();
+          }}
           reference={dateInputRef}
         />
 
