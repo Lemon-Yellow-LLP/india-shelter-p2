@@ -77,6 +77,7 @@ const SearchableTextInput = memo(
             className={`w-full focus:outline-none ${inputClasses}`}
             id={name}
             name={name}
+            value={props.value}
             onBlur={props.onBlur}
             onChange={(e, value) => onChange(name, value)}
             options={options}
