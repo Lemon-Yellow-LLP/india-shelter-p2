@@ -59,8 +59,12 @@ export const defaultValues = {
     total_family_number: '',
     total_household_income: '',
     no_of_dependents: '',
+    pention_amount: '',
     geo_lat: '',
     geo_long: '',
+    extra_params: {
+      extra_company_name: '',
+    },
   },
 
   applicant_details: {
