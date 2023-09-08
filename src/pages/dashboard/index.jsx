@@ -24,6 +24,14 @@ const Dashboard = () => {
       >
         go-to-personal-details-page
       </Link>
+
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/property-details'
+      >
+        go-to-property-details-page
+      </Link>
+
       <Link
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
         to='/lead/address-details'

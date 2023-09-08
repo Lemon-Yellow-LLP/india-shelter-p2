@@ -10,8 +10,7 @@ import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWith
 import { manualModeDropdownOptions } from './manualModeDropdownOptions';
 import OtpInput from '../../../../components/OtpInput/index';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
-import axios from 'axios';
-import { editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
+import { getEmailOtp, verifyEmailOtp } from '../../../../global';
 
 export default function ManualMode({
   requiredFieldsStatus,
@@ -84,7 +83,57 @@ export default function ManualMode({
 
   const handleTextInputChange = useCallback(
     (e) => {
-      setFieldValue(e.target.name, e.target.value);
+      const value = e.target.value;
+      const pattern = /^[A-Za-z]+$/;
+      if (
+        pattern.exec(value[value.length - 1]) &&
+        e.target.name !== 'personal_details.email' &&
+        e.target.name !== 'personal_details.id_number' &&
+        e.target.name !== 'personal_details.address_proof_number'
+      ) {
+        setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+      }
+
+      if (e.target.name === 'personal_details.email') {
+        setFieldValue(e.target.name, value);
+      }
+
+      if (
+        e.target.name === 'personal_details.id_number' ||
+        e.target.name === 'personal_details.address_proof_number'
+      ) {
+        if (
+          e.target.name === 'personal_details.id_number' &&
+          values.personal_details.id_type === 'Aadhar'
+        ) {
+          let aadharPattern = /^\d$/;
+          if (aadharPattern.exec(value[value.length - 1])) {
+            const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
+            const maskedAadhar = maskedPortion + value.slice(8);
+            setFieldValue(e.target.name, maskedAadhar);
+          } else if (value.length < values.personal_details.id_number.length) {
+            setFieldValue(e.target.name, value);
+          }
+        } else if (
+          e.target.name === 'personal_details.address_proof_number' &&
+          values.personal_details.selected_address_proof === 'Aadhar'
+        ) {
+          let aadharPattern = /^\d$/;
+          if (aadharPattern.exec(value[value.length - 1])) {
+            const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
+            const maskedAadhar = maskedPortion + value.slice(8);
+            setFieldValue(e.target.name, maskedAadhar);
+          } else if (value.length < values.personal_details.address_proof_number.length) {
+            setFieldValue(e.target.name, value);
+          }
+        } else {
+          const pattern2 = /^[A-Za-z0-9]+$/;
+          if (pattern2.exec(value[value.length - 1])) {
+            setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }
+      }
+
       const name = e.target.name.split('.')[1];
       if (
         requiredFieldsStatus[name] !== undefined &&
@@ -94,7 +143,13 @@ export default function ManualMode({
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus],
+    [
+      requiredFieldsStatus,
+      values.personal_details.id_number,
+      values.personal_details.address_proof_number,
+      values.personal_details.id_type,
+      values.personal_details.selected_address_proof,
+    ],
   );
 
   const handleDropdownChange = useCallback(
@@ -126,6 +181,16 @@ export default function ManualMode({
   useEffect(() => {
     updateFields();
   }, [values?.personal_details?.extra_params?.same_as_id_type]);
+
+  useEffect(() => {
+    setFieldValue('personal_details.id_number', '');
+  }, [values.personal_details?.id_type]);
+
+  useEffect(() => {
+    if (!values?.personal_details?.extra_params?.same_as_id_type) {
+      setFieldValue('personal_details.address_proof_number', '');
+    }
+  }, [values.personal_details?.selected_address_proof]);
 
   useEffect(() => {
     if (values?.personal_details?.extra_params?.same_as_id_type) {
@@ -184,7 +249,7 @@ export default function ManualMode({
 
       <TextInput
         label='Enter ID number'
-        placeholder='Eg: SABCD67120'
+        placeholder='Enter Id number'
         required
         name='personal_details.id_number'
         value={values.personal_details?.id_number}
@@ -287,7 +352,7 @@ export default function ManualMode({
 
       <TextInput
         label='Enter address proof number'
-        placeholder='Eg: 32432432423'
+        placeholder='Enter address proof number'
         required
         name='personal_details.address_proof_number'
         value={values.personal_details?.address_proof_number}
@@ -429,7 +494,7 @@ export default function ManualMode({
       />
 
       <TextInput
-        label='Father/Husbands name'
+        label={`Father/Husband's name`}
         placeholder='Eg: Akash'
         required
         name='personal_details.father_husband_name'
@@ -550,7 +615,7 @@ export default function ManualMode({
         touched={touched.personal_details?.email}
         onOTPSendClick={sendEmailOTP}
         disabledOtpButton={!!errors.personal_details?.email || emailVerified || hasSentOTPOnce}
-        disabled={disableEmailInput}
+        disabled={disableEmailInput || emailVerified}
         message={
           emailVerified
             ? `OTP Verfied
