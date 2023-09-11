@@ -79,6 +79,7 @@ const DropDown = memo(
           }}
           {...props}
           onBlur={onBlur}
+          onMouseLeave={onBlur} // For Iphone
           className={`${getThemes()} w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white disabled:bg-disabled-grey`}
         >
           {selectedOption ? selectedOption.label : placeholder || 'Click me'} <IconArrowDown />
