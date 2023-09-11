@@ -9,13 +9,69 @@ import TextInput from '../../../../components/TextInput';
 import UnEmployed from './UnEmployed';
 import Retired from './Retired';
 import CurrencyInput from '../../../../components/CurrencyInput';
+import { checkIsValidStatePincode, editFieldsById } from '../../../../global';
+
+const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
 const WorkIncomeDetails = () => {
-  const { values, errors, touched, handleBlur, setFieldValue } = useContext(AuthContext);
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    setFieldValue,
+    setFieldError,
+    handleChange,
+    handleSubmit,
+  } = useContext(AuthContext);
 
   const handleRadioChange = useCallback((e) => {
     setFieldValue(`work_income_details.${e.name}`, e.value);
+
+    editFieldsById(1, 'work-income', {
+      [e.name]: e.value,
+    });
   }, []);
+
+  const handleOnPincodeChange = useCallback(async () => {
+    if (
+      !values.work_income_details.pincode ||
+      values.work_income_details.pincode.toString().length < 5 ||
+      errors.work_income_details?.pincode
+    ) {
+      setFieldValue('work_income_details.city', '');
+      setFieldValue('work_income_details.state', '');
+      return;
+    }
+
+    const res = await checkIsValidStatePincode(values.work_income_details.pincode);
+    if (!res) {
+      setFieldError('work_income_details.pincode', 'Invalid Pincode');
+      return;
+    }
+
+    editFieldsById(1, 'work-income', {
+      city: res.city,
+      state: res.state,
+    });
+
+    setFieldValue('work_income_details.city', res.city);
+    setFieldValue('work_income_details.state', res.state);
+
+    // if (!requiredFieldsStatus['pincode']) {
+    //   updateProgress(4, requiredFieldsStatus);
+    //   setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: true }));
+    // }
+  }, [
+    errors.work_income_details?.pincode,
+    values.work_income_details.pincode,
+    setFieldError,
+    setFieldValue,
+    // requiredFieldsStatus,
+  ]);
+
+  // console.log(errors.work_income_details?.total_family_number);
+  // console.log(!values.work_income_details.total_family_number);
 
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
@@ -41,6 +97,12 @@ const WorkIncomeDetails = () => {
               );
             })}
           </div>
+
+          {errors.work_income_details?.profession && !values.work_income_details.profession ? (
+            <span className='text-sm text-primary-red'>
+              {errors.work_income_details.profession}
+            </span>
+          ) : null}
         </div>
         {values.work_income_details.profession === 'Salaried' && <Salaried />}
         {values.work_income_details.profession === 'SelfEmployed' && <SelfEmployed />}
@@ -58,7 +120,18 @@ const WorkIncomeDetails = () => {
               value={values.work_income_details.flat_no_building_name}
               error={errors.work_income_details?.flat_no_building_name}
               touched={touched.work_income_details?.flat_no_building_name}
-              onBlur={handleBlur}
+              onBlur={(e) => {
+                handleBlur(e);
+
+                if (
+                  !errors.work_income_details?.flat_no_building_name &&
+                  values.work_income_details.flat_no_building_name
+                ) {
+                  editFieldsById(1, 'work-income', {
+                    flat_no_building_name: values.work_income_details.flat_no_building_name,
+                  });
+                }
+              }}
               onChange={(e) => {
                 const value = e.currentTarget.value;
                 const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
@@ -79,7 +152,18 @@ const WorkIncomeDetails = () => {
               value={values.work_income_details.street_area_locality}
               error={errors.work_income_details?.street_area_locality}
               touched={touched.work_income_details?.street_area_locality}
-              onBlur={handleBlur}
+              onBlur={(e) => {
+                handleBlur(e);
+
+                if (
+                  !errors.work_income_details?.street_area_locality &&
+                  values.work_income_details.street_area_locality
+                ) {
+                  editFieldsById(1, 'work-income', {
+                    street_area_locality: values.work_income_details.street_area_locality,
+                  });
+                }
+              }}
               onChange={(e) => {
                 const value = e.currentTarget.value;
                 const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
@@ -99,10 +183,18 @@ const WorkIncomeDetails = () => {
               value={values.work_income_details.town}
               error={errors.work_income_details?.town}
               touched={touched.work_income_details?.town}
-              onBlur={handleBlur}
+              onBlur={(e) => {
+                handleBlur(e);
+
+                if (!errors.work_income_details?.town && values.work_income_details.town) {
+                  editFieldsById(1, 'work-income', {
+                    town: values.work_income_details.town,
+                  });
+                }
+              }}
               onChange={(e) => {
                 const value = e.currentTarget.value;
-                const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                const address_pattern = /^[a-zA-Z\s]+$/;
                 if (address_pattern.exec(value[value.length - 1])) {
                   setFieldValue(
                     e.currentTarget.name,
@@ -120,10 +212,18 @@ const WorkIncomeDetails = () => {
               value={values.work_income_details.landmark}
               error={errors.work_income_details?.landmark}
               touched={touched.work_income_details?.landmark}
-              onBlur={handleBlur}
+              onBlur={(e) => {
+                handleBlur(e);
+
+                if (!errors.work_income_details?.landmark && values.work_income_details.landmark) {
+                  editFieldsById(1, 'work-income', {
+                    landmark: values.work_income_details.landmark,
+                  });
+                }
+              }}
               onChange={(e) => {
                 const value = e.currentTarget.value;
-                const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                const address_pattern = /^[a-zA-Z\s]+$/;
                 if (address_pattern.exec(value[value.length - 1])) {
                   setFieldValue(
                     e.currentTarget.name,
@@ -134,30 +234,72 @@ const WorkIncomeDetails = () => {
             />
 
             <TextInput
-              label='Pincode'
-              placeholder='Eg: 123456'
               required
+              hint='City and State fields will get filled based on Pincode'
+              placeholder='Eg: 123456'
+              label='Pincode'
               name='work_income_details.pincode'
               value={values.work_income_details.pincode}
               error={errors.work_income_details?.pincode}
               touched={touched.work_income_details?.pincode}
-              onBlur={handleBlur}
-              onChange={(e) => {
-                const value = e.currentTarget.value;
-                const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-                if (address_pattern.exec(value[value.length - 1])) {
-                  setFieldValue(
-                    e.currentTarget.name,
-                    value.charAt(0).toUpperCase() + value.slice(1),
-                  );
+              onBlur={(e) => {
+                handleBlur(e);
+                handleOnPincodeChange();
+
+                if (!errors.work_income_details?.pincode && values.work_income_details.pincode) {
+                  editFieldsById(1, 'work-income', {
+                    pincode: values.work_income_details.pincode,
+                  });
                 }
               }}
-              hint='City and State fields will get filled based on Pincode'
+              min='0'
+              onInput={(e) => {
+                if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
+              }}
+              onChange={(e) => {
+                if (e.currentTarget.value.length > 6) {
+                  e.preventDefault();
+                  return;
+                }
+                const value = e.currentTarget.value;
+                if (value.charAt(0) === '0') {
+                  e.preventDefault();
+                  return;
+                }
+                handleChange(e);
+              }}
+              onKeyDown={(e) => {
+                //capturing ctrl V and ctrl C
+                (e.key == 'v' && (e.metaKey || e.ctrlKey)) ||
+                DISALLOW_CHAR.includes(e.key) ||
+                e.key === 'ArrowUp' ||
+                e.key === 'ArrowDown'
+                  ? e.preventDefault()
+                  : null;
+              }}
+              pattern='\d*'
+              onFocus={(e) =>
+                e.target.addEventListener(
+                  'wheel',
+                  function (e) {
+                    e.preventDefault();
+                  },
+                  { passive: false },
+                )
+              }
+              onPaste={(e) => {
+                e.preventDefault();
+                const text = (e.originalEvent || e).clipboardData.getData('text/plain').replace('');
+                e.target.value = text;
+                handleChange(e);
+              }}
+              inputClasses='hidearrow'
             />
 
             <TextInput
               label='City'
               placeholder='Eg: Nashik'
+              disabled
               name='work_income_details.city'
               value={values.work_income_details.city}
               error={errors.work_income_details?.city}
@@ -178,6 +320,7 @@ const WorkIncomeDetails = () => {
             <TextInput
               label='State'
               placeholder='Eg: Maharashtra'
+              disabled
               name='work_income_details.state'
               value={values.work_income_details.state}
               error={errors.work_income_details?.state}
@@ -209,15 +352,22 @@ const WorkIncomeDetails = () => {
                     <CardRadioWithoutIcon
                       key={option.value}
                       label={option.label}
-                      name='total_family_members'
+                      name='total_family_number'
                       value={option.value}
-                      current={values.work_income_details.total_family_members}
+                      current={values.work_income_details.total_family_number}
                       onChange={handleRadioChange}
                       containerClasses='flex-1'
                     ></CardRadioWithoutIcon>
                   );
                 })}
               </div>
+
+              {/* {errors.work_income_details?.total_family_number &&
+              values.work_income_details.total_family_number ? (
+                <span className='text-sm text-primary-red'>
+                  {errors.work_income_details.total_family_number}
+                </span>
+              ) : null} */}
             </div>
 
             <CurrencyInput
@@ -228,7 +378,18 @@ const WorkIncomeDetails = () => {
               value={values.work_income_details.total_household_income}
               error={errors.work_income_details?.total_household_income}
               touched={touched.work_income_details?.total_household_income}
-              onBlur={handleBlur}
+              onBlur={(e) => {
+                handleBlur(e);
+
+                if (
+                  !errors.work_income_details?.total_household_income &&
+                  values.work_income_details.total_household_income
+                ) {
+                  editFieldsById(1, 'work-income', {
+                    total_household_income: values.work_income_details.total_household_income,
+                  });
+                }
+              }}
               onChange={(e) => {
                 const value = e.currentTarget.value;
                 const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
@@ -266,9 +427,18 @@ const WorkIncomeDetails = () => {
                   );
                 })}
               </div>
+
+              {/* {errors.work_income_details?.no_of_dependents &&
+              values.work_income_details.no_of_dependents ? (
+                <span className='text-sm text-primary-red'>
+                  {errors.work_income_details.no_of_dependents}
+                </span>
+              ) : null} */}
             </div>
           </>
         ) : null}
+
+        <button onClick={handleSubmit}>submit</button>
       </div>
     </div>
   );
