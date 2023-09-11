@@ -1,9 +1,10 @@
 import { useCallback, useContext, useState } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import TextInput from '../../../../components/TextInput';
+import { CurrencyInput } from '../../../../components';
 
 export default function UnEmployed() {
-  const { values, errors, touched, handleBlur } = useContext(AuthContext);
+  const { values, errors, touched, handleBlur, setFieldValue } = useContext(AuthContext);
 
   return (
     <>
@@ -15,20 +16,33 @@ export default function UnEmployed() {
         value={values.work_income_details.no_current_loan}
         error={errors.work_income_details?.no_current_loan}
         touched={touched.work_income_details?.no_current_loan}
-        onBlur={handleBlur}
-        onChange={(e) => {
-          const value = e.currentTarget.value;
-          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-          if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-          }
+        onBlur={(e) => {
+          handleBlur(e);
           if (values.work_income_details.no_current_loan == 0) {
             setFieldValue('work_income_details.ongoing_emi', '');
           }
         }}
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          const address_pattern = /^[0-9]+$/;
+          if (address_pattern.exec(value[value.length - 1])) {
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Backspace') {
+            setFieldValue(
+              'work_income_details.no_current_loan',
+              values.work_income_details.no_current_loan.slice(
+                0,
+                values.work_income_details.no_current_loan.length - 1,
+              ),
+            );
+          }
+        }}
       />
 
-      <TextInput
+      <CurrencyInput
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'
         required
@@ -43,7 +57,7 @@ export default function UnEmployed() {
         onBlur={handleBlur}
         onChange={(e) => {
           const value = e.currentTarget.value;
-          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
