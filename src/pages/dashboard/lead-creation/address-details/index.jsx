@@ -22,19 +22,19 @@ const residenceData = [
 const yearsResidingData = [
   {
     label: '0-1',
-    value: '0',
+    value: '0-1',
   },
   {
     label: '2-5',
-    value: '1',
+    value: '2-5',
   },
   {
     label: '6-10',
-    value: '2',
+    value: '6-10',
   },
   {
     label: '10+',
-    value: '3',
+    value: '10+',
   },
 ];
 
@@ -233,9 +233,9 @@ const AddressDetails = () => {
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
           Type of residence <span className='text-primary-red text-xs'>*</span>
         </label>
-        <h2 className='text-xs text-dark-grey'>
+        {/* <h2 className='text-xs text-dark-grey'>
           If the applicant is in rented house, please enter permanent address too.
-        </h2>
+        </h2> */}
         <div
           className={`flex gap-4 w-full ${
             inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
@@ -458,7 +458,7 @@ const AddressDetails = () => {
             required
             name='addressSchema.current_pincode'
             type='tel'
-            hint='City and State fields will get filled based on Pincode'
+            // hint='City and State fields will get filled based on Pincode'
             value={values.addressSchema.current_pincode}
             error={errors.addressSchema?.current_pincode}
             touched={touched.addressSchema?.current_pincode}
@@ -466,22 +466,6 @@ const AddressDetails = () => {
             onBlur={(e) => {
               handleBlur(e);
               handleCurrentPincodeChange();
-              if (!errors.addressSchema?.current_pincode && values.addressSchema.current_pincode) {
-                if (values.addressSchema.extra_params.permanent_address_same_as_current) {
-                  setFieldValue(
-                    'addressSchema.permanent_pincode',
-                    values.addressSchema.current_pincode,
-                  );
-                  editAddressById(TEST_ADDRESS_ID, {
-                    current_pincode: values.addressSchema.current_pincode,
-                    permanent_pincode: values.addressSchema.current_pincode,
-                  });
-                } else {
-                  editAddressById(TEST_ADDRESS_ID, {
-                    current_pincode: values.addressSchema.current_pincode,
-                  });
-                }
-              }
             }}
             min='0'
             onInput={(e) => {
@@ -536,6 +520,7 @@ const AddressDetails = () => {
             touched={touched.addressSchema?.current_city}
             onBlur={handleBlur}
             disabled={true}
+            labelDisabled={!values.addressSchema.current_city}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -549,6 +534,7 @@ const AddressDetails = () => {
             touched={touched.addressSchema?.current_state}
             onBlur={handleBlur}
             disabled={true}
+            labelDisabled={!values.addressSchema.current_state}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -784,15 +770,6 @@ const AddressDetails = () => {
             onBlur={(e) => {
               handleBlur(e);
               handlePermanentPincodeChange();
-
-              if (
-                !errors.addressSchema?.permanent_pincode &&
-                values.addressSchema.permanent_pincode
-              ) {
-                editAddressById(TEST_ADDRESS_ID, {
-                  permanent_pincode: values.addressSchema.permanent_pincode,
-                });
-              }
             }}
             min='0'
             onInput={(e) => {
@@ -847,6 +824,7 @@ const AddressDetails = () => {
             touched={touched.addressSchema?.permanent_city}
             onBlur={handleBlur}
             disabled={true}
+            labelDisabled={!values.addressSchema.permanent_city}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -860,6 +838,7 @@ const AddressDetails = () => {
             touched={touched.addressSchema?.permanent_state}
             onBlur={handleBlur}
             disabled={true}
+            labelDisabled={!values.addressSchema.permanent_state}
             onChange={() => {}}
             inputClasses='capitalize'
           />
