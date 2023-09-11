@@ -40,9 +40,6 @@ export const defaultValues = {
   work_income_details: {
     profession: '',
     company_name: '',
-    business_name: '',
-    industries: '',
-    gst_number: '',
     total_income: '',
     pf_uan: '',
     no_current_loan: '',
@@ -59,11 +56,15 @@ export const defaultValues = {
     total_family_number: '',
     total_household_income: '',
     no_of_dependents: '',
+    business_name: '',
+    industries: '',
+    gst_number: '',
     pention_amount: '',
     geo_lat: '',
     geo_long: '',
     extra_params: {
       extra_company_name: '',
+      extra_industries: '',
     },
   },
 
