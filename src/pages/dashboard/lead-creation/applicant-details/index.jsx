@@ -9,6 +9,7 @@ import {
   isEighteenOrAbove,
   getMobileOtp,
   verifyMobileOtp,
+  addApi,
 } from '../../../../global/index';
 
 import {
@@ -21,6 +22,7 @@ import {
 } from '../../../../components';
 import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWithSendOtp';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
+import { Button } from '@mui/material';
 
 const loanTypeOptions = [
   {
@@ -111,6 +113,9 @@ const ApplicantDetails = () => {
     setFieldValue,
     setFieldError,
     updateProgress,
+    setToastMessage,
+    setFieldTouched,
+    handleSubmit,
   } = useContext(AuthContext);
 
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
@@ -127,7 +132,7 @@ const ApplicantDetails = () => {
 
   const dateInputRef = useRef(null);
 
-  const [date, setDate] = useState(null);
+  const [date, setDate] = useState(values.applicant_details.date_of_birth);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     loan_type: false,
@@ -139,16 +144,30 @@ const ApplicantDetails = () => {
     mobile_number: false,
   });
 
-  const updateFields = async (name, value) => {
+  const updateFieldsApplicant = async (name, value) => {
     let newData = values.applicant_details;
     newData[name] = value;
-    await editFieldsById(1, 'applicant', newData);
+    if (values.applicant_id) {
+      const res = await editFieldsById(1, 'applicant', newData);
+      return res;
+    } else {
+      const res = await addApi('applicant', newData);
+      setFieldValue('applicant_id', res.id);
+      return res;
+    }
   };
 
   const updateFieldsLead = async (name, value) => {
     let newData = values.lead;
     newData[name] = value;
-    await editFieldsById(1, 'lead', newData);
+    if (values.lead_id) {
+      const res = await editFieldsById(1, 'lead', newData);
+      return res;
+    } else {
+      const res = await addApi('lead', newData);
+      setFieldValue('lead_id', res.id);
+      return res;
+    }
   };
 
   useEffect(() => {
@@ -174,7 +193,7 @@ const ApplicantDetails = () => {
       if (pattern.exec(value[value.length - 1])) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
         const name = e.currentTarget.name.split('.')[1];
-        updateFields(name, value);
+        updateFieldsApplicant(name, value);
         if (
           requiredFieldsStatus[name] !== undefined &&
           !requiredFieldsStatus[name] &&
@@ -240,7 +259,7 @@ const ApplicantDetails = () => {
 
       setFieldValue('applicant_details.mobile_number', phoneNumber);
 
-      updateFields('mobile_number', phoneNumber);
+      updateFieldsApplicant('mobile_number', phoneNumber);
       if (
         phoneNumber.length === 10 &&
         requiredFieldsStatus['mobile_number'] !== undefined &&
@@ -267,16 +286,20 @@ const ApplicantDetails = () => {
   );
 
   const checkDate = () => {
-    if (!date) return;
+    if (!date) {
+      return;
+    }
     if (!isEighteenOrAbove(date)) {
       setFieldError(
         'applicant_details.date_of_birth',
         'To apply for loan the minimum age must be 18 or 18+',
       );
-      return;
+      setFieldValue('applicant_details.date_of_birth', '');
+      setFieldTouched('applicant_details.date_of_birth');
+    } else {
+      setFieldValue('applicant_details.date_of_birth', date);
+      updateFieldsApplicant('date_of_birth', date);
     }
-    setFieldValue('applicant_details.date_of_birth', date);
-    updateFields('date_of_birth', date);
   };
 
   useEffect(() => {
@@ -289,22 +312,37 @@ const ApplicantDetails = () => {
     }
   };
 
-  const sendMobileOtp = () => {
-    setDisablePhoneNumber((prev) => !prev);
-    setShowOTPInput(true);
-    setHasSentOTPOnce(true);
-    getMobileOtp(1);
-    setToastMessage('OTP has been sent to your mail id');
+  const sendMobileOtp = async () => {
+    if (values.applicant_details.date_of_birth) {
+      await updateFieldsApplicant().then(async () => {
+        setDisablePhoneNumber((prev) => !prev);
+        setShowOTPInput(true);
+        setHasSentOTPOnce(true);
+        getMobileOtp(1);
+        setToastMessage('OTP has been sent to your mail id');
+      });
+    } else {
+      setFieldError(
+        'applicant_details.date_of_birth',
+        'Date of Birth is Required. Minimum age must be 18 or 18+',
+      );
+      setFieldTouched('applicant_details.date_of_birth');
+      dateInputRef.current.focus();
+    }
   };
 
   const verifyOTP = useCallback((otp) => {
     verifyMobileOtp(1, otp)
-      .then((res) => {
-        setMobileVerified(true);
-        setFieldValue('applicant_details.is_mobile_verified', true);
-        updateFields('is_mobile_verified', true);
-        setShowOTPInput(false);
-        return true;
+      .then(async () => {
+        await updateFieldsLead().then((res) => {
+          setFieldValue('applicant_details.lead_id', res.id);
+          updateFieldsApplicant('lead_id', res.id);
+          setMobileVerified(true);
+          setFieldValue('applicant_details.is_mobile_verified', true);
+          updateFieldsApplicant('is_mobile_verified', true);
+          setShowOTPInput(false);
+          return true;
+        });
       })
       .catch((err) => {
         setMobileVerified(false);
@@ -416,7 +454,7 @@ const ApplicantDetails = () => {
               name='applicant_details.last_name'
               onChange={handleTextInputChange}
               inputClasses='capitalize'
-              onFocus={datePickerScrollToTop}
+              // onFocus={datePickerScrollToTop}
             />
           </div>
         </div>
@@ -436,6 +474,73 @@ const ApplicantDetails = () => {
           }}
           reference={dateInputRef}
         />
+
+        <TextInputWithSendOtp
+          type='tel'
+          inputClasses='hidearrow'
+          label='Mobile Number'
+          placeholder='Eg: 1234567890'
+          required
+          name='applicant_details.mobile_number'
+          value={values.applicant_details?.mobile_number}
+          onChange={handleOnPhoneNumberChange}
+          error={errors.applicant_details?.mobile_number}
+          touched={touched.applicant_details?.mobile_number}
+          onOTPSendClick={sendMobileOtp}
+          disabledOtpButton={
+            !values.applicant_details?.mobile_number ||
+            !!errors.applicant_details?.mobile_number ||
+            mobileVerified ||
+            hasSentOTPOnce
+          }
+          disabled={disablePhoneNumber || mobileVerified}
+          message={
+            mobileVerified
+              ? `<img src="${otpVerified}" alt='Otp Verified' role='presentation' /> OTP Verfied`
+              : null
+          }
+          onBlur={(e) => {
+            handleBlur(e);
+            const name = e.target.name.split('.')[1];
+            console.log(name);
+            console.log(errors);
+            if (
+              errors?.applicant_details &&
+              !errors?.applicant_details[name] &&
+              values?.applicant_details[name]
+            ) {
+              updateFieldsApplicant(name, values.applicant_details[name]);
+            }
+          }}
+          pattern='\d*'
+          onFocus={(e) =>
+            e.target.addEventListener(
+              'wheel',
+              function (e) {
+                e.preventDefault();
+              },
+              { passive: false },
+            )
+          }
+          min='0'
+          onInput={(e) => {
+            if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
+          }}
+        />
+
+        {showOTPInput && (
+          <OtpInput
+            label='Enter OTP'
+            required
+            verified={mobileVerified}
+            setOTPVerified={setMobileVerified}
+            onSendOTPClick={sendMobileOtp}
+            defaultResendTime={30}
+            disableSendOTP={!mobileVerified}
+            verifyOTPCB={verifyOTP}
+            hasSentOTPOnce={hasSentOTPOnce}
+          />
+        )}
 
         <DropDown
           label='Purpose of loan'
@@ -470,70 +575,14 @@ const ApplicantDetails = () => {
           error={errors?.lead?.property_type}
           onBlur={handleBlur}
         />
-
-        <TextInputWithSendOtp
-          type='tel'
-          inputClasses='hidearrow'
-          label='Mobile Number'
-          placeholder='Eg: 1234567890'
-          required
-          name='applicant_details.mobile_number'
-          value={values.applicant_details?.mobile_number}
-          onChange={handleOnPhoneNumberChange}
-          error={errors.applicant_details?.mobile_number}
-          touched={touched.applicant_details?.mobile_number}
-          onOTPSendClick={sendMobileOtp}
-          disabledOtpButton={
-            !!errors.applicant_details?.mobile_number || mobileVerified || hasSentOTPOnce
-          }
-          disabled={disablePhoneNumber || mobileVerified}
-          message={
-            mobileVerified
-              ? `OTP Verfied
-          <img src="${otpVerified}" alt='Otp Verified' role='presentation' />
-          `
-              : null
-          }
-          onBlur={(e) => {
-            handleBlur(e);
-            const name = e.target.name.split('.')[1];
-            if (!errors.applicant_details[name] && values.applicant_details[name]) {
-              updateFields(name, values.applicant_details[name]);
-            }
-          }}
-          pattern='\d*'
-          onFocus={(e) =>
-            e.target.addEventListener(
-              'wheel',
-              function (e) {
-                e.preventDefault();
-              },
-              { passive: false },
-            )
-          }
-          min='0'
-          onInput={(e) => {
-            if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
-          }}
-        />
-
-        {showOTPInput && (
-          <OtpInput
-            label='Enter OTP'
-            required
-            verified={mobileVerified}
-            setOTPVerified={setMobileVerified}
-            onSendOTPClick={sendMobileOtp}
-            defaultResendTime={30}
-            disableSendOTP={!mobileVerified}
-            verifyOTPCB={verifyOTP}
-            hasSentOTPOnce={hasSentOTPOnce}
-          />
-        )}
       </div>
-      {/* <div className='bottom-0 absolute '>
-        <PreviousNextButtons disablePrevious={true} linkNext='/lead/personal-details' />
-      </div> */}
+      <div className='bottom-0 fixed'>
+        <PreviousNextButtons
+          disablePrevious={true}
+          disableNext={!mobileVerified || errors.applicant_details}
+          linkNext='/lead/personal-details'
+        />
+      </div>
     </div>
   );
 };

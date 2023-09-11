@@ -236,9 +236,8 @@ export const signUpSchema = Yup.object({
       .max(10, 'Last Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
     date_of_birth: Yup.string()
-      .nullable()
       .min(10, 'Enter valid date')
-      .required('Date of birth is required'),
+      .required('Date of Birth is Required. Minimum age must be 18 or 18+'),
     mobile_number: Yup.string()
       .matches(/^(?!.*(\d)\1{4})(?!.*(\d{5}).*\2)\d{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),

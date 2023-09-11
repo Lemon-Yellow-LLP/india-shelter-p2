@@ -77,8 +77,13 @@ async function verifyEmailOtp(id, otp) {
 }
 
 async function editFieldsById(id, page, values) {
-  const res = await axios.patch(`${API_URL}/${page}/edit/${id}`, values, requestOptions);
-  return res;
+  const { data } = await axios.patch(`${API_URL}/${page}/edit/${id}`, values, requestOptions);
+  return data;
+}
+
+async function addApi(page, values) {
+  const { data } = await axios.post(`${API_URL}/${page}/add`, values, requestOptions);
+  return data;
 }
 
 async function getMobileOtp(id) {
@@ -105,4 +110,5 @@ export {
   editFieldsById,
   getMobileOtp,
   verifyMobileOtp,
+  addApi,
 };

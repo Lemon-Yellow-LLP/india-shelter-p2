@@ -136,9 +136,9 @@ const OtpInput = ({
             </span>
           )}
           {verified === false && (
-            <span className='flex text-primary-black text-xs leading-[18px]'>
-              OTP not verified
+            <span className='flex text-[#E33439] text-xs leading-[18px]'>
               <img src={otpNotVerified} alt='Otp Verified' role='presentation' />
+              Invalid OTP. Please try again
             </span>
           )}
         </div>

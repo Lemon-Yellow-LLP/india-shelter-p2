@@ -99,11 +99,13 @@ const PersonalDetails = () => {
         )}
       </div>
 
-      {/* <PreviousNextButtons
-        linkPrevious='/lead/applicant-details'
-        linkNext='/lead/address-details'
-        onNextClick={handleNextClick}
-      /> */}
+      <div className='bottom-0 fixed'>
+        <PreviousNextButtons
+          linkPrevious='/lead/applicant-details'
+          linkNext='/lead/address-details'
+          onNextClick={handleNextClick}
+        />
+      </div>
     </div>
   );
 };

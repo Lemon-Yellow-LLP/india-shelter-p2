@@ -26,6 +26,7 @@ export default function ManualMode({
     handleBlur,
     handleSubmit,
     setFieldValue,
+    setToastMessage,
   } = useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
@@ -229,6 +230,8 @@ export default function ManualMode({
         return false;
       });
   }, []);
+
+  console.log(values.personal_details.id_number);
 
   return (
     <>

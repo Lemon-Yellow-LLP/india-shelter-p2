@@ -7,12 +7,9 @@ const DatePickerInput = forwardRef(function DatePickerInput(
   _ref,
 ) {
   const inputRef = useRef(null);
-  console.log(value);
+
   return (
-    <div
-      ref={reference}
-      className={`flex flex-col gap-1 ${error && touched ? 'pb-[0px]' : 'pb-[12px]'}`}
-    >
+    <div className={`flex flex-col gap-1 ${error && touched ? 'pb-[0px]' : 'pb-[12px]'}`}>
       <label htmlFor={name} className='flex gap-0.5 items-center text-primary-black w-fit'>
         {props.label}
         {true && <span className='text-primary-red text-sm'>*</span>}
@@ -36,7 +33,7 @@ const DatePickerInput = forwardRef(function DatePickerInput(
           placeholder='DD/MM/YYYY'
           className='w-full'
           name={name}
-          ref={inputRef}
+          ref={reference}
           onBlur={onBlur}
           onInput={(e) => {
             let value = e.currentTarget.value;
