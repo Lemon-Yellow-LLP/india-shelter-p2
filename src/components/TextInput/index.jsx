@@ -21,6 +21,7 @@ const TextInput = memo(
       displayError = true,
       message,
       onChange,
+      labelDisabled,
       ...props
     },
     ref,
@@ -29,7 +30,10 @@ const TextInput = memo(
 
     return (
       <div className='flex flex-col gap-1'>
-        <label htmlFor={name} className='flex gap-0.5 items-center text-primary-black'>
+        <label
+          htmlFor={name}
+          className={`'flex gap-0.5 items-center' ${labelDisabled ? 'opacity-60' : 'opacity-100'}`}
+        >
           {label}
           {props.required && <span className='text-primary-red text-sm'>*</span>}
         </label>
@@ -53,6 +57,8 @@ const TextInput = memo(
         ${!props.value && !touched ? 'border-stroke' : 'border-light-grey'}
         ${error && touched && 'border-primary-red shadow-primary shadow-primary-red'}
         ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
+        ${labelDisabled ? 'bg-white opacity-60' : 'opacity-100'}
+
         `}
         >
           {Icon && <Icon />}

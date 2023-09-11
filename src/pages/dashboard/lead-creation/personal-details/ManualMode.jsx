@@ -261,6 +261,7 @@ export default function ManualMode({
         error={errors.personal_details?.id_number}
         touched={touched.personal_details?.id_number}
         disabled={!values.personal_details?.id_type}
+        labelDisabled={!values.personal_details?.id_type}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[1];
@@ -367,6 +368,7 @@ export default function ManualMode({
           !values.personal_details?.selected_address_proof ||
           values?.personal_details?.extra_params?.same_as_id_type
         }
+        labelDisabled={!values.personal_details?.selected_address_proof}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[1];
