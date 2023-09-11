@@ -84,12 +84,30 @@ export const signUpSchema = Yup.object({
         .required('This field is mandatory')
         .min(2, 'Company name must be atleast 2 characters long')
         .max(90, 'Company name can be max 90 characters long'),
+      extra_industries: Yup.string()
+        .required('This field is mandatory')
+        .min(2, 'Industry name must be atleast 2 characters long')
+        .max(90, 'Industry name can be max 90 characters long'),
     }),
-    business_name: Yup.string().required('This field is mandatory'),
+    business_name: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Business name must be atleast 2 characters long')
+      .max(90, 'Business name can be max 90 characters long'),
     industries: Yup.string().required('This field is mandatory'),
     gst_number: Yup.string().required('This field is mandatory'),
-    total_income: Yup.string().required('This field is mandatory'),
-    pf_uan: Yup.string().required('This field is mandatory'),
+    total_income: Yup.number()
+      .required('This field is mandatory')
+      .required('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
+      .typeError('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
+      .min(10000, 'Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
+      .max(
+        500000000,
+        'Total loan amount should not be less than ₹ 10,000 and more than ₹ 50,00,00,000',
+      ),
+    pf_uan: Yup.string()
+      .required('This field is mandatory')
+      .min(12, 'pf uan number must be atleast 12 characters')
+      .max(12, 'pf uan number must be atleast 12 characters'),
     no_current_loan: Yup.number()
       .required('This field is mandatory')
       .min(0, 'No. of Current loan(s) can be min 0')
@@ -97,10 +115,22 @@ export const signUpSchema = Yup.object({
     ongoing_emi: Yup.string().required('This field is mandatory'),
     working_since: Yup.string().required('This field is mandatory'),
     mode_of_salary: Yup.string().required('This field is mandatory'),
-    flat_no_building_name: Yup.string().required('This field is mandatory'),
-    street_area_locality: Yup.string().required('This field is mandatory'),
-    town: Yup.string().required('This field is mandatory'),
-    landmark: Yup.string().required('This field is mandatory'),
+    flat_no_building_name: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Address must be atleast 2 characters long')
+      .max(90, 'Address can be max 90 characters long'),
+    street_area_locality: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Address must be atleast 2 characters long')
+      .max(90, 'Address can be max 90 characters long'),
+    town: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Town must be atleast 2 characters long')
+      .max(90, 'Town can be max 90 characters long'),
+    landmark: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Landmark must be atleast 2 characters long')
+      .max(90, 'Landmark can be max 90 characters long'),
     pincode: Yup.string()
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
@@ -109,6 +139,7 @@ export const signUpSchema = Yup.object({
     total_family_number: Yup.string().required('This field is mandatory'),
     total_household_income: Yup.string().required('This field is mandatory'),
     no_of_dependents: Yup.string().required('This field is mandatory'),
+    pention_amount: Yup.string().required('This field is mandatory'),
   }),
   pan_number: Yup.string()
     .required('Please enter your valid PAN number')
