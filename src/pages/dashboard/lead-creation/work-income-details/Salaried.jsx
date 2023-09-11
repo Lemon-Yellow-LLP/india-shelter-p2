@@ -4,6 +4,226 @@ import TextInput from '../../../../components/TextInput';
 import DropDown from '../../../../components/DropDown';
 import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
 import CurrencyInput from '../../../../components/CurrencyInput';
+import { editFieldsById } from '../../../../global';
+
+const companyNameOptions = [
+  {
+    label: 'Others',
+    value: 'Others',
+  },
+  {
+    label: 'Google',
+    value: 'Google',
+  },
+  {
+    label: 'Amazon',
+    value: 'Amazon',
+  },
+];
+
+const workingSinceOptions = [
+  {
+    label: '1975',
+    value: '1975',
+  },
+  {
+    label: '1976',
+    value: '1976',
+  },
+  {
+    label: '1977',
+    value: '1977',
+  },
+  {
+    label: '1978',
+    value: '1978',
+  },
+  {
+    label: '1979',
+    value: '1979',
+  },
+  {
+    label: '1980',
+    value: '1980',
+  },
+  {
+    label: '1981',
+    value: '1981',
+  },
+  {
+    label: '1982',
+    value: '1982',
+  },
+  {
+    label: '1983',
+    value: '1983',
+  },
+  {
+    label: '1984',
+    value: '1984',
+  },
+  {
+    label: '1985',
+    value: '1985',
+  },
+  {
+    label: '1986',
+    value: '1986',
+  },
+  {
+    label: '1987',
+    value: '1987',
+  },
+  {
+    label: '1988',
+    value: '1988',
+  },
+  {
+    label: '1989',
+    value: '1989',
+  },
+  {
+    label: '1990',
+    value: '1990',
+  },
+  {
+    label: '1991',
+    value: '1991',
+  },
+  {
+    label: '1992',
+    value: '1992',
+  },
+  {
+    label: '1993',
+    value: '1993',
+  },
+  {
+    label: '1994',
+    value: '1994',
+  },
+  {
+    label: '1995',
+    value: '1995',
+  },
+  {
+    label: '1996',
+    value: '1996',
+  },
+  {
+    label: '1997',
+    value: '1997',
+  },
+  {
+    label: '1998',
+    value: '1998',
+  },
+  {
+    label: '1999',
+    value: '1999',
+  },
+  {
+    label: '2000',
+    value: '2000',
+  },
+  {
+    label: '2001',
+    value: '2001',
+  },
+  {
+    label: '2002',
+    value: '2002',
+  },
+  {
+    label: '2003',
+    value: '2003',
+  },
+  {
+    label: '2004',
+    value: '2004',
+  },
+  {
+    label: '2005',
+    value: '2005',
+  },
+  {
+    label: '2006',
+    value: '2006',
+  },
+  {
+    label: '2007',
+    value: '2007',
+  },
+  {
+    label: '2008',
+    value: '2008',
+  },
+  {
+    label: '2009',
+    value: '2009',
+  },
+  {
+    label: '2010',
+    value: '2010',
+  },
+  {
+    label: '2011',
+    value: '2011',
+  },
+  {
+    label: '2012',
+    value: '2012',
+  },
+  {
+    label: '2013',
+    value: '2013',
+  },
+  {
+    label: '2014',
+    value: '2014',
+  },
+  {
+    label: '2015',
+    value: '2015',
+  },
+  {
+    label: '2016',
+    value: '2016',
+  },
+  {
+    label: '2017',
+    value: '2017',
+  },
+  {
+    label: '2018',
+    value: '2018',
+  },
+  {
+    label: '2019',
+    value: '2019',
+  },
+  {
+    label: '2020',
+    value: '2020',
+  },
+  {
+    label: '2021',
+    value: '2021',
+  },
+  {
+    label: '2022',
+    value: '2022',
+  },
+  {
+    label: '2023',
+    value: '2023',
+  },
+];
+
+const modeOfSalary = [
+  { label: 'Bank-transfer', value: 'Bank-transfer' },
+  { label: 'Cash', value: 'Cash' },
+];
 
 export default function Salaried() {
   const { values, setValues, errors, touched, handleBlur, setFieldValue, setFieldError } =
@@ -11,37 +231,12 @@ export default function Salaried() {
 
   const searchableTextInputChange = useCallback((name, value) => {
     setFieldValue(name, value?.value);
+    const new_name = name.split('.')[1];
+
+    editFieldsById(1, 'work-income', {
+      [new_name]: value?.value,
+    });
   }, []);
-
-  const companyNameOptions = [
-    {
-      label: 'Others',
-      value: 'Others',
-    },
-    {
-      label: 'Google',
-      value: 'Google',
-    },
-    {
-      label: 'Amazon',
-      value: 'Amazon',
-    },
-  ];
-
-  const workingSinceOptions = [
-    {
-      label: '2021',
-      value: '2021',
-    },
-    {
-      label: '2022',
-      value: '2022',
-    },
-    {
-      label: '2023',
-      value: '2023',
-    },
-  ];
 
   const handleDropdownChange = useCallback((value) => {
     setFieldValue('work_income_details.mode_of_salary', value);
@@ -51,9 +246,9 @@ export default function Salaried() {
     //   setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_type']: true }));
     // }
 
-    // editReferenceById(2, {
-    //   reference_2_type: value,
-    // });
+    editFieldsById(1, 'work-income', {
+      mode_of_salary: value,
+    });
   }, []);
 
   return (
@@ -66,7 +261,18 @@ export default function Salaried() {
         value={values.work_income_details.company_name}
         error={errors.work_income_details?.company_name}
         touched={touched.work_income_details?.company_name}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (
+            !errors.work_income_details?.company_name &&
+            values.work_income_details.company_name
+          ) {
+            editFieldsById(1, 'work-income', {
+              company_name: values.work_income_details.company_name,
+            });
+          }
+        }}
         onChange={searchableTextInputChange}
         type='search'
         options={companyNameOptions}
@@ -80,11 +286,24 @@ export default function Salaried() {
           value={values.work_income_details.extra_params.extra_company_name}
           error={errors.work_income_details?.extra_params?.extra_company_name}
           touched={touched.work_income_details?.extra_params?.extra_company_name}
-          onBlur={handleBlur}
+          onBlur={(e) => {
+            handleBlur(e);
+
+            if (
+              !errors.work_income_details?.extra_params?.extra_company_name &&
+              values.work_income_details.extra_params?.extra_company_name
+            ) {
+              editFieldsById(1, 'work-income', {
+                extra_params: {
+                  extra_company_name: values.work_income_details.extra_params.extra_company_name,
+                },
+              });
+            }
+          }}
           onChange={(e) => {
             const value = e.currentTarget.value;
-            const address_pattern = /^[a-zA-Z\s]+$/;
-            if (address_pattern.exec(value[value.length - 1])) {
+            const pattern = /^[a-zA-Z\s]+$/;
+            if (pattern.exec(value[value.length - 1])) {
               setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
             }
 
@@ -105,11 +324,22 @@ export default function Salaried() {
         value={values.work_income_details.total_income}
         error={errors.work_income_details?.total_income}
         touched={touched.work_income_details?.total_income}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (
+            !errors.work_income_details?.total_income &&
+            values.work_income_details.total_income
+          ) {
+            editFieldsById(1, 'work-income', {
+              total_income: values.work_income_details.total_income,
+            });
+          }
+        }}
         onChange={(e) => {
           const value = e.currentTarget.value;
-          const address_pattern = /^[0-9-]+$/;
-          if (address_pattern.exec(value[value.length - 1])) {
+          const pattern = /^[a-zA-Z0-9\/-\s,]+$/;
+          if (pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
 
@@ -128,12 +358,34 @@ export default function Salaried() {
         value={values.work_income_details.pf_uan}
         error={errors.work_income_details?.pf_uan}
         touched={touched.work_income_details?.pf_uan}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (!errors.work_income_details?.pf_uan && values.work_income_details.pf_uan) {
+            editFieldsById(1, 'work-income', {
+              pf_uan: values.work_income_details.pf_uan,
+            });
+          }
+        }}
         onChange={(e) => {
           const value = e.currentTarget.value;
-          const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+          if (value.length > 12) {
+            return;
+          }
+          const address_pattern = /^[0-9]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Backspace') {
+            setFieldValue(
+              'work_income_details.pf_uan',
+              values.work_income_details.pf_uan.slice(
+                0,
+                values.work_income_details.pf_uan.length - 1,
+              ),
+            );
           }
         }}
       />
@@ -146,20 +398,45 @@ export default function Salaried() {
         value={values.work_income_details.no_current_loan}
         error={errors.work_income_details?.no_current_loan}
         touched={touched.work_income_details?.no_current_loan}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+          if (values.work_income_details.no_current_loan == 0) {
+            setFieldValue('work_income_details.ongoing_emi', '');
+            editFieldsById(1, 'work-income', {
+              ongoing_emi: null,
+            });
+          }
+
+          if (
+            !errors.work_income_details?.no_current_loan &&
+            values.work_income_details.no_current_loan
+          ) {
+            editFieldsById(1, 'work-income', {
+              no_current_loan: parseInt(values.work_income_details.no_current_loan),
+            });
+          }
+        }}
         onChange={(e) => {
           const value = e.currentTarget.value;
-          const address_pattern = /^[0-9-]+$/;
+          const address_pattern = /^[0-9]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
-          if (values.work_income_details.no_current_loan == 0) {
-            setFieldValue('work_income_details.ongoing_emi', '');
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Backspace') {
+            setFieldValue(
+              'work_income_details.no_current_loan',
+              values.work_income_details.no_current_loan.slice(
+                0,
+                values.work_income_details.no_current_loan.length - 1,
+              ),
+            );
           }
         }}
       />
 
-      <TextInput
+      <CurrencyInput
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'
         required
@@ -171,10 +448,18 @@ export default function Salaried() {
             : null
         }
         touched={touched.work_income_details?.ongoing_emi}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (!errors.work_income_details?.ongoing_emi && values.work_income_details.ongoing_emi) {
+            editFieldsById(1, 'work-income', {
+              ongoing_emi: values.work_income_details.ongoing_emi,
+            });
+          }
+        }}
         onChange={(e) => {
           const value = e.currentTarget.value;
-          const address_pattern = /^[0-9-]+$/;
+          const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
@@ -200,7 +485,7 @@ export default function Salaried() {
       <DropDown
         label='Mode of salary'
         required
-        options={workingSinceOptions}
+        options={modeOfSalary}
         placeholder='Choose mode of salary'
         onChange={handleDropdownChange}
         name='work_income_details.mode_of_salary'
