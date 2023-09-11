@@ -187,7 +187,8 @@ export const signUpSchema = Yup.object({
     }),
 
     selected_address_proof: Yup.string().required('This field is mandatory.'),
-    address_proof_number: Yup.string().when('selected_address_proof', (value, schema) => {
+    address_proof_number: Yup.string()
+    .when('selected_address_proof', (value, schema) => {
       if (value[0] === 'Passport') {
         return schema
           .matches(
@@ -216,7 +217,7 @@ export const signUpSchema = Yup.object({
           .matches(/^[A-Za-z]{3}\d{7}$/, 'Enter Valid Voter ID number. Format should be XGS1234567')
           .required('Enter a valid address proof number');
       } else {
-        return schema.required('Enter a valid address proof number');
+        return schema.required('This field is mandatory.');
       }
     }),
 

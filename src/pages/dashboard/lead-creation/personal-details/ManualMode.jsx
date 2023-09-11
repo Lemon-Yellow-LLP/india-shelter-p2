@@ -335,7 +335,7 @@ export default function ManualMode({
 
       <DropDown
         label='Select address proof'
-        name='personal_details.address_proof'
+        name='personal_details.selected_address_proof'
         required
         options={manualModeDropdownOptions[1].options}
         placeholder='Choose address proof'
