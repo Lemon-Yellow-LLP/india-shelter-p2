@@ -10,10 +10,10 @@ const DatePicker = ({ value, setDate, label, error, touched, onBlur, reference, 
 
   useEffect(() => {
     if (value) {
-      var dateParts = value.split('/');
-      var day = parseInt(dateParts[0], 10);
+      var dateParts = value.split('-');
+      var day = parseInt(dateParts[2], 10);
       var month = parseInt(dateParts[1] - 1, 10);
-      var year = parseInt(dateParts[2], 10);
+      var year = parseInt(dateParts[0], 10);
       const newStartDate = new Date(year, month, day);
       setStartDate(newStartDate);
     }
@@ -74,7 +74,9 @@ const DatePicker = ({ value, setDate, label, error, touched, onBlur, reference, 
           month = month.toString().padStart(2, '0');
           const dayOfMonth = returnDate.getDate().toString().padStart(2, '0');
           const year = returnDate.getFullYear();
-          const finalDate = `${dayOfMonth}/${month}/${year}`;
+          // const finalDate = `${dayOfMonth}/${month}/${year}`;
+          const finalDate = `${year}-${month}-${dayOfMonth}`;
+
           setDate(finalDate);
         }
       }}

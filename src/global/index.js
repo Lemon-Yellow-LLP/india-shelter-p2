@@ -50,8 +50,8 @@ function isEighteenOrAbove(date) {
   const today = new Date();
 
   const dateString = date;
-  const parts = dateString.split('/');
-  const year = parts[2];
+  const parts = dateString.split('-');
+  const year = parts[0];
   const month = parts[1];
   const differenceInYear = today.getFullYear() - year;
   const differenceInMonth = today.getMonth() - month;
@@ -96,6 +96,30 @@ async function verifyMobileOtp(id, otp) {
   return res;
 }
 
+async function checkExistingCustomer(body) {
+  let myHeaders = new Headers();
+  myHeaders.append('Content-Type', 'application/json');
+  let requestOptions2 = {
+    method: 'POST',
+    headers: myHeaders,
+    body: body,
+    redirect: 'follow',
+    mode: 'no-cors',
+  };
+
+  // const res = await axios.post(
+  //   `https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run`,
+  //   body,
+  // );
+
+  await fetch(
+    'https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run',
+    requestOptions2,
+  ).then((res) => {
+    return res;
+  });
+}
+
 export {
   API_URL,
   pingAPI,
@@ -111,4 +135,5 @@ export {
   getMobileOtp,
   verifyMobileOtp,
   addApi,
+  checkExistingCustomer,
 };

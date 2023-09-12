@@ -10,6 +10,7 @@ import {
   getMobileOtp,
   verifyMobileOtp,
   addApi,
+  checkExistingCustomer,
 } from '../../../../global/index';
 
 import {
@@ -27,7 +28,7 @@ import { Button } from '@mui/material';
 const loanTypeOptions = [
   {
     label: 'Home Loan',
-    value: 'Home Loan',
+    value: 'HL',
     icon: <IconHomeLoan />,
   },
   {
@@ -257,7 +258,13 @@ const ApplicantDetails = () => {
         return;
       }
 
+      setShowOTPInput(false);
+
       setFieldValue('applicant_details.mobile_number', phoneNumber);
+
+      if (phoneNumber.length === 10) {
+        setHasSentOTPOnce(false);
+      }
 
       updateFieldsApplicant('mobile_number', phoneNumber);
       if (
@@ -315,11 +322,66 @@ const ApplicantDetails = () => {
   const sendMobileOtp = async () => {
     if (values.applicant_details.date_of_birth) {
       await updateFieldsApplicant().then(async () => {
-        setDisablePhoneNumber((prev) => !prev);
+        // setDisablePhoneNumber((prev) => !prev);
         setShowOTPInput(true);
         setHasSentOTPOnce(true);
         getMobileOtp(1);
         setToastMessage('OTP has been sent to your mail id');
+        const bodyForExistingCustomer = JSON.stringify({
+          resource: '/customer_check',
+          path: '/customer_check',
+          httpMethod: 'POST',
+          auth: 'exi$t_Sys@85',
+          'source flag': '1',
+          body: {
+            DOB: values.applicant_details.date_of_birth,
+            'Mobile Number': values.applicant_details.mobile_number,
+            Product: values.lead.loan_type,
+          },
+        });
+
+        const responce = await checkExistingCustomer(bodyForExistingCustomer);
+
+        const { body } = {
+          ErrorCode: 200,
+          body: [
+            {
+              // DOB: '',
+              // 'Mobile Number': '9833563411',
+              // Product: 'HL',
+              is_existing_customer: 'TRUE',
+              pre_approved_amount: '1000000',
+              id_type: 'PAN',
+              id_number: 'AAAPB2117A',
+              selected_address_proof: 'AADHAR',
+              address_proof_number: '654987321659',
+              first_name: 'SANTOSH YADAV',
+              middle_name: '',
+              last_name: '',
+              gender: 'MALE',
+              father_husband_name: 'XYZ',
+              mother_name: 'XYZ',
+              current_flat_no_building_name: '12',
+              current_street_area_locality: 'Thane',
+              current_town: 'Delhi',
+              current_landmark: 'ABC',
+              current_pincode: '421202',
+              current_city: 'Dombivli',
+              current_state: 'Maharashtra',
+              current_no_of_year_residing: '20',
+              permanent_flat_no_building_name: '12',
+              permanent_street_area_locality: 'Thane',
+              permanent_town: 'Delhi',
+              permanent_landmark: 'ABC',
+              permanent_pincode: '421202',
+              permanent_city: 'Dombivli',
+              permanent_state: 'Maharashtra',
+              permanent_no_of_year_residing: '20',
+            },
+          ],
+        };
+
+        console.log('Existing data', body[0]);
       });
     } else {
       setFieldError(
@@ -579,7 +641,7 @@ const ApplicantDetails = () => {
       <div className='bottom-0 fixed'>
         <PreviousNextButtons
           disablePrevious={true}
-          disableNext={!mobileVerified || errors.applicant_details}
+          disableNext={!mobileVerified || errors.applicant_details || errors.lead}
           linkNext='/lead/personal-details'
         />
       </div>
