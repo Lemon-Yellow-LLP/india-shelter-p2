@@ -116,18 +116,22 @@ export const signUpSchema = Yup.object({
     working_since: Yup.string().required('This field is mandatory'),
     mode_of_salary: Yup.string().required('This field is mandatory'),
     flat_no_building_name: Yup.string()
+      .trim()
       .required('This field is mandatory')
       .min(2, 'Address must be atleast 2 characters long')
       .max(90, 'Address can be max 90 characters long'),
     street_area_locality: Yup.string()
+      .trim()
       .required('This field is mandatory')
       .min(2, 'Address must be atleast 2 characters long')
       .max(90, 'Address can be max 90 characters long'),
     town: Yup.string()
+      .trim()
       .required('This field is mandatory')
       .min(2, 'Town must be atleast 2 characters long')
       .max(90, 'Town can be max 90 characters long'),
     landmark: Yup.string()
+      .trim()
       .required('This field is mandatory')
       .min(2, 'Landmark must be atleast 2 characters long')
       .max(90, 'Landmark can be max 90 characters long'),
