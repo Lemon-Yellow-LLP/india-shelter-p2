@@ -38,6 +38,13 @@ const Dashboard = () => {
       >
         go-to-address-details-page
       </Link>
+
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/work-income-details'
+      >
+        go-to-work-income-page
+      </Link>
     </div>
   );
 };

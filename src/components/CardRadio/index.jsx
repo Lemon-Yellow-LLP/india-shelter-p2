@@ -14,9 +14,9 @@ const CardRadio = memo(({ label, current, children, value, onChange, name, disab
     }
 
     if (current === value) {
-      return 'bg-light-green border-secondary-green stroke-secondary-green fill-[#147257]';
+      return 'bg-light-green border-secondary-green stroke-secondary-green text-secondary-green fill-[#147257]';
     }
-    return 'bg-white border-stroke stroke-light-grey hover:bg-grey-white fill-red';
+    return 'bg-white border-stroke stroke-light-grey hover:bg-grey-white fill-red text-light-grey';
   };
 
   return (
