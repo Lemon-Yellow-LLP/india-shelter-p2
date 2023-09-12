@@ -70,7 +70,7 @@ export const professionOptions = [
   },
   {
     label: 'Self employed',
-    value: 'SelfEmployed',
+    value: 'Self-employed',
     icon: <IconSelfEmployed />,
   },
   {
