@@ -2,6 +2,7 @@ import { useCallback, useContext, useState } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import TextInput from '../../../../components/TextInput';
 import { CurrencyInput } from '../../../../components';
+import { editFieldsById } from '../../../../global';
 
 export default function UnEmployed() {
   const { values, errors, touched, handleBlur, setFieldValue } = useContext(AuthContext);
@@ -20,6 +21,18 @@ export default function UnEmployed() {
           handleBlur(e);
           if (values.work_income_details.no_current_loan == 0) {
             setFieldValue('work_income_details.ongoing_emi', '');
+            editFieldsById(1, 'work-income', {
+              ongoing_emi: null,
+            });
+          }
+
+          if (
+            !errors.work_income_details?.no_current_loan &&
+            values.work_income_details.no_current_loan
+          ) {
+            editFieldsById(1, 'work-income', {
+              no_current_loan: parseInt(values.work_income_details.no_current_loan),
+            });
           }
         }}
         onChange={(e) => {
@@ -54,7 +67,15 @@ export default function UnEmployed() {
             : null
         }
         touched={touched.work_income_details?.ongoing_emi}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (!errors.work_income_details?.ongoing_emi && values.work_income_details.ongoing_emi) {
+            editFieldsById(1, 'work-income', {
+              ongoing_emi: values.work_income_details.ongoing_emi,
+            });
+          }
+        }}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;

@@ -114,7 +114,7 @@ export default function SelfEmployed() {
       {values.work_income_details.industries === 'Others' && (
         <TextInput
           label=''
-          placeholder='Enter company name'
+          placeholder='Enter industry name'
           name='work_income_details.extra_params.extra_industries'
           value={values.work_income_details.extra_params.extra_industries}
           error={errors.work_income_details?.extra_params?.extra_industries}
@@ -127,8 +127,9 @@ export default function SelfEmployed() {
               values.work_income_details.extra_params?.extra_industries
             ) {
               editFieldsById(1, 'work-income', {
+                industries: values.work_income_details.extra_params?.extra_industries,
                 extra_params: {
-                  extra_industries: values.work_income_details.extra_params.extra_industries,
+                  extra_industries: 'Others',
                 },
               });
             }
@@ -194,6 +195,18 @@ export default function SelfEmployed() {
           handleBlur(e);
           if (values.work_income_details.no_current_loan == 0) {
             setFieldValue('work_income_details.ongoing_emi', '');
+            editFieldsById(1, 'work-income', {
+              ongoing_emi: null,
+            });
+          }
+
+          if (
+            !errors.work_income_details?.no_current_loan &&
+            values.work_income_details.no_current_loan
+          ) {
+            editFieldsById(1, 'work-income', {
+              no_current_loan: parseInt(values.work_income_details.no_current_loan),
+            });
           }
         }}
         onChange={(e) => {
@@ -228,7 +241,15 @@ export default function SelfEmployed() {
             : null
         }
         touched={touched.work_income_details?.ongoing_emi}
-        onBlur={handleBlur}
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (!errors.work_income_details?.ongoing_emi && values.work_income_details.ongoing_emi) {
+            editFieldsById(1, 'work-income', {
+              ongoing_emi: values.work_income_details.ongoing_emi,
+            });
+          }
+        }}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
