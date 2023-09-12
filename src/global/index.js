@@ -86,6 +86,11 @@ async function editFieldsById(id, page, values) {
   return res;
 }
 
+async function editAddressById(id, data) {
+  const res = await axios.patch(`${API_URL}/address/edit/${id}`, data, requestOptions);
+  return res;
+}
+
 export {
   API_URL,
   pingAPI,
@@ -99,4 +104,5 @@ export {
   editPropertyById,
   editFieldsById,
   getCompanyNamesList,
+  editAddressById,
 };

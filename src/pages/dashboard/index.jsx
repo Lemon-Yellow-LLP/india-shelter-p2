@@ -31,6 +31,13 @@ const Dashboard = () => {
       >
         go-to-property-details-page
       </Link>
+
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/address-details'
+      >
+        go-to-address-details-page
+      </Link>
     </div>
   );
 };

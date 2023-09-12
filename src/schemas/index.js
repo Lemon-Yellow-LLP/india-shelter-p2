@@ -76,6 +76,55 @@ export const signUpSchema = Yup.object({
       .email('Enter a valid Email')
       .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   }),
+  addressSchema: Yup.object().shape({
+    current_type_of_residence: Yup.string().required('This field is mandatory'),
+    current_flat_no_building_name: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Flat no/Building name must be atleast 2 characters long')
+      .max(90, 'Flat no/Building name can be max 90 characters long'),
+    current_street_area_locality: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Street/Area/Locality must be atleast 2 characters long')
+      .max(90, 'Street/Area/Locality can be max 90 characters long'),
+    current_town: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Town must be atleast 2 characters long')
+      .max(90, 'Town can be max 90 characters long'),
+    current_landmark: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Landmark must be atleast 2 characters long')
+      .max(90, 'Landmark can be max 90 characters long'),
+    current_pincode: Yup.string()
+      .required('This field is mandatory')
+      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
+      .min(6, 'Pincode a valid Pincode')
+      .max(6, 'Pincode a valid Pincode'),
+    current_no_of_year_residing: Yup.string().required('This field is mandatory'),
+
+    permanent_type_of_residence: Yup.string().required('This field is mandatory'),
+    permanent_flat_no_building_name: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Flat no/Building name must be atleast 2 characters long')
+      .max(90, 'Flat no/Building name can be max 90 characters long'),
+    permanent_street_area_locality: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Street/Area/Locality must be atleast 2 characters long')
+      .max(90, 'Street/Area/Locality can be max 90 characters long'),
+    permanent_town: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Town must be atleast 2 characters long')
+      .max(90, 'Town can be max 90 characters long'),
+    permanent_landmark: Yup.string()
+      .required('This field is mandatory')
+      .min(2, 'Landmark must be atleast 2 characters long')
+      .max(90, 'Landmark can be max 90 characters long'),
+    permanent_pincode: Yup.string()
+      .required('This field is mandatory')
+      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
+      .min(6, 'Pincode a valid Pincode')
+      .max(6, 'Pincode a valid Pincode'),
+    permanent_no_of_year_residing: Yup.string().required('This field is mandatory'),
+  }),
   work_income_details: Yup.object().shape({
     profession: Yup.string().required('This field is mandatory'),
     company_name: Yup.string().required('This field is mandatory'),
@@ -186,7 +235,8 @@ export const signUpSchema = Yup.object({
           .required('Enter a valid ID number');
       } else if (value[0] === 'Aadhar') {
         return schema
-          .matches(/^\d{12}$/, 'Enter Valid 12 digit Aadhar number')
+          .min(12, 'Enter Valid 12 digit Aadhar number')
+          .max(12, 'Enter Valid 12 digit Aadhar number')
           .required('Enter a valid ID number');
       } else if (value[0] === 'Driving license') {
         return schema
@@ -219,7 +269,8 @@ export const signUpSchema = Yup.object({
           .required('Enter a valid address proof number');
       } else if (value[0] === 'Aadhar') {
         return schema
-          .matches(/^\d{12}$/, 'Enter Valid 12 digit Aadhar number')
+          .min(12, 'Enter Valid 12 digit Aadhar number')
+          .max(12, 'Enter Valid 12 digit Aadhar number')
           .required('Enter a valid address proof number');
       } else if (value[0] === 'Driving license') {
         return schema
@@ -233,7 +284,7 @@ export const signUpSchema = Yup.object({
           .matches(/^[A-Za-z]{3}\d{7}$/, 'Enter Valid Voter ID number. Format should be XGS1234567')
           .required('Enter a valid address proof number');
       } else {
-        return schema.required('Enter a valid address proof number');
+        return schema.required('This field is mandatory.');
       }
     }),
 
