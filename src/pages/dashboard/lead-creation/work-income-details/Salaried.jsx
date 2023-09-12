@@ -4,22 +4,7 @@ import TextInput from '../../../../components/TextInput';
 import DropDown from '../../../../components/DropDown';
 import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
 import CurrencyInput from '../../../../components/CurrencyInput';
-import { editFieldsById } from '../../../../global';
-
-const companyNameOptions = [
-  {
-    label: 'Others',
-    value: 'Others',
-  },
-  {
-    label: 'Google',
-    value: 'Google',
-  },
-  {
-    label: 'Amazon',
-    value: 'Amazon',
-  },
-];
+import { editFieldsById, getCompanyNamesList } from '../../../../global';
 
 const workingSinceOptions = [
   {
@@ -226,16 +211,43 @@ const modeOfSalary = [
 ];
 
 export default function Salaried() {
-  const { values, setValues, errors, touched, handleBlur, setFieldValue, setFieldError } =
+  const { values, errors, touched, handleBlur, setFieldValue, setFieldError } =
     useContext(AuthContext);
 
+  const [companyNameOptions, setCompanyNameOptions] = useState([]);
+
   const searchableTextInputChange = useCallback((name, value) => {
-    setFieldValue(name, value?.value);
+    setFieldValue(name, value?.label);
     const new_name = name.split('.')[1];
 
     editFieldsById(1, 'work-income', {
-      [new_name]: value?.value,
+      [new_name]: value?.label,
     });
+  }, []);
+
+  useEffect(() => {
+    const getCompanies = async () => {
+      try {
+        const data = await getCompanyNamesList();
+
+        if (!data) return;
+
+        const new_data = data.map((obj) => {
+          return { label: obj.name, value: obj.name, id: obj.id };
+        });
+
+        new_data.unshift({
+          label: 'Others',
+          value: 'Others',
+          id: 0,
+        });
+
+        setCompanyNameOptions(new_data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getCompanies();
   }, []);
 
   const handleDropdownChange = useCallback((value) => {
@@ -294,8 +306,9 @@ export default function Salaried() {
               values.work_income_details.extra_params?.extra_company_name
             ) {
               editFieldsById(1, 'work-income', {
+                company_name: values.work_income_details.extra_params?.extra_company_name,
                 extra_params: {
-                  extra_company_name: values.work_income_details.extra_params.extra_company_name,
+                  extra_company_name: 'Others',
                 },
               });
             }
