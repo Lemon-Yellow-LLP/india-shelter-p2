@@ -32,6 +32,11 @@ async function editPropertyById(id, propertyData) {
   return res.data;
 }
 
+async function getCompanyNamesList() {
+  const res = await axios.get(`${API_URL}/company-list`, requestOptions);
+  return res.data;
+}
+
 async function updateLeadDataOnBlur(leadId, fieldName, value) {
   if (!leadId) return;
   const inputName = fieldName;
@@ -93,4 +98,5 @@ export {
   editReferenceById,
   editPropertyById,
   editFieldsById,
+  getCompanyNamesList,
 };
