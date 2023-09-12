@@ -1,7 +1,7 @@
 import { professionOptions, noOfDependentsOptions, totalFamilyMembersOptions } from '../utils';
 import CardRadio from '../../../../components/CardRadio';
 import CardRadioWithoutIcon from '../../../../components/CardRadio/CardRadioWithoutIcon';
-import { memo, useCallback, useContext } from 'react';
+import { memo, useCallback, useContext, useEffect } from 'react';
 import { AuthContext } from '../../../../context/AuthContext';
 import Salaried from './Salaried';
 import SelfEmployed from './SelfEmployed';
@@ -15,6 +15,7 @@ const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified
 
 const WorkIncomeDetails = () => {
   const {
+    setValues,
     values,
     errors,
     touched,
@@ -32,6 +33,128 @@ const WorkIncomeDetails = () => {
       [e.name]: e.value,
     });
   }, []);
+
+  // useEffect(() => {
+  //   if (values.work_income_details.profession === 'Salaried') {
+  //     editFieldsById(1, 'work-income', {
+  //       business_name: null,
+  //       industries: null,
+  //       gst_number: null,
+  //       pention_amount: null,
+  //     });
+  //     // setValues({
+  //     //   ...values,
+  //     //   work_income_details: {
+  //     //     ...values.work_income_details,
+  //     //     business_name: '',
+  //     //     industries: '',
+  //     //     gst_number: '',
+  //     //     pention_amount: '',
+  //     //   },
+  //     // });
+  //   } else if (values.work_income_details.profession === 'Self-employed') {
+  //     editFieldsById(1, 'work-income', {
+  //       company_name: null,
+  //       total_income: null,
+  //       pf_uan: null,
+  //       working_since: null,
+  //       mode_of_salary: null,
+  //       pention_amount: null,
+  //     });
+  //     setValues({
+  //       ...values,
+  //       work_income_details: {
+  //         ...values.work_income_details,
+  //         company_name: '',
+  //         total_income: '',
+  //         pf_uan: '',
+  //         working_since: '',
+  //         mode_of_salary: '',
+  //         pention_amount: '',
+  //       },
+  //     });
+  //   } else if (values.work_income_details.profession === 'Unemployed') {
+  //     editFieldsById(1, 'work-income', {
+  //       company_name: null,
+  //       total_income: null,
+  //       pf_uan: null,
+  //       working_since: null,
+  //       mode_of_salary: null,
+  //       flat_no_building_name: null,
+  //       street_area_locality: null,
+  //       town: null,
+  //       landmark: null,
+  //       pincode: null,
+  //       city: null,
+  //       state: null,
+  //       business_name: null,
+  //       industries: null,
+  //       gst_number: null,
+  //       pention_amount: null,
+  //     });
+  //     setValues({
+  //       ...values,
+  //       work_income_details: {
+  //         ...values.work_income_details,
+  //         company_name: '',
+  //         total_income: '',
+  //         pf_uan: '',
+  //         working_since: '',
+  //         mode_of_salary: '',
+  //         flat_no_building_name: '',
+  //         street_area_locality: '',
+  //         town: '',
+  //         landmark: '',
+  //         pincode: '',
+  //         city: '',
+  //         state: '',
+  //         business_name: '',
+  //         industries: '',
+  //         gst_number: '',
+  //         pention_amount: '',
+  //       },
+  //     });
+  //   } else {
+  //     editFieldsById(1, 'work-income', {
+  //       company_name: null,
+  //       total_income: null,
+  //       pf_uan: null,
+  //       working_since: null,
+  //       mode_of_salary: null,
+  //       flat_no_building_name: null,
+  //       street_area_locality: null,
+  //       town: null,
+  //       landmark: null,
+  //       pincode: null,
+  //       city: null,
+  //       state: null,
+  //       business_name: null,
+  //       industries: null,
+  //       gst_number: null,
+  //     });
+  //     setValues({
+  //       ...values,
+  //       work_income_details: {
+  //         ...values.work_income_details,
+  //         company_name: '',
+  //         total_income: '',
+  //         pf_uan: '',
+  //         working_since: '',
+  //         mode_of_salary: '',
+  //         flat_no_building_name: '',
+  //         street_area_locality: '',
+  //         town: '',
+  //         landmark: '',
+  //         pincode: '',
+  //         city: '',
+  //         state: '',
+  //         business_name: '',
+  //         industries: '',
+  //         gst_number: '',
+  //       },
+  //     });
+  //   }
+  // }, [values.work_income_details.profession]);
 
   const handleOnPincodeChange = useCallback(async () => {
     if (
@@ -70,9 +193,6 @@ const WorkIncomeDetails = () => {
     // requiredFieldsStatus,
   ]);
 
-  // console.log(errors.work_income_details?.total_family_number);
-  // console.log(!values.work_income_details.total_family_number);
-
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
       <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
@@ -105,12 +225,12 @@ const WorkIncomeDetails = () => {
           ) : null}
         </div>
         {values.work_income_details.profession === 'Salaried' && <Salaried />}
-        {values.work_income_details.profession === 'SelfEmployed' && <SelfEmployed />}
+        {values.work_income_details.profession === 'Self-employed' && <SelfEmployed />}
         {values.work_income_details.profession === 'Unemployed' && <UnEmployed />}
         {values.work_income_details.profession === 'Retired' && <Retired />}
 
         {values.work_income_details.profession === 'Salaried' ||
-        values.work_income_details.profession === 'SelfEmployed' ? (
+        values.work_income_details.profession === 'Self-employed' ? (
           <>
             <TextInput
               label='Flat no/Building name'
@@ -363,11 +483,18 @@ const WorkIncomeDetails = () => {
               </div>
 
               {/* {errors.work_income_details?.total_family_number &&
-              values.work_income_details.total_family_number ? (
+              !touched.work_income_details?.total_family_number &&
+              !values.work_income_details.total_family_number ? (
                 <span className='text-sm text-primary-red'>
                   {errors.work_income_details.total_family_number}
                 </span>
               ) : null} */}
+
+              {/* {errors.work_income_details?.total_family_number && (
+                <span className='text-sm text-primary-red'>
+                  {errors.work_income_details.total_family_number}
+                </span>
+              )} */}
             </div>
 
             <CurrencyInput
@@ -429,16 +556,23 @@ const WorkIncomeDetails = () => {
               </div>
 
               {/* {errors.work_income_details?.no_of_dependents &&
-              values.work_income_details.no_of_dependents ? (
+              !touched.work_income_details?.no_of_dependents &&
+              !values.work_income_details.no_of_dependents ? (
                 <span className='text-sm text-primary-red'>
                   {errors.work_income_details.no_of_dependents}
                 </span>
               ) : null} */}
+
+              {/* {errors.work_income_details?.no_of_dependents && (
+                <span className='text-sm text-primary-red'>
+                  {errors.work_income_details.no_of_dependents}
+                </span>
+              )} */}
             </div>
           </>
         ) : null}
 
-        <button onClick={handleSubmit}>submit</button>
+        {/* <button onClick={handleSubmit}>submit</button> */}
       </div>
     </div>
   );
