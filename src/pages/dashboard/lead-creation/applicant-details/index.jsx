@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef } from 'react';
 import { useState, useCallback } from 'react';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import { IconHomeLoan, IconLoanAgainstProperty } from '../../../../assets/icons';
 import DatePicker from '../../../../components/DatePicker';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
@@ -117,7 +117,7 @@ const ApplicantDetails = () => {
     setToastMessage,
     setFieldTouched,
     handleSubmit,
-  } = useContext(AuthContext);
+  } = useContext(LeadContext);
 
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);

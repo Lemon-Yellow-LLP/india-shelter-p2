@@ -11,9 +11,10 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import DrawerFooter from './DrawerFooter';
 import DrawerSteps from './DrawerSteps';
-import { AuthContext } from '../../context/AuthContext';
+
 import CustomizedTimeline from './CustomizedTimeline';
 import WarningCircle from '../../assets/icons/WarningCircle.svg';
+import { LeadContext } from '../../context/LeadContextProvider';
 
 const drawerBleeding = 0;
 
@@ -57,7 +58,7 @@ function a11yProps(index) {
 
 export default function SwipeableDrawerComponent() {
   const { stepsProgress, updateProgress, applicants, addApplicant, drawerOpen, setDrawerOpen } =
-    useContext(AuthContext);
+    useContext(LeadContext);
 
   const theme = useTheme();
   const [value, setValue] = useState(0);

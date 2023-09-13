@@ -1,7 +1,7 @@
 import { personalDetailsGenderOption, personalMaritalStatusOptions } from '../utils';
 import CardRadio from '../../../../components/CardRadio';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import DropDown from '../../../../components/DropDown';
 import TextInput from '../../../../components/TextInput';
 import DatePicker from '../../../../components/DatePicker';
@@ -27,7 +27,7 @@ export default function ManualMode({
     handleSubmit,
     setFieldValue,
     setToastMessage,
-  } = useContext(AuthContext);
+  } = useContext(LeadContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
@@ -267,6 +267,7 @@ export default function ManualMode({
         error={errors.personal_details?.id_number}
         touched={touched.personal_details?.id_number}
         disabled={!values.personal_details?.id_type}
+        labelDisabled={!values.personal_details?.id_type}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[1];
@@ -341,7 +342,7 @@ export default function ManualMode({
 
       <DropDown
         label='Select address proof'
-        name='personal_details.address_proof'
+        name='personal_details.selected_address_proof'
         required
         options={manualModeDropdownOptions[1].options}
         placeholder='Choose address proof'
@@ -373,6 +374,7 @@ export default function ManualMode({
           !values.personal_details?.selected_address_proof ||
           values?.personal_details?.extra_params?.same_as_id_type
         }
+        labelDisabled={!values.personal_details?.selected_address_proof}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[1];

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 axiosRetry(axios, { retries: 0 });
 

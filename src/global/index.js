@@ -32,6 +32,11 @@ async function editPropertyById(id, propertyData) {
   return res.data;
 }
 
+async function getCompanyNamesList() {
+  const res = await axios.get(`${API_URL}/company-list`, requestOptions);
+  return res.data;
+}
+
 async function updateLeadDataOnBlur(leadId, fieldName, value) {
   if (!leadId) return;
   const inputName = fieldName;
@@ -96,6 +101,11 @@ async function verifyMobileOtp(id, otp) {
   return res;
 }
 
+async function editAddressById(id, data) {
+  const res = await axios.patch(`${API_URL}/address/edit/${id}`, data, requestOptions);
+  return res;
+}
+
 async function checkExistingCustomer(body) {
   let myHeaders = new Headers();
   myHeaders.append('Content-Type', 'application/json');
@@ -132,6 +142,8 @@ export {
   editReferenceById,
   editPropertyById,
   editFieldsById,
+  getCompanyNamesList,
+  editAddressById,
   getMobileOtp,
   verifyMobileOtp,
   addApi,

@@ -1,10 +1,10 @@
 import DrawerArrowUpButton from '../../assets/icons/drawerArrowUpButton.svg';
 import DrawerArrowDownButton from '../../assets/icons/drawerArrowDownButton.svg';
 import { useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
+import { LeadContext } from '../../context/LeadContextProvider';
 
 export default function DrawerFooter() {
-  const { currentStepIndex, stepsProgress, drawerOpen, setDrawerOpen } = useContext(AuthContext);
+  const { currentStepIndex, stepsProgress, drawerOpen, setDrawerOpen } = useContext(LeadContext);
 
   return (
     <div className='flex justify-between p-4 pt-3 rounded-t-2xl bg-white w-full border-solid border fixed bottom-0 z-[5000]'>

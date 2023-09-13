@@ -3,8 +3,8 @@ import Dashboard from './dashboard';
 import LeadCreationRoutes from './dashboard/lead-creation';
 import FaceAuth from './login/FaceAuth';
 import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
 import Login from './login/Login';
+import { AuthContext } from '../context/AuthContextProvider';
 
 const DashboardRoutes = () => {
   const { isAuthenticated } = useContext(AuthContext);
@@ -18,10 +18,8 @@ const DashboardRoutes = () => {
         </Routes>
       ) : (
         <Routes>
-          {/* <Route path='/' element={<FaceAuth />} /> */}
-          <Route path='/' element={<Dashboard />} />
-          <Route path='/manual-login' element={<Login />} />
-          <Route path='*' element={<FaceAuth />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='*' element={<Login />} />
         </Routes>
       )}
     </>

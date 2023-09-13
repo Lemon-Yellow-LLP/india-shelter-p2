@@ -52,60 +52,6 @@ export const defaultValues = {
     },
   },
 
-  addressSchema: {
-    current_type_of_residence: '',
-    current_flat_no_building_name: '',
-    current_street_area_locality: '',
-    current_town: '',
-    current_landmark: '',
-    current_pincode: '',
-    current_city: '',
-    current_state: '',
-    current_no_of_year_residing: null,
-    permanent_type_of_residence: '',
-    permanent_flat_no_building_name: '',
-    permanent_street_area_locality: '',
-    permanent_town: '',
-    permanent_landmark: '',
-    permanent_pincode: '',
-    permanent_city: '',
-    permanent_state: '',
-    permanent_no_of_year_residing: null,
-    extra_params: {
-      permanent_address_same_as_current: false,
-    },
-  },
-
-  work_income_details: {
-    profession: '',
-    company_name: '',
-    business_name: '',
-    industries: '',
-    gst_number: '',
-    total_income: '',
-    pf_uan: '',
-    no_current_loan: '',
-    ongoing_emi: '',
-    working_since: '',
-    mode_of_salary: '',
-    flat_no_building_name: '',
-    street_area_locality: '',
-    town: '',
-    landmark: '',
-    pincode: '',
-    city: '',
-    state: '',
-    total_family_number: '',
-    total_household_income: '',
-    no_of_dependents: '',
-    pention_amount: '',
-    geo_lat: '',
-    geo_long: '',
-    extra_params: {
-      extra_company_name: '',
-    },
-  },
-
   propertySchema: {
     property_identification_is: '',
     property_value_estimate: '',
@@ -136,6 +82,60 @@ export const defaultValues = {
     reference_2_city: '',
     reference_2_state: '',
     reference_2_email: '',
+  },
+  addressSchema: {
+    current_type_of_residence: '',
+    current_flat_no_building_name: '',
+    current_street_area_locality: '',
+    current_town: '',
+    current_landmark: '',
+    current_pincode: '',
+    current_city: '',
+    current_state: '',
+    current_no_of_year_residing: null,
+    permanent_type_of_residence: '',
+    permanent_flat_no_building_name: '',
+    permanent_street_area_locality: '',
+    permanent_town: '',
+    permanent_landmark: '',
+    permanent_pincode: '',
+    permanent_city: '',
+    permanent_state: '',
+    permanent_no_of_year_residing: null,
+    extra_params: {
+      permanent_address_same_as_current: false,
+    },
+  },
+
+  work_income_details: {
+    profession: '',
+    company_name: '',
+    total_income: '',
+    pf_uan: '',
+    no_current_loan: '',
+    ongoing_emi: '',
+    working_since: '',
+    mode_of_salary: '',
+    flat_no_building_name: '',
+    street_area_locality: '',
+    town: '',
+    landmark: '',
+    pincode: '',
+    city: '',
+    state: '',
+    total_family_number: '',
+    total_household_income: '',
+    no_of_dependents: '',
+    business_name: '',
+    industries: '',
+    gst_number: '',
+    pention_amount: '',
+    geo_lat: '',
+    geo_long: '',
+    extra_params: {
+      extra_company_name: '',
+      extra_industries: '',
+    },
   },
 
   applicants: [
@@ -409,14 +409,13 @@ export const defaultValues = {
   ],
 };
 
-export const AuthContext = createContext(defaultValues);
+export const LeadContext = createContext(defaultValues);
 
-const AuthContextProvider = ({ children }) => {
+const LeadContextProvider = ({ children }) => {
   const [inputDisabled, setInputDisabled] = useState(false);
   const [isLeadGenerated, setIsLeadGenearted] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showError, setShowError] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [addressProofcheckbox, setAddressProofCheckbox] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
@@ -541,7 +540,7 @@ const AuthContextProvider = ({ children }) => {
   });
 
   return (
-    <AuthContext.Provider
+    <LeadContext.Provider
       value={{
         ...formik,
         stepsProgress,
@@ -552,8 +551,6 @@ const AuthContextProvider = ({ children }) => {
         setCurrentStepIndex,
         drawerOpen,
         setDrawerOpen,
-        isAuthenticated,
-        setIsAuthenticated,
         inputDisabled,
         setInputDisabled,
         isLeadGenerated,
@@ -567,20 +564,12 @@ const AuthContextProvider = ({ children }) => {
       }}
     >
       {children}
-    </AuthContext.Provider>
+    </LeadContext.Provider>
   );
 };
 
-const AuthContextLayout = () => {
-  return (
-    <AuthContextProvider>
-      <Outlet />
-    </AuthContextProvider>
-  );
-};
+export default LeadContextProvider;
 
-export default AuthContextLayout;
-
-AuthContextProvider.propTypes = {
+LeadContextProvider.propTypes = {
   children: PropTypes.element,
 };
