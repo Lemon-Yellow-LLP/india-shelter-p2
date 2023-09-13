@@ -178,7 +178,14 @@ export default function SwipeableDrawerComponent() {
                   </div>
 
                   <div className='flex flex-col justify-end'>
-                    {applicants.length < 4 ? (
+                    {applicants?.length > 4 ? (
+                      <div className='flex'>
+                        <img src={WarningCircle} />
+                        <span className='text-[12px] text-[#E33439] font-normal ml-1'>
+                          You have reached the limit of adding co-applicant
+                        </span>
+                      </div>
+                    ) : (
                       <>
                         <button
                           onClick={addApplicant}
@@ -190,13 +197,6 @@ export default function SwipeableDrawerComponent() {
                           *You can add upto 4 co-applicants
                         </span>
                       </>
-                    ) : (
-                      <div className='flex'>
-                        <img src={WarningCircle} />
-                        <span className='text-[12px] text-[#E33439] font-normal ml-1'>
-                          You have reached the limit of adding co-applicant
-                        </span>
-                      </div>
                     )}
                   </div>
                 </div>

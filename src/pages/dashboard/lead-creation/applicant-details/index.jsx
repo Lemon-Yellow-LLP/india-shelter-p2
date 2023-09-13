@@ -20,10 +20,13 @@ import {
   OtpInput,
   CurrencyInput,
   RangeSlider,
+  Button,
 } from '../../../../components';
 import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWithSendOtp';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
-import { Button } from '@mui/material';
+
+import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
+import { Navigate } from 'react-router-dom';
 
 const loanTypeOptions = [
   {
@@ -118,12 +121,14 @@ const ApplicantDetails = () => {
     setFieldTouched,
     handleSubmit,
   } = useContext(LeadContext);
-
+  const [openExistingPopup, setOpenExistingPopup] = useState(false);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const [mobileVerified, setMobileVerified] = useState(
-    values?.applicant_details?.is_mobile_verified,
+    values?.applicants[activeIndex]?.applicant_details.is_mobile_verified,
   );
 
   const [showOTPInput, setShowOTPInput] = useState(false);
@@ -133,7 +138,9 @@ const ApplicantDetails = () => {
 
   const dateInputRef = useRef(null);
 
-  const [date, setDate] = useState(values.applicant_details.date_of_birth);
+  const [date, setDate] = useState(
+    values?.applicants[activeIndex]?.applicant_details.date_of_birth,
+  );
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     loan_type: false,
@@ -146,7 +153,7 @@ const ApplicantDetails = () => {
   });
 
   const updateFieldsApplicant = async (name, value) => {
-    let newData = values.applicant_details;
+    let newData = values.applicants[activeIndex]?.applicant_details;
     newData[name] = value;
     if (values.applicant_id) {
       const res = await editFieldsById(1, 'applicant', newData);
@@ -193,8 +200,7 @@ const ApplicantDetails = () => {
       const pattern = /^[A-Za-z]+$/;
       if (pattern.exec(value[value.length - 1])) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-        const name = e.currentTarget.name.split('.')[1];
-        updateFieldsApplicant(name, value);
+        const name = e.currentTarget.name.split('.')[2];
         if (
           requiredFieldsStatus[name] !== undefined &&
           !requiredFieldsStatus[name] &&
@@ -260,13 +266,13 @@ const ApplicantDetails = () => {
 
       setShowOTPInput(false);
 
-      setFieldValue('applicant_details.mobile_number', phoneNumber);
+      setFieldValue(`applicants[${activeIndex}].applicant_details.mobile_number`, phoneNumber);
 
       if (phoneNumber.length === 10) {
         setHasSentOTPOnce(false);
+        updateFieldsApplicant('mobile_number', phoneNumber);
       }
 
-      updateFieldsApplicant('mobile_number', phoneNumber);
       if (
         phoneNumber.length === 10 &&
         requiredFieldsStatus['mobile_number'] !== undefined &&
@@ -298,13 +304,13 @@ const ApplicantDetails = () => {
     }
     if (!isEighteenOrAbove(date)) {
       setFieldError(
-        'applicant_details.date_of_birth',
+        `applicants[${activeIndex}].applicant_details.date_of_birth`,
         'To apply for loan the minimum age must be 18 or 18+',
       );
-      setFieldValue('applicant_details.date_of_birth', '');
-      setFieldTouched('applicant_details.date_of_birth');
+      setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
+      setFieldTouched(`applicants[${activeIndex}].date_of_birth`);
     } else {
-      setFieldValue('applicant_details.date_of_birth', date);
+      setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, date);
       updateFieldsApplicant('date_of_birth', date);
     }
   };
@@ -320,7 +326,7 @@ const ApplicantDetails = () => {
   };
 
   const sendMobileOtp = async () => {
-    if (values.applicant_details.date_of_birth) {
+    if (values.applicants[activeIndex]?.applicant_details.date_of_birth) {
       await updateFieldsApplicant().then(async () => {
         // setDisablePhoneNumber((prev) => !prev);
         setShowOTPInput(true);
@@ -334,8 +340,8 @@ const ApplicantDetails = () => {
           auth: 'exi$t_Sys@85',
           'source flag': '1',
           body: {
-            DOB: values.applicant_details.date_of_birth,
-            'Mobile Number': values.applicant_details.mobile_number,
+            DOB: values.applicants[activeIndex]?.applicant_details.date_of_birth,
+            'Mobile Number': values.applicants[activeIndex]?.applicant_details.mobile_number,
             Product: values.lead.loan_type,
           },
         });
@@ -385,10 +391,10 @@ const ApplicantDetails = () => {
       });
     } else {
       setFieldError(
-        'applicant_details.date_of_birth',
+        `applicants[${activeIndex}].applicant_details.date_of_birth`,
         'Date of Birth is Required. Minimum age must be 18 or 18+',
       );
-      setFieldTouched('applicant_details.date_of_birth');
+      setFieldTouched(`applicants[${activeIndex}].date_of_birth`);
       dateInputRef.current.focus();
     }
   };
@@ -397,10 +403,10 @@ const ApplicantDetails = () => {
     verifyMobileOtp(1, otp)
       .then(async () => {
         await updateFieldsLead().then((res) => {
-          setFieldValue('applicant_details.lead_id', res.id);
+          setFieldValue('applicants[activeIndex].applicant_details.lead_id', res.id);
           updateFieldsApplicant('lead_id', res.id);
           setMobileVerified(true);
-          setFieldValue('applicant_details.is_mobile_verified', true);
+          setFieldValue('applicants[activeIndex].applicant_details.is_mobile_verified', true);
           updateFieldsApplicant('is_mobile_verified', true);
           setShowOTPInput(false);
           return true;
@@ -413,239 +419,319 @@ const ApplicantDetails = () => {
       });
   }, []);
 
-  console.log('values', values.applicant_details);
-  // console.log('errors',errors.applicant_details);
-  // console.log('touched',touched.applicant_details);
+  // console.log('values', values.applicants[activeIndex]?.applicant_details);
+  // console.log('errors', errors?.applicants && errors.applicants[activeIndex]?.applicant_details);
+  // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
 
   return (
-    <div className='overflow-hidden flex flex-col h-[100vh]'>
-      <div
-        className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1`}
-      >
-        <div className='flex flex-col gap-2'>
-          <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
-            Loan Type <span className='text-primary-red text-xs'>*</span>
-          </label>
-          <div
-            className={`flex gap-4 w-full ${
-              inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
-            }`}
-          >
-            {loanTypeOptions.map((data, index) => (
-              <CardRadio
-                key={index}
-                name='lead.loan_type'
-                label={data.label}
-                value={data.value}
-                current={values.lead?.loan_type}
-                onChange={onLoanTypeChange}
-                containerClasses='flex-1'
-              >
-                {data.icon}
-              </CardRadio>
-            ))}
+    <>
+      <div className='overflow-hidden flex flex-col h-[100vh]'>
+        <div
+          className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1`}
+        >
+          <div className='flex flex-col gap-2'>
+            <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
+              Loan Type <span className='text-primary-red text-xs'>*</span>
+            </label>
+            <div
+              className={`flex gap-4 w-full ${
+                inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
+              }`}
+            >
+              {loanTypeOptions.map((data, index) => (
+                <CardRadio
+                  key={index}
+                  name='lead.loan_type'
+                  label={data.label}
+                  value={data.value}
+                  current={values.lead?.loan_type}
+                  onChange={onLoanTypeChange}
+                  containerClasses='flex-1'
+                >
+                  {data.icon}
+                </CardRadio>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <CurrencyInput
-          label='Required loan amount'
-          placeholder='5,00,000'
-          required
-          name='lead.applied_amount'
-          value={values.lead?.applied_amount}
-          onBlur={handleBlur}
-          onChange={handleLoanAmountChange}
-          displayError={false}
-          disabled={inputDisabled}
-          inputClasses='font-semibold'
-        />
-
-        <RangeSlider
-          minValueLabel='1 L'
-          maxValueLabel='50 L'
-          onChange={handleLoanAmountChange}
-          initialValue={values.lead?.applied_amount}
-          min={100000}
-          max={5000000}
-          disabled={inputDisabled}
-          step={50000}
-        />
-
-        {errors?.lead?.applied_amount && touched?.lead?.applied_amount ? (
-          <span className='text-xs text-primary-red'>{errors?.lead?.applied_amount}</span>
-        ) : null}
-
-        <TextInput
-          label='First Name'
-          placeholder='Eg: Suresh, Priya'
-          required
-          name='applicant_details.first_name'
-          value={values.applicant_details?.first_name}
-          error={errors?.applicant_details?.first_name}
-          touched={touched?.applicant_details?.first_name}
-          onBlur={handleBlur}
-          disabled={inputDisabled}
-          onChange={handleTextInputChange}
-          inputClasses='capitalize'
-        />
-
-        <div className='flex flex-col md:flex-row gap-2 md:gap-6'>
-          <div className='w-full'>
-            <TextInput
-              label='Middle Name'
-              placeholder='Eg: Ramji, Sreenath'
-              name='applicant_details.middle_name'
-              value={values.applicant_details?.middle_name}
-              error={errors?.applicant_details?.middle_name}
-              touched={touched?.applicant_details?.middle_name}
-              disabled={inputDisabled}
-              onBlur={handleBlur}
-              onChange={handleTextInputChange}
-              inputClasses='capitalize'
-            />
-          </div>
-          <div className='w-full'>
-            <TextInput
-              onBlur={handleBlur}
-              label='Last Name'
-              value={values.applicant_details?.last_name}
-              error={errors?.applicant_details?.last_name}
-              touched={touched?.applicant_details?.last_name}
-              placeholder='Eg: Swami, Singh'
-              disabled={inputDisabled}
-              name='applicant_details.last_name'
-              onChange={handleTextInputChange}
-              inputClasses='capitalize'
-              // onFocus={datePickerScrollToTop}
-            />
-          </div>
-        </div>
-
-        <DatePicker
-          // value={values?.applicant_details?.date_of_birth}
-          value={date}
-          setDate={setDate}
-          required
-          name='applicant_details.date_of_birth'
-          label='Date of Birth'
-          error={errors?.applicant_details?.date_of_birth}
-          touched={touched?.applicant_details?.date_of_birth}
-          onBlur={(e) => {
-            handleBlur(e);
-            checkDate();
-          }}
-          reference={dateInputRef}
-        />
-
-        <TextInputWithSendOtp
-          type='tel'
-          inputClasses='hidearrow'
-          label='Mobile Number'
-          placeholder='Eg: 1234567890'
-          required
-          name='applicant_details.mobile_number'
-          value={values.applicant_details?.mobile_number}
-          onChange={handleOnPhoneNumberChange}
-          error={errors.applicant_details?.mobile_number}
-          touched={touched.applicant_details?.mobile_number}
-          onOTPSendClick={sendMobileOtp}
-          disabledOtpButton={
-            !values.applicant_details?.mobile_number ||
-            !!errors.applicant_details?.mobile_number ||
-            mobileVerified ||
-            hasSentOTPOnce
-          }
-          disabled={disablePhoneNumber || mobileVerified}
-          message={
-            mobileVerified
-              ? `<img src="${otpVerified}" alt='Otp Verified' role='presentation' /> OTP Verfied`
-              : null
-          }
-          onBlur={(e) => {
-            handleBlur(e);
-            const name = e.target.name.split('.')[1];
-            console.log(name);
-            console.log(errors);
-            if (
-              errors?.applicant_details &&
-              !errors?.applicant_details[name] &&
-              values?.applicant_details[name]
-            ) {
-              updateFieldsApplicant(name, values.applicant_details[name]);
-            }
-          }}
-          pattern='\d*'
-          onFocus={(e) =>
-            e.target.addEventListener(
-              'wheel',
-              function (e) {
-                e.preventDefault();
-              },
-              { passive: false },
-            )
-          }
-          min='0'
-          onInput={(e) => {
-            if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
-          }}
-        />
-
-        {showOTPInput && (
-          <OtpInput
-            label='Enter OTP'
+          <CurrencyInput
+            label='Required loan amount'
+            placeholder='5,00,000'
             required
-            verified={mobileVerified}
-            setOTPVerified={setMobileVerified}
-            onSendOTPClick={sendMobileOtp}
-            defaultResendTime={30}
-            disableSendOTP={!mobileVerified}
-            verifyOTPCB={verifyOTP}
-            hasSentOTPOnce={hasSentOTPOnce}
+            name='lead.applied_amount'
+            value={values.lead?.applied_amount}
+            onBlur={handleBlur}
+            onChange={handleLoanAmountChange}
+            displayError={false}
+            disabled={inputDisabled}
+            inputClasses='font-semibold'
           />
-        )}
 
-        <DropDown
-          label='Purpose of loan'
-          name='lead.purpose_of_loan'
-          required
-          options={loanPurposeOptions}
-          placeholder='Eg: Choose reference type'
-          onChange={handleLoanPurposeChange}
-          touched={touched?.lead?.purpose_of_loan}
-          error={errors?.lead?.purpose_of_loan}
-          onBlur={handleBlur}
-          defaultSelected={values.lead?.purpose_of_loan}
-          inputClasses='mt-2'
-        />
+          <RangeSlider
+            minValueLabel='1 L'
+            maxValueLabel='50 L'
+            onChange={handleLoanAmountChange}
+            initialValue={values.lead?.applied_amount}
+            min={100000}
+            max={5000000}
+            disabled={inputDisabled}
+            step={50000}
+          />
 
-        <DropDown
-          label='Property Type'
-          name='lead.property_type'
-          required
-          placeholder='Eg: Residential'
-          options={
-            loanFields[values.lead?.purpose_of_loan] || [
-              {
-                label: 'Residential House',
-                value: 'Residential House',
-              },
-            ]
-          }
-          onChange={handlePropertyType}
-          defaultSelected={values.lead?.property_type}
-          touched={touched?.lead?.property_type}
-          error={errors?.lead?.property_type}
-          onBlur={handleBlur}
-        />
+          {errors?.lead?.applied_amount && touched?.lead?.applied_amount ? (
+            <span className='text-xs text-primary-red'>{errors?.lead?.applied_amount}</span>
+          ) : null}
+
+          <TextInput
+            label='First Name'
+            placeholder='Eg: Suresh, Priya'
+            required
+            name={`applicants[${activeIndex}].applicant_details.first_name`}
+            value={values.applicants[activeIndex]?.applicant_details.first_name}
+            error={errors?.applicants[activeIndex]?.applicant_details?.first_name}
+            touched={
+              touched?.applicants && touched?.applicants[activeIndex]?.applicant_details?.first_name
+            }
+            onBlur={(e) => {
+              handleBlur(e);
+              const name = e.currentTarget.name.split('.')[2];
+              if (
+                errors &&
+                errors.applicants &&
+                errors?.applicants[activeIndex]?.applicant_details &&
+                !errors?.applicants[activeIndex]?.applicant_details[name] &&
+                values?.applicants[activeIndex]?.applicant_details[name]
+              ) {
+                updateFieldsApplicant(
+                  name,
+                  values.applicants[activeIndex]?.applicant_details[name],
+                );
+              }
+            }}
+            disabled={inputDisabled}
+            onChange={handleTextInputChange}
+            inputClasses='capitalize'
+          />
+
+          <div className='flex flex-col md:flex-row gap-2 md:gap-6'>
+            <div className='w-full'>
+              <TextInput
+                label='Middle Name'
+                placeholder='Eg: Ramji, Sreenath'
+                name={`applicants[${activeIndex}].applicant_details.middle_name`}
+                value={values.applicants[activeIndex]?.applicant_details?.middle_name}
+                error={errors?.applicants[activeIndex]?.applicant_details?.middle_name}
+                touched={
+                  touched.applicants &&
+                  touched?.applicants[activeIndex]?.applicant_details?.middle_name
+                }
+                disabled={inputDisabled}
+                onBlur={(e) => {
+                  handleBlur(e);
+                  const name = e.currentTarget.name.split('.')[2];
+                  if (
+                    errors &&
+                    errors.applicants &&
+                    errors?.applicants[activeIndex]?.applicant_details &&
+                    !errors?.applicants[activeIndex]?.applicant_details[name] &&
+                    values?.applicants[activeIndex]?.applicant_details[name]
+                  ) {
+                    updateFieldsApplicant(
+                      name,
+                      values.applicants[activeIndex]?.applicant_details[name],
+                    );
+                  }
+                }}
+                onChange={handleTextInputChange}
+                inputClasses='capitalize'
+              />
+            </div>
+            <div className='w-full'>
+              <TextInput
+                label='Last Name'
+                value={values.applicants[activeIndex]?.applicant_details?.last_name}
+                error={errors?.applicants[activeIndex]?.applicant_details?.last_name}
+                touched={
+                  touched.applicants &&
+                  touched?.applicants[activeIndex]?.applicant_details?.last_name
+                }
+                placeholder='Eg: Swami, Singh'
+                disabled={inputDisabled}
+                name={`applicants[${activeIndex}].applicant_details.last_name`}
+                onChange={handleTextInputChange}
+                inputClasses='capitalize'
+                // onFocus={datePickerScrollToTop}
+                onBlur={(e) => {
+                  handleBlur(e);
+                  const name = e.currentTarget.name.split('.')[2];
+                  if (
+                    errors &&
+                    errors.applicants &&
+                    errors?.applicants[activeIndex]?.applicant_details &&
+                    !errors?.applicants[activeIndex]?.applicant_details[name] &&
+                    values?.applicants[activeIndex]?.applicant_details[name]
+                  ) {
+                    updateFieldsApplicant(
+                      name,
+                      values.applicants[activeIndex]?.applicant_details[name],
+                    );
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          <DatePicker
+            // value={values?.applicants[activeIndex]?.applicant_details?.date_of_birth}
+            value={date}
+            setDate={setDate}
+            required
+            name={`applicants[${activeIndex}].applicant_details.date_of_birth`}
+            label='Date of Birth'
+            error={errors?.applicants[activeIndex]?.applicant_details?.date_of_birth}
+            touched={
+              touched.applicants &&
+              touched?.applicants[activeIndex]?.applicant_details?.date_of_birth
+            }
+            onBlur={(e) => {
+              handleBlur(e);
+              checkDate();
+            }}
+            reference={dateInputRef}
+          />
+
+          <TextInputWithSendOtp
+            type='tel'
+            inputClasses='hidearrow'
+            label='Mobile Number'
+            placeholder='Eg: 1234567890'
+            required
+            name={`applicants[${activeIndex}].applicant_details.mobile_number`}
+            value={values.applicants[activeIndex]?.applicant_details?.mobile_number}
+            onChange={handleOnPhoneNumberChange}
+            error={errors.applicants[activeIndex]?.applicant_details?.mobile_number}
+            touched={
+              touched.applicants &&
+              touched.applicants[activeIndex]?.applicant_details?.mobile_number
+            }
+            onOTPSendClick={sendMobileOtp}
+            disabledOtpButton={
+              !values.applicants[activeIndex]?.applicant_details?.mobile_number ||
+              !!errors?.applicants[activeIndex]?.applicant_details?.mobile_number ||
+              mobileVerified ||
+              hasSentOTPOnce
+            }
+            disabled={disablePhoneNumber || mobileVerified}
+            message={
+              mobileVerified
+                ? `<img src="${otpVerified}" alt='Otp Verified' role='presentation' /> OTP Verfied`
+                : null
+            }
+            onBlur={(e) => {
+              handleBlur(e);
+              const name = e.target.name.split('.')[1];
+              if (
+                errors &&
+                errors.applicants &&
+                errors?.applicants[activeIndex]?.applicant_details &&
+                !errors?.applicants[activeIndex]?.applicant_details[name] &&
+                values?.applicants[activeIndex]?.applicant_details[name]
+              ) {
+                updateFieldsApplicant(
+                  name,
+                  values.applicants[activeIndex]?.applicant_details[name],
+                );
+              }
+            }}
+            pattern='\d*'
+            onFocus={(e) =>
+              e.target.addEventListener(
+                'wheel',
+                function (e) {
+                  e.preventDefault();
+                },
+                { passive: false },
+              )
+            }
+            min='0'
+            onInput={(e) => {
+              if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
+            }}
+          />
+
+          {showOTPInput && (
+            <OtpInput
+              label='Enter OTP'
+              required
+              verified={mobileVerified}
+              setOTPVerified={setMobileVerified}
+              onSendOTPClick={sendMobileOtp}
+              defaultResendTime={30}
+              disableSendOTP={!mobileVerified}
+              verifyOTPCB={verifyOTP}
+              hasSentOTPOnce={hasSentOTPOnce}
+            />
+          )}
+
+          <DropDown
+            label='Purpose of loan'
+            name='lead.purpose_of_loan'
+            required
+            options={loanPurposeOptions}
+            placeholder='Eg: Choose reference type'
+            onChange={handleLoanPurposeChange}
+            touched={touched && touched?.lead?.purpose_of_loan}
+            error={errors && errors?.lead?.purpose_of_loan}
+            onBlur={handleBlur}
+            defaultSelected={values.lead?.purpose_of_loan}
+            inputClasses='mt-2'
+          />
+
+          <DropDown
+            label='Property Type'
+            name='lead.property_type'
+            required
+            placeholder='Eg: Residential'
+            options={
+              loanFields[values.lead?.purpose_of_loan] || [
+                {
+                  label: 'Residential House',
+                  value: 'Residential House',
+                },
+              ]
+            }
+            onChange={handlePropertyType}
+            defaultSelected={values.lead?.property_type}
+            touched={touched && touched?.lead?.property_type}
+            error={errors && errors?.lead?.property_type}
+            onBlur={handleBlur}
+          />
+        </div>
+
+        <div className='bottom-0 fixed'>
+          <PreviousNextButtons
+            disablePrevious={true}
+            disableNext={
+              !mobileVerified ||
+              (errors?.applicants && errors.applicants[activeIndex]?.applicant_details) ||
+              errors.lead
+            }
+            linkNext='/lead/personal-details'
+          />
+        </div>
       </div>
-      <div className='bottom-0 fixed'>
-        <PreviousNextButtons
-          disablePrevious={true}
-          disableNext={!mobileVerified || errors.applicant_details || errors.lead}
-          linkNext='/lead/personal-details'
-        />
-      </div>
-    </div>
+      <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='223px'>
+        <span className='font-normal text-center leading-[21px] text-[16px] text-black'>
+          This is an existing customer and is already pre-approved for a loan upto
+        </span>
+        <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
+          ₹ 10,00,000/-
+        </span>
+        <Button primary={true} inputClasses='w-full h-[46px]' link='/lead/personal-details'>
+          Continue
+        </Button>
+      </DynamicDrawer>
+    </>
   );
 };
 

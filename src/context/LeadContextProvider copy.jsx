@@ -1,9 +1,8 @@
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
-import { signUpSchema } from '../schemas/index';
+import { signUpSchema, validationSchema } from '../schemas/index';
 import PropTypes from 'prop-types';
 import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
-import { defaultErrors } from './defaultErrors';
 
 export const defaultValues = {
   lead_id: '',
@@ -15,6 +14,43 @@ export const defaultValues = {
     property_type: '',
     applied_amount: '500000',
   },
+
+  // applicant_details: {
+  //   lead_id: null,
+  //   is_primary: true,
+  //   first_name: '',
+  //   middle_name: '',
+  //   last_name: '',
+  //   date_of_birth: null,
+  //   mobile_number: '',
+  //   is_mobile_verified: false,
+  // },
+
+  // personal_details: {
+  //   applicant_type: 'Primary Applicant',
+  //   how_would_you_like_to_proceed: null,
+  //   id_type: null,
+  //   id_number: '',
+  //   selected_address_proof: null,
+  //   address_proof_number: '',
+  //   first_name: '',
+  //   middle_name: '',
+  //   last_name: '',
+  //   gender: null,
+  //   date_of_birth: null,
+  //   mobile_number: '',
+  //   father_husband_name: '',
+  //   mother_name: '',
+  //   marital_status: null,
+  //   religion: '',
+  //   preferred_language: '',
+  //   qualification: '',
+  //   email: '',
+  //   is_email_verified: false,
+  //   extra_params: {
+  //     same_as_id_type: false,
+  //   },
+  // },
 
   propertySchema: {
     property_identification_is: '',
@@ -105,6 +141,7 @@ export const defaultValues = {
   applicants: [
     {
       applicant_details: {
+        applicant_id: '',
         is_primary: true,
         first_name: '',
         middle_name: '',
@@ -114,6 +151,81 @@ export const defaultValues = {
         is_mobile_verified: false,
       },
       personal_details: {
+        applicant_type: 'Primary Applicant',
+        how_would_you_like_to_proceed: null,
+        id_type: null,
+        id_number: '',
+        selected_address_proof: null,
+        address_proof_number: '',
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        gender: null,
+        date_of_birth: null,
+        mobile_number: '',
+        father_husband_name: '',
+        mother_name: '',
+        marital_status: null,
+        religion: '',
+        preferred_language: '',
+        qualification: '',
+        email: '',
+        is_email_verified: false,
+        extra_params: {
+          same_as_id_type: false,
+        },
+      },
+    },
+    {
+      applicant_details: {
+        applicant_id: '',
+        is_primary: true,
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        date_of_birth: null,
+        mobile_number: '',
+        is_mobile_verified: false,
+      },
+      personal_details: {
+        applicant_type: 'Primary Applicant',
+        how_would_you_like_to_proceed: null,
+        id_type: null,
+        id_number: '',
+        selected_address_proof: null,
+        address_proof_number: '',
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        gender: null,
+        date_of_birth: null,
+        mobile_number: '',
+        father_husband_name: '',
+        mother_name: '',
+        marital_status: null,
+        religion: '',
+        preferred_language: '',
+        qualification: '',
+        email: '',
+        is_email_verified: false,
+        extra_params: {
+          same_as_id_type: false,
+        },
+      },
+    },
+    {
+      applicant_details: {
+        applicant_id: '',
+        is_primary: true,
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        date_of_birth: null,
+        mobile_number: '',
+        is_mobile_verified: false,
+      },
+      personal_details: {
+        applicant_type: 'Primary Applicant',
         how_would_you_like_to_proceed: null,
         id_type: null,
         id_number: '',
@@ -235,52 +347,20 @@ const LeadContextProvider = ({ children }) => {
   };
 
   const addApplicant = () => {
-    setValues((prev) => {
-      let newData = { ...prev };
-      newData.applicants.push({
-        applicant_details: {
-          is_primary: false,
-          first_name: '',
-          middle_name: '',
-          last_name: '',
-          date_of_birth: null,
-          mobile_number: '',
-          is_mobile_verified: false,
-        },
-        personal_details: {
-          how_would_you_like_to_proceed: null,
-          id_type: null,
-          id_number: '',
-          selected_address_proof: null,
-          address_proof_number: '',
-          first_name: '',
-          middle_name: '',
-          last_name: '',
-          gender: null,
-          date_of_birth: null,
-          mobile_number: '',
-          father_husband_name: '',
-          mother_name: '',
-          marital_status: null,
-          religion: '',
-          preferred_language: '',
-          qualification: '',
-          email: '',
-          is_email_verified: false,
-          extra_params: {
-            same_as_id_type: false,
-          },
-        },
-      });
-      return newData;
-    });
+    // setApplicants((prevStepsProgress) => {
+    //   let newData = [...prevStepsProgress];
+    //   newData.push({
+    //     title: '',
+    //     description: '',
+    //     progress: 0,
+    //     applicant: false,
+    //   });
+    //   return newData;
+    // });
   };
 
   const formik = useFormik({
     initialValues: { ...defaultValues },
-    initialErrors: {
-      ...defaultErrors,
-    },
     validationSchema: signUpSchema,
     onSubmit: (_, action) => {
       console.log(action);
