@@ -176,9 +176,9 @@ body {
   margin: 0;
 }
 
-.MuiBackdrop-root {
+/* .MuiBackdrop-root {
   background-color: transparent !important;
-}
+} */
 
 .MuiDrawer-root > .MuiPaper-root {
   visibility: visible !important;
