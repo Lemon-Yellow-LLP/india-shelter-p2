@@ -1,4 +1,4 @@
-export const defaultErrors = {
+export const defaultErrorsLead = {
   lead: {
     loan_type: null,
     purpose_of_loan: null,

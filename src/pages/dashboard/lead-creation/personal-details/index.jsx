@@ -1,13 +1,13 @@
 import { personalDetailsModeOption } from '../utils';
 import CardRadio from '../../../../components/CardRadio';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import ManualMode from './ManualMode';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
-import { editFieldsById } from '../../../../global';
+import { addApi, editFieldsById } from '../../../../global';
 
-const PersonalDetails = () => {
-  const { values, setValues, updateProgress, errors, touched, handleSubmit, setFieldValue } =
+const PersonalDetails = memo(() => {
+  const { values, updateProgress, errors, touched, setFieldValue, activeIndex, setActiveIndex } =
     useContext(LeadContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
@@ -29,21 +29,39 @@ const PersonalDetails = () => {
   });
 
   const updateFields = async (name, value) => {
-    let newData = values.personal_details;
+    let newData = {};
     newData[name] = value;
-    await editFieldsById(1, 'personal', newData);
+
+    if (values?.applicants[activeIndex]?.personal_details?.id) {
+      const res = await editFieldsById(
+        values?.applicants[activeIndex]?.personal_details?.id,
+        'personal',
+        newData,
+      );
+    } else {
+      const res = await addApi('personal', newData);
+      setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
+    }
+
+    if (!name || !value) {
+      const res = await editFieldsById(
+        values?.applicants[activeIndex]?.personal_details?.id,
+        'personal',
+        values?.applicants[activeIndex]?.personal_details,
+      );
+    }
   };
 
   const handleRadioChange = useCallback(
     (e) => {
       setFieldValue(e.name, e.value);
-      const name = e.name.split('.')[1];
+      const name = e.name.split('.')[2];
       updateFields(name, e.value);
       if (!requiredFieldsStatus[name]) {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus],
+    [requiredFieldsStatus, values],
   );
 
   useEffect(() => {
@@ -67,9 +85,11 @@ const PersonalDetails = () => {
                 <CardRadio
                   key={option.value}
                   label={option.label}
-                  name='personal_details.how_would_you_like_to_proceed'
+                  name={`applicants[${activeIndex}].personal_details.how_would_you_like_to_proceed`}
                   value={option.value}
-                  current={values.personal_details?.how_would_you_like_to_proceed}
+                  current={
+                    values?.applicants[activeIndex]?.personal_details?.how_would_you_like_to_proceed
+                  }
                   onChange={handleRadioChange}
                   containerClasses='flex-1'
                 >
@@ -78,19 +98,22 @@ const PersonalDetails = () => {
               );
             })}
           </div>
-          {errors.personal_details?.how_would_you_like_to_proceed &&
-          touched.personal_details?.how_would_you_like_to_proceed ? (
+          {errors?.applicants[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
+          touched?.applicants &&
+          touched?.applicants[activeIndex]?.personal_details?.how_would_you_like_to_proceed ? (
             <span
               className='text-xs text-primary-red'
               dangerouslySetInnerHTML={{
-                __html: errors.personal_details?.how_would_you_like_to_proceed,
+                __html:
+                  errors?.applicants[activeIndex]?.personal_details?.how_would_you_like_to_proceed,
               }}
             />
           ) : (
             ''
           )}
         </div>
-        {values.personal_details?.how_would_you_like_to_proceed === 'Manual' && (
+        {values?.applicants[activeIndex]?.personal_details?.how_would_you_like_to_proceed ===
+          'Manual' && (
           <ManualMode
             requiredFieldsStatus={requiredFieldsStatus}
             setRequiredFieldsStatus={setRequiredFieldsStatus}
@@ -108,6 +131,6 @@ const PersonalDetails = () => {
       </div>
     </div>
   );
-};
+});
 
 export default PersonalDetails;

@@ -1,156 +1,19 @@
-import { createContext, useCallback, useEffect, useRef, useState } from 'react';
+import { createContext, useState } from 'react';
 import { useFormik } from 'formik';
-import { signUpSchema } from '../schemas/index';
 import PropTypes from 'prop-types';
-import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
-import { defaultErrors } from './defaultErrors';
+import { validationSchemaLead } from '../schemas/index';
+import { defaultErrorsLead } from './defaultErrorsLead';
+import { defaultValuesLead } from './defaultValuesLead';
+import { useNavigate } from 'react-router-dom';
 
-export const defaultValues = {
-  lead_id: '',
-  applicant_id: '',
-
-  lead: {
-    loan_type: '',
-    purpose_of_loan: '',
-    property_type: '',
-    applied_amount: '500000',
-  },
-
-  propertySchema: {
-    property_identification_is: '',
-    property_value_estimate: '',
-    owner_name: '',
-    plot_house_flat: '',
-    project_society_colony: '',
-    pincode: '',
-    city: '',
-    state: '',
-    geo_lat: '',
-    geo_long: '',
-  },
-
-  referenceSchema: {
-    reference_1_type: '',
-    reference_1_full_name: '',
-    reference_1_phone_number: '',
-    reference_1_address: '',
-    reference_1_pincode: '',
-    reference_1_city: '',
-    reference_1_state: '',
-    reference_1_email: '',
-    reference_2_type: '',
-    reference_2_full_name: '',
-    reference_2_phone_number: '',
-    reference_2_address: '',
-    reference_2_pincode: '',
-    reference_2_city: '',
-    reference_2_state: '',
-    reference_2_email: '',
-  },
-  addressSchema: {
-    current_type_of_residence: '',
-    current_flat_no_building_name: '',
-    current_street_area_locality: '',
-    current_town: '',
-    current_landmark: '',
-    current_pincode: '',
-    current_city: '',
-    current_state: '',
-    current_no_of_year_residing: null,
-    permanent_type_of_residence: '',
-    permanent_flat_no_building_name: '',
-    permanent_street_area_locality: '',
-    permanent_town: '',
-    permanent_landmark: '',
-    permanent_pincode: '',
-    permanent_city: '',
-    permanent_state: '',
-    permanent_no_of_year_residing: null,
-    extra_params: {
-      permanent_address_same_as_current: false,
-    },
-  },
-
-  work_income_details: {
-    profession: '',
-    company_name: '',
-    total_income: '',
-    pf_uan: '',
-    no_current_loan: '',
-    ongoing_emi: '',
-    working_since: '',
-    mode_of_salary: '',
-    flat_no_building_name: '',
-    street_area_locality: '',
-    town: '',
-    landmark: '',
-    pincode: '',
-    city: '',
-    state: '',
-    total_family_number: '',
-    total_household_income: '',
-    no_of_dependents: '',
-    business_name: '',
-    industries: '',
-    gst_number: '',
-    pention_amount: '',
-    geo_lat: '',
-    geo_long: '',
-    extra_params: {
-      extra_company_name: '',
-      extra_industries: '',
-    },
-  },
-
-  applicants: [
-    {
-      applicant_details: {
-        is_primary: true,
-        first_name: '',
-        middle_name: '',
-        last_name: '',
-        date_of_birth: null,
-        mobile_number: '',
-        is_mobile_verified: false,
-      },
-      personal_details: {
-        how_would_you_like_to_proceed: null,
-        id_type: null,
-        id_number: '',
-        selected_address_proof: null,
-        address_proof_number: '',
-        first_name: '',
-        middle_name: '',
-        last_name: '',
-        gender: null,
-        date_of_birth: null,
-        mobile_number: '',
-        father_husband_name: '',
-        mother_name: '',
-        marital_status: null,
-        religion: '',
-        preferred_language: '',
-        qualification: '',
-        email: '',
-        is_email_verified: false,
-        extra_params: {
-          same_as_id_type: false,
-        },
-      },
-    },
-  ],
-};
-
-export const LeadContext = createContext(defaultValues);
+export const LeadContext = createContext(defaultValuesLead);
 
 const LeadContextProvider = ({ children }) => {
-  const [inputDisabled, setInputDisabled] = useState(false);
-  const [isLeadGenerated, setIsLeadGenearted] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [showError, setShowError] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [addressProofcheckbox, setAddressProofCheckbox] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const [stepsProgress, setStepProgress] = useState([
     {
       title: 'Applicant Details',
@@ -234,11 +97,14 @@ const LeadContextProvider = ({ children }) => {
     });
   };
 
+  const navigate = useNavigate();
+
   const addApplicant = () => {
-    setValues((prev) => {
+    formik.setValues((prev) => {
       let newData = { ...prev };
       newData.applicants.push({
         applicant_details: {
+          lead_id: null,
           is_primary: false,
           first_name: '',
           middle_name: '',
@@ -274,19 +140,27 @@ const LeadContextProvider = ({ children }) => {
       });
       return newData;
     });
+
+    setActiveIndex(formik.values.applicants.length + 1);
+
+    navigate('/lead/applicant-details');
+
+    setDrawerOpen(false);
   };
 
   const formik = useFormik({
-    initialValues: { ...defaultValues },
+    initialValues: { ...defaultValuesLead },
     initialErrors: {
-      ...defaultErrors,
+      ...defaultErrorsLead,
     },
-    validationSchema: signUpSchema,
+    validationSchema: validationSchemaLead,
     onSubmit: (_, action) => {
       console.log(action);
       action.resetForm(defaultValues);
     },
   });
+
+  console.log(formik.values);
 
   return (
     <LeadContext.Provider
@@ -299,16 +173,10 @@ const LeadContextProvider = ({ children }) => {
         setCurrentStepIndex,
         drawerOpen,
         setDrawerOpen,
-        inputDisabled,
-        setInputDisabled,
-        isLeadGenerated,
-        setIsLeadGenearted,
-        showError,
-        setShowError,
-        addressProofcheckbox,
-        setAddressProofCheckbox,
         toastMessage,
         setToastMessage,
+        activeIndex,
+        setActiveIndex,
       }}
     >
       {children}

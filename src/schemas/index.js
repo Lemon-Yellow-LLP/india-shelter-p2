@@ -138,7 +138,7 @@ const applicantSchema = Yup.object().shape({
   }),
 });
 
-export const signUpSchema = Yup.object().shape({
+export const validationSchemaLead = Yup.object().shape({
   propertySchema: Yup.object().shape({
     property_identification_is: Yup.string().required('This field is mandatory'),
     property_value_estimate: Yup.string().required('This field is mandatory'),

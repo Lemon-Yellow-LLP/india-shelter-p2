@@ -57,8 +57,15 @@ function a11yProps(index) {
 }
 
 export default function SwipeableDrawerComponent() {
-  const { stepsProgress, updateProgress, applicants, addApplicant, drawerOpen, setDrawerOpen } =
-    useContext(LeadContext);
+  const {
+    stepsProgress,
+    updateProgress,
+    addApplicant,
+    drawerOpen,
+    setDrawerOpen,
+    values,
+    setActiveIndex,
+  } = useContext(LeadContext);
 
   const theme = useTheme();
   const [value, setValue] = useState(0);
@@ -166,19 +173,29 @@ export default function SwipeableDrawerComponent() {
               >
                 <div className='flex flex-col justify-between w-[100%] h-[100%]'>
                   <div className='flex flex-col gap-[16px] w-[100%]'>
-                    {applicants &&
-                      applicants.map((e, index) => (
-                        <DrawerSteps
+                    {values?.applicants &&
+                      values?.applicants.map((e, index) => (
+                        <div
                           key={index}
-                          details={e}
-                          toggleDrawer={toggleDrawer}
-                          index={index}
-                        />
+                          onClick={() => {
+                            setActiveIndex(index);
+                            setDrawerOpen(false);
+                          }}
+                        >
+                          <span>{index}</span>
+                          <span>{e.applicant_details.first_name}</span>
+                        </div>
+                        // <DrawerSteps
+                        //   key={index}
+                        //   details={e}
+                        //   toggleDrawer={toggleDrawer}
+                        //   index={index}
+                        // />
                       ))}
                   </div>
 
                   <div className='flex flex-col justify-end'>
-                    {applicants?.length > 4 ? (
+                    {values?.applicants?.length > 4 ? (
                       <div className='flex'>
                         <img src={WarningCircle} />
                         <span className='text-[12px] text-[#E33439] font-normal ml-1'>

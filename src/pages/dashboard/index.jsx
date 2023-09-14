@@ -4,12 +4,6 @@ const Dashboard = () => {
   return (
     <div className='flex flex-col gap-5'>
       <h1>Dashboard</h1>
-      {/* <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead'
-      >
-        Applicant Form Test Button
-      </Link> */}
 
       <Link
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
@@ -34,13 +28,6 @@ const Dashboard = () => {
 
       <Link
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/applicant-details'
-      >
-        go-to-applicant-details-page
-      </Link>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
         to='/lead/address-details'
       >
         go-to-address-details-page
@@ -51,6 +38,13 @@ const Dashboard = () => {
         to='/lead/work-income-details'
       >
         go-to-work-income-page
+      </Link>
+
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/applicant-details'
+      >
+        go-to-applicant-details-page
       </Link>
     </div>
   );

@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef } from 'react';
 import { useState, useCallback } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
-import { IconHomeLoan, IconLoanAgainstProperty } from '../../../../assets/icons';
 import DatePicker from '../../../../components/DatePicker';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import {
@@ -12,7 +11,6 @@ import {
   addApi,
   checkExistingCustomer,
 } from '../../../../global/index';
-
 import {
   CardRadio,
   TextInput,
@@ -24,88 +22,8 @@ import {
 } from '../../../../components';
 import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWithSendOtp';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
-
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
-import { Navigate } from 'react-router-dom';
-
-const loanTypeOptions = [
-  {
-    label: 'Home Loan',
-    value: 'HL',
-    icon: <IconHomeLoan />,
-  },
-  {
-    label: 'Loan against Property',
-    value: 'LAP',
-    icon: <IconLoanAgainstProperty />,
-  },
-];
-
-const loanOptions = {
-  'Home Purchase': [
-    {
-      label: 'Residential House',
-      value: 'Residential House',
-    },
-    {
-      label: 'Plot + Construction',
-      value: 'Plot + Construction',
-    },
-    {
-      label: 'Ready Built Flat',
-      value: 'Ready Built Flat',
-    },
-  ],
-  'Home Construction': [
-    {
-      label: 'Owned Plot',
-      value: 'Owned Plot',
-    },
-    {
-      label: 'Plot + Construction',
-      value: 'Plot + Construction',
-    },
-  ],
-  'Home Renovation/Extension': [
-    {
-      label: 'Residential House',
-      value: 'Residential House',
-    },
-  ],
-  'BT+Top-up': [
-    {
-      label: 'Residential House',
-      value: 'Residential House',
-    },
-    {
-      label: 'Plot + Construction',
-      value: 'Plot + Construction',
-    },
-    {
-      label: 'Ready Built Flat',
-      value: 'Ready Built Flat',
-    },
-  ],
-};
-
-const loanPurposeData = [
-  {
-    label: 'Home Purchase',
-    value: 'Home Purchase',
-  },
-  {
-    label: 'Home Construction',
-    value: 'Home Construction',
-  },
-  {
-    label: 'Home Renovation/Extension',
-    value: 'Home Renovation/Extension',
-  },
-  {
-    label: 'BT+Top-up',
-    value: 'BT+Top-up',
-  },
-];
+import { loanTypeOptions, loanOptions, loanPurposeData } from './ApplicantDropDownData';
 
 const ApplicantDetails = () => {
   const {
@@ -120,15 +38,15 @@ const ApplicantDetails = () => {
     setToastMessage,
     setFieldTouched,
     handleSubmit,
+    activeIndex,
+    setActiveIndex,
   } = useContext(LeadContext);
   const [openExistingPopup, setOpenExistingPopup] = useState(false);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
-  const [activeIndex, setActiveIndex] = useState(0);
-
   const [mobileVerified, setMobileVerified] = useState(
-    values?.applicants[activeIndex]?.applicant_details.is_mobile_verified,
+    values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified,
   );
 
   const [showOTPInput, setShowOTPInput] = useState(false);
@@ -153,27 +71,31 @@ const ApplicantDetails = () => {
   });
 
   const updateFieldsApplicant = async (name, value) => {
-    let newData = values.applicants[activeIndex]?.applicant_details;
+    let newData = {};
     newData[name] = value;
-    if (values.applicant_id) {
-      const res = await editFieldsById(1, 'applicant', newData);
+    if (values?.applicants[activeIndex]?.applicant_details?.id) {
+      const res = await editFieldsById(
+        values?.applicants[activeIndex]?.applicant_details?.id,
+        'applicant',
+        newData,
+      );
       return res;
     } else {
       const res = await addApi('applicant', newData);
-      setFieldValue('applicant_id', res.id);
+      setFieldValue(`applicants[${activeIndex}].applicant_details.id`, res.id);
       return res;
     }
   };
 
   const updateFieldsLead = async (name, value) => {
-    let newData = values.lead;
+    let newData = {};
     newData[name] = value;
-    if (values.lead_id) {
-      const res = await editFieldsById(1, 'lead', newData);
+    if (values?.lead?.id) {
+      const res = await editFieldsById(values?.lead?.id, 'lead', newData);
       return res;
     } else {
       const res = await addApi('lead', newData);
-      setFieldValue('lead_id', res.id);
+      setFieldValue('lead.id', res.id);
       return res;
     }
   };
@@ -191,7 +113,7 @@ const ApplicantDetails = () => {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus],
+    [requiredFieldsStatus, values],
   );
 
   const handleTextInputChange = useCallback(
@@ -210,7 +132,7 @@ const ApplicantDetails = () => {
         }
       }
     },
-    [requiredFieldsStatus],
+    [requiredFieldsStatus, values],
   );
 
   const handleLoanPurposeChange = useCallback(
@@ -224,7 +146,7 @@ const ApplicantDetails = () => {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['purpose_of_loan']: true }));
       }
     },
-    [requiredFieldsStatus],
+    [requiredFieldsStatus, values],
   );
 
   const handlePropertyType = useCallback(
@@ -238,7 +160,7 @@ const ApplicantDetails = () => {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['property_type']: true }));
       }
     },
-    [requiredFieldsStatus],
+    [requiredFieldsStatus, values],
   );
 
   const handleOnPhoneNumberChange = useCallback(
@@ -281,7 +203,7 @@ const ApplicantDetails = () => {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
       }
     },
-    [requiredFieldsStatus],
+    [requiredFieldsStatus, values],
   );
 
   const handleLoanAmountChange = useCallback(
@@ -295,7 +217,7 @@ const ApplicantDetails = () => {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['applied_amount']: true }));
       }
     },
-    [requiredFieldsStatus],
+    [requiredFieldsStatus, values],
   );
 
   const checkDate = () => {
@@ -331,7 +253,7 @@ const ApplicantDetails = () => {
         // setDisablePhoneNumber((prev) => !prev);
         setShowOTPInput(true);
         setHasSentOTPOnce(true);
-        getMobileOtp(1);
+        getMobileOtp(values.applicants[activeIndex]?.applicant_details?.id);
         setToastMessage('OTP has been sent to your mail id');
         const bodyForExistingCustomer = JSON.stringify({
           resource: '/customer_check',
@@ -399,14 +321,15 @@ const ApplicantDetails = () => {
     }
   };
 
-  const verifyOTP = useCallback((otp) => {
-    verifyMobileOtp(1, otp)
+  const verifyOTP = (otp) => {
+    verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp)
       .then(async () => {
         await updateFieldsLead().then((res) => {
-          setFieldValue('applicants[activeIndex].applicant_details.lead_id', res.id);
+          setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
+          setFieldValue(`applicants[${activeIndex}].personal_details.lead_id`, res.id);
           updateFieldsApplicant('lead_id', res.id);
           setMobileVerified(true);
-          setFieldValue('applicants[activeIndex].applicant_details.is_mobile_verified', true);
+          setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
           updateFieldsApplicant('is_mobile_verified', true);
           setShowOTPInput(false);
           return true;
@@ -417,7 +340,7 @@ const ApplicantDetails = () => {
         setShowOTPInput(true);
         return false;
       });
-  }, []);
+  };
 
   // console.log('values', values.applicants[activeIndex]?.applicant_details);
   // console.log('errors', errors?.applicants && errors.applicants[activeIndex]?.applicant_details);

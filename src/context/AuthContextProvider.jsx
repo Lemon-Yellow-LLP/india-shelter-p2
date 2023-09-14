@@ -1,8 +1,5 @@
-import { createContext, useCallback, useEffect, useRef, useState } from 'react';
-import { useFormik } from 'formik';
-import { signUpSchema } from '../schemas/index';
+import { createContext, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
 export const defaultValues = {
   lead_id: '',

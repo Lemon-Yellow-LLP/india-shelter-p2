@@ -140,6 +140,5 @@ DropDown.propTypes = {
   onChange: PropTypes.func,
   optionsMaxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   showIcon: PropTypes.bool,
-  showError: PropTypes.bool,
   disabled: PropTypes.bool,
 };
