@@ -23,6 +23,7 @@ const TextInputWithSendOtp = memo(
       onChange,
       onOTPSendClick,
       disabledOtpButton,
+      buttonLabel,
       ...props
     },
     ref,
@@ -78,7 +79,7 @@ const TextInputWithSendOtp = memo(
             disabled={disabledOtpButton}
             onClick={onOTPSendClick}
           >
-            Send OTP
+            {buttonLabel ?? 'Send OTP'}
           </button>
         </div>
 
