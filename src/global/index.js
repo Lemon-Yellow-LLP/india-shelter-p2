@@ -37,6 +37,33 @@ async function getCompanyNamesList() {
   return res.data;
 }
 
+async function getLoginOtp(mobile_no) {
+  const res = await axios.get(
+    `${API_URL}/account/login-sms-otp-request/${mobile_no}`,
+    requestOptions,
+  );
+  return res.data;
+}
+
+async function verifyLoginOtp(mobile_no, otp) {
+  const res = await axios.post(
+    `${API_URL}/account/login-sms-otp-verify/${mobile_no}`,
+    otp,
+    requestOptions,
+  );
+  return res.data;
+}
+
+async function logout(status, options) {
+  const res = await axios.post(`${API_URL}/account/user/logout`, status, options);
+  return res.data;
+}
+
+async function testLogout(options) {
+  const res = await axios.post(`${API_URL}/session/check-auth/login`, {}, options);
+  return res.data;
+}
+
 async function updateLeadDataOnBlur(leadId, fieldName, value) {
   if (!leadId) return;
   const inputName = fieldName;
@@ -55,8 +82,8 @@ function isEighteenOrAbove(date) {
   const today = new Date();
 
   const dateString = date;
-  const parts = dateString.split('/');
-  const year = parts[2];
+  const parts = dateString.split('-');
+  const year = parts[0];
   const month = parts[1];
   const differenceInYear = today.getFullYear() - year;
   const differenceInMonth = today.getMonth() - month;
@@ -82,13 +109,52 @@ async function verifyEmailOtp(id, otp) {
 }
 
 async function editFieldsById(id, page, values) {
-  const res = await axios.patch(`${API_URL}/${page}/edit/${id}`, values, requestOptions);
+  const { data } = await axios.patch(`${API_URL}/${page}/edit/${id}`, values, requestOptions);
+  return data;
+}
+
+async function addApi(page, values) {
+  const { data } = await axios.post(`${API_URL}/${page}/add`, values, requestOptions);
+  return data;
+}
+
+async function getMobileOtp(id) {
+  const res = await axios.get(`${API_URL}/applicant/send-sms/${id}`, {}, requestOptions);
+  return res;
+}
+
+async function verifyMobileOtp(id, otp) {
+  const res = await axios.post(`${API_URL}/applicant/verify-sms/${id}`, { otp }, requestOptions);
   return res;
 }
 
 async function editAddressById(id, data) {
   const res = await axios.patch(`${API_URL}/address/edit/${id}`, data, requestOptions);
   return res;
+}
+
+async function checkExistingCustomer(body) {
+  let myHeaders = new Headers();
+  myHeaders.append('Content-Type', 'application/json');
+  let requestOptions2 = {
+    method: 'POST',
+    headers: myHeaders,
+    body: body,
+    redirect: 'follow',
+    mode: 'no-cors',
+  };
+
+  // const res = await axios.post(
+  //   `https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run`,
+  //   body,
+  // );
+
+  await fetch(
+    'https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run',
+    requestOptions2,
+  ).then((res) => {
+    return res;
+  });
 }
 
 export {
@@ -105,4 +171,12 @@ export {
   editFieldsById,
   getCompanyNamesList,
   editAddressById,
+  getMobileOtp,
+  verifyMobileOtp,
+  addApi,
+  checkExistingCustomer,
+  getLoginOtp,
+  verifyLoginOtp,
+  logout,
+  testLogout,
 };

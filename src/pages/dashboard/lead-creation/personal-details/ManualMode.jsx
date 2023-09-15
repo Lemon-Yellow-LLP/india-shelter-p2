@@ -1,7 +1,7 @@
 import { personalDetailsGenderOption, personalMaritalStatusOptions } from '../utils';
 import CardRadio from '../../../../components/CardRadio';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import DropDown from '../../../../components/DropDown';
 import TextInput from '../../../../components/TextInput';
 import DatePicker from '../../../../components/DatePicker';
@@ -26,7 +26,8 @@ export default function ManualMode({
     handleBlur,
     handleSubmit,
     setFieldValue,
-  } = useContext(AuthContext);
+    setToastMessage,
+  } = useContext(LeadContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
@@ -96,6 +97,8 @@ export default function ManualMode({
 
       if (e.target.name === 'personal_details.email') {
         setFieldValue(e.target.name, value);
+        setHasSentOTPOnce(false);
+        setShowOTPInput(false);
       }
 
       if (
@@ -168,16 +171,6 @@ export default function ManualMode({
     [requiredFieldsStatus],
   );
 
-  const handleDateChange = useCallback(
-    (e) => {
-      setFieldValue('personal_details.date_of_birth', e);
-      if (!requiredFieldsStatus.date_of_birth) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, date_of_birth: true }));
-      }
-    },
-    [requiredFieldsStatus],
-  );
-
   useEffect(() => {
     updateFields();
   }, [values?.personal_details?.extra_params?.same_as_id_type]);
@@ -209,10 +202,11 @@ export default function ManualMode({
   }, [values.personal_details?.id_type, values.personal_details?.id_number]);
 
   const sendEmailOTP = () => {
-    setDisableEmailInput((prev) => !prev);
+    // setDisableEmailInput((prev) => !prev);
     setShowOTPInput(true);
     setHasSentOTPOnce(true);
     getEmailOtp(1);
+    setToastMessage('OTP has been sent to your mail id');
   };
 
   const verifyOTP = useCallback((otp) => {
@@ -228,6 +222,18 @@ export default function ManualMode({
         return false;
       });
   }, []);
+
+  useEffect(() => {
+    setFieldValue('personal_details.date_of_birth', values.applicant_details?.date_of_birth);
+    updateFields('date_of_birth', values.applicant_details?.date_of_birth);
+  }, [values.applicant_details?.date_of_birth]);
+
+  useEffect(() => {
+    setFieldValue('personal_details.mobile_number', values.applicant_details?.mobile_number);
+    updateFields('mobile_number', values.applicant_details?.mobile_number);
+  }, [values.applicant_details?.mobile_number]);
+
+  console.log(values.personal_details.id_number);
 
   return (
     <>
@@ -459,8 +465,7 @@ export default function ManualMode({
       )}
 
       <DatePicker
-        startDate={values.personal_details?.date_of_birth}
-        setStartDate={handleDateChange}
+        value={values.applicant_details?.date_of_birth}
         required
         name='personal_details.date_of_birth'
         label='Date of Birth'
@@ -481,7 +486,7 @@ export default function ManualMode({
         placeholder='1234567890'
         required
         name='personal_details.mobile_number'
-        value={values.personal_details?.mobile_number}
+        value={values.applicant_details?.mobile_number}
         onChange={handleTextInputChange}
         error={errors.personal_details?.mobile_number}
         touched={touched.personal_details?.mobile_number}

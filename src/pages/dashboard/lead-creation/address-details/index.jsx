@@ -1,5 +1,5 @@
 import { useContext, useState, useCallback, useEffect } from 'react';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import IconRent from '../../../../assets/icons/rent';
 import { CardRadio, TextInput } from '../../../../components';
 import IconSelfOwned from '../../../../assets/icons/self-owned';
@@ -55,7 +55,7 @@ const AddressDetails = () => {
     setFieldError,
     setFieldValue,
     updateProgress,
-  } = useContext(AuthContext);
+  } = useContext(LeadContext);
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     type_of_residence: false,
     current_flat_no_building_name: false,

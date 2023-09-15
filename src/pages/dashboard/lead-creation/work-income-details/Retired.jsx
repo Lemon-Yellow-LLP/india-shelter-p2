@@ -1,11 +1,11 @@
 import { useCallback, useContext, useState } from 'react';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInput from '../../../../components/TextInput';
 import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
 
 export default function Retired() {
-  const { values, errors, handleBlur, touched, setFieldValue } = useContext(AuthContext);
+  const { values, errors, handleBlur, touched, setFieldValue } = useContext(LeadContext);
 
   return (
     <>

@@ -2,7 +2,7 @@ import { useCallback, useState, useContext, useEffect } from 'react';
 import { IconPropertyIdentified, IconPropertyUnIdentified } from '../../../../assets/icons';
 import { CardRadio } from '../../../../components';
 import IdentificationDoneFields from './IdentificationDoneFields';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import { editPropertyById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 
@@ -23,7 +23,7 @@ const selectedLoanType = 'LAP';
 
 const PropertyDetails = () => {
   const { values, updateProgress, errors, touched, setFieldValue, handleSubmit } =
-    useContext(AuthContext);
+    useContext(LeadContext);
   const [propertyIdentification, setPropertyIdentification] = useState(null);
 
   useEffect(() => {

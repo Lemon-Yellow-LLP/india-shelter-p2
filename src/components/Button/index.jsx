@@ -3,15 +3,18 @@ import PropTypes from 'prop-types';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 
-const Button = memo(({ primary, children, inputClasses, link, ...props }) => {
+const Button = memo(({ primary, children, inputClasses, link, disabled, ...props }) => {
   return (
     <Link
-      to={link}
-      className={`p-2 md:py-3 text-base md:text-lg rounded md:w-64 flex justify-center items-center ${inputClasses} ${
+      to={disabled ? null : link}
+      className={`p-2 md:py-3 text-base md:text-lg rounded md:w-64 flex justify-center items-center ${inputClasses}
+      ${null} ${
         primary
-          ? 'bg-primary-red border border-primary-red text-white disabled:bg-light-red disabled:border-light-red'
-          : 'bg-neutral-white border border-primary-red text-primary-red disabled:text-light-red'
-      } transition-colors ease-out duration-300`}
+          ? disabled
+            ? 'bg-stroke border-stroke pointer-events-none text-dark-grey'
+            : 'bg-primary-red border border-primary-red text-white disabled:bg-stroke disabled:border-stroke'
+          : 'bg-neutral-white border border-primary-red text-primary-red disabled:text-dark-grey'
+      } transition-colors ease-out duration-300 `}
       {...props}
     >
       {children}

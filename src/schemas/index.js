@@ -9,6 +9,13 @@ function parseDateString(_, originalValue) {
   return parsedDate;
 }
 
+export const signInSchema = Yup.object({
+  username: Yup.string()
+    .required('This field is mandatory')
+    .min(10, 'Enter a valid phone number')
+    .max(10, 'Enter a valid phone number'),
+});
+
 export const signUpSchema = Yup.object({
   propertySchema: Yup.object().shape({
     property_identification_is: Yup.string().required('This field is mandatory'),
@@ -325,8 +332,10 @@ export const signUpSchema = Yup.object({
       .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   }),
 
-  applicant_details: Yup.object().shape({
+  lead: Yup.object().shape({
     loan_type: Yup.string().required('This field is mandatory field.'),
+    purpose_of_loan: Yup.string().required('Loan Purpose is required'),
+    property_type: Yup.string().required('Property Type is required'),
     applied_amount: Yup.number()
       .min(100000, 'Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000')
       .max(
@@ -334,6 +343,9 @@ export const signUpSchema = Yup.object({
         'Total loan amount should not be less than ₹ 1,00,000 and more than ₹ 50,00,000',
       )
       .required('This field is mandatory.'),
+  }),
+
+  applicant_details: Yup.object().shape({
     first_name: Yup.string()
       .min(2, 'First Name must be atleast 2 characters long')
       .max(10, 'First Name can be max 10 characters long')
@@ -348,11 +360,8 @@ export const signUpSchema = Yup.object({
       .max(10, 'Last Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
     date_of_birth: Yup.string()
-      .nullable()
       .min(10, 'Enter valid date')
-      .required('Date of birth is required'),
-    purpose_of_loan: Yup.string().required('Loan Purpose is required'),
-    property_type: Yup.string().required('Property Type is required'),
+      .required('Date of Birth is Required. Minimum age must be 18 or 18+'),
     mobile_number: Yup.string()
       .matches(/^(?!.*(\d)\1{4})(?!.*(\d{5}).*\2)\d{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),

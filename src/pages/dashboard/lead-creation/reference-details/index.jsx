@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import { DropDown, TextInput } from '../../../../components';
 import { checkIsValidStatePincode, editReferenceById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
@@ -92,7 +92,7 @@ const ReferenceDetails = () => {
     setFieldValue,
     setFieldError,
     updateProgress,
-  } = useContext(AuthContext);
+  } = useContext(LeadContext);
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     reference_1_type: false,
     reference_1_full_name: false,

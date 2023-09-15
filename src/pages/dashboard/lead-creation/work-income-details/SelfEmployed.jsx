@@ -1,5 +1,5 @@
 import { useCallback, useContext, useState, useEffect } from 'react';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInput from '../../../../components/TextInput';
 import DropDown from '../../../../components/DropDown';
 import { CurrencyInput } from '../../../../components';
@@ -7,7 +7,7 @@ import { editFieldsById } from '../../../../global';
 
 export default function SelfEmployed() {
   const { values, errors, handleBlur, touched, setFieldValue, setFieldError } =
-    useContext(AuthContext);
+    useContext(LeadContext);
 
   const industriesOptions = [
     {

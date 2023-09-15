@@ -9,9 +9,10 @@ export default function PreviousNextButtons({
   onPreviousClick,
   onNextClick,
 }) {
+  // mb-[62.6px]
   return (
     <div
-      className='flex w-[100vw] p-[18px] bg-white mb-[62.6px] gap-[20px] justify-center'
+      className='flex w-[100vw] p-[18px] bg-white gap-[20px] justify-center mb-[62.6px]'
       style={{ boxShadow: '0px -5px 10px #E5E5E580' }}
     >
       {disablePrevious ? (

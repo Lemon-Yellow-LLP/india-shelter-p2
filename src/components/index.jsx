@@ -13,6 +13,7 @@ import DesktopPopUp from './DesktopPopUp';
 import PanInput from './TextInput/PanInput';
 import MapInput from './MapInput';
 import Map from './Map';
+import ToastMessage from './ToastMessage';
 
 export {
   TextInput,
@@ -30,4 +31,5 @@ export {
   PanInput,
   MapInput,
   Map,
+  ToastMessage,
 };

@@ -1,14 +1,14 @@
 import { personalDetailsModeOption } from '../utils';
 import CardRadio from '../../../../components/CardRadio';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import ManualMode from './ManualMode';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { editFieldsById } from '../../../../global';
 
 const PersonalDetails = () => {
   const { values, setValues, updateProgress, errors, touched, handleSubmit, setFieldValue } =
-    useContext(AuthContext);
+    useContext(LeadContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     how_would_you_like_to_proceed: false,
@@ -99,11 +99,13 @@ const PersonalDetails = () => {
         )}
       </div>
 
-      {/* <PreviousNextButtons
-        linkPrevious='/lead/applicant-details'
-        linkNext='/lead/address-details'
-        onNextClick={handleNextClick}
-      /> */}
+      <div className='bottom-0 fixed'>
+        <PreviousNextButtons
+          linkPrevious='/lead/applicant-details'
+          linkNext='/lead/address-details'
+          onNextClick={handleNextClick}
+        />
+      </div>
     </div>
   );
 };

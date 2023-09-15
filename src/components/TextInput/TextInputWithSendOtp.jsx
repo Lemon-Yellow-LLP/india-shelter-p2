@@ -50,7 +50,7 @@ const TextInputWithSendOtp = memo(
             onClick={() => (ref ? ref.current.focus() : inputRef.current.focus())}
             onKeyDown={() => (ref ? ref.current?.focus() : inputRef.current.focus())}
             className={`input-container px-4 py-3 border rounded-lg
-        flex gap-1
+        flex flex-1 gap-1
         transition-all ease-out duration-150
         focus-within:border-secondary-blue focus-within:shadow-secondary-blue focus-within:shadow-primary
         ${!props.value && !touched ? 'border-stroke' : 'border-light-grey'}
@@ -94,7 +94,7 @@ const TextInputWithSendOtp = memo(
         )}
         {message ? (
           <span
-            className='flex text-primary-black text-xs leading-[18px]'
+            className='flex text-[#147257] text-xs leading-[18px]'
             dangerouslySetInnerHTML={{
               __html: message,
             }}

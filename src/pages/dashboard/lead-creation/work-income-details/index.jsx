@@ -2,7 +2,7 @@ import { professionOptions, noOfDependentsOptions, totalFamilyMembersOptions } f
 import CardRadio from '../../../../components/CardRadio';
 import CardRadioWithoutIcon from '../../../../components/CardRadio/CardRadioWithoutIcon';
 import { memo, useCallback, useContext, useEffect } from 'react';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import Salaried from './Salaried';
 import SelfEmployed from './SelfEmployed';
 import TextInput from '../../../../components/TextInput';
@@ -24,7 +24,7 @@ const WorkIncomeDetails = () => {
     setFieldError,
     handleChange,
     handleSubmit,
-  } = useContext(AuthContext);
+  } = useContext(LeadContext);
 
   const handleRadioChange = useCallback((e) => {
     setFieldValue(`work_income_details.${e.name}`, e.value);

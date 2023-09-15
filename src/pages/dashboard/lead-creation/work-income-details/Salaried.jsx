@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInput from '../../../../components/TextInput';
 import DropDown from '../../../../components/DropDown';
 import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
@@ -212,7 +212,7 @@ const modeOfSalary = [
 
 export default function Salaried() {
   const { values, errors, touched, handleBlur, setFieldValue, setFieldError } =
-    useContext(AuthContext);
+    useContext(LeadContext);
 
   const [companyNameOptions, setCompanyNameOptions] = useState([]);
 

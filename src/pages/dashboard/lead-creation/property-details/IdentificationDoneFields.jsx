@@ -1,7 +1,7 @@
 import { useCallback, useState, useContext, useEffect } from 'react';
 import { TextInput, CurrencyInput, MapInput, Map } from '../../../../components';
 import propTypes from 'prop-types';
-import { AuthContext } from '../../../../context/AuthContext';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 import { checkIsValidStatePincode, editPropertyById } from '../../../../global';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
@@ -20,7 +20,7 @@ const IdentificationDoneFields = ({
     setFieldValue,
     setFieldError,
     updateProgress,
-  } = useContext(AuthContext);
+  } = useContext(LeadContext);
   const [showMap, setShowMap] = useState(false);
 
   // const onMapButtonClick = useCallback(() => {
