@@ -1,21 +1,50 @@
-import { createContext, useCallback, useEffect, useRef, useState } from 'react';
+import { createContext, useState } from 'react';
 import { useFormik } from 'formik';
-import { signUpSchema } from '../schemas/index';
+import { signInSchema } from '../schemas/index';
 import PropTypes from 'prop-types';
-import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
 export const defaultValues = {
-  lead_id: '',
-  applicant_id: '',
+  employee_code: '',
+  username: '',
+  password: '',
+  role: '',
+  first_name: '',
+  middle_name: '',
+  last_name: '',
+  address: '',
+  alternate_number: '',
+  comments: '',
+  extra_params: '',
+  is_mobile_verified: false,
 };
 
 export const AuthContext = createContext(defaultValues);
 
 const AuthContextProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [token, setToken] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [otpFailCount, setOtpFailCount] = useState(0);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const formik = useFormik({
+    initialValues: { ...defaultValues },
+    validationSchema: signInSchema,
+  });
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+    <AuthContext.Provider
+      value={{
+        ...formik,
+        isAuthenticated,
+        setIsAuthenticated,
+        toastMessage,
+        setToastMessage,
+        otpFailCount,
+        setOtpFailCount,
+        token,
+        setToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
