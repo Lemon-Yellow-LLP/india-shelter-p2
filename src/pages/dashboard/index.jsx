@@ -1,6 +1,29 @@
+import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { testLogout } from '../../global';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 const Dashboard = () => {
+  const { token, setIsAuthenticated } = useContext(AuthContext);
+  const [activeLoginRes, setActiveLoginRes] = useState(null);
+
+  const handleActiveLogin = async () => {
+    try {
+      const res = await testLogout({
+        headers: {
+          Authorization: token,
+        },
+      });
+      if (!res) return;
+
+      setActiveLoginRes('SUCCESS, LOGGED IN');
+    } catch (err) {
+      console.log(err);
+      setActiveLoginRes('FAILED, LOGGED OUT');
+      window.location.reload();
+    }
+  };
+
   return (
     <div className='flex flex-col gap-5'>
       <h1>Dashboard</h1>
@@ -52,6 +75,19 @@ const Dashboard = () => {
       >
         go-to-work-income-page
       </Link>
+
+      <button
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        onClick={handleActiveLogin}
+      >
+        Test active login
+      </button>
+
+      {activeLoginRes ? (
+        <span>{activeLoginRes}</span>
+      ) : (
+        <span>ACTIVE LOGIN STATUS WILL BE SHOWN HERE</span>
+      )}
     </div>
   );
 };

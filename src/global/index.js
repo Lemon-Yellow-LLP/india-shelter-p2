@@ -37,6 +37,33 @@ async function getCompanyNamesList() {
   return res.data;
 }
 
+async function getLoginOtp(mobile_no) {
+  const res = await axios.get(
+    `${API_URL}/account/login-sms-otp-request/${mobile_no}`,
+    requestOptions,
+  );
+  return res.data;
+}
+
+async function verifyLoginOtp(mobile_no, otp) {
+  const res = await axios.post(
+    `${API_URL}/account/login-sms-otp-verify/${mobile_no}`,
+    otp,
+    requestOptions,
+  );
+  return res.data;
+}
+
+async function logout(status, options) {
+  const res = await axios.post(`${API_URL}/account/user/logout`, status, options);
+  return res.data;
+}
+
+async function testLogout(options) {
+  const res = await axios.post(`${API_URL}/session/check-auth/login`, {}, options);
+  return res.data;
+}
+
 async function updateLeadDataOnBlur(leadId, fieldName, value) {
   if (!leadId) return;
   const inputName = fieldName;
@@ -148,4 +175,8 @@ export {
   verifyMobileOtp,
   addApi,
   checkExistingCustomer,
+  getLoginOtp,
+  verifyLoginOtp,
+  logout,
+  testLogout,
 };
