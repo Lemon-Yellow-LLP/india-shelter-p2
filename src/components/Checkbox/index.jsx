@@ -45,9 +45,8 @@ const Checkbox = forwardRef(function Checkbox({ name, checked, setChecked, ...pr
         {...props}
         name={name}
         type='checkbox'
-        onChange={(e) => {
-          // setChecked(e.currentTarget.checked);
-          props.onChange(e);
+        onTouchEnd={(e) => {
+          props.onTouchEnd(e);
         }}
         ref={ref}
         className='absolute top-0 left-0 w-full h-full opacity-0'

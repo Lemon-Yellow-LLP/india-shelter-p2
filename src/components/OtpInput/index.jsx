@@ -15,6 +15,8 @@ const OtpInput = ({
   verifyOTPCB,
   defaultResendTime,
   hasSentOTPOnce,
+  verifiedOnce,
+  setVerifiedOnce,
 }) => {
   const [otp, setOtp] = useState('');
   const [activeOtpIndex, setActiveOtpIndex] = useState(null);
@@ -41,6 +43,7 @@ const OtpInput = ({
     setInputDisabled(false);
     onSendOTPClick();
     setTimer(true);
+    setVerifiedOnce(false);
   }, [onSendOTPClick]);
 
   useEffect(() => {
@@ -53,7 +56,7 @@ const OtpInput = ({
   useEffect(() => {
     let interval = null;
     if (timer) {
-      setOTPVerified(null);
+      // setOTPVerified(false);
       let time = defaultResendTime || 10;
       interval = setInterval(() => {
         time -= 1;
@@ -79,11 +82,13 @@ const OtpInput = ({
 
   const inputClasses = useMemo(() => {
     if (!hasSentOTPOnce) return 'border-stroke bg-white';
-    if (hasSentOTPOnce && verified === null)
+    if (hasSentOTPOnce && !verified && !verifiedOnce)
       return 'border-secondary-blue shadow-secondary-blue shadow-primary';
-    if (!verified) return 'border-primary-red shadow-primary shadow-primary-red';
+    if (!verified && verifiedOnce) return 'border-primary-red shadow-primary shadow-primary-red';
     if (verified) return 'border-dark-grey';
-  }, [verified, hasSentOTPOnce]);
+  }, [verified, hasSentOTPOnce, verifiedOnce]);
+
+  console.log(verifiedOnce);
 
   return (
     <div className='otp-container'>
@@ -126,7 +131,7 @@ const OtpInput = ({
       </div>
       <div className='mt-3 flex justify-between items-center'>
         <div className='flex gap-0.5'>
-          {verified === null && timer && (
+          {!verified && !verifiedOnce && timer && (
             <span className='text-primary-red text-xs leading-[18px]'>0:{resendTime}s</span>
           )}
           {verified === true && !timer && (
@@ -135,7 +140,7 @@ const OtpInput = ({
               <img src={otpVerified} alt='Otp Verified' role='presentation' />
             </span>
           )}
-          {verified === false && (
+          {!verified && verifiedOnce && (
             <span className='flex text-[#E33439] text-xs leading-[18px]'>
               <img src={otpNotVerified} alt='Otp Verified' role='presentation' />
               Invalid OTP. Please try again

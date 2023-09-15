@@ -58,6 +58,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       setFieldValue(`applicants[${activeIndex}].personal_details.id_type`, e);
       setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
       updateFields('id_type', e);
+      updateFields('id_number', '');
+      if (values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
+        updateFields('selected_address_proof', e);
+        updateFields('address_proof_number', '');
+      }
       if (!requiredFieldsStatus.id_type) {
         setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true }));
       }
@@ -70,6 +75,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       setFieldValue(`applicants[${activeIndex}].personal_details.selected_address_proof`, e);
       setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
       updateFields('selected_address_proof', e);
+      updateFields('address_proof_number', '');
       if (!requiredFieldsStatus.selected_address_proof) {
         setRequiredFieldsStatus((prev) => ({ ...prev, selected_address_proof: true }));
       }
@@ -152,7 +158,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const handleDropdownChange = useCallback(
     (name, value) => {
       setFieldValue(name, value);
-      console.log(name);
       const fieldName = name.split('.')[2];
       updateFields(fieldName, value);
       if (
@@ -222,7 +227,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       });
   }, []);
 
-  useEffect(() => {
+  const dobUpdate = useCallback(() => {
     setFieldValue(
       `applicants[${activeIndex}].personal_details.date_of_birth`,
       values?.applicants[activeIndex]?.applicant_details?.date_of_birth,
@@ -234,6 +239,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   }, [values?.applicants[activeIndex]?.applicant_details?.date_of_birth]);
 
   useEffect(() => {
+    dobUpdate();
+  }, [values?.applicants[activeIndex]?.applicant_details?.date_of_birth]);
+
+  const mobileNumberUpdate = useCallback(() => {
     setFieldValue(
       `applicants[${activeIndex}].personal_details.mobile_number`,
       values?.applicants[activeIndex]?.applicant_details?.mobile_number,
@@ -241,8 +250,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     updateFields('mobile_number', values.applicant_details?.mobile_number);
   }, [values?.applicants[activeIndex]?.applicant_details?.mobile_number]);
 
+  useEffect(() => {
+    mobileNumberUpdate();
+  }, [values?.applicants[activeIndex]?.applicant_details?.mobile_number]);
+
   console.log(values?.applicants[activeIndex]?.personal_details?.id_type);
-  console.log(values?.applicants[activeIndex]?.personal_details?.id_number);
+  // console.log(values?.applicants[activeIndex]?.personal_details?.id_number);
 
   return (
     <>
@@ -289,115 +302,72 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           handleBlur(e);
           const name = e.target.name.split('.')[2];
           if (
-            !errors.applicants[activeIndex]?.personal_details[name] &&
-            values?.applicants[activeIndex]?.personal_details[name]
+            !errors.applicants[activeIndex]?.personal_details?.[name] &&
+            values?.applicants[activeIndex]?.personal_details?.[name]
           ) {
-            updateFields(name, values?.applicants[activeIndex]?.personal_details[name]);
+            updateFields(name, values?.applicants[activeIndex]?.personal_details?.[name]);
           }
           if (values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
             updateFields(
               'address_proof_number',
-              values?.applicants[activeIndex]?.personal_details[name],
+              values?.applicants[activeIndex]?.personal_details?.[name],
             );
           }
         }}
       />
 
       <div className='flex items-center gap-2'>
-        {values?.applicants[activeIndex]?.personal_details?.id_type &&
-        values?.applicants[activeIndex]?.personal_details?.id_type !== 'PAN Card' &&
-        values?.applicants[activeIndex]?.personal_details?.id_number ? (
-          <>
-            <Checkbox
-              checked={
-                values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type
-              }
-              name='terms-agreed'
-              onChange={(e) => {
-                if (!e.target.checked) {
-                  setFieldValue(
-                    `applicants[${activeIndex}].personal_details.selected_address_proof`,
-                    '',
-                  );
-                  setFieldValue(
-                    `applicants[${activeIndex}].personal_details.address_proof_number`,
-                    '',
-                  );
-                } else {
-                  setFieldValue(
-                    `applicants[${activeIndex}].personal_details.selected_address_proof`,
-                    values?.applicants[activeIndex]?.personal_details?.id_type,
-                  );
-                  setFieldValue(
-                    `applicants[${activeIndex}].personal_details.address_proof_number`,
-                    values?.applicants[activeIndex]?.personal_details?.id_number,
-                  );
-                  setFieldError(
-                    `applicants[${activeIndex}].personal_details.selected_address_proof`,
-                    null,
-                  );
-                  setFieldError(
-                    `applicants[${activeIndex}].personal_details.address_proof_number`,
-                    null,
-                  );
-                }
-                setFieldValue(
-                  `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
-                  e.target.checked,
-                );
-                updateFields();
-              }}
-              disabled={!values?.applicants[activeIndex]?.personal_details?.id_type}
-            />
-
-            <span
-              className={`${
-                values?.applicants[activeIndex]?.personal_details?.id_type
-                  ? 'text-[black]'
-                  : 'text-[gray]'
-              }`}
-            >
-              Address proof will be as same as ID type
-            </span>
-          </>
-        ) : (
-          <>
-            <Checkbox
-              checked={
-                values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type
-              }
-              name='terms-agreed'
-              onChange={(e) => {
-                if (!e.target.checked) {
-                  setFieldValue(
-                    `applicants[${activeIndex}].personal_details.selected_address_proof`,
-                    '',
-                  );
-                  setFieldValue(
-                    `applicants[${activeIndex}].personal_details.address_proof_number`,
-                    '',
-                  );
-                } else {
-                  setFieldValue(
-                    `applicants[${activeIndex}].personal_details.selected_address_proof`,
-                    values?.applicants[activeIndex]?.personal_details?.id_type,
-                  );
-                  setFieldValue(
-                    `applicants[${activeIndex}].personal_details.address_proof_number`,
-                    values?.applicants[activeIndex]?.personal_details?.id_number,
-                  );
-                }
-                setFieldValue(
-                  `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
-                  e.target.checked,
-                );
-              }}
-              disabled={true}
-            />
-
-            <span className='text-[gray]'>Address proof will be as same as ID type</span>
-          </>
-        )}
+        <Checkbox
+          checked={values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type}
+          name='terms-agreed'
+          onTouchEnd={(e) => {
+            setFieldValue(
+              `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
+              e.target.checked,
+            );
+            if (!e.target.checked) {
+              setFieldValue(
+                `applicants[${activeIndex}].personal_details.selected_address_proof`,
+                '',
+              );
+              setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
+            } else {
+              setFieldValue(
+                `applicants[${activeIndex}].personal_details.selected_address_proof`,
+                values?.applicants[activeIndex]?.personal_details?.id_type,
+              );
+              setFieldValue(
+                `applicants[${activeIndex}].personal_details.address_proof_number`,
+                values?.applicants[activeIndex]?.personal_details?.id_number,
+              );
+              setFieldError(
+                `applicants[${activeIndex}].personal_details.selected_address_proof`,
+                null,
+              );
+              setFieldError(
+                `applicants[${activeIndex}].personal_details.address_proof_number`,
+                null,
+              );
+            }
+            updateFields();
+          }}
+          disabled={
+            !values?.applicants[activeIndex]?.personal_details?.id_type ||
+            values?.applicants[activeIndex]?.personal_details?.id_type === 'PAN Card' ||
+            !values?.applicants[activeIndex]?.personal_details?.id_number
+          }
+        />
+        <span
+          className={`${
+            values?.applicants[activeIndex]?.personal_details?.id_type &&
+            values?.applicants[activeIndex]?.personal_details?.id_type !== 'PAN Card' &&
+            values?.applicants[activeIndex]?.personal_details?.id_number
+              ? 'text-[black]'
+              : 'text-[gray]'
+          }`}
+        >
+          Address proof will be as same as ID type
+        </span>
       </div>
 
       <DropDown
@@ -445,10 +415,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           handleBlur(e);
           const name = e.target.name.split('.')[2];
           if (
-            !errors.applicants[activeIndex]?.personal_details[name] &&
-            values?.applicants[activeIndex]?.personal_details[name]
+            !errors.applicants[activeIndex]?.personal_details?.[name] &&
+            values?.applicants[activeIndex]?.personal_details?.[name]
           ) {
-            updateFields(name, values?.applicants[activeIndex]?.personal_details[name]);
+            updateFields(name, values?.applicants[activeIndex]?.personal_details?.[name]);
           }
         }}
       />
@@ -468,13 +438,14 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           handleBlur(e);
           const name = e.target.name.split('.')[2];
           if (
-            !errors.applicants[activeIndex]?.personal_details[name] &&
-            values?.applicants[activeIndex]?.personal_details[name]
+            !errors.applicants[activeIndex]?.personal_details?.[name] &&
+            values?.applicants[activeIndex]?.personal_details?.[name]
           ) {
-            updateFields(name, values?.applicants[activeIndex]?.personal_details[name]);
+            updateFields(name, values?.applicants[activeIndex]?.personal_details?.[name]);
           }
         }}
       />
+
       <TextInput
         label='Middle Name'
         placeholder='Eg: Sham'
@@ -488,11 +459,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[2];
-          if (
-            !errors.applicants[activeIndex]?.personal_details[name] &&
-            values?.applicants[activeIndex]?.personal_details[name]
-          ) {
-            updateFields(name, values?.applicants[activeIndex]?.personal_details[name]);
+          if (!errors.applicants[activeIndex]?.personal_details?.[name]) {
+            updateFields(name, values?.applicants[activeIndex]?.personal_details?.[name]);
           }
         }}
       />
@@ -509,11 +477,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[2];
-          if (
-            !errors.applicants[activeIndex]?.personal_details[name] &&
-            values?.applicants[activeIndex]?.personal_details[name]
-          ) {
-            updateFields(name, values?.applicants[activeIndex]?.personal_details[name]);
+          if (!errors.applicants[activeIndex]?.personal_details?.[name]) {
+            updateFields(name, values?.applicants[activeIndex]?.personal_details?.[name]);
           }
         }}
       />
@@ -564,10 +529,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           handleBlur(e);
           const name = e.target.name.split('.')[2];
           if (
-            !errors.applicants[activeIndex]?.personal_details[name] &&
-            values?.applicants[activeIndex]?.personal_details[name]
+            !errors.applicants[activeIndex]?.personal_details?.[name] &&
+            values?.applicants[activeIndex]?.personal_details?.[name]
           ) {
-            updateFields(name, values?.applicants[activeIndex]?.personal_details[name]);
+            updateFields(name, values?.applicants[activeIndex]?.personal_details?.[name]);
           }
         }}
       />
@@ -588,10 +553,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           handleBlur(e);
           const name = e.target.name.split('.')[2];
           if (
-            !errors.applicants[activeIndex]?.personal_details[name] &&
-            values?.applicants[activeIndex]?.personal_details[name]
+            !errors.applicants[activeIndex]?.personal_details?.[name] &&
+            values?.applicants[activeIndex]?.personal_details?.[name]
           ) {
-            updateFields(name, values?.applicants[activeIndex]?.personal_details[name]);
+            updateFields(name, values?.applicants[activeIndex]?.personal_details?.[name]);
           }
         }}
       />
@@ -612,10 +577,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           handleBlur(e);
           const name = e.target.name.split('.')[2];
           if (
-            !errors.applicants[activeIndex]?.personal_details[name] &&
-            values?.applicants[activeIndex]?.personal_details[name]
+            !errors.applicants[activeIndex]?.personal_details?.[name] &&
+            values?.applicants[activeIndex]?.personal_details?.[name]
           ) {
-            updateFields(name, values?.applicants[activeIndex]?.personal_details[name]);
+            updateFields(name, values?.applicants[activeIndex]?.personal_details?.[name]);
           }
         }}
       />
@@ -635,10 +600,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           handleBlur(e);
           const name = e.target.name.split('.')[2];
           if (
-            !errors.applicants[activeIndex]?.personal_details[name] &&
-            values?.applicants[activeIndex]?.personal_details[name]
+            !errors.applicants[activeIndex]?.personal_details?.[name] &&
+            values?.applicants[activeIndex]?.personal_details?.[name]
           ) {
-            updateFields(name, values?.applicants[activeIndex]?.personal_details[name]);
+            updateFields(name, values?.applicants[activeIndex]?.personal_details?.[name]);
           }
         }}
       />
@@ -758,10 +723,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           handleBlur(e);
           const name = e.target.name.split('.')[2];
           if (
-            !errors.applicants[activeIndex]?.personal_details[name] &&
-            values?.applicants[activeIndex]?.personal_details[name]
+            !errors.applicants[activeIndex]?.personal_details?.[name] &&
+            values?.applicants[activeIndex]?.personal_details?.[name]
           ) {
-            updateFields(name, values?.applicants[activeIndex]?.personal_details[name]);
+            updateFields(name, values?.applicants[activeIndex]?.personal_details?.[name]);
           }
         }}
       />

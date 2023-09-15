@@ -2,12 +2,41 @@ import { Route, Routes } from 'react-router-dom';
 import Dashboard from './dashboard';
 import LeadCreationRoutes from './dashboard/lead-creation';
 import FaceAuth from './login/FaceAuth';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Login from './login/Login';
 import { AuthContext } from '../context/AuthContextProvider';
+import { LeadContext } from '../context/LeadContextProvider';
+import axios from 'axios';
 
 const DashboardRoutes = () => {
   const { isAuthenticated } = useContext(AuthContext);
+  const { setValues, values, setActiveIndex } = useContext(LeadContext);
+  // const [data, setData] = useState([]);
+
+  console.log('values', values);
+
+  const getData = async () => {
+    await axios
+      .get(`https://lo.scotttiger.in/api/dashboard/lead/89`)
+      .then(({ data }) => {
+        setValues({ ...data });
+        let newActiveIndex = 0;
+        data.applicants.map((e, index) => {
+          if (e.applicant_details.is_primary) {
+            newActiveIndex = index;
+          }
+        });
+        setActiveIndex(newActiveIndex);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <>
       {isAuthenticated ? (

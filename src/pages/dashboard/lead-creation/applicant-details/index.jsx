@@ -24,6 +24,7 @@ import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWith
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import { loanTypeOptions, loanOptions, loanPurposeData } from './ApplicantDropDownData';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const ApplicantDetails = () => {
   const {
@@ -41,15 +42,14 @@ const ApplicantDetails = () => {
     activeIndex,
     setActiveIndex,
   } = useContext(LeadContext);
-  const [openExistingPopup, setOpenExistingPopup] = useState(false);
+  const { lo_id } = useContext(AuthContext);
+
+  const [openExistingPopup, setOpenExistingPopup] = useState(true);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
-  const [mobileVerified, setMobileVerified] = useState(
-    values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified,
-  );
-
   const [showOTPInput, setShowOTPInput] = useState(false);
+  const [verifiedOnce, setVerifiedOnce] = useState(false);
 
   const [loanFields, setLoanFields] = useState(loanOptions);
   const [loanPurposeOptions, setLoanPurposeOptions] = useState(loanPurposeData);
@@ -59,6 +59,10 @@ const ApplicantDetails = () => {
   const [date, setDate] = useState(
     values?.applicants[activeIndex]?.applicant_details.date_of_birth,
   );
+
+  useEffect(() => {
+    setDate(values?.applicants[activeIndex]?.applicant_details.date_of_birth);
+  }, [values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     loan_type: false,
@@ -90,6 +94,7 @@ const ApplicantDetails = () => {
   const updateFieldsLead = async (name, value) => {
     let newData = {};
     newData[name] = value;
+    newData.lo_id = lo_id;
     if (values?.lead?.id) {
       const res = await editFieldsById(values?.lead?.id, 'lead', newData);
       return res;
@@ -229,17 +234,17 @@ const ApplicantDetails = () => {
         `applicants[${activeIndex}].applicant_details.date_of_birth`,
         'To apply for loan the minimum age must be 18 or 18+',
       );
-      setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
-      setFieldTouched(`applicants[${activeIndex}].date_of_birth`);
+      // setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
+      setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
     } else {
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, date);
       updateFieldsApplicant('date_of_birth', date);
     }
   };
 
-  useEffect(() => {
-    checkDate();
-  }, [date, setFieldError, setFieldValue]);
+  // useEffect(() => {
+  //   checkDate();
+  // }, [date, values.applicants[activeIndex]?.applicant_details.date_of_birth]);
 
   const datePickerScrollToTop = () => {
     if (dateInputRef.current) {
@@ -255,6 +260,7 @@ const ApplicantDetails = () => {
         setHasSentOTPOnce(true);
         getMobileOtp(values.applicants[activeIndex]?.applicant_details?.id);
         setToastMessage('OTP has been sent to your mail id');
+
         const bodyForExistingCustomer = JSON.stringify({
           resource: '/customer_check',
           path: '/customer_check',
@@ -328,7 +334,6 @@ const ApplicantDetails = () => {
           setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
           setFieldValue(`applicants[${activeIndex}].personal_details.lead_id`, res.id);
           updateFieldsApplicant('lead_id', res.id);
-          setMobileVerified(true);
           setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
           updateFieldsApplicant('is_mobile_verified', true);
           setShowOTPInput(false);
@@ -336,15 +341,16 @@ const ApplicantDetails = () => {
         });
       })
       .catch((err) => {
-        setMobileVerified(false);
+        setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
         setShowOTPInput(true);
+        setVerifiedOnce(true);
         return false;
       });
   };
 
   // console.log('values', values.applicants[activeIndex]?.applicant_details);
-  // console.log('errors', errors?.applicants && errors.applicants[activeIndex]?.applicant_details);
-  // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
+  console.log('errors', errors?.applicants[activeIndex]);
+  console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
 
   return (
     <>
@@ -410,7 +416,7 @@ const ApplicantDetails = () => {
             placeholder='Eg: Suresh, Priya'
             required
             name={`applicants[${activeIndex}].applicant_details.first_name`}
-            value={values.applicants[activeIndex]?.applicant_details.first_name}
+            value={values.applicants[activeIndex]?.applicant_details.first_name || ''}
             error={errors?.applicants[activeIndex]?.applicant_details?.first_name}
             touched={
               touched?.applicants && touched?.applicants[activeIndex]?.applicant_details?.first_name
@@ -419,15 +425,12 @@ const ApplicantDetails = () => {
               handleBlur(e);
               const name = e.currentTarget.name.split('.')[2];
               if (
-                errors &&
-                errors.applicants &&
-                errors?.applicants[activeIndex]?.applicant_details &&
-                !errors?.applicants[activeIndex]?.applicant_details[name] &&
-                values?.applicants[activeIndex]?.applicant_details[name]
+                !errors?.applicants[activeIndex]?.applicant_details?.[name] &&
+                values?.applicants[activeIndex]?.applicant_details?.[name]
               ) {
                 updateFieldsApplicant(
                   name,
-                  values.applicants[activeIndex]?.applicant_details[name],
+                  values.applicants[activeIndex]?.applicant_details?.[name],
                 );
               }
             }}
@@ -442,7 +445,7 @@ const ApplicantDetails = () => {
                 label='Middle Name'
                 placeholder='Eg: Ramji, Sreenath'
                 name={`applicants[${activeIndex}].applicant_details.middle_name`}
-                value={values.applicants[activeIndex]?.applicant_details?.middle_name}
+                value={values.applicants[activeIndex]?.applicant_details?.middle_name || ''}
                 error={errors?.applicants[activeIndex]?.applicant_details?.middle_name}
                 touched={
                   touched.applicants &&
@@ -452,16 +455,10 @@ const ApplicantDetails = () => {
                 onBlur={(e) => {
                   handleBlur(e);
                   const name = e.currentTarget.name.split('.')[2];
-                  if (
-                    errors &&
-                    errors.applicants &&
-                    errors?.applicants[activeIndex]?.applicant_details &&
-                    !errors?.applicants[activeIndex]?.applicant_details[name] &&
-                    values?.applicants[activeIndex]?.applicant_details[name]
-                  ) {
+                  if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
                     updateFieldsApplicant(
                       name,
-                      values.applicants[activeIndex]?.applicant_details[name],
+                      values.applicants[activeIndex]?.applicant_details?.[name],
                     );
                   }
                 }}
@@ -472,7 +469,7 @@ const ApplicantDetails = () => {
             <div className='w-full'>
               <TextInput
                 label='Last Name'
-                value={values.applicants[activeIndex]?.applicant_details?.last_name}
+                value={values.applicants[activeIndex]?.applicant_details?.last_name || ''}
                 error={errors?.applicants[activeIndex]?.applicant_details?.last_name}
                 touched={
                   touched.applicants &&
@@ -487,16 +484,10 @@ const ApplicantDetails = () => {
                 onBlur={(e) => {
                   handleBlur(e);
                   const name = e.currentTarget.name.split('.')[2];
-                  if (
-                    errors &&
-                    errors.applicants &&
-                    errors?.applicants[activeIndex]?.applicant_details &&
-                    !errors?.applicants[activeIndex]?.applicant_details[name] &&
-                    values?.applicants[activeIndex]?.applicant_details[name]
-                  ) {
+                  if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
                     updateFieldsApplicant(
                       name,
-                      values.applicants[activeIndex]?.applicant_details[name],
+                      values.applicants[activeIndex]?.applicant_details?.[name],
                     );
                   }
                 }}
@@ -507,13 +498,16 @@ const ApplicantDetails = () => {
           <DatePicker
             // value={values?.applicants[activeIndex]?.applicant_details?.date_of_birth}
             value={date}
-            setDate={setDate}
+            setDate={(e) => {
+              setDate(e);
+              checkDate();
+            }}
             required
             name={`applicants[${activeIndex}].applicant_details.date_of_birth`}
             label='Date of Birth'
             error={errors?.applicants[activeIndex]?.applicant_details?.date_of_birth}
             touched={
-              touched.applicants &&
+              touched?.applicants &&
               touched?.applicants[activeIndex]?.applicant_details?.date_of_birth
             }
             onBlur={(e) => {
@@ -541,12 +535,15 @@ const ApplicantDetails = () => {
             disabledOtpButton={
               !values.applicants[activeIndex]?.applicant_details?.mobile_number ||
               !!errors?.applicants[activeIndex]?.applicant_details?.mobile_number ||
-              mobileVerified ||
+              values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified ||
               hasSentOTPOnce
             }
-            disabled={disablePhoneNumber || mobileVerified}
+            disabled={
+              disablePhoneNumber ||
+              values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified
+            }
             message={
-              mobileVerified
+              values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified
                 ? `<img src="${otpVerified}" alt='Otp Verified' role='presentation' /> OTP Verfied`
                 : null
             }
@@ -554,15 +551,12 @@ const ApplicantDetails = () => {
               handleBlur(e);
               const name = e.target.name.split('.')[1];
               if (
-                errors &&
-                errors.applicants &&
-                errors?.applicants[activeIndex]?.applicant_details &&
-                !errors?.applicants[activeIndex]?.applicant_details[name] &&
-                values?.applicants[activeIndex]?.applicant_details[name]
+                !errors?.applicants[activeIndex]?.applicant_details?.[name] &&
+                values?.applicants[activeIndex]?.applicant_details?.[name]
               ) {
                 updateFieldsApplicant(
                   name,
-                  values.applicants[activeIndex]?.applicant_details[name],
+                  values.applicants[activeIndex]?.applicant_details?.[name],
                 );
               }
             }}
@@ -586,11 +580,15 @@ const ApplicantDetails = () => {
             <OtpInput
               label='Enter OTP'
               required
-              verified={mobileVerified}
-              setOTPVerified={setMobileVerified}
+              verified={values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified}
+              setOTPVerified={() => console.log('hii')}
+              verifiedOnce={verifiedOnce}
+              setVerifiedOnce={setVerifiedOnce}
               onSendOTPClick={sendMobileOtp}
               defaultResendTime={30}
-              disableSendOTP={!mobileVerified}
+              disableSendOTP={
+                !values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified
+              }
               verifyOTPCB={verifyOTP}
               hasSentOTPOnce={hasSentOTPOnce}
             />
@@ -630,12 +628,12 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
           />
         </div>
-
+        {/* {errors.applicants[activeIndex]?.applicant_details} */}
         <div className='bottom-0 fixed'>
           <PreviousNextButtons
             disablePrevious={true}
             disableNext={
-              !mobileVerified ||
+              !values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified ||
               (errors?.applicants && errors.applicants[activeIndex]?.applicant_details) ||
               errors.lead
             }

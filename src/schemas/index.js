@@ -17,10 +17,12 @@ const applicantSchema = Yup.object().shape({
       .required('First Name is required')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     middle_name: Yup.string()
+      .nullable()
       .min(2, 'Middle Name must be atleast 2 characters long')
       .max(10, 'Middle Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
     last_name: Yup.string()
+      .nullable()
       .min(2, 'Last Name must be atleast 2 characters long')
       .max(10, 'Last Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
@@ -106,10 +108,12 @@ const applicantSchema = Yup.object().shape({
       .required('First Name is required')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     middle_name: Yup.string()
+      .nullable()
       .min(2, 'Middle Name must be atleast 2 characters long')
       .max(10, 'Middle Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
     last_name: Yup.string()
+      .nullable()
       .min(2, 'Last Name must be atleast 2 characters long')
       .max(10, 'Last Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),

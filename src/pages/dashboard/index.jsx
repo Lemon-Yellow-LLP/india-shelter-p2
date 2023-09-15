@@ -46,6 +46,7 @@ const Dashboard = () => {
       >
         go-to-applicant-details-page
       </Link>
+      <div></div>
     </div>
   );
 };
