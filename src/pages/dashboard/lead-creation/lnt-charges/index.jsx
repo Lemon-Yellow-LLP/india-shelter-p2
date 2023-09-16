@@ -4,7 +4,7 @@ import InfoIcon from '../../../../assets/icons/info.svg';
 import ScannerIcon from '../../../../assets/icons/scanner.svg';
 import CashIcon from '../../../../assets/icons/cash.svg';
 import LinkIcon from '../../../../assets/icons/link.svg';
-import { Button } from '../../../../components';
+import { Button, ToastMessage } from '../../../../components';
 import { memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import LoaderIcon from '../../../../assets/loader';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
@@ -22,6 +22,7 @@ import {
   makePaymentByLink,
 } from '../../../../global';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const LEAD_ID = 1;
 const QR_TIMEOUT = 5 * 60;
@@ -90,10 +91,9 @@ const LnTCharges = ({ amount = 1500 }) => {
   const handleCheckingStatus = async (label = '') => {
     try {
       setCheckingStatus(label);
-      const resp = await checkPaymentStatus(lntId);
-      console.log(resp);
+      const resp = await checkPaymentStatus(LEAD_ID);
       if (resp?.airpay_response_json?.airpay_verify_transaction_status == '200') {
-        setPaymentMethod('success');
+        setPaymentStatus('success');
       } else if (resp?.airpay_response_json?.airpay_verify_transaction_status == '400') {
         setPaymentStatus('failure');
       }
@@ -163,15 +163,17 @@ const LnTCharges = ({ amount = 1500 }) => {
   };
 
   const sendPaymentLink = async () => {
+    setToastMessage('Link has been sent to the entered mobile number');
+
     const resp = await makePaymentByLink(LEAD_ID, {
       mobile_number: values.lnt_charges?.mobile_number,
     });
     console.log(resp);
+    alert(`Payment Link: ${resp?.airpay_response.payment_url}`);
     setHasSentOTPOnce(true);
     setShowResendLink(false);
     setDisablePhoneNumber(true);
     setSendLinkTime(LINK_RESEND_TIME);
-    setToastMessage('Link has been sent to the entered mobile number');
     const interval = setInterval(() => {
       setSendLinkTime((prev) => {
         if (prev <= 0) {
