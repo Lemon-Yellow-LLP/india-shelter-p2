@@ -24,6 +24,7 @@ const TextInputWithSendOtp = memo(
       onOTPSendClick,
       disabledOtpButton,
       buttonLabel,
+      hideOTPButton,
       ...props
     },
     ref,
@@ -70,17 +71,19 @@ const TextInputWithSendOtp = memo(
             />
           </div>
 
-          <button
-            className={`min-w-[93px] self-end font-normal py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
-              disabledOtpButton
-                ? 'text-dark-grey bg-stroke pointer-events-none'
-                : 'bg-primary-red text-white'
-            }`}
-            disabled={disabledOtpButton}
-            onClick={onOTPSendClick}
-          >
-            {buttonLabel ?? 'Send OTP'}
-          </button>
+          {hideOTPButton ? (
+            <button
+              className={`min-w-[93px] self-end font-normal py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
+                disabledOtpButton
+                  ? 'text-dark-grey bg-stroke pointer-events-none'
+                  : 'bg-primary-red text-white'
+              }`}
+              disabled={disabledOtpButton}
+              onClick={onOTPSendClick}
+            >
+              {buttonLabel ?? 'Send OTP'}
+            </button>
+          ) : null}
         </div>
 
         {displayError && !message ? (

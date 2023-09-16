@@ -18,11 +18,14 @@ import {
   doesLnTChargesExist,
   editLnTCharges,
   getLnTChargesQRCode,
-  sendPaymentLink,
+  makePaymentByCash,
+  makePaymentByLink,
 } from '../../../../global';
+import { useNavigate } from 'react-router-dom';
 
-const LEAD_ID = 4;
+const LEAD_ID = 1;
 const QR_TIMEOUT = 5 * 60;
+const LINK_RESEND_TIME = 30;
 
 const LnTCharges = ({ amount = 1500 }) => {
   const {
@@ -38,6 +41,9 @@ const LnTCharges = ({ amount = 1500 }) => {
     updateProgress,
   } = useContext(LeadContext);
 
+  const { toastMessage, setToastMessage } = useContext(AuthContext);
+
+  const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState('');
   const [checkingStatus, setCheckingStatus] = useState('');
   const [isConfirmPaymentVisible, setConfirmPaymentVisibility] = useState(false);
@@ -45,19 +51,19 @@ const LnTCharges = ({ amount = 1500 }) => {
   const [paymentStatus, setPaymentStatus] = useState(''); // 'success' | 'failure' | ''
   const [qrCode, setQrCode] = useState('');
   const [loadingQr, setLoadingQr] = useState(false);
+  const [lntId, setLntId] = useState('');
 
-  const [paymentMethod, setPaymentMethod] = useState('UPI');
+  const [paymentMethod, setPaymentMethod] = useState('UPI Payment');
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
-
-  const [mobileVerified, setMobileVerified] = useState(
-    values?.applicant_details?.is_mobile_verified,
-  );
+  const [sendLinkTime, setSendLinkTime] = useState(0);
+  const [showResendLink, setShowResendLink] = useState(false);
 
   const [qrTime, setQrTime] = useState(QR_TIMEOUT);
 
   const handleClick = (label = 'UPI Payment') => {
     setActiveItem(label);
+    setPaymentMethod(label);
   };
 
   const fetchQR = async () => {
@@ -75,20 +81,8 @@ const LnTCharges = ({ amount = 1500 }) => {
 
   useEffect(() => {
     (async () => {
-      // const res = await doesLnTChargesExist(LEAD_ID);
-      // if (res.success) {
-      //   if (res.data[0].status === 'success') {
-      //     setPaymentStatus('success');
-      //     setPaymentMethod(res.data[0].method);
-      //   } else if (res.data[0].status === 'failed') {
-      //     setPaymentStatus('failure');
-      //   } else {
-      //     fetchQR();
-      //   }
-      // } else {
-
-      // }
-      await addLnTCharges(LEAD_ID);
+      const resp = await addLnTCharges(LEAD_ID);
+      setLntId(resp.id);
       await fetchQR();
     })();
   }, []);
@@ -96,9 +90,15 @@ const LnTCharges = ({ amount = 1500 }) => {
   const handleCheckingStatus = async (label = '') => {
     try {
       setCheckingStatus(label);
-      const resp = await checkPaymentStatus(LEAD_ID);
+      const resp = await checkPaymentStatus(lntId);
       console.log(resp);
+      if (resp?.airpay_response_json?.airpay_verify_transaction_status == '200') {
+        setPaymentMethod('success');
+      } else if (resp?.airpay_response_json?.airpay_verify_transaction_status == '400') {
+        setPaymentStatus('failure');
+      }
     } catch (error) {
+      setPaymentStatus('failure');
       console.log(error);
     } finally {
       setCheckingStatus('');
@@ -107,10 +107,13 @@ const LnTCharges = ({ amount = 1500 }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
+      if (paymentStatus !== '') {
+        clearInterval(interval);
+        return;
+      }
       setQrTime((prev) => {
         if (prev === 0) {
           fetchQR();
-          console.log('Fetched QR');
           return QR_TIMEOUT;
         }
         if (loadingQr) return prev;
@@ -118,7 +121,7 @@ const LnTCharges = ({ amount = 1500 }) => {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [loadingQr]);
+  }, [loadingQr, paymentStatus]);
 
   function secondsToMinSecFormat(sec) {
     const minutes = Math.floor(sec / 60);
@@ -147,21 +150,50 @@ const LnTCharges = ({ amount = 1500 }) => {
       e.preventDefault();
       return;
     }
-
     setFieldValue('lnt_charges.mobile_number', phoneNumber);
 
     if (phoneNumber.length === 10) {
       setHasSentOTPOnce(false);
     }
-
-    editLnTCharges(LEAD_ID, { mobile_number: phoneNumber });
   }, []);
+
+  const handlePaymentByCash = async () => {
+    const resp = await makePaymentByCash(lntId);
+    setPaymentStatus('success');
+  };
+
+  const sendPaymentLink = async () => {
+    const resp = await makePaymentByLink(LEAD_ID, {
+      mobile_number: values.lnt_charges?.mobile_number,
+    });
+    console.log(resp);
+    setHasSentOTPOnce(true);
+    setShowResendLink(false);
+    setDisablePhoneNumber(true);
+    setSendLinkTime(LINK_RESEND_TIME);
+    setToastMessage('Link has been sent to the entered mobile number');
+    const interval = setInterval(() => {
+      setSendLinkTime((prev) => {
+        if (prev <= 0) {
+          clearInterval(interval);
+          setDisablePhoneNumber(false);
+          setShowResendLink(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   const showConfirmPayment = () => setConfirmPaymentVisibility(true);
   const hideConfirmPayment = () => setConfirmPaymentVisibility(false);
 
   const showConfirmSkip = () => setConfirmSkipVisibility(true);
   const hideConfirmSkip = () => setConfirmSkipVisibility(false);
+
+  const handleSkipPayment = () => {
+    navigate(0);
+  };
 
   return (
     <>
@@ -209,7 +241,7 @@ const LnTCharges = ({ amount = 1500 }) => {
 
                       {activeItem == 'UPI Payment' ? (
                         <>
-                          <p className='text-black text-center text-sm not-italic font-normal'>
+                          <p className='text-black text-center text-sm not-italic font-normal mb-4'>
                             QR code will get changed in
                             <span className='text-black text-sm not-italic font-semibold'>
                               {` ${secondsToMinSecFormat(qrTime)}s`}
@@ -252,24 +284,18 @@ const LnTCharges = ({ amount = 1500 }) => {
                       onChange={handleOnPhoneNumberChange}
                       error={errors.lnt_charges?.mobile_number}
                       touched={touched.lnt_charges?.mobile_number}
-                      onOTPSendClick={() =>
-                        sendPaymentLink(LEAD_ID, {
-                          mobile_number: values.lnt_charges?.mobile_number,
-                        })
-                      }
+                      onOTPSendClick={sendPaymentLink}
                       disabledOtpButton={
                         !values.lnt_charges?.mobile_number ||
                         !!errors.lnt_charges?.mobile_number ||
-                        mobileVerified ||
                         hasSentOTPOnce
                       }
-                      disabled={disablePhoneNumber || mobileVerified}
+                      hideOTPButton={!hasSentOTPOnce}
+                      disabled={disablePhoneNumber}
                       buttonLabel='Send Link'
                       onBlur={(e) => {
                         handleBlur(e);
                         const name = e.target.name.split('.')[1];
-                        console.log(name);
-                        console.log(errors);
                         if (
                           errors?.lnt_charges?.mobile_number &&
                           !errors?.lnt_charges?.mobile_number[name] &&
@@ -294,12 +320,27 @@ const LnTCharges = ({ amount = 1500 }) => {
                         if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
                       }}
                     />
+                    <div className='flex items-center'>
+                      {sendLinkTime && sendLinkTime > 0 ? (
+                        <span className='mr-auto text-primary-red cursor-pointer'>
+                          {`${secondsToMinSecFormat(sendLinkTime)}s`}
+                        </span>
+                      ) : null}
+
+                      {showResendLink ? (
+                        <button
+                          type='button'
+                          className='text-primary-red cursor-pointer font-semibold ml-auto'
+                          onClick={sendPaymentLink}
+                        >
+                          <span>Resend Link</span>
+                        </button>
+                      ) : null}
+                    </div>
+
                     <StatusButton
                       disabled={
-                        !values.lnt_charges?.mobile_number ||
-                        !!errors.lnt_charges?.mobile_number ||
-                        mobileVerified ||
-                        hasSentOTPOnce
+                        !values.lnt_charges?.mobile_number || !!errors.lnt_charges?.mobile_number
                       }
                       onClick={() => handleCheckingStatus('Pay via Link')}
                       isLoading={checkingStatus === 'Pay via Link'}
@@ -341,11 +382,7 @@ const LnTCharges = ({ amount = 1500 }) => {
               <Button inputClasses='w-full h-[46px]' onClick={hideConfirmPayment}>
                 Cancel
               </Button>
-              <Button
-                primary={true}
-                inputClasses=' w-full h-[46px]'
-                onClick={() => setPaymentStatus('success')}
-              >
+              <Button primary={true} inputClasses=' w-full h-[46px]' onClick={handlePaymentByCash}>
                 Confirm
               </Button>
             </div>
@@ -358,9 +395,12 @@ const LnTCharges = ({ amount = 1500 }) => {
       {paymentStatus === 'failure' ? (
         <PaymentFailure
           amount={amount}
-          back={() => setPaymentStatus('')}
+          back={() => {
+            setPaymentStatus('');
+          }}
           next={() => console.log('Goto next page')}
           skip={showConfirmSkip}
+          reload={handleSkipPayment}
         />
       ) : null}
 
@@ -391,13 +431,15 @@ const LnTCharges = ({ amount = 1500 }) => {
             inputClasses=' w-full h-[46px]'
             onClick={() => {
               hideConfirmSkip();
-              setPaymentStatus('failure');
+              // setPaymentStatus('failure');
             }}
           >
             Yes, skip
           </Button>
         </div>
       </DynamicDrawer>
+
+      <ToastMessage message={toastMessage} setMessage={setToastMessage} />
     </>
   );
 };
@@ -432,7 +474,7 @@ const PaymentSuccess = ({ amount, method }) => {
   );
 };
 
-const PaymentFailure = ({ back, next, skip }) => {
+const PaymentFailure = ({ back, next, skip, reload }) => {
   return (
     <div className='h-screen bg-medium-grey flex flex-col w-full'>
       <div className='flex-1 flex items-center z-0'>
@@ -451,7 +493,7 @@ const PaymentFailure = ({ back, next, skip }) => {
         </div>
       </div>
       <div className='mt-auto w-full p-4 space-y-4 '>
-        <Button inputClasses='h-12' primary={true} onClick={back}>
+        <Button inputClasses='h-12' primary={true} onClick={reload}>
           Select other payment method
         </Button>
         <Button
@@ -532,13 +574,14 @@ const StatusButton = memo(
         disabled={disabled}
         className={`p-2 md:py-3 text-base md:text-lg rounded md:w-64 flex justify-center items-center gap-2 h-12 w-full
        ${
-         isLoading || disabled ? 'pointer-events-none' : 'pointer-events-auto'
-       } bg-primary-red border border-primary-red text-white disabled:bg-light-red disabled:border-light-red transition-colors ease-out duration-300 `}
+         isLoading ? 'pointer-events-none' : 'pointer-events-auto'
+       } bg-primary-red border border-primary-red text-white disabled:bg-[#D9D9D9] disabled:text-[#96989A] disabled:border-transparent transition-colors ease-out duration-300 
+       `}
         {...props}
       >
-        {isLoading ? <LoaderIcon /> : null}
+        {isLoading ? <LoaderIcon className='animate-spin' /> : null}
         <span className='text-center text-base not-italic font-semibold'>
-          {isLoading ? 'Checking Status' : 'Check Status'}
+          {isLoading && !disabled ? 'Checking Status' : 'Check Status'}
         </span>
       </button>
     );
