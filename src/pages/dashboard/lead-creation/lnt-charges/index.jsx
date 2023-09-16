@@ -71,7 +71,6 @@ const LnTCharges = ({ amount = 1500 }) => {
     try {
       setLoadingQr(true);
       const resp = await getLnTChargesQRCode(LEAD_ID);
-      console.log(resp);
       setQrCode(resp.DecryptedData.QRCODE_STRING);
     } catch (err) {
       console.log(err);
@@ -168,7 +167,6 @@ const LnTCharges = ({ amount = 1500 }) => {
     const resp = await makePaymentByLink(LEAD_ID, {
       mobile_number: values.lnt_charges?.mobile_number,
     });
-    console.log(resp);
     alert(`Payment Link: ${resp?.airpay_response.payment_url}`);
     setHasSentOTPOnce(true);
     setShowResendLink(false);
@@ -303,7 +301,6 @@ const LnTCharges = ({ amount = 1500 }) => {
                           !errors?.lnt_charges?.mobile_number[name] &&
                           values?.lnt_charges?.mobile_number[name]
                         ) {
-                          console.log('blur');
                           editLnTCharges(LEAD_ID, { mobile_number: phoneNumber });
                         }
                       }}
