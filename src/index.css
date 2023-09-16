@@ -199,6 +199,8 @@ body {
 
 .MuiDrawer-root>.MuiPaper-root {
   visibility: visible !important;
+  border-bottom-left-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
 }
 
 @layer utilities {

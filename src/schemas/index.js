@@ -9,6 +9,13 @@ function parseDateString(_, originalValue) {
   return parsedDate;
 }
 
+export const signInSchema = Yup.object({
+  username: Yup.string()
+    .required('This field is mandatory')
+    .min(10, 'Enter a valid phone number')
+    .max(10, 'Enter a valid phone number'),
+});
+
 export const signUpSchema = Yup.object({
   propertySchema: Yup.object().shape({
     property_identification_is: Yup.string().required('This field is mandatory'),

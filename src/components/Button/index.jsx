@@ -11,9 +11,9 @@ const Button = memo(({ primary, children, inputClasses, link, disabled, ...props
       ${null} ${
         primary
           ? disabled
-            ? 'bg-light-red border-light-red pointer-events-none text-white'
-            : 'bg-primary-red border border-primary-red text-white disabled:bg-light-red disabled:border-light-red'
-          : 'bg-neutral-white border border-primary-red text-primary-red disabled:text-light-red'
+            ? 'bg-stroke border-stroke pointer-events-none text-dark-grey'
+            : 'bg-primary-red border border-primary-red text-white disabled:bg-stroke disabled:border-stroke'
+          : 'bg-neutral-white border border-primary-red text-primary-red disabled:text-dark-grey'
       } transition-colors ease-out duration-300 `}
       {...props}
     >

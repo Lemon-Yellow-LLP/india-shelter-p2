@@ -422,7 +422,6 @@ const LeadContextProvider = ({ children }) => {
   const [showError, setShowError] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [addressProofcheckbox, setAddressProofCheckbox] = useState(false);
-  const [toastMessage, setToastMessage] = useState(null);
   const [stepsProgress, setStepProgress] = useState([
     {
       title: 'Applicant Details',
@@ -563,8 +562,6 @@ const LeadContextProvider = ({ children }) => {
         setShowError,
         addressProofcheckbox,
         setAddressProofCheckbox,
-        toastMessage,
-        setToastMessage,
       }}
     >
       {children}
