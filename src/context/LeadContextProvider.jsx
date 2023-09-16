@@ -138,6 +138,10 @@ export const defaultValues = {
     },
   },
 
+  lnt_charges: {
+    mobile_number: '',
+  },
+
   applicants: [
     {
       applicant_details: {

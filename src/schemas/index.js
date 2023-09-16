@@ -366,4 +366,10 @@ export const signUpSchema = Yup.object({
       .matches(/^(?!.*(\d)\1{4})(?!.*(\d{5}).*\2)\d{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),
   }),
+
+  lnt_charges: Yup.object().shape({
+    mobile_number: Yup.string()
+      .matches(/^(?!.*(\d)\1{4})(?!.*(\d{5}).*\2)\d{10}$/, 'Enter a valid 10-digit mobile number')
+      .required('Mobile number is required'),
+  }),
 });

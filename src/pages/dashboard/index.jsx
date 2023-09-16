@@ -76,6 +76,12 @@ const Dashboard = () => {
         go-to-work-income-page
       </Link>
 
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/lnt-charges'
+      >
+        go-to-L&T-charges-page
+      </Link>
       <button
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
         onClick={handleActiveLogin}
