@@ -71,7 +71,7 @@ const TextInputWithSendOtp = memo(
             />
           </div>
 
-          {hideOTPButton ? (
+          {hideOTPButton ? null : (
             <button
               className={`min-w-[93px] self-end font-normal py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
                 disabledOtpButton
@@ -83,7 +83,7 @@ const TextInputWithSendOtp = memo(
             >
               {buttonLabel ?? 'Send OTP'}
             </button>
-          ) : null}
+          )}
         </div>
 
         {displayError && !message ? (

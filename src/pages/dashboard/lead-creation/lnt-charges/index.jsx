@@ -290,7 +290,7 @@ const LnTCharges = ({ amount = 1500 }) => {
                         !!errors.lnt_charges?.mobile_number ||
                         hasSentOTPOnce
                       }
-                      hideOTPButton={!hasSentOTPOnce}
+                      hideOTPButton={hasSentOTPOnce}
                       disabled={disablePhoneNumber}
                       buttonLabel='Send Link'
                       onBlur={(e) => {
