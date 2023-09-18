@@ -3,7 +3,7 @@ import TextInputWithSendOtp from '../../components/TextInput/TextInputWithSendOt
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
 import { OtpInput, ToastMessage, Button } from '../../components';
-import { getLoginOtp, logout, verifyLoginOtp } from '../../global';
+import { getAllLoanOfficers, getLoginOtp, logout, verifyLoginOtp } from '../../global';
 import otpVerified from '../../assets/icons/otp-verified.svg';
 import DynamicDrawer from '../../components/SwipeableDrawer/DynamicDrawer';
 import { Header } from '../../components';
@@ -60,10 +60,24 @@ export default function Login() {
   }, []);
 
   const sendMobileOtp = async () => {
+    const officers = await getAllLoanOfficers();
+
+    const user_exists = officers.find((user) => {
+      return user.username === values.username;
+    });
+
+    if (!user_exists) {
+      setFieldError('username', 'User with this number does not exists');
+      return;
+    }
+
     setDisablePhoneNumber(true);
-    setShowOTPInput(true);
     setHasSentOTPOnce(true);
-    getLoginOtp(values.username);
+    setShowOTPInput(true);
+
+    const res = await getLoginOtp(values.username);
+    if (!res) return;
+
     setToastMessage('OTP has been sent to the mobile number');
   };
 
