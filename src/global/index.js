@@ -1,6 +1,7 @@
 import { reference } from '@popperjs/core';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import { func } from 'prop-types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://lo.scotttiger.in/api';
 
@@ -61,6 +62,11 @@ async function logout(status, options) {
 
 async function testLogout(options) {
   const res = await axios.post(`${API_URL}/session/check-auth/login`, {}, options);
+  return res.data;
+}
+
+async function getAllLoanOfficers() {
+  const res = await axios.get(`${API_URL}/account`, requestOptions);
   return res.data;
 }
 
@@ -195,12 +201,9 @@ export async function doesLnTChargesExist(leadId, values) {
 }
 
 export async function editLnTCharges(id, values) {
-  const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`,
-    values,
-  );
+  const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, values);
   return data;
 }
-
 
 export async function makePaymentByCash(id, values) {
   try {
@@ -208,7 +211,7 @@ export async function makePaymentByCash(id, values) {
       extra_params: {
         method: 'Cash',
         status: 'success',
-      }
+      },
     });
     return data;
   } catch (err) {
@@ -218,14 +221,12 @@ export async function makePaymentByCash(id, values) {
 
 export async function makePaymentByLink(id, values) {
   try {
-    const { data } = await axios.post(`${API_URL}/lt-charges/invoice-create/${id}`, values)
+    const { data } = await axios.post(`${API_URL}/lt-charges/invoice-create/${id}`, values);
     return data;
   } catch (err) {
-    console.log(err)
-
+    console.log(err);
   }
 }
-
 
 export {
   API_URL,
@@ -249,4 +250,5 @@ export {
   verifyLoginOtp,
   logout,
   testLogout,
+  getAllLoanOfficers,
 };
