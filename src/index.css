@@ -184,6 +184,10 @@ body {
   visibility: visible !important;
 }
 
+.swipeableDrawerSteps {
+  z-index: 900 !important;
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;

@@ -108,7 +108,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       ) {
         if (
           e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
-          values?.applicants[activeIndex]?.personal_details?.id_type === 'Aadhar'
+          values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR'
         ) {
           let aadharPattern = /^\d$/;
           if (aadharPattern.exec(value[value.length - 1])) {
@@ -122,7 +122,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         } else if (
           e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
-          values?.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Aadhar'
+          values?.applicants[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR'
         ) {
           let aadharPattern = /^\d$/;
           if (aadharPattern.exec(value[value.length - 1])) {

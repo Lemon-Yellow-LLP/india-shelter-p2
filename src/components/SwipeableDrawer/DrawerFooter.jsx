@@ -7,7 +7,7 @@ export default function DrawerFooter() {
   const { currentStepIndex, stepsProgress, drawerOpen, setDrawerOpen } = useContext(LeadContext);
 
   return (
-    <div className='flex justify-between p-4 pt-3 rounded-t-2xl bg-white w-full border-solid border fixed bottom-0 z-[5000]'>
+    <div className='flex justify-between p-4 pt-3 rounded-t-2xl bg-white w-full border-solid border fixed bottom-0 z-[1000]'>
       <div className='flex flex-col'>
         <span style={{ fontSize: '10px', fontWeight: '500', lineHeight: '15px', color: '#E33439' }}>
           STEP: {currentStepIndex + 1}/{stepsProgress.length}

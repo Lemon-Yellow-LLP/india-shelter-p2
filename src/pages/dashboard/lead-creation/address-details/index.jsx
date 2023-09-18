@@ -75,7 +75,7 @@ const AddressDetails = () => {
 
   const handleRadioChange = useCallback(
     (e) => {
-      setFieldValue('addressSchema.' + e.name, e.value);
+      setFieldValue('address_details.' + e.name, e.value);
 
       editAddressById(TEST_ADDRESS_ID, {
         // 'type_of_residence' is named as 'current_type_of_residence' in db
@@ -83,12 +83,12 @@ const AddressDetails = () => {
       });
 
       if (
-        values.addressSchema.extra_params.permanent_address_same_as_current &&
+        values.address_details.extra_params.permanent_address_same_as_current &&
         e.name === 'current_no_of_year_residing'
       ) {
-        setFieldValue('addressSchema.permanent_no_of_year_residing', e.value);
+        setFieldValue('address_details.permanent_no_of_year_residing', e.value);
         editAddressById(TEST_ADDRESS_ID, {
-          permanent_no_of_year_residing: values.addressSchema.current_no_of_year_residing,
+          permanent_no_of_year_residing: values.address_details.current_no_of_year_residing,
         });
       }
 
@@ -104,14 +104,14 @@ const AddressDetails = () => {
 
   const handleCurrentPincodeChange = useCallback(async () => {
     if (
-      !values.addressSchema.current_pincode ||
-      values.addressSchema.current_pincode.toString().length < 5
+      !values.address_details.current_pincode ||
+      values.address_details.current_pincode.toString().length < 5
     )
       return;
 
-    const res = await checkIsValidStatePincode(values.addressSchema.current_pincode);
+    const res = await checkIsValidStatePincode(values.address_details.current_pincode);
     if (!res) {
-      setFieldError('addressSchema.current_pincode', 'Invalid Pincode');
+      setFieldError('address_details.current_pincode', 'Invalid Pincode');
       return;
     }
 
@@ -120,17 +120,17 @@ const AddressDetails = () => {
       current_state: res.state,
     });
 
-    setFieldValue('addressSchema.current_city', res.city);
-    setFieldValue('addressSchema.current_state', res.state);
+    setFieldValue('address_details.current_city', res.city);
+    setFieldValue('address_details.current_state', res.state);
 
-    if (values.addressSchema.extra_params.permanent_address_same_as_current) {
+    if (values.address_details.extra_params.permanent_address_same_as_current) {
       editAddressById(TEST_ADDRESS_ID, {
         permanent_city: res.city,
         permanent_state: res.state,
       });
 
-      setFieldValue('addressSchema.permanent_city', res.city);
-      setFieldValue('addressSchema.permanent_state', res.state);
+      setFieldValue('address_details.permanent_city', res.city);
+      setFieldValue('address_details.permanent_state', res.state);
     }
 
     if (!requiredFieldsStatus['current_pincode']) {
@@ -138,72 +138,72 @@ const AddressDetails = () => {
       setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: true }));
     }
   }, [
-    errors.addressSchema?.current_pincode,
-    values.addressSchema?.current_pincode,
+    errors.address_details?.current_pincode,
+    values.address_details?.current_pincode,
     setFieldError,
     setFieldValue,
     requiredFieldsStatus,
   ]);
 
   useEffect(() => {
-    if (values.addressSchema.extra_params?.permanent_address_same_as_current) {
+    if (values.address_details.extra_params?.permanent_address_same_as_current) {
       setFieldValue(
-        'addressSchema.permanent_flat_no_building_name',
-        values.addressSchema.current_flat_no_building_name,
+        'address_details.permanent_flat_no_building_name',
+        values.address_details.current_flat_no_building_name,
       );
       setFieldValue(
-        'addressSchema.permanent_street_area_locality',
-        values.addressSchema.current_street_area_locality,
+        'address_details.permanent_street_area_locality',
+        values.address_details.current_street_area_locality,
       );
-      setFieldValue('addressSchema.permanent_town', values.addressSchema.current_town);
-      setFieldValue('addressSchema.permanent_landmark', values.addressSchema.current_landmark);
-      setFieldValue('addressSchema.permanent_pincode', values.addressSchema.current_pincode);
-      setFieldValue('addressSchema.permanent_city', values.addressSchema.current_city);
-      setFieldValue('addressSchema.permanent_state', values.addressSchema.current_state);
+      setFieldValue('address_details.permanent_town', values.address_details.current_town);
+      setFieldValue('address_details.permanent_landmark', values.address_details.current_landmark);
+      setFieldValue('address_details.permanent_pincode', values.address_details.current_pincode);
+      setFieldValue('address_details.permanent_city', values.address_details.current_city);
+      setFieldValue('address_details.permanent_state', values.address_details.current_state);
       setFieldValue(
-        'addressSchema.permanent_no_of_year_residing',
-        values.addressSchema.current_no_of_year_residing,
+        'address_details.permanent_no_of_year_residing',
+        values.address_details.current_no_of_year_residing,
       );
     } else {
-      setFieldValue('addressSchema.permanent_flat_no_building_name', '');
-      setFieldValue('addressSchema.permanent_street_area_locality', '');
-      setFieldValue('addressSchema.permanent_town', '');
-      setFieldValue('addressSchema.permanent_landmark', '');
-      setFieldValue('addressSchema.permanent_pincode', '');
-      setFieldValue('addressSchema.permanent_city', '');
-      setFieldValue('addressSchema.permanent_state', '');
-      setFieldValue('addressSchema.permanent_no_of_year_residing', null);
+      setFieldValue('address_details.permanent_flat_no_building_name', '');
+      setFieldValue('address_details.permanent_street_area_locality', '');
+      setFieldValue('address_details.permanent_town', '');
+      setFieldValue('address_details.permanent_landmark', '');
+      setFieldValue('address_details.permanent_pincode', '');
+      setFieldValue('address_details.permanent_city', '');
+      setFieldValue('address_details.permanent_state', '');
+      setFieldValue('address_details.permanent_no_of_year_residing', null);
     }
-    if (values.addressSchema.type_of_residence) {
+    if (values.address_details.type_of_residence) {
       editAddressById(TEST_ADDRESS_ID, {
-        permanent_flat_no_building_name: values.addressSchema.current_flat_no_building_name,
-        permanent_street_area_locality: values.addressSchema.current_street_area_locality,
-        permanent_town: values.addressSchema.current_town,
-        permanent_landmark: values.addressSchema.current_landmark,
-        permanent_pincode: values.addressSchema.current_pincode,
-        permanent_city: values.addressSchema.current_city,
-        permanent_state: values.addressSchema.current_state,
-        permanent_no_of_year_residing: values.addressSchema.current_no_of_year_residing,
+        permanent_flat_no_building_name: values.address_details.current_flat_no_building_name,
+        permanent_street_area_locality: values.address_details.current_street_area_locality,
+        permanent_town: values.address_details.current_town,
+        permanent_landmark: values.address_details.current_landmark,
+        permanent_pincode: values.address_details.current_pincode,
+        permanent_city: values.address_details.current_city,
+        permanent_state: values.address_details.current_state,
+        permanent_no_of_year_residing: values.address_details.current_no_of_year_residing,
       });
     }
-  }, [values.addressSchema.extra_params.permanent_address_same_as_current]);
+  }, [values.address_details.extra_params.permanent_address_same_as_current]);
 
   useEffect(() => {
-    if (values.addressSchema.type_of_residence === 'Rented') {
-      setFieldValue('addressSchema.extra_params.permanent_address_same_as_current', false);
+    if (values.address_details.type_of_residence === 'Rented') {
+      setFieldValue('address_details.extra_params.permanent_address_same_as_current', false);
     }
-  }, [values.addressSchema.type_of_residence]);
+  }, [values.address_details.type_of_residence]);
 
   const handlePermanentPincodeChange = useCallback(async () => {
     if (
-      !values.addressSchema.permanent_pincode ||
-      values.addressSchema.permanent_pincode.toString().length < 5
+      !values.address_details.permanent_pincode ||
+      values.address_details.permanent_pincode.toString().length < 5
     )
       return;
 
-    const res = await checkIsValidStatePincode(values.addressSchema.permanent_pincode);
+    const res = await checkIsValidStatePincode(values.address_details.permanent_pincode);
     if (!res) {
-      setFieldError('addressSchema.permanent_pincode', 'Invalid Pincode');
+      setFieldError('address_details.permanent_pincode', 'Invalid Pincode');
       return;
     }
 
@@ -212,16 +212,16 @@ const AddressDetails = () => {
       permanent_state: res.state,
     });
 
-    setFieldValue('addressSchema.permanent_city', res.city);
-    setFieldValue('addressSchema.permanent_state', res.state);
+    setFieldValue('address_details.permanent_city', res.city);
+    setFieldValue('address_details.permanent_state', res.state);
 
     if (!requiredFieldsStatus['permanent_pincode']) {
       updateProgress(2, requiredFieldsStatus);
       setRequiredFieldsStatus((prev) => ({ ...prev, ['permanent_pincode']: true }));
     }
   }, [
-    errors.addressSchema?.permanent_pincode,
-    values.addressSchema?.permanent_pincode,
+    errors.address_details?.permanent_pincode,
+    values.address_details?.permanent_pincode,
     setFieldError,
     setFieldValue,
     requiredFieldsStatus,
@@ -247,7 +247,7 @@ const AddressDetails = () => {
               label={residence.label}
               name='type_of_residence'
               value={residence.value}
-              current={values.addressSchema.type_of_residence}
+              current={values.address_details.type_of_residence}
               onChange={handleRadioChange}
             >
               {residence.icon}
@@ -256,7 +256,7 @@ const AddressDetails = () => {
         </div>
       </div>
 
-      {values.addressSchema.type_of_residence ? (
+      {values.address_details.type_of_residence ? (
         <>
           {/* Current Address */}
           <label
@@ -270,31 +270,31 @@ const AddressDetails = () => {
             label='Flat no/Building name'
             placeholder='Eg: C-101'
             required
-            name='addressSchema.current_flat_no_building_name'
-            value={values.addressSchema.current_flat_no_building_name}
-            error={errors.addressSchema?.current_flat_no_building_name}
-            touched={touched.addressSchema?.current_flat_no_building_name}
+            name='address_details.current_flat_no_building_name'
+            value={values.address_details.current_flat_no_building_name}
+            error={errors.address_details?.current_flat_no_building_name}
+            touched={touched.address_details?.current_flat_no_building_name}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.addressSchema?.current_flat_no_building_name &&
-                values.addressSchema.current_flat_no_building_name
+                !errors.address_details?.current_flat_no_building_name &&
+                values.address_details.current_flat_no_building_name
               ) {
-                if (values.addressSchema.extra_params.permanent_address_same_as_current) {
+                if (values.address_details.extra_params.permanent_address_same_as_current) {
                   setFieldValue(
-                    'addressSchema.permanent_flat_no_building_name',
-                    values.addressSchema.current_flat_no_building_name,
+                    'address_details.permanent_flat_no_building_name',
+                    values.address_details.current_flat_no_building_name,
                   );
                   editAddressById(TEST_ADDRESS_ID, {
                     current_flat_no_building_name:
-                      values.addressSchema.current_flat_no_building_name,
+                      values.address_details.current_flat_no_building_name,
                     permanent_flat_no_building_name:
-                      values.addressSchema.current_flat_no_building_name,
+                      values.address_details.current_flat_no_building_name,
                   });
                 } else {
                   editAddressById(TEST_ADDRESS_ID, {
                     current_flat_no_building_name:
-                      values.addressSchema.current_flat_no_building_name,
+                      values.address_details.current_flat_no_building_name,
                   });
                 }
               }
@@ -320,29 +320,31 @@ const AddressDetails = () => {
             label='Street/Area/Locality'
             placeholder='Eg: Senapati road'
             required
-            name='addressSchema.current_street_area_locality'
-            value={values.addressSchema.current_street_area_locality}
-            error={errors.addressSchema?.current_street_area_locality}
-            touched={touched.addressSchema?.current_street_area_locality}
+            name='address_details.current_street_area_locality'
+            value={values.address_details.current_street_area_locality}
+            error={errors.address_details?.current_street_area_locality}
+            touched={touched.address_details?.current_street_area_locality}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.addressSchema?.current_street_area_locality &&
-                values.addressSchema.current_street_area_locality
+                !errors.address_details?.current_street_area_locality &&
+                values.address_details.current_street_area_locality
               ) {
-                if (values.addressSchema.extra_params.permanent_address_same_as_current) {
+                if (values.address_details.extra_params.permanent_address_same_as_current) {
                   setFieldValue(
-                    'addressSchema.permanent_street_area_locality',
-                    values.addressSchema.current_street_area_locality,
+                    'address_details.permanent_street_area_locality',
+                    values.address_details.current_street_area_locality,
                   );
                   editAddressById(TEST_ADDRESS_ID, {
-                    current_street_area_locality: values.addressSchema.current_street_area_locality,
+                    current_street_area_locality:
+                      values.address_details.current_street_area_locality,
                     permanent_street_area_locality:
-                      values.addressSchema.current_street_area_locality,
+                      values.address_details.current_street_area_locality,
                   });
                 } else {
                   editAddressById(TEST_ADDRESS_ID, {
-                    current_street_area_locality: values.addressSchema.current_street_area_locality,
+                    current_street_area_locality:
+                      values.address_details.current_street_area_locality,
                   });
                 }
               }
@@ -368,22 +370,25 @@ const AddressDetails = () => {
             label='Town'
             placeholder='Eg: Igatpuri'
             required
-            name='addressSchema.current_town'
-            value={values.addressSchema.current_town}
-            error={errors.addressSchema?.current_town}
-            touched={touched.addressSchema?.current_town}
+            name='address_details.current_town'
+            value={values.address_details.current_town}
+            error={errors.address_details?.current_town}
+            touched={touched.address_details?.current_town}
             onBlur={(e) => {
               handleBlur(e);
-              if (!errors.addressSchema?.current_town && values.addressSchema.current_town) {
-                if (values.addressSchema.extra_params.permanent_address_same_as_current) {
-                  setFieldValue('addressSchema.permanent_town', values.addressSchema.current_town);
+              if (!errors.address_details?.current_town && values.address_details.current_town) {
+                if (values.address_details.extra_params.permanent_address_same_as_current) {
+                  setFieldValue(
+                    'address_details.permanent_town',
+                    values.address_details.current_town,
+                  );
                   editAddressById(TEST_ADDRESS_ID, {
-                    current_town: values.addressSchema.current_town,
-                    permanent_town: values.addressSchema.current_town,
+                    current_town: values.address_details.current_town,
+                    permanent_town: values.address_details.current_town,
                   });
                 } else {
                   editAddressById(TEST_ADDRESS_ID, {
-                    current_town: values.addressSchema.current_town,
+                    current_town: values.address_details.current_town,
                   });
                 }
               }
@@ -409,28 +414,28 @@ const AddressDetails = () => {
             label='Landmark'
             placeholder='Eg: Near apollo hospital'
             required
-            name='addressSchema.current_landmark'
-            value={values.addressSchema.current_landmark}
-            error={errors.addressSchema?.current_landmark}
-            touched={touched.addressSchema?.current_landmark}
+            name='address_details.current_landmark'
+            value={values.address_details.current_landmark}
+            error={errors.address_details?.current_landmark}
+            touched={touched.address_details?.current_landmark}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.addressSchema?.current_landmark &&
-                values.addressSchema.current_landmark
+                !errors.address_details?.current_landmark &&
+                values.address_details.current_landmark
               ) {
-                if (values.addressSchema.extra_params.permanent_address_same_as_current) {
+                if (values.address_details.extra_params.permanent_address_same_as_current) {
                   setFieldValue(
-                    'addressSchema.permanent_landmark',
-                    values.addressSchema.current_landmark,
+                    'address_details.permanent_landmark',
+                    values.address_details.current_landmark,
                   );
                   editAddressById(TEST_ADDRESS_ID, {
-                    current_landmark: values.addressSchema.current_landmark,
-                    permanent_landmark: values.addressSchema.current_landmark,
+                    current_landmark: values.address_details.current_landmark,
+                    permanent_landmark: values.address_details.current_landmark,
                   });
                 } else {
                   editAddressById(TEST_ADDRESS_ID, {
-                    current_landmark: values.addressSchema.current_landmark,
+                    current_landmark: values.address_details.current_landmark,
                   });
                 }
               }
@@ -456,12 +461,12 @@ const AddressDetails = () => {
             label='Pincode'
             placeholder='Eg: 123456'
             required
-            name='addressSchema.current_pincode'
+            name='address_details.current_pincode'
             type='tel'
             // hint='City and State fields will get filled based on Pincode'
-            value={values.addressSchema.current_pincode}
-            error={errors.addressSchema?.current_pincode}
-            touched={touched.addressSchema?.current_pincode}
+            value={values.address_details.current_pincode}
+            error={errors.address_details?.current_pincode}
+            touched={touched.address_details?.current_pincode}
             disabled={inputDisabled}
             onBlur={(e) => {
               handleBlur(e);
@@ -514,13 +519,13 @@ const AddressDetails = () => {
           <TextInput
             label='City'
             placeholder='Eg: Nashik'
-            name='addressSchema.current_city'
-            value={values.addressSchema.current_city}
-            error={errors.addressSchema?.current_city}
-            touched={touched.addressSchema?.current_city}
+            name='address_details.current_city'
+            value={values.address_details.current_city}
+            error={errors.address_details?.current_city}
+            touched={touched.address_details?.current_city}
             onBlur={handleBlur}
             disabled={true}
-            labelDisabled={!values.addressSchema.current_city}
+            labelDisabled={!values.address_details.current_city}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -528,13 +533,13 @@ const AddressDetails = () => {
           <TextInput
             label='State'
             placeholder='Eg: Maharashtra'
-            name='addressSchema.current_state'
-            value={values.addressSchema.current_state}
-            error={errors.addressSchema?.current_state}
-            touched={touched.addressSchema?.current_state}
+            name='address_details.current_state'
+            value={values.address_details.current_state}
+            error={errors.address_details?.current_state}
+            touched={touched.address_details?.current_state}
             onBlur={handleBlur}
             disabled={true}
-            labelDisabled={!values.addressSchema.current_state}
+            labelDisabled={!values.address_details.current_state}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -553,12 +558,12 @@ const AddressDetails = () => {
                   key={index}
                   name='current_no_of_year_residing'
                   value={data.value}
-                  current={values.addressSchema.current_no_of_year_residing}
+                  current={values.address_details.current_no_of_year_residing}
                   onChange={handleRadioChange}
                 >
                   <span
                     className={`${
-                      index == values.addressSchema.current_no_of_year_residing
+                      index == values.address_details.current_no_of_year_residing
                         ? 'text-secondary-green font-semibold'
                         : 'text-primary-black font-normal'
                     }`}
@@ -569,15 +574,15 @@ const AddressDetails = () => {
               ))}
             </div>
           </div>
-          {values.addressSchema.type_of_residence === 'Self owned' ? (
+          {values.address_details.type_of_residence === 'Self owned' ? (
             <div className='flex items-center gap-2 mt-6'>
               <Checkbox
-                checked={values.addressSchema.extra_params.permanent_address_same_as_current}
+                checked={values.address_details.extra_params.permanent_address_same_as_current}
                 name='permanent_address_same_as_current'
                 onChange={(e) => {
                   let isChecked = !!e.target.checked;
                   setFieldValue(
-                    'addressSchema.extra_params.permanent_address_same_as_current',
+                    'address_details.extra_params.permanent_address_same_as_current',
                     isChecked,
                   );
                   editAddressById(TEST_ADDRESS_ID, {
@@ -586,7 +591,7 @@ const AddressDetails = () => {
                     },
                   });
                 }}
-                disabled={values.addressSchema.type_of_residence !== 'Self owned'}
+                disabled={values.address_details.type_of_residence !== 'Self owned'}
               />
 
               <span className='text-[#373435] text-xs font-normal'>
@@ -607,24 +612,24 @@ const AddressDetails = () => {
             label='Flat no/Building name'
             placeholder='Eg: C-101'
             required
-            name='addressSchema.permanent_flat_no_building_name'
-            value={values.addressSchema.permanent_flat_no_building_name}
-            error={errors.addressSchema?.permanent_flat_no_building_name}
-            touched={touched.addressSchema?.permanent_flat_no_building_name}
+            name='address_details.permanent_flat_no_building_name'
+            value={values.address_details.permanent_flat_no_building_name}
+            error={errors.address_details?.permanent_flat_no_building_name}
+            touched={touched.address_details?.permanent_flat_no_building_name}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.addressSchema?.permanent_flat_no_building_name &&
-                values.addressSchema.permanent_flat_no_building_name
+                !errors.address_details?.permanent_flat_no_building_name &&
+                values.address_details.permanent_flat_no_building_name
               ) {
                 editAddressById(TEST_ADDRESS_ID, {
                   permanent_flat_no_building_name:
-                    values.addressSchema.permanent_flat_no_building_name,
+                    values.address_details.permanent_flat_no_building_name,
                 });
               }
             }}
             disabled={
-              inputDisabled || values.addressSchema.extra_params.permanent_address_same_as_current
+              inputDisabled || values.address_details.extra_params.permanent_address_same_as_current
             }
             onChange={(e) => {
               const value = e.currentTarget.value;
@@ -646,24 +651,24 @@ const AddressDetails = () => {
             label='Street/Area/Locality'
             placeholder='Eg: Senapati road'
             required
-            name='addressSchema.permanent_street_area_locality'
-            value={values.addressSchema.permanent_street_area_locality}
-            error={errors.addressSchema?.permanent_street_area_locality}
-            touched={touched.addressSchema?.permanent_street_area_locality}
+            name='address_details.permanent_street_area_locality'
+            value={values.address_details.permanent_street_area_locality}
+            error={errors.address_details?.permanent_street_area_locality}
+            touched={touched.address_details?.permanent_street_area_locality}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.addressSchema?.permanent_street_area_locality &&
-                values.addressSchema.permanent_street_area_locality
+                !errors.address_details?.permanent_street_area_locality &&
+                values.address_details.permanent_street_area_locality
               ) {
                 editAddressById(TEST_ADDRESS_ID, {
                   permanent_street_area_locality:
-                    values.addressSchema.permanent_street_area_locality,
+                    values.address_details.permanent_street_area_locality,
                 });
               }
             }}
             disabled={
-              inputDisabled || values.addressSchema.extra_params.permanent_address_same_as_current
+              inputDisabled || values.address_details.extra_params.permanent_address_same_as_current
             }
             onChange={(e) => {
               const value = e.currentTarget.value;
@@ -685,20 +690,23 @@ const AddressDetails = () => {
             label='Town'
             placeholder='Eg: Igatpuri'
             required
-            name='addressSchema.permanent_town'
-            value={values.addressSchema.permanent_town}
-            error={errors.addressSchema?.permanent_town}
-            touched={touched.addressSchema?.permanent_town}
+            name='address_details.permanent_town'
+            value={values.address_details.permanent_town}
+            error={errors.address_details?.permanent_town}
+            touched={touched.address_details?.permanent_town}
             onBlur={(e) => {
               handleBlur(e);
-              if (!errors.addressSchema?.permanent_town && values.addressSchema.permanent_town) {
+              if (
+                !errors.address_details?.permanent_town &&
+                values.address_details.permanent_town
+              ) {
                 editAddressById(TEST_ADDRESS_ID, {
-                  permanent_town: values.addressSchema.permanent_town,
+                  permanent_town: values.address_details.permanent_town,
                 });
               }
             }}
             disabled={
-              inputDisabled || values.addressSchema.extra_params.permanent_address_same_as_current
+              inputDisabled || values.address_details.extra_params.permanent_address_same_as_current
             }
             onChange={(e) => {
               const value = e.currentTarget.value;
@@ -720,23 +728,23 @@ const AddressDetails = () => {
             label='Landmark'
             placeholder='Eg: Near apollo hospital'
             required
-            name='addressSchema.permanent_landmark'
-            value={values.addressSchema.permanent_landmark}
-            error={errors.addressSchema?.permanent_landmark}
-            touched={touched.addressSchema?.permanent_landmark}
+            name='address_details.permanent_landmark'
+            value={values.address_details.permanent_landmark}
+            error={errors.address_details?.permanent_landmark}
+            touched={touched.address_details?.permanent_landmark}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.addressSchema?.permanent_landmark &&
-                values.addressSchema.permanent_landmark
+                !errors.address_details?.permanent_landmark &&
+                values.address_details.permanent_landmark
               ) {
                 editAddressById(TEST_ADDRESS_ID, {
-                  permanent_landmark: values.addressSchema.permanent_landmark,
+                  permanent_landmark: values.address_details.permanent_landmark,
                 });
               }
             }}
             disabled={
-              inputDisabled || values.addressSchema.extra_params.permanent_address_same_as_current
+              inputDisabled || values.address_details.extra_params.permanent_address_same_as_current
             }
             onChange={(e) => {
               const value = e.currentTarget.value;
@@ -758,14 +766,14 @@ const AddressDetails = () => {
             label='Pincode'
             placeholder='Eg: 123456'
             required
-            name='addressSchema.permanent_pincode'
+            name='address_details.permanent_pincode'
             type='tel'
             hint='City and State fields will get filled based on Pincode'
-            value={values.addressSchema.permanent_pincode}
-            error={errors.addressSchema?.permanent_pincode}
-            touched={touched.addressSchema?.permanent_pincode}
+            value={values.address_details.permanent_pincode}
+            error={errors.address_details?.permanent_pincode}
+            touched={touched.address_details?.permanent_pincode}
             disabled={
-              inputDisabled || values.addressSchema.extra_params.permanent_address_same_as_current
+              inputDisabled || values.address_details.extra_params.permanent_address_same_as_current
             }
             onBlur={(e) => {
               handleBlur(e);
@@ -818,13 +826,13 @@ const AddressDetails = () => {
           <TextInput
             label='City'
             placeholder='Eg: Nashik'
-            name='addressSchema.permanent_city'
-            value={values.addressSchema.permanent_city}
-            error={errors.addressSchema?.permanent_city}
-            touched={touched.addressSchema?.permanent_city}
+            name='address_details.permanent_city'
+            value={values.address_details.permanent_city}
+            error={errors.address_details?.permanent_city}
+            touched={touched.address_details?.permanent_city}
             onBlur={handleBlur}
             disabled={true}
-            labelDisabled={!values.addressSchema.permanent_city}
+            labelDisabled={!values.address_details.permanent_city}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -832,13 +840,13 @@ const AddressDetails = () => {
           <TextInput
             label='State'
             placeholder='Eg: Maharashtra'
-            name='addressSchema.permanent_state'
-            value={values.addressSchema.permanent_state}
-            error={errors.addressSchema?.permanent_state}
-            touched={touched.addressSchema?.permanent_state}
+            name='address_details.permanent_state'
+            value={values.address_details.permanent_state}
+            error={errors.address_details?.permanent_state}
+            touched={touched.address_details?.permanent_state}
             onBlur={handleBlur}
             disabled={true}
-            labelDisabled={!values.addressSchema.permanent_state}
+            labelDisabled={!values.address_details.permanent_state}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -857,14 +865,14 @@ const AddressDetails = () => {
                   key={index}
                   name='permanent_no_of_year_residing'
                   value={data.value}
-                  current={values.addressSchema.permanent_no_of_year_residing}
+                  current={values.address_details.permanent_no_of_year_residing}
                   onChange={handleRadioChange}
-                  disabled={values.addressSchema.extra_params.permanent_address_same_as_current}
+                  disabled={values.address_details.extra_params.permanent_address_same_as_current}
                 >
                   <span
                     className={`${
-                      index == values.addressSchema.permanent_no_of_year_residing
-                        ? values.addressSchema.extra_params.permanent_address_same_as_current
+                      index == values.address_details.permanent_no_of_year_residing
+                        ? values.address_details.extra_params.permanent_address_same_as_current
                           ? 'text-[#373435] font-semibold'
                           : 'text-secondary-green font-semibold'
                         : ''

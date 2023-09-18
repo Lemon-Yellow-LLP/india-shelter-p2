@@ -96,6 +96,7 @@ export default function SwipeableDrawerComponent() {
         ModalProps={{
           keepMounted: true,
         }}
+        className='swipeableDrawerSteps'
       >
         <StyledBox
           sx={{

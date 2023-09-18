@@ -13,6 +13,8 @@ const LeadContextProvider = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isExisting, setIsExisting] = useState(true);
+  const [existingData, setExistingData] = useState({});
 
   const [stepsProgress, setStepProgress] = useState([
     {
@@ -177,6 +179,10 @@ const LeadContextProvider = ({ children }) => {
         setToastMessage,
         activeIndex,
         setActiveIndex,
+        isExisting,
+        setIsExisting,
+        existingData,
+        setExistingData,
       }}
     >
       {children}

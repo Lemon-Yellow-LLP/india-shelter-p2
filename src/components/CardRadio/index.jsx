@@ -8,9 +8,9 @@ const CardRadio = memo(({ label, current, children, value, onChange, name, disab
   const getThemes = () => {
     if (disabled) {
       if (current === value) {
-        return 'bg-disabled-grey border-stroke stroke-light-grey';
+        return 'bg-disabled-grey border-stroke stroke-black';
       }
-      return 'opacity-60';
+      // return 'opacity-60';
     }
 
     if (current === value) {
@@ -43,7 +43,9 @@ transition-all duration-300 ease-out`}
           className={`text-center text-xs  leading-normal
         ${
           current === value
-            ? 'text-secondary-green font-semibold'
+            ? disabled
+              ? 'text-black font-semibold'
+              : 'text-secondary-green font-semibold'
             : 'text-primary-black font-normal'
         } transition-colors ease-out duration-300`}
         >

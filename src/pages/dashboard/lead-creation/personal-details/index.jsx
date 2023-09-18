@@ -9,8 +9,18 @@ import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer'
 import { Button } from '../../../../components';
 
 const PersonalDetails = memo(() => {
-  const { values, updateProgress, errors, touched, setFieldValue, activeIndex, setActiveIndex } =
-    useContext(LeadContext);
+  const {
+    values,
+    updateProgress,
+    errors,
+    touched,
+    setFieldValue,
+    activeIndex,
+    setActiveIndex,
+    isExisting,
+    existingData,
+    setValues,
+  } = useContext(LeadContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     how_would_you_like_to_proceed: false,
@@ -30,7 +40,7 @@ const PersonalDetails = memo(() => {
     qualification: false,
   });
 
-  const [openExistingPopup, setOpenExistingPopup] = useState(true);
+  const [openExistingPopup, setOpenExistingPopup] = useState(isExisting);
 
   const updateFields = async (name, value) => {
     let newData = {};
@@ -74,6 +84,61 @@ const PersonalDetails = memo(() => {
 
   const handleNextClick = () => {
     updateFields();
+  };
+
+  const handleAutofill = async () => {
+    const fillData = { ...values.applicants?.[activeIndex]?.applicant_details };
+
+    const {
+      existing_customer_id_type,
+      existing_customer_id_number,
+
+      existing_customer_selected_address_proof,
+      existing_customer_address_proof_number,
+
+      existing_customer_first_name,
+      existing_customer_middle_name,
+      existing_customer_last_name,
+
+      existing_customer_gender,
+      existing_customer_father_husband_name,
+      existing_customer_mother_name,
+    } = fillData;
+
+    const mappedData = {
+      id_type: existing_customer_id_type,
+      id_number: existing_customer_id_number,
+      selected_address_proof: existing_customer_selected_address_proof,
+      address_proof_number: existing_customer_address_proof_number,
+      first_name: existing_customer_first_name,
+      middle_name: existing_customer_middle_name,
+      last_name: existing_customer_last_name,
+      gender: existing_customer_gender,
+      father_husband_name: existing_customer_father_husband_name,
+      mother_name: existing_customer_mother_name,
+    };
+
+    let finalData = { ...values };
+
+    finalData.applicants[activeIndex].personal_details = {
+      ...finalData.applicants[activeIndex].personal_details,
+      ...mappedData,
+    };
+
+    setValues(finalData);
+
+    if (values?.applicants[activeIndex]?.personal_details?.id) {
+      const res = await editFieldsById(
+        values?.applicants[activeIndex]?.personal_details?.id,
+        'personal',
+        mappedData,
+      );
+    } else {
+      const res = await addApi('personal', mappedData);
+      setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
+    }
+
+    setOpenExistingPopup(false);
   };
 
   return (
@@ -147,107 +212,122 @@ const PersonalDetails = memo(() => {
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>ID Type**</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.id_type}
+                {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_id_type}
               </span>
             </div>
 
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>ID Number**</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.id_number}
+                {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_id_number}
               </span>
             </div>
 
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Address proof**</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.selected_address_proof}
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_selected_address_proof
+                }
               </span>
             </div>
 
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Address proof number**</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.address_proof_number}
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_address_proof_number
+                }
               </span>
             </div>
 
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>First name**</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.first_name}
+                {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_first_name}
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Middle name</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.middle_name}
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_middle_name
+                }
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Last name</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.last_name}
+                {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_last_name}
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Gender</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.gender}
+                {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_gender}
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Date of birth</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.date_of_birth}
+                {values?.applicants?.[activeIndex]?.personal_details?.date_of_birth}
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Mobile number</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.mobile_number}
+                {values?.applicants?.[activeIndex]?.personal_details?.mobile_number}
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Father/Husband's name</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.father_husband_name}
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_father_husband_name
+                }
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Mother's name</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.mother_name}
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_mother_name
+                }
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Marital status**</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.marital_status}
+                {values?.applicants?.[activeIndex]?.personal_details?.marital_status}
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Religion**</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.religion}
+                {values?.applicants?.[activeIndex]?.personal_details?.religion}
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Preferred Language**</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.preferred_language}
+                {values?.applicants?.[activeIndex]?.personal_details?.preferred_language}
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Qualification**</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.qualification}
+                {values?.applicants?.[activeIndex]?.personal_details?.qualification}
               </span>
             </div>
             <div className='flex justify-between w-full'>
               <span className='w-full text-[12px] text-[#727376]'>Email**</span>
               <span className='w-full text-[12px]'>
-                {values?.applicants[activeIndex]?.personal_details?.email}
+                {values?.applicants?.[activeIndex]?.personal_details?.email}
               </span>
             </div>
           </div>
@@ -258,8 +338,10 @@ const PersonalDetails = memo(() => {
             Would the customer prefer to proceed with the same details?
           </span>
           <div className='w-full flex gap-4 mt-3'>
-            <Button inputClasses='w-full h-[46px]'>No</Button>
-            <Button primary={true} inputClasses=' w-full h-[46px]'>
+            <Button inputClasses='w-full h-[46px]' onClick={() => setOpenExistingPopup(false)}>
+              No
+            </Button>
+            <Button primary={true} inputClasses=' w-full h-[46px]' onClick={handleAutofill}>
               Yes
             </Button>
           </div>

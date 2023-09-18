@@ -41,10 +41,15 @@ const ApplicantDetails = () => {
     handleSubmit,
     activeIndex,
     setActiveIndex,
+    isExisting,
+    setIsExisting,
+    existingData,
+    setExistingData,
+    setValues,
   } = useContext(LeadContext);
   const { lo_id } = useContext(AuthContext);
 
-  const [openExistingPopup, setOpenExistingPopup] = useState(true);
+  const [openExistingPopup, setOpenExistingPopup] = useState(false);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
@@ -280,21 +285,23 @@ const ApplicantDetails = () => {
           ErrorCode: 200,
           body: [
             {
-              // DOB: '',
-              // 'Mobile Number': '9833563411',
-              // Product: 'HL',
               is_existing_customer: 'TRUE',
               pre_approved_amount: '1000000',
+
               id_type: 'PAN',
               id_number: 'AAAPB2117A',
+
               selected_address_proof: 'AADHAR',
               address_proof_number: '654987321659',
+
               first_name: 'SANTOSH YADAV',
               middle_name: '',
               last_name: '',
+
               gender: 'MALE',
               father_husband_name: 'XYZ',
               mother_name: 'XYZ',
+
               current_flat_no_building_name: '12',
               current_street_area_locality: 'Thane',
               current_town: 'Delhi',
@@ -315,6 +322,35 @@ const ApplicantDetails = () => {
           ],
         };
 
+        let {
+          id_type,
+          id_number,
+          selected_address_proof,
+          address_proof_number,
+          first_name,
+          middle_name,
+          last_name,
+          gender,
+          father_husband_name,
+          mother_name,
+        } = body[0];
+
+        let newData = { ...values };
+
+        newData.personal_details = {
+          id_type,
+          id_number,
+          selected_address_proof,
+          address_proof_number,
+          first_name,
+          middle_name,
+          last_name,
+          gender,
+          father_husband_name,
+          mother_name,
+        };
+        setValues(newData);
+        setIsExisting(true);
         console.log('Existing data', body[0]);
       });
     } else {
@@ -348,6 +384,133 @@ const ApplicantDetails = () => {
       });
   };
 
+  //TEst------------
+  const test = async () => {
+    const { body } = {
+      ErrorCode: 200,
+      body: [
+        {
+          is_existing_customer: 'TRUE',
+          pre_approved_amount: '1000000',
+
+          id_type: 'PAN',
+          id_number: 'AAAPB2117A',
+
+          selected_address_proof: 'AADHAR',
+          address_proof_number: '654987321659',
+
+          first_name: 'SANTOSH YADAV',
+          middle_name: 'JHON',
+          last_name: 'DOE',
+
+          gender: 'MALE',
+          father_husband_name: 'XYZ',
+          mother_name: 'XYZ',
+
+          current_flat_no_building_name: '12',
+          current_street_area_locality: 'Thane',
+          current_town: 'Delhi',
+          current_landmark: 'ABC',
+          current_pincode: '421202',
+          current_city: 'Dombivli',
+          current_state: 'Maharashtra',
+          current_no_of_year_residing: '20',
+          permanent_flat_no_building_name: '12',
+          permanent_street_area_locality: 'Thane',
+          permanent_town: 'Delhi',
+          permanent_landmark: 'ABC',
+          permanent_pincode: '421202',
+          permanent_city: 'Dombivli',
+          permanent_state: 'Maharashtra',
+          permanent_no_of_year_residing: '20',
+        },
+      ],
+    };
+
+    let {
+      is_existing_customer,
+      pre_approved_amount,
+      id_type,
+      id_number,
+      selected_address_proof,
+      address_proof_number,
+      first_name,
+      middle_name,
+      last_name,
+      gender,
+      father_husband_name,
+      mother_name,
+      current_flat_no_building_name,
+      current_street_area_locality,
+      current_town,
+      current_landmark,
+      current_pincode,
+      current_city,
+      current_state,
+      current_no_of_year_residing,
+      permanent_flat_no_building_name,
+      permanent_street_area_locality,
+      permanent_town,
+      permanent_landmark,
+      permanent_pincode,
+      permanent_city,
+      permanent_state,
+      permanent_no_of_year_residing,
+    } = body[0];
+
+    let mappedData = {
+      existing_customer_is_existing_customer: is_existing_customer,
+      existing_customer_pre_approved_amount: pre_approved_amount,
+
+      existing_customer_id_type: id_type,
+      existing_customer_id_number: id_number,
+
+      existing_customer_selected_address_proof: selected_address_proof,
+      existing_customer_address_proof_number: address_proof_number,
+
+      existing_customer_first_name: first_name,
+      existing_customer_middle_name: middle_name,
+      existing_customer_last_name: last_name,
+
+      existing_customer_gender: gender,
+      existing_customer_father_husband_name: father_husband_name,
+      existing_customer_mother_name: mother_name,
+
+      existing_customer_current_flat_no_building_name: current_flat_no_building_name,
+      existing_customer_current_street_area_locality: current_street_area_locality,
+      existing_customer_current_town: current_town,
+      existing_customer_current_landmark: current_landmark,
+      existing_customer_current_pincode: current_pincode,
+      existing_customer_current_city: current_city,
+      existing_customer_current_state: current_state,
+      existing_customer_current_no_of_year_residing: current_no_of_year_residing,
+
+      existing_customer_permanent_flat_no_building_name: permanent_flat_no_building_name,
+      existing_customer_permanent_street_area_locality: permanent_street_area_locality,
+      existing_customer_permanent_town: permanent_town,
+      existing_customer_permanent_landmark: permanent_landmark,
+      existing_customer_permanent_pincode: permanent_pincode,
+      existing_customer_permanent_city: permanent_city,
+      existing_customer_permanent_state: permanent_state,
+      existing_customer_permanent_no_of_year_residing: permanent_no_of_year_residing,
+    };
+
+    let newData = { ...values };
+
+    newData.applicants[activeIndex].applicant_details = {
+      ...newData.applicants[activeIndex].applicant_details,
+      ...mappedData,
+    };
+
+    setValues(newData);
+
+    const res = await editFieldsById(
+      values?.applicants[activeIndex]?.applicant_details?.id,
+      'applicant',
+      mappedData,
+    );
+  };
+
   // console.log('values', values.applicants[activeIndex]?.applicant_details);
   console.log('errors', errors?.applicants[activeIndex]);
   console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
@@ -376,6 +539,7 @@ const ApplicantDetails = () => {
                   current={values.lead?.loan_type}
                   onChange={onLoanTypeChange}
                   containerClasses='flex-1'
+                  disabled={!values?.applicants?.[activeIndex].applicant_details.is_primary}
                 >
                   {data.icon}
                 </CardRadio>
@@ -392,7 +556,7 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
             onChange={handleLoanAmountChange}
             displayError={false}
-            disabled={inputDisabled}
+            disabled={!values?.applicants?.[activeIndex].applicant_details.is_primary}
             inputClasses='font-semibold'
           />
 
@@ -403,7 +567,7 @@ const ApplicantDetails = () => {
             initialValue={values.lead?.applied_amount}
             min={100000}
             max={5000000}
-            disabled={inputDisabled}
+            disabled={!values?.applicants?.[activeIndex].applicant_details.is_primary}
             step={50000}
           />
 
@@ -606,6 +770,7 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
             defaultSelected={values.lead?.purpose_of_loan}
             inputClasses='mt-2'
+            disabled={!values?.applicants?.[activeIndex].applicant_details.is_primary}
           />
 
           <DropDown
@@ -626,9 +791,10 @@ const ApplicantDetails = () => {
             touched={touched && touched?.lead?.property_type}
             error={errors && errors?.lead?.property_type}
             onBlur={handleBlur}
+            disabled={!values?.applicants?.[activeIndex].applicant_details.is_primary}
           />
         </div>
-        {/* {errors.applicants[activeIndex]?.applicant_details} */}
+
         <div className='bottom-0 fixed'>
           <PreviousNextButtons
             disablePrevious={true}
@@ -637,20 +803,58 @@ const ApplicantDetails = () => {
               (errors?.applicants && errors.applicants[activeIndex]?.applicant_details) ||
               errors.lead
             }
-            linkNext='/lead/personal-details'
+            onNextClick={
+              isExisting
+                ? () => {
+                    setOpenExistingPopup(true);
+                  }
+                : undefined
+            }
+            linkNext={isExisting ? undefined : '/lead/personal-details'}
           />
         </div>
       </div>
+
+      {console.log(
+        parseInt(
+          values.applicants[activeIndex].applicant_details.existing_customer_pre_approved_amount,
+        ).toLocaleString('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+        }),
+      )}
+
       <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='223px'>
-        <span className='font-normal text-center leading-[21px] text-[16px] text-black'>
-          This is an existing customer and is already pre-approved for a loan upto
-        </span>
-        <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
-          ₹ 10,00,000/-
-        </span>
-        <Button primary={true} inputClasses='w-full h-[46px]' link='/lead/personal-details'>
-          Continue
-        </Button>
+        <div className='z-[6000] h-full w-full flex flex-col'>
+          <span className='font-normal text-center leading-[21px] text-[16px] text-black '>
+            This is an existing customer and is already pre-approved for a loan upto
+          </span>
+          <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
+            {
+              values?.applicants?.[activeIndex]?.applicant_details
+                ?.existing_customer_pre_approved_amount
+                ? parseInt(
+                    values.applicants[activeIndex].applicant_details
+                      .existing_customer_pre_approved_amount,
+                  )
+                    .toLocaleString('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                    })
+                    .replace('.00', '')
+                : 'N/A' // Display 'N/A' or some other fallback if the value is undefined
+            }
+            /-
+          </span>
+          <Button
+            primary={true}
+            inputClasses='w-full h-[46px]'
+            onClick={() => test()}
+            link='/lead/personal-details'
+          >
+            Continue
+          </Button>
+        </div>
       </DynamicDrawer>
     </>
   );

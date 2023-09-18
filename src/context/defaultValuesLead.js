@@ -7,6 +7,30 @@ export const defaultValuesLead = {
     applied_amount: '500000',
   },
 
+  address_details: {
+    current_type_of_residence: '',
+    current_flat_no_building_name: '',
+    current_street_area_locality: '',
+    current_town: '',
+    current_landmark: '',
+    current_pincode: '',
+    current_city: '',
+    current_state: '',
+    current_no_of_year_residing: null,
+    permanent_type_of_residence: '',
+    permanent_flat_no_building_name: '',
+    permanent_street_area_locality: '',
+    permanent_town: '',
+    permanent_landmark: '',
+    permanent_pincode: '',
+    permanent_city: '',
+    permanent_state: '',
+    permanent_no_of_year_residing: null,
+    extra_params: {
+      permanent_address_same_as_current: false,
+    },
+  },
+
   propertySchema: {
     property_identification_is: '',
     property_value_estimate: '',
@@ -75,7 +99,7 @@ export const defaultValuesLead = {
           same_as_id_type: false,
         },
       },
-      address_detail: {
+      address_details: {
         current_type_of_residence: '',
         current_flat_no_building_name: '',
         current_street_area_locality: '',
@@ -98,7 +122,7 @@ export const defaultValuesLead = {
           permanent_address_same_as_current: false,
         },
       },
-      work_income_detail: {
+      work_income_details: {
         profession: '',
         company_name: '',
         total_income: '',

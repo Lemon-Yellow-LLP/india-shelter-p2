@@ -45,11 +45,11 @@ const applicantSchema = Yup.object().shape({
             'Invalid Passport number. Format should be J1234567',
           )
           .required('Enter a valid ID number');
-      } else if (value[0] === 'PAN Card') {
+      } else if (value[0] === 'PAN') {
         return schema
           .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid Pan number. Format should be AAAPB2117A')
           .required('Enter a valid ID number');
-      } else if (value[0] === 'Aadhar') {
+      } else if (value[0] === 'AADHAR') {
         return schema
           .min(12, 'Enter Valid 12 digit Aadhar number')
           .max(12, 'Enter Valid 12 digit Aadhar number')
@@ -82,7 +82,7 @@ const applicantSchema = Yup.object().shape({
         return schema
           .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid Pan number. Format should be AAAPB2117A')
           .required('Enter a valid address proof number');
-      } else if (value[0] === 'Aadhar') {
+      } else if (value[0] === 'AADHAR') {
         return schema
           .min(12, 'Enter Valid 12 digit Aadhar number')
           .max(12, 'Enter Valid 12 digit Aadhar number')
