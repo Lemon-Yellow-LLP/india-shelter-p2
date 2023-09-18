@@ -157,6 +157,76 @@ async function checkExistingCustomer(body) {
   });
 }
 
+// L&T
+export async function getLnTChargesQRCode(leadId, values) {
+  const { data } = await axios.post(`${API_URL}/lt-charges/payment-qr/${leadId}`);
+  return data;
+}
+
+export async function checkPaymentStatus(leadId, values) {
+  try {
+    const { data } = await axios.post(`${API_URL}/lt-charges/payment-verify/${leadId}`);
+    return data;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function addLnTCharges(leadId, values) {
+  const { data } = await axios.post(`${API_URL}/lt-charges/add/`, {
+    lead_id: leadId,
+  });
+  return data;
+}
+
+export async function doesLnTChargesExist(leadId, values) {
+  try {
+    const { data } = await axios.get(`${API_URL}/lt-charges/by-lead/${leadId}`);
+    return {
+      data,
+      success: true,
+    };
+  } catch (err) {
+    return {
+      err,
+      success: false,
+    };
+  }
+}
+
+export async function editLnTCharges(id, values) {
+  const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`,
+    values,
+  );
+  return data;
+}
+
+
+export async function makePaymentByCash(id, values) {
+  try {
+    const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, {
+      extra_params: {
+        method: 'Cash',
+        status: 'success',
+      }
+    });
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+export async function makePaymentByLink(id, values) {
+  try {
+    const { data } = await axios.post(`${API_URL}/lt-charges/invoice-create/${id}`, values)
+    return data;
+  } catch (err) {
+    console.log(err)
+
+  }
+}
+
+
 export {
   API_URL,
   pingAPI,
