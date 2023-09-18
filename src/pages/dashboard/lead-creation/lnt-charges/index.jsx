@@ -42,7 +42,7 @@ const LnTCharges = ({ amount = 1500 }) => {
     updateProgress,
   } = useContext(LeadContext);
 
-  const { toastMessage, setToastMessage } = useContext(AuthContext);
+  const [toastMessage, setToastMessage] = useState('');
 
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState('');
