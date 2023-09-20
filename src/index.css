@@ -243,7 +243,7 @@ body {
   display: flex;
   width: 100%;
   height: 100%;
-  padding: 15px !important;
+  padding: 0px !important;
 }
 
 .MuiTimeline-root {
@@ -294,6 +294,29 @@ body {
 
 .MuiAutocomplete-popper {
   margin-top: 20px !important;
+}
+
+.MuiTooltip-tooltip {
+  background-color: #373435 !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+.MuiTooltip-arrow {
+  color: #373435 !important;
+}
+
+.MuiButtonBase-root {
+  padding: 0 !important;
+}
+
+.MuiTooltip-popper {
+  width: 155px !important;
+}
+
+.MuiTooltip-tooltip {
+  margin-top: 12px !important;
 }
 
 @media (max-width: 1024px) {

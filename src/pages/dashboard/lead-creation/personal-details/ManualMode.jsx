@@ -254,7 +254,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     mobileNumberUpdate();
   }, [values?.applicants[activeIndex]?.applicant_details?.mobile_number]);
 
-  console.log(values?.applicants[activeIndex]?.personal_details?.id_type);
+  // console.log(values?.applicants[activeIndex]?.personal_details?.id_type);
   // console.log(values?.applicants[activeIndex]?.personal_details?.id_number);
 
   return (

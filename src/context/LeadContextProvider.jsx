@@ -5,12 +5,25 @@ import { validationSchemaLead } from '../schemas/index';
 import { defaultErrorsLead } from './defaultErrorsLead';
 import { defaultValuesLead } from './defaultValuesLead';
 import { useNavigate } from 'react-router-dom';
+import {
+  ApplicantDetailsIcon,
+  WorkIncomeIcon,
+  UploadIcon,
+  ReferenceDetailsIcon,
+  QualifierIcon,
+  PropertyDetailsIcon,
+  PreviewIcon,
+  PersonalDetailsIcon,
+  LnTIcon,
+  BankingDetailsIcon,
+  AddressDetailsIcon,
+} from '../assets/icons';
 
 export const LeadContext = createContext(defaultValuesLead);
 
 const LeadContextProvider = ({ children }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(true);
   const [toastMessage, setToastMessage] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isExisting, setIsExisting] = useState(true);
@@ -22,54 +35,85 @@ const LeadContextProvider = ({ children }) => {
       description: 'Name, Mobile Number, Loan Type',
       progress: 0,
       url: '/lead/applicant-details',
+      Icon: ApplicantDetailsIcon,
     },
     {
       title: 'Personal Details',
       description: 'OCR, e-KYC, Address',
       progress: 0,
       url: '/lead/personal-details',
+      lock: true,
+      Icon: PersonalDetailsIcon,
     },
     {
       title: 'Address Details',
       description: 'OCR, e-KYC, Address',
       progress: 0,
       url: '/lead/address-details',
+      lock: true,
+      Icon: AddressDetailsIcon,
     },
     {
       title: 'Work/Income Details',
       description: 'Profession details, Family Income',
       progress: 0,
       url: '/lead/work-income-details',
+      lock: true,
+      Icon: WorkIncomeIcon,
     },
     {
-      title: 'Property Details',
-      description: 'Loan Type, Property address',
-      progress: 0,
-      url: '/lead/property-details',
-    },
-    {
-      title: 'Banking Details',
-      description: 'IFSC Details, Bank Statement',
-      progress: 0,
-      url: '/lead/banking-details',
-    },
-    {
-      title: 'Reference Details',
-      description: 'Reference person name, Mobile number',
-      progress: 0,
-      url: '/lead/reference-details',
-    },
-    {
-      title: 'Upload Documents',
-      description: 'Aadhar, PAN, Property document',
-      progress: 0,
-      url: '/lead/upload-documents',
+      title: 'Qualifier is not activated',
+      description: 'Complete Applicant, Personal, Address and Work & Income details to activate',
+      url: '/lead/work-income-details',
+      hideProgress: true,
+      Icon: QualifierIcon,
     },
     {
       title: 'L&T Charges',
       description: 'Fee details',
       progress: 0,
       url: '/lead/lnt-charges',
+      lock: true,
+      Icon: LnTIcon,
+    },
+    {
+      title: 'Property Details',
+      description: 'Profession details, Family Income',
+      progress: 0,
+      url: '/lead/property-details',
+      lock: true,
+      Icon: PropertyDetailsIcon,
+    },
+    {
+      title: 'Banking Details',
+      description: 'IFSC Details, Bank Statement',
+      progress: 0,
+      url: '/lead/banking-details',
+      lock: true,
+      Icon: BankingDetailsIcon,
+    },
+    {
+      title: 'Reference Details',
+      description: 'Reference person name, Mobile number',
+      progress: 0,
+      url: '/lead/reference-details',
+      lock: true,
+      Icon: ReferenceDetailsIcon,
+    },
+    {
+      title: 'Upload Documents',
+      description: 'Aadhar, PAN, Property document',
+      progress: 0,
+      url: '/lead/upload-documents',
+      lock: true,
+      Icon: UploadIcon,
+    },
+    {
+      title: 'Preview',
+      description: '',
+      url: '/lead/upload-documents',
+      hideProgress: true,
+      Icon: PreviewIcon,
     },
   ]);
 
@@ -140,10 +184,11 @@ const LeadContextProvider = ({ children }) => {
           },
         },
       });
+
       return newData;
     });
 
-    setActiveIndex(formik.values.applicants.length + 1);
+    setActiveIndex(formik.values.applicants.length - 1);
 
     navigate('/lead/applicant-details');
 
@@ -162,7 +207,7 @@ const LeadContextProvider = ({ children }) => {
     },
   });
 
-  console.log(formik.values);
+  // console.log(formik.values);
 
   return (
     <LeadContext.Provider

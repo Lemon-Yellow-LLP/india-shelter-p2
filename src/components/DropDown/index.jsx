@@ -19,6 +19,7 @@ const DropDown = memo(
     touched,
     onBlur,
     disableOption,
+    disabledError,
     ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -121,9 +122,11 @@ const DropDown = memo(
             })}
           </div>
         )}
-        <span className='text-xs text-primary-red mt-1'>
-          {error && touched ? error : String.fromCharCode(160)}
-        </span>
+        {!disabledError ? (
+          <span className='text-xs text-primary-red mt-1'>
+            {error && touched ? error : String.fromCharCode(160)}
+          </span>
+        ) : null}
       </div>
     );
   },
@@ -132,7 +135,7 @@ const DropDown = memo(
 export default DropDown;
 
 DropDown.propTypes = {
-  defaultSelected: PropTypes.string,
+  defaultSelected: PropTypes.any,
   placeholder: PropTypes.string,
   label: PropTypes.string,
   required: PropTypes.bool,

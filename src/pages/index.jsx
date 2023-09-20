@@ -13,7 +13,7 @@ const DashboardRoutes = () => {
   const { setValues, values, setActiveIndex } = useContext(LeadContext);
   // const [data, setData] = useState([]);
 
-  console.log('values', values);
+  // console.log('values', values);
 
   const getData = async () => {
     await axios

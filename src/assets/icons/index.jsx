@@ -23,7 +23,38 @@ import IconSingle from './single.jsx';
 import IconSalarid from './salarid.jsx';
 import IconSelfEmployed from './self-employed.jsx';
 
+import ApplicantDetailsIcon from './ApplicantDetailsIcon';
+import AddressDetailsIcon from './AddressDetailsIcon';
+import BankingDetailsIcon from './BankingDetailsIcon';
+import LnTIcon from './lnTIcon';
+import PersonalDetailsIcon from './PersonalDetailsIcon';
+import PreviewIcon from './PreviewIcon';
+import PropertyDetailsIcon from './PropertyDetailsIcon';
+import QualifierIcon from './QualifierIcon';
+import ReferenceDetailsIcon from './ReferenceDetailsIcon';
+import UploadIcon from './UploadIcon';
+import WorkIncomeIcon from './WorkInconeIcon';
+import LockIcon from './LockIcon';
+import ToolTipIcon from './ToolTipIcon';
+import DustbinIcon from './DustbinIcon';
+import CommingSoon from './CommingSoon.svg';
+
 export {
+  CommingSoon,
+  DustbinIcon,
+  ToolTipIcon,
+  LockIcon,
+  WorkIncomeIcon,
+  UploadIcon,
+  ReferenceDetailsIcon,
+  QualifierIcon,
+  PropertyDetailsIcon,
+  PreviewIcon,
+  PersonalDetailsIcon,
+  LnTIcon,
+  BankingDetailsIcon,
+  AddressDetailsIcon,
+  ApplicantDetailsIcon,
   IconClose,
   IconHomeLoan,
   IconArrowDown,

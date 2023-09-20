@@ -11,10 +11,11 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import DrawerFooter from './DrawerFooter';
 import DrawerSteps from './DrawerSteps';
-
-import CustomizedTimeline from './CustomizedTimeline';
-import WarningCircle from '../../assets/icons/WarningCircle.svg';
 import { LeadContext } from '../../context/LeadContextProvider';
+import { CommingSoon, DustbinIcon, ToolTipIcon } from '../../assets/icons';
+import { ClickAwayListener, FormControlLabel, IconButton, Tooltip } from '@mui/material';
+import DropDown from '../DropDown';
+import Switch from '@mui/material/Switch';
 
 const drawerBleeding = 0;
 
@@ -68,7 +69,24 @@ export default function SwipeableDrawerComponent() {
   } = useContext(LeadContext);
 
   const theme = useTheme();
+
   const [value, setValue] = useState(0);
+
+  const [open, setOpen] = useState(false);
+
+  const [primaryIndex, setPrimaryIndex] = useState(0);
+
+  const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
+
+  const [coApplicants, setCoApplicants] = useState([]);
+
+  const handleTooltipClose = () => {
+    setOpen(false);
+  };
+
+  const handleTooltipOpen = () => {
+    setOpen(true);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -81,6 +99,77 @@ export default function SwipeableDrawerComponent() {
   const toggleDrawer = () => {
     setDrawerOpen((prev) => !prev);
   };
+
+  useEffect(() => {
+    let newData = [];
+
+    values.applicants.map((e, index) => {
+      if (!e.applicant_details.is_primary) {
+        newData.push({
+          label: e.applicant_details.first_name,
+          value: index,
+        });
+      }
+    });
+
+    setCoApplicants(newData);
+
+    setActiveCoApplicantIndex(newData?.[0]?.value);
+
+    values.applicants.map((e, index) => {
+      if (e.applicant_details.is_primary) {
+        setPrimaryIndex(index);
+      }
+    });
+  }, [values.applicants]);
+
+  const IOSSwitch = styled((props) => (
+    <Switch focusVisibleClassName='.Mui-focusVisible' disableRipple {...props} />
+  ))(({ theme }) => ({
+    width: 36,
+    height: 20,
+    padding: 0,
+    '& .MuiSwitch-switchBase': {
+      padding: 0,
+      margin: 2,
+      transitionDuration: '300ms',
+      '&.Mui-checked': {
+        transform: 'translateX(16px)',
+        color: '#fff',
+        '& + .MuiSwitch-track': {
+          backgroundColor: theme.palette.mode === 'dark' ? '#2ECA45' : '#E33439',
+          opacity: 1,
+          border: 0,
+        },
+        '&.Mui-disabled + .MuiSwitch-track': {
+          opacity: 0.5,
+        },
+      },
+      '&.Mui-focusVisible .MuiSwitch-thumb': {
+        color: '#33cf4d',
+        border: '6px solid #fff',
+      },
+      '&.Mui-disabled .MuiSwitch-thumb': {
+        color: theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[600],
+      },
+      '&.Mui-disabled + .MuiSwitch-track': {
+        opacity: theme.palette.mode === 'light' ? 0.7 : 0.3,
+      },
+    },
+    '& .MuiSwitch-thumb': {
+      boxSizing: 'border-box',
+      width: 16,
+      height: 16,
+    },
+    '& .MuiSwitch-track': {
+      borderRadius: 26 / 2,
+      backgroundColor: theme.palette.mode === 'light' ? '#E9E9EA' : '#39393D',
+      opacity: 1,
+      transition: theme.transitions.create(['background-color'], {
+        duration: 500,
+      }),
+    },
+  }));
 
   return (
     <Root>
@@ -110,8 +199,18 @@ export default function SwipeableDrawerComponent() {
         >
           <div className='pt-2 flex justify-center flex-col'>
             <BottomSheetHandle />
-            <div className='flex justify-between p-4'>
-              <h4 className='text-base font-medium'>Suresh Ramji Shah</h4>
+            <div className='flex justify-between p-4 pt-2 pb-1'>
+              <div className='flex gap-1'>
+                <h4 className='text-base font-medium'>
+                  {values?.applicants?.[primaryIndex]?.applicant_details?.first_name}
+                </h4>
+                <h4 className='text-base font-medium'>
+                  {values?.applicants?.[primaryIndex]?.applicant_details?.middle_name}
+                </h4>
+                <h4 className='text-base font-medium'>
+                  {values?.applicants?.[primaryIndex]?.applicant_details?.last_name}
+                </h4>
+              </div>
               <div className='flex flex-col items-end'>
                 <span className='text-base text-[#E33439] font-medium'>15%</span>
                 <span className='text-xs text-[#727376] font-normal'>Completed</span>
@@ -139,8 +238,8 @@ export default function SwipeableDrawerComponent() {
               aria-label='full width tabs example'
               className='border-solid border bg-[#FAFAFA]'
             >
-              <Tab label='Steps' {...a11yProps(0)} className='tabLabels' />
-              <Tab label='Applicants' {...a11yProps(1)} className='tabLabels' />
+              <Tab label='Primary' {...a11yProps(0)} className='tabLabels' />
+              <Tab label='Co-Applicants' {...a11yProps(1)} className='tabLabels' />
               <Tab label='Tools' {...a11yProps(2)} className='tabLabels' />
             </Tabs>
 
@@ -151,17 +250,15 @@ export default function SwipeableDrawerComponent() {
             >
               <TabPanel
                 className='tabPanel'
-                style={{ maxHeight: `calc(80vh - 65px)`, overflow: 'auto' }}
+                style={{ maxHeight: `calc(84vh - 65px)`, overflow: 'auto' }}
                 value={value}
                 index={0}
                 dir={theme.direction}
               >
-                {/* <CustomizedTimeline /> */}
-
-                <div className='flex flex-col gap-[16px] w-[100%]'>
+                <div className='flex flex-col gap-[16px] w-[100%] pb-[80px] p-[15px]'>
                   {stepsProgress &&
                     stepsProgress.map((e, index) => (
-                      <DrawerSteps key={index} details={e} steps={true} index={index} />
+                      <DrawerSteps key={index} details={e} steps={true} index={primaryIndex} />
                     ))}
                 </div>
               </TabPanel>
@@ -172,61 +269,117 @@ export default function SwipeableDrawerComponent() {
                 index={1}
                 dir={theme.direction}
               >
-                <div className='flex flex-col justify-between w-[100%] h-[100%]'>
+                <div className='flex flex-col justify-between w-[100%] h-[100%] p-[15px]'>
                   <div className='flex flex-col gap-[16px] w-[100%]'>
-                    {values?.applicants &&
-                      values?.applicants.map((e, index) => (
-                        <div
-                          key={index}
-                          onClick={() => {
-                            setActiveIndex(index);
-                            setDrawerOpen(false);
-                          }}
-                        >
-                          <span>{index}</span>
-                          <span>{e.applicant_details.first_name}</span>
-                        </div>
-                        // <DrawerSteps
-                        //   key={index}
-                        //   details={e}
-                        //   toggleDrawer={toggleDrawer}
-                        //   index={index}
-                        // />
-                      ))}
-                  </div>
+                    <div className='flex flex-col justify-end gap-4 mt-[5px]'>
+                      <div className='flex flex-col gap-1'>
+                        <div className='flex justify-between'>
+                          <div className='flex gap-2 items-center'>
+                            <span className='font-medium text-[16px] leading-[24px]'>
+                              Co-applicants
+                            </span>
+                            <ClickAwayListener onClickAway={handleTooltipClose}>
+                              <div>
+                                <Tooltip
+                                  PopperProps={{
+                                    disablePortal: true,
+                                  }}
+                                  onClose={handleTooltipClose}
+                                  open={open}
+                                  disableFocusListener
+                                  disableHoverListener
+                                  disableTouchListener
+                                  title='You can add upto 4 Co-applicants'
+                                  placement='bottom-start'
+                                  arrow
+                                >
+                                  <IconButton onClick={handleTooltipOpen}>
+                                    <ToolTipIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </div>
+                            </ClickAwayListener>
 
-                  <div className='flex flex-col justify-end'>
-                    {values?.applicants?.length > 4 ? (
-                      <div className='flex'>
-                        <img src={WarningCircle} />
-                        <span className='text-[12px] text-[#E33439] font-normal ml-1'>
-                          You have reached the limit of adding co-applicant
+                            <span className='font-semibold text-[16px] leading-[24px] text-[#373435]'>
+                              {
+                                values.applicants.filter((e) => !e.applicant_details.is_primary)
+                                  .length
+                              }
+                              <span className='text-[#96989A]'>/4</span>
+                            </span>
+                          </div>
+
+                          <button
+                            onClick={addApplicant}
+                            className='text-primary-red font-medium text-[16px]'
+                          >
+                            + Add
+                          </button>
+                        </div>
+                        <span className='font-normal text-[12px] leading-[18px] text-[#727376]'>
+                          After the qualifier is complete, co-applicants can be made primary
                         </span>
                       </div>
-                    ) : (
-                      <>
+
+                      {values?.applicants && values.applicants.length > 1 ? (
+                        <div className='flex flex-col gap-4'>
+                          <DropDown
+                            options={coApplicants}
+                            onChange={(e) => setActiveCoApplicantIndex(e)}
+                            defaultSelected={coApplicants?.[0]?.value}
+                            disabledError={true}
+                          />
+                          <div className='flex justify-between'>
+                            <div className='flex gap-1 items-center'>
+                              <span className='text-[12px] font-[400] text-[#727376]'>
+                                Make it primary
+                              </span>
+                              <IOSSwitch />
+                            </div>
+                            <div className='flex justify-end gap-2 items-center'>
+                              <span className='text-[#727376] text-[12px] font-normal'>
+                                Qualifier:
+                                <span className='text-[#FF9D4A] text-[12px] font-semibold ml-[5px]'>
+                                  Amber
+                                </span>
+                              </span>
+                              <button>
+                                <DustbinIcon />
+                              </button>
+                            </div>
+                          </div>
+                          <div className='flex flex-col gap-[16px] w-[100%] pb-[80px]'>
+                            {stepsProgress &&
+                              stepsProgress.map((e, index) => (
+                                <DrawerSteps
+                                  key={index}
+                                  details={e}
+                                  steps={true}
+                                  index={activeCoApplicantIndex}
+                                />
+                              ))}
+                          </div>
+                        </div>
+                      ) : (
                         <button
                           onClick={addApplicant}
-                          className='w-[100%] h-[48px] border border-[#E33439] rounded-[4px] flex items-center justify-center text-[16px] text-[#E33439] font-normal'
+                          className='w-[100%] h-[48px] border bg-[#E33439] rounded-[4px] flex items-center justify-center text-[16px] text-[white] font-normal'
                         >
                           Add Co-applicant
                         </button>
-                        <span className='text-[12px] text-[#727376] font-normal'>
-                          *You can add upto 4 co-applicants
-                        </span>
-                      </>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </TabPanel>
               <TabPanel
-                className='tabPanel'
+                className='tabPanel p-0'
                 style={{ height: `calc(80vh - 65px)`, overflow: 'auto' }}
                 value={value}
                 index={2}
                 dir={theme.direction}
               >
-                Item Three
+                <img src={CommingSoon} alt='' className='w-full' />
               </TabPanel>
             </SwipeableViews>
           </Box>
@@ -236,5 +389,3 @@ export default function SwipeableDrawerComponent() {
     </Root>
   );
 }
-
-SwipeableDrawerComponent.propTypes = {};

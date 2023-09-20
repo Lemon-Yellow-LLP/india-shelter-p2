@@ -351,7 +351,6 @@ const ApplicantDetails = () => {
         };
         setValues(newData);
         setIsExisting(true);
-        console.log('Existing data', body[0]);
       });
     } else {
       setFieldError(
@@ -512,8 +511,8 @@ const ApplicantDetails = () => {
   };
 
   // console.log('values', values.applicants[activeIndex]?.applicant_details);
-  console.log('errors', errors?.applicants[activeIndex]);
-  console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
+  // console.log('errors', errors?.applicants[activeIndex]);
+  // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
 
   return (
     <>
@@ -814,15 +813,6 @@ const ApplicantDetails = () => {
           />
         </div>
       </div>
-
-      {console.log(
-        parseInt(
-          values.applicants[activeIndex].applicant_details.existing_customer_pre_approved_amount,
-        ).toLocaleString('en-IN', {
-          style: 'currency',
-          currency: 'INR',
-        }),
-      )}
 
       <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='223px'>
         <div className='z-[6000] h-full w-full flex flex-col'>
