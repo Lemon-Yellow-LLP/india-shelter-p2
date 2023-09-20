@@ -32,10 +32,14 @@ async function editPropertyById(id, propertyData) {
   return res.data;
 }
 
+//WORK AND INCOME SCREEN
+
 async function getCompanyNamesList() {
   const res = await axios.get(`${API_URL}/company-list`, requestOptions);
   return res.data;
 }
+
+//LOGIN SCREEN
 
 async function getLoginOtp(mobile_no) {
   const res = await axios.get(
@@ -62,6 +66,114 @@ async function logout(status, options) {
 async function testLogout(options) {
   const res = await axios.post(`${API_URL}/session/check-auth/login`, {}, options);
   return res.data;
+}
+
+async function getAllLoanOfficers() {
+  const res = await axios.get(`${API_URL}/account`, requestOptions);
+  return res.data;
+}
+
+//BRE SCREEN
+
+async function verifyPan(id) {
+  const res = await axios.post(
+    `${API_URL}/pan/${id}`,
+    {},
+    {
+      ...requestOptions,
+      timeout: 30000,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+
+  return res.data;
+}
+
+async function verifyDL(data, options) {
+  const res = await axios.post('https://testapi.karza.in/v3/dl', data, {
+    ...options,
+    timeout: 30000,
+    'axios-retry': {
+      retries: 3,
+      retryCondition: () => true,
+    },
+  });
+
+  return res.data;
+}
+
+async function verifyVoterID(data) {
+  const res = await axios.post('https://testapi.karza.in/v3/voter', data, {
+    headers: {
+      x_karza_key: '',
+    },
+    timeout: 30000,
+    'axios-retry': {
+      retries: 3,
+      retryCondition: () => true,
+    },
+  });
+
+  return res.data;
+}
+
+async function verifyGST(data) {
+  const res = await axios.post('https://api.karza.in/gst/uat/v2/gstdetailed', data, {
+    headers: {
+      x_karza_key: '',
+    },
+    timeout: 30000,
+    'axios-retry': {
+      retries: 3,
+      retryCondition: () => true,
+    },
+  });
+
+  return res.data;
+}
+
+async function verifyPFUAN(data) {
+  const res = await axios.post('https://testapi.karza.in/v3/epf-auth', data, {
+    headers: {
+      x_karza_key: '',
+    },
+    timeout: 30000,
+    'axios-retry': {
+      retries: 3,
+      retryCondition: () => true,
+    },
+  });
+
+  return res.data;
+}
+
+async function checkDedupe(id) {
+  const res = await axios.post(`${API_URL}/dedupe/${id}`, {}, requestOptions);
+  return res;
+}
+
+async function checkBre99(id) {
+  const res = await axios.post(`${API_URL}/bre-99/${id}`, {}, requestOptions);
+  return res;
+}
+
+async function checkBureau(id) {
+  const res = await axios.post(
+    `${API_URL}/cibil/${id}`,
+    {},
+    {
+      ...requestOptions,
+      timeout: 90000,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res;
 }
 
 async function updateLeadDataOnBlur(leadId, fieldName, value) {
@@ -195,12 +307,9 @@ export async function doesLnTChargesExist(leadId, values) {
 }
 
 export async function editLnTCharges(id, values) {
-  const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`,
-    values,
-  );
+  const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, values);
   return data;
 }
-
 
 export async function makePaymentByCash(id, values) {
   try {
@@ -208,7 +317,7 @@ export async function makePaymentByCash(id, values) {
       extra_params: {
         method: 'Cash',
         status: 'success',
-      }
+      },
     });
     return data;
   } catch (err) {
@@ -218,14 +327,12 @@ export async function makePaymentByCash(id, values) {
 
 export async function makePaymentByLink(id, values) {
   try {
-    const { data } = await axios.post(`${API_URL}/lt-charges/invoice-create/${id}`, values)
+    const { data } = await axios.post(`${API_URL}/lt-charges/invoice-create/${id}`, values);
     return data;
   } catch (err) {
-    console.log(err)
-
+    console.log(err);
   }
 }
-
 
 export {
   API_URL,
@@ -249,4 +356,13 @@ export {
   verifyLoginOtp,
   logout,
   testLogout,
+  getAllLoanOfficers,
+  verifyPan,
+  verifyDL,
+  verifyVoterID,
+  verifyGST,
+  verifyPFUAN,
+  checkDedupe,
+  checkBre99,
+  checkBureau,
 };
