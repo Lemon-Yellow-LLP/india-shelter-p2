@@ -1,8 +1,428 @@
 import InfoIcon from '../../../../assets/icons/info.svg';
 import { Link } from 'react-router-dom';
 import { Button } from '../../../../components';
+import loading from '../../../../assets/icons/loading.svg';
+import { useEffect, useState } from 'react';
+import {
+  checkBre99,
+  checkBureau,
+  checkDedupe,
+  getAllLoanOfficers,
+  getCompanyNamesList,
+  verifyDL,
+  verifyGST,
+  verifyPFUAN,
+  verifyPan,
+  verifyVoterID,
+} from '../../../../global';
+import { func } from 'prop-types';
+
+const pan = false;
+const dl = true;
+const voterId = false;
+const pf = false;
+const gst = true;
 
 const BRE_ONE = () => {
+  const [progress, setProgress] = useState(0);
+  const [personalDetailsApi, setPersonalDetailsApi] = useState({
+    label: '',
+    res: false,
+    loader: false,
+    ran: false,
+  });
+  const [workIncomeApi, setWorkIncomeApi] = useState({
+    label: '',
+    res: false,
+    loader: false,
+    ran: false,
+  });
+  const [dedupe, setDedupe] = useState({
+    res: false,
+    loader: false,
+    ran: false,
+  });
+  const [bre99, setBre99] = useState({
+    res: false,
+    loader: false,
+    ran: false,
+  });
+  const [bureauOrCrif, setBureauOrCrif] = useState({
+    label: '',
+    res: false,
+    loader: false,
+    ran: false,
+  });
+  // const [bre101, setBre101] = useState({
+  //   res: false,
+  //   loader: false,
+  //   ran: false,
+  // });
+
+  useEffect(() => {
+    async function bre101() {
+      if (pan) {
+        setPersonalDetailsApi({
+          ...personalDetailsApi,
+          loader: true,
+          ran: true,
+          label: 'PAN card',
+        });
+        setProgress(1);
+
+        // try {
+        //   const pan_res = await verifyPan();
+
+        //   if (pan_res.valid) {
+        //     setPersonalDetailsApi({
+        //       ...personalDetailsApi,
+        //       loader: false,
+        //       ran: true,
+        //       label: 'PAN card',
+        //       res: 'Valid Match',
+        //     });
+        //   } else {
+        //     setPersonalDetailsApi({
+        //       ...personalDetailsApi,
+        //       loader: false,
+        //       ran: true,
+        //       label: 'PAN card',
+        //       res: 'Invalid',
+        //     });
+        //   }
+        // } catch (err) {
+        //   console.log(err);
+        //   setPersonalDetailsApi({
+        //     ...personalDetailsApi,
+        //     loader: false,
+        //     ran: true,
+        //     label: 'PAN card',
+        //     res: 'Error',
+        //   });
+        // }
+      }
+
+      if (dl) {
+        setPersonalDetailsApi({
+          ...personalDetailsApi,
+          loader: true,
+          ran: true,
+          label: 'Driving license',
+        });
+        setProgress(1);
+
+        // try {
+        //   const dl_res = await verifyDL();
+
+        //   if (dl_res.valid) {
+        //     setPersonalDetailsApi({
+        //       ...personalDetailsApi,
+        //       loader: false,
+        //       ran: true,
+        //       label: 'Driving license',
+        //       res: 'Valid Match',
+        //     });
+        //   } else {
+        //     setPersonalDetailsApi({
+        //       ...personalDetailsApi,
+        //       loader: false,
+        //       ran: true,
+        //       label: 'Driving license',
+        //       res: 'Invalid',
+        //     });
+        //   }
+        // } catch (err) {
+        //   console.log(err);
+        //   setPersonalDetailsApi({
+        //     ...personalDetailsApi,
+        //     loader: false,
+        //     ran: true,
+        //     label: 'Driving license',
+        //     res: 'Error',
+        //   });
+        // }
+      }
+
+      if (voterId) {
+        setPersonalDetailsApi({
+          ...personalDetailsApi,
+          loader: true,
+          ran: true,
+          label: 'Voter ID',
+        });
+        setProgress(1);
+
+        // try {
+        //   const voterId_res = verifyVoterID();
+
+        //   if (voterId_res.valid) {
+        //     setPersonalDetailsApi({
+        //       ...personalDetailsApi,
+        //       loader: false,
+        //       ran: true,
+        //       label: 'Voter ID',
+        //       res: 'Valid Match',
+        //     });
+        //   } else {
+        //     setPersonalDetailsApi({
+        //       ...personalDetailsApi,
+        //       loader: false,
+        //       ran: true,
+        //       label: 'Voter ID',
+        //       res: 'Invalid',
+        //     });
+        //   }
+        // } catch (err) {
+        //   console.log(err);
+        //   setPersonalDetailsApi({
+        //     ...personalDetailsApi,
+        //     loader: false,
+        //     ran: true,
+        //     label: 'Voter ID',
+        //     res: 'Error',
+        //   });
+        // }
+      }
+
+      if (pf) {
+        setWorkIncomeApi({ ...workIncomeApi, loader: true, ran: true, label: 'PF UAN' });
+        setProgress(2);
+
+        // try {
+        //   const pf_res = verifyPFUAN();
+
+        //   if (pf_res.valid) {
+        //     setWorkIncomeApi({
+        //       ...workIncomeApi,
+        //       loader: false,
+        //       ran: true,
+        //       label: 'PF UAN',
+        //       res: 'Valid Match',
+        //     });
+        //   } else {
+        //     setWorkIncomeApi({
+        //       ...workIncomeApi,
+        //       loader: false,
+        //       ran: true,
+        //       label: 'PF UAN',
+        //       res: 'Invalid',
+        //     });
+        //   }
+        // } catch (err) {
+        //   console.log(err);
+        //   setWorkIncomeApi({
+        //     ...workIncomeApi,
+        //     loader: false,
+        //     ran: true,
+        //     label: 'PF UAN',
+        //     res: 'Error',
+        //   });
+        // }
+      }
+
+      if (gst) {
+        setWorkIncomeApi({ ...workIncomeApi, loader: true, ran: true, label: 'GST IN' });
+        setProgress(2);
+
+        // try {
+        //   const gst_res = verifyGST();
+
+        //   if (gst_res.valid) {
+        //     setWorkIncomeApi({
+        //       ...workIncomeApi,
+        //       loader: false,
+        //       ran: true,
+        //       label: 'GST IN',
+        //       res: 'Valid Match',
+        //     });
+        //   } else {
+        //     setWorkIncomeApi({
+        //       ...workIncomeApi,
+        //       loader: false,
+        //       ran: true,
+        //       label: 'GST IN',
+        //       res: 'InValid',
+        //     });
+        //   }
+        // } catch (err) {
+        //   console.log(err);
+        //   setWorkIncomeApi({
+        //     ...workIncomeApi,
+        //     loader: false,
+        //     ran: true,
+        //     label: 'GST IN',
+        //     res: 'Error',
+        //   });
+        // }
+      }
+
+      setDedupe({ ...dedupe, loader: true, ran: true });
+      setProgress(3);
+
+      // try {
+      //   const dedupe_res = await checkDedupe();
+
+      //   if (dedupe_res === 200) {
+      //     setDedupe({ ...dedupe, loader: false, ran: true, res: 'Valid Match' });
+      //   }
+      // } catch (err) {
+      //   console.log(err);
+      //   setDedupe({ ...dedupe, loader: false, ran: true, res: 'Error' });
+      // }
+
+      setBre99({ ...bre99, loader: true, ran: true });
+      setProgress(4);
+
+      // try {
+      //   const bre99_res = await checkBre99();
+
+      //   if (bre99_res === 200) {
+      //     setBre99({ ...bre99, loader: false, ran: true, res: 'Valid Match' });
+      //   }
+      // } catch (err) {
+      //   console.log(err);
+      //   setBre99({ ...bre99, loader: false, ran: true, res: 'Error' });
+      // }
+
+      const bre99_res = {
+        value: 'Bureau',
+      };
+
+      if (bre99_res.value === 'Bureau') {
+        setBureauOrCrif({ ...bureauOrCrif, loader: true, ran: true, label: 'Bureau' });
+        setProgress(5);
+
+        // try {
+        //   const bureau_res = await checkBureau();
+
+        //   if (bureau_res === 200) {
+        //     setBureauOrCrif({ ...bre99, loader: false, ran: true, res: 'Valid Match', label: 'Bureau' });
+        //   }
+        // } catch (err) {
+        //   console.log(err);
+        //   setBureauOrCrif({ ...bre99, loader: false, ran: true, res: 'Error', label: 'Bureau' });
+        // }
+      } else {
+        setBureauOrCrif({ ...bureauOrCrif, loader: true, ran: true, label: 'CRIF' });
+        setProgress(5);
+
+        // try {
+        //   const bureau_res = await checkCRIF();
+
+        //   if (crif_res === 200) {
+        //     setBureauOrCrif({ ...bre99, loader: false, ran: true, res: 'Valid Match', label: 'CRIF' });
+        //   }
+        // } catch (err) {
+        //   console.log(err);
+        //   setBureauOrCrif({ ...bre99, loader: false, ran: true, res: 'Error', label: 'CRIF' });
+        // }
+      }
+    }
+    bre101();
+  }, []);
+
+  // useEffect(() => {
+  //   console.log(personalDetailsApi.label);
+  //   console.log(workIncomeApi.label);
+  //   async function verifydetails() {
+  //     await Promise.all([getCompanyNamesList(), getAllLoanOfficers()])
+  //       .then((res) => {
+  //         console.log(res.status);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   }
+  //   verifydetails();
+  // }, [personalDetailsApi.label, workIncomeApi.label]);
+
+  // useEffect(() => {
+  //   async function verifydetails() {
+  //     if (personalDetailsApi.res && workIncomeApi.res && dedupe.res) {
+  //       try {
+  //         const bre99_res = await checkBre99();
+  //       } catch (err) {
+  //         console.log(err);
+  //       }
+
+  //       try {
+  //         if (bre99_res === 'CIBIL') {
+  //           const bureau_res = await checkBereau();
+  //         } else {
+  //           // call CRIF
+  //         }
+  //       } catch (err) {
+  //         console.log(err);
+  //       }
+  //     }
+  //   }
+  //   verifydetails();
+  // }, [personalDetailsApi, workIncomeApi]);
+
+  // setTimeout(() => {
+  //   setBre99({ ...bre99, loader: true, ran: true });
+  //   setProgress(4);
+
+  //   if (pan) {
+  //     setPersonalDetailsApi({
+  //       ...personalDetailsApi,
+  //       loader: false,
+  //       ran: true,
+  //       label: 'PAN card',
+  //       res: 'Valid Match',
+  //     });
+  //   }
+  //   if (dl) {
+  //     setPersonalDetailsApi({
+  //       ...personalDetailsApi,
+  //       loader: false,
+  //       ran: true,
+  //       label: 'Driving license',
+  //       res: 'Error',
+  //     });
+  //   }
+  //   if (voterId) {
+  //     setPersonalDetailsApi({
+  //       ...personalDetailsApi,
+  //       loader: false,
+  //       ran: true,
+  //       label: 'Voter ID',
+  //       res: 'Valid Match',
+  //     });
+  //   }
+  //   if (pf) {
+  //     setWorkIncomeApi({
+  //       ...workIncomeApi,
+  //       loader: false,
+  //       ran: true,
+  //       label: 'PF UAN',
+  //       res: 'Valid Match',
+  //     });
+  //   }
+  //   if (gst) {
+  //     setWorkIncomeApi({
+  //       ...workIncomeApi,
+  //       loader: false,
+  //       ran: true,
+  //       label: 'GST IN',
+  //       res: 'Valid Match',
+  //     });
+  //   }
+
+  //   setDedupe({ ...dedupe, loader: false, ran: true, res: 'Valid Match' });
+  // }, 6000);
+
+  // setTimeout(() => {
+  //   setBureau({ ...bureau, loader: true, ran: true });
+  //   setProgress(5);
+
+  //   setBre99({ ...bre99, loader: false, ran: true, res: 'Valid Match' });
+  // }, 12000);
+
+  // setTimeout(() => {
+  //   setBureau({ ...bureau, loader: false, ran: true, res: 'Valid Match' });
+  // }, 18000);
+
   return (
     <div className='p-4 relative h-screen'>
       <div className='flex items-start gap-2'>
@@ -17,7 +437,7 @@ const BRE_ONE = () => {
         <p className='text-xs text-primary-black font-normal'>Applicant name: Santosh Yadav</p>
         <div className='flex justify-between text-primary-black font-medium'>
           <h3>Verification in progress</h3>
-          <h3>4/6</h3>
+          <h3>{progress}/5</h3>
         </div>
 
         <div className='flex justify-center mt-3'>
@@ -55,274 +475,287 @@ const BRE_ONE = () => {
       <div className='mt-4 flex flex-col gap-2'>
         <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
           <div className='flex items-center gap-1'>
-            <svg
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                stroke='#EC7739'
-                strokeWidth='1.5'
-              />
-            </svg>
-            <p className='text-sm text-primary-black'>PAN card</p>
+            {!personalDetailsApi.ran ? (
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                  stroke='#EC7739'
+                  strokeWidth='1.5'
+                />
+              </svg>
+            ) : (
+              <svg
+                width='24'
+                height='13'
+                viewBox='0 0 18 13'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M17 1L6 12L1 7'
+                  stroke='#147257'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            )}
+
+            <p className='text-sm text-primary-black'>{personalDetailsApi.label}</p>
           </div>
-          <div>
-            <svg
-              width='20'
-              height='20'
-              viewBox='0 0 20 20'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10Z'
-                fill='url(#paint0_angular_2724_6266)'
-              />
-              <defs>
-                <radialGradient
-                  id='paint0_angular_2724_6266'
-                  cx='0'
-                  cy='0'
-                  r='1'
-                  gradientUnits='userSpaceOnUse'
-                  gradientTransform='translate(10 10) rotate(90) scale(10)'
-                >
-                  <stop stopColor='#E33439' />
-                  <stop offset='1' stopColor='#FFF7F7' />
-                </radialGradient>
-              </defs>
-            </svg>
-          </div>
+          {personalDetailsApi.loader ? (
+            <div className='ml-auto'>
+              <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+            </div>
+          ) : null}
+          {personalDetailsApi.res && (
+            <span className='text-xs font-normal text-light-grey'>{personalDetailsApi.res}</span>
+          )}
         </div>
+
         <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
           <div className='flex items-center gap-1'>
-            <svg
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                stroke='#EC7739'
-                strokeWidth='1.5'
-              />
-            </svg>
-            <p className='text-sm text-primary-black'>PAN card</p>
+            {!workIncomeApi.ran ? (
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                  stroke='#EC7739'
+                  strokeWidth='1.5'
+                />
+              </svg>
+            ) : (
+              <svg
+                width='24'
+                height='13'
+                viewBox='0 0 18 13'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M17 1L6 12L1 7'
+                  stroke='#147257'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            )}
+
+            <p className='text-sm text-primary-black'>{workIncomeApi.label}</p>
           </div>
           <div>
-            <svg
-              width='20'
-              height='20'
-              viewBox='0 0 20 20'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10Z'
-                fill='url(#paint0_angular_2724_6266)'
-              />
-              <defs>
-                <radialGradient
-                  id='paint0_angular_2724_6266'
-                  cx='0'
-                  cy='0'
-                  r='1'
-                  gradientUnits='userSpaceOnUse'
-                  gradientTransform='translate(10 10) rotate(90) scale(10)'
-                >
-                  <stop stopColor='#E33439' />
-                  <stop offset='1' stopColor='#FFF7F7' />
-                </radialGradient>
-              </defs>
-            </svg>
+            {workIncomeApi.loader ? (
+              <div className='ml-auto'>
+                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+              </div>
+            ) : null}
+            {workIncomeApi.res && (
+              <span className='text-xs font-normal text-light-grey'>{workIncomeApi.res}</span>
+            )}
           </div>
         </div>
+
         <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
           <div className='flex items-center gap-1'>
-            <svg
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                stroke='#EC7739'
-                strokeWidth='1.5'
-              />
-            </svg>
-            <p className='text-sm text-primary-black'>PAN card</p>
+            {!dedupe.ran ? (
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                  stroke='#EC7739'
+                  strokeWidth='1.5'
+                />
+              </svg>
+            ) : (
+              <svg
+                width='24'
+                height='13'
+                viewBox='0 0 18 13'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M17 1L6 12L1 7'
+                  stroke='#147257'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            )}
+
+            <p className='text-sm text-primary-black'>Dedupe</p>
           </div>
           <div>
-            <svg
-              width='20'
-              height='20'
-              viewBox='0 0 20 20'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10Z'
-                fill='url(#paint0_angular_2724_6266)'
-              />
-              <defs>
-                <radialGradient
-                  id='paint0_angular_2724_6266'
-                  cx='0'
-                  cy='0'
-                  r='1'
-                  gradientUnits='userSpaceOnUse'
-                  gradientTransform='translate(10 10) rotate(90) scale(10)'
-                >
-                  <stop stopColor='#E33439' />
-                  <stop offset='1' stopColor='#FFF7F7' />
-                </radialGradient>
-              </defs>
-            </svg>
+            {dedupe.loader ? (
+              <div className='ml-auto'>
+                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+              </div>
+            ) : null}
+            {dedupe.res && (
+              <span className='text-xs font-normal text-light-grey'>{dedupe.res}</span>
+            )}
           </div>
         </div>
+
         <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
           <div className='flex items-center gap-1'>
-            <svg
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                stroke='#EC7739'
-                strokeWidth='1.5'
-              />
-            </svg>
-            <p className='text-sm text-primary-black'>PAN card</p>
+            {!bre99.ran ? (
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                  stroke='#EC7739'
+                  strokeWidth='1.5'
+                />
+              </svg>
+            ) : (
+              <svg
+                width='24'
+                height='13'
+                viewBox='0 0 18 13'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M17 1L6 12L1 7'
+                  stroke='#147257'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            )}
+
+            <p className='text-sm text-primary-black'>BRE 99</p>
           </div>
           <div>
-            <svg
-              width='20'
-              height='20'
-              viewBox='0 0 20 20'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10Z'
-                fill='url(#paint0_angular_2724_6266)'
-              />
-              <defs>
-                <radialGradient
-                  id='paint0_angular_2724_6266'
-                  cx='0'
-                  cy='0'
-                  r='1'
-                  gradientUnits='userSpaceOnUse'
-                  gradientTransform='translate(10 10) rotate(90) scale(10)'
-                >
-                  <stop stopColor='#E33439' />
-                  <stop offset='1' stopColor='#FFF7F7' />
-                </radialGradient>
-              </defs>
-            </svg>
+            {bre99.loader ? (
+              <div className='ml-auto'>
+                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+              </div>
+            ) : null}
+            {bre99.res && <span className='text-xs font-normal text-light-grey'>{bre99.res}</span>}
           </div>
         </div>
-        <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+
+        {bre99.res && (
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!bureauOrCrif.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>{bureauOrCrif.label}</p>
+            </div>
+            <div>
+              {bureauOrCrif.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {bureauOrCrif.res && (
+                <span className='text-xs font-normal text-light-grey'>{bureauOrCrif.res}</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
           <div className='flex items-center gap-1'>
-            <svg
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                stroke='#EC7739'
-                strokeWidth='1.5'
-              />
-            </svg>
+            {!bre101.ran ? (
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                  stroke='#EC7739'
+                  strokeWidth='1.5'
+                />
+              </svg>
+            ) : (
+              <svg
+                width='24'
+                height='13'
+                viewBox='0 0 18 13'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M17 1L6 12L1 7'
+                  stroke='#147257'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            )}
+
             <p className='text-sm text-primary-black'>PAN card</p>
           </div>
           <div>
-            <svg
-              width='20'
-              height='20'
-              viewBox='0 0 20 20'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10Z'
-                fill='url(#paint0_angular_2724_6266)'
-              />
-              <defs>
-                <radialGradient
-                  id='paint0_angular_2724_6266'
-                  cx='0'
-                  cy='0'
-                  r='1'
-                  gradientUnits='userSpaceOnUse'
-                  gradientTransform='translate(10 10) rotate(90) scale(10)'
-                >
-                  <stop stopColor='#E33439' />
-                  <stop offset='1' stopColor='#FFF7F7' />
-                </radialGradient>
-              </defs>
-            </svg>
+            {bre101.loader ? (
+              <div className='ml-auto'>
+                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+              </div>
+            ) : null}
+            {gst.res && <span className='text-xs font-normal text-light-grey'>Valid Match</span>}
           </div>
-        </div>
-        <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-          <div className='flex items-center gap-1'>
-            <svg
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                stroke='#EC7739'
-                strokeWidth='1.5'
-              />
-            </svg>
-            <p className='text-sm text-primary-black'>PAN card</p>
-          </div>
-          <div>
-            <svg
-              width='20'
-              height='20'
-              viewBox='0 0 20 20'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10Z'
-                fill='url(#paint0_angular_2724_6266)'
-              />
-              <defs>
-                <radialGradient
-                  id='paint0_angular_2724_6266'
-                  cx='0'
-                  cy='0'
-                  r='1'
-                  gradientUnits='userSpaceOnUse'
-                  gradientTransform='translate(10 10) rotate(90) scale(10)'
-                >
-                  <stop stopColor='#E33439' />
-                  <stop offset='1' stopColor='#FFF7F7' />
-                </radialGradient>
-              </defs>
-            </svg>
-          </div>
-        </div>
+        </div> */}
       </div>
 
       <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center'>
@@ -335,10 +768,16 @@ const BRE_ONE = () => {
           <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
           <p className='text-sm not-italic font-normal text-dark-grey'>
             Eligibility can be increased by adding Co-applicant{' '}
-            <Link className='text-primary-red underline'>Add now</Link>
+            <Link
+              className={`underline ${
+                !bureauOrCrif.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
+              }`}
+            >
+              Add now
+            </Link>
           </p>
         </div>
-        <Button inputClasses='w-full h-14' primary={true}>
+        <Button disabled={!bureauOrCrif.res} inputClasses='w-full h-14' primary={true}>
           Next
         </Button>
       </div>
