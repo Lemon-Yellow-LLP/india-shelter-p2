@@ -1,8 +1,8 @@
 import { useContext, useEffect } from 'react';
 import ProgressBar from './ProgressBar';
 import { useNavigate } from 'react-router-dom';
-import { LeadContext } from '../../context/LeadContextProvider';
-import { LockIcon } from '../../assets/icons';
+import { LeadContext } from '../../../context/LeadContextProvider';
+import { LockIcon } from '../../../assets/icons';
 
 export default function DrawerSteps({ details, steps, index }) {
   const { setCurrentStepIndex, setDrawerOpen, drawerOpen, setActiveIndex } =

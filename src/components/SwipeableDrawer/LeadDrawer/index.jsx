@@ -4,18 +4,18 @@ import Box from '@mui/material/Box';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import propTypes from 'prop-types';
-import BottomSheetHandle from '../BottomSheetHandle';
+import BottomSheetHandle from '../../BottomSheetHandle';
 import SwipeableViews from 'react-swipeable-views';
 import { useTheme } from '@mui/material/styles';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import DrawerFooter from './DrawerFooter';
 import DrawerSteps from './DrawerSteps';
-import { LeadContext } from '../../context/LeadContextProvider';
-import { CommingSoon, DustbinIcon, ToolTipIcon } from '../../assets/icons';
-import { ClickAwayListener, FormControlLabel, IconButton, Tooltip } from '@mui/material';
-import DropDown from '../DropDown';
-import Switch from '@mui/material/Switch';
+import { LeadContext } from '../../../context/LeadContextProvider';
+import { CommingSoon, DustbinIcon, ToolTipIcon } from '../../../assets/icons';
+import { ClickAwayListener, IconButton, Tooltip } from '@mui/material';
+import DropDown from '../../DropDown';
+import ToggleSwitch from '../../ToggleSwitch';
 
 const drawerBleeding = 0;
 
@@ -84,8 +84,8 @@ export default function SwipeableDrawerComponent() {
     setOpen(false);
   };
 
-  const handleTooltipOpen = () => {
-    setOpen(true);
+  const handleTooltipToggle = () => {
+    setOpen((prev) => !prev);
   };
 
   const handleChange = (event, newValue) => {
@@ -122,54 +122,6 @@ export default function SwipeableDrawerComponent() {
       }
     });
   }, [values.applicants]);
-
-  const IOSSwitch = styled((props) => (
-    <Switch focusVisibleClassName='.Mui-focusVisible' disableRipple {...props} />
-  ))(({ theme }) => ({
-    width: 36,
-    height: 20,
-    padding: 0,
-    '& .MuiSwitch-switchBase': {
-      padding: 0,
-      margin: 2,
-      transitionDuration: '300ms',
-      '&.Mui-checked': {
-        transform: 'translateX(16px)',
-        color: '#fff',
-        '& + .MuiSwitch-track': {
-          backgroundColor: theme.palette.mode === 'dark' ? '#2ECA45' : '#E33439',
-          opacity: 1,
-          border: 0,
-        },
-        '&.Mui-disabled + .MuiSwitch-track': {
-          opacity: 0.5,
-        },
-      },
-      '&.Mui-focusVisible .MuiSwitch-thumb': {
-        color: '#33cf4d',
-        border: '6px solid #fff',
-      },
-      '&.Mui-disabled .MuiSwitch-thumb': {
-        color: theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[600],
-      },
-      '&.Mui-disabled + .MuiSwitch-track': {
-        opacity: theme.palette.mode === 'light' ? 0.7 : 0.3,
-      },
-    },
-    '& .MuiSwitch-thumb': {
-      boxSizing: 'border-box',
-      width: 16,
-      height: 16,
-    },
-    '& .MuiSwitch-track': {
-      borderRadius: 26 / 2,
-      backgroundColor: theme.palette.mode === 'light' ? '#E9E9EA' : '#39393D',
-      opacity: 1,
-      transition: theme.transitions.create(['background-color'], {
-        duration: 500,
-      }),
-    },
-  }));
 
   return (
     <Root>
@@ -250,7 +202,7 @@ export default function SwipeableDrawerComponent() {
             >
               <TabPanel
                 className='tabPanel'
-                style={{ maxHeight: `calc(84vh - 65px)`, overflow: 'auto' }}
+                style={{ maxHeight: `calc(100vh - 175px)`, overflow: 'auto' }}
                 value={value}
                 index={0}
                 dir={theme.direction}
@@ -264,7 +216,7 @@ export default function SwipeableDrawerComponent() {
               </TabPanel>
               <TabPanel
                 className='tabPanel'
-                style={{ height: `calc(80vh - 65px)`, overflow: 'auto' }}
+                style={{ height: `calc(100vh - 175px)`, overflow: 'auto' }}
                 value={value}
                 index={1}
                 dir={theme.direction}
@@ -286,14 +238,11 @@ export default function SwipeableDrawerComponent() {
                                   }}
                                   onClose={handleTooltipClose}
                                   open={open}
-                                  disableFocusListener
-                                  disableHoverListener
-                                  disableTouchListener
                                   title='You can add upto 4 Co-applicants'
                                   placement='bottom-start'
                                   arrow
                                 >
-                                  <IconButton onClick={handleTooltipOpen}>
+                                  <IconButton onClick={handleTooltipToggle}>
                                     <ToolTipIcon />
                                   </IconButton>
                                 </Tooltip>
@@ -334,7 +283,10 @@ export default function SwipeableDrawerComponent() {
                               <span className='text-[12px] font-[400] text-[#727376]'>
                                 Make it primary
                               </span>
-                              <IOSSwitch />
+                              <ToggleSwitch
+                                name='make_it_primary'
+                                onChange={(e) => console.log(e.target.name)}
+                              />
                             </div>
                             <div className='flex justify-end gap-2 items-center'>
                               <span className='text-[#727376] text-[12px] font-normal'>
@@ -343,7 +295,7 @@ export default function SwipeableDrawerComponent() {
                                   Amber
                                 </span>
                               </span>
-                              <button>
+                              <button onClick={() => console.log(activeCoApplicantIndex)}>
                                 <DustbinIcon />
                               </button>
                             </div>

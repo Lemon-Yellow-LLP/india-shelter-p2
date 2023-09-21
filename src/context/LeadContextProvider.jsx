@@ -148,42 +148,7 @@ const LeadContextProvider = ({ children }) => {
   const addApplicant = () => {
     formik.setValues((prev) => {
       let newData = { ...prev };
-      newData.applicants.push({
-        applicant_details: {
-          lead_id: null,
-          is_primary: false,
-          first_name: '',
-          middle_name: '',
-          last_name: '',
-          date_of_birth: null,
-          mobile_number: '',
-          is_mobile_verified: false,
-        },
-        personal_details: {
-          how_would_you_like_to_proceed: null,
-          id_type: null,
-          id_number: '',
-          selected_address_proof: null,
-          address_proof_number: '',
-          first_name: '',
-          middle_name: '',
-          last_name: '',
-          gender: null,
-          date_of_birth: null,
-          mobile_number: '',
-          father_husband_name: '',
-          mother_name: '',
-          marital_status: null,
-          religion: '',
-          preferred_language: '',
-          qualification: '',
-          email: '',
-          is_email_verified: false,
-          extra_params: {
-            same_as_id_type: false,
-          },
-        },
-      });
+      newData.applicants.push({ ...defaultValuesLead.applicants[0] });
 
       return newData;
     });

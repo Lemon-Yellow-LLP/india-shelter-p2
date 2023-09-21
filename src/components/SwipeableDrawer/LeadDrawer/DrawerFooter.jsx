@@ -1,7 +1,7 @@
-import DrawerArrowUpButton from '../../assets/icons/drawerArrowUpButton.svg';
-import DrawerArrowDownButton from '../../assets/icons/drawerArrowDownButton.svg';
+import DrawerArrowUpButton from '../../../assets/icons/drawerArrowUpButton.svg';
+import DrawerArrowDownButton from '../../../assets/icons/drawerArrowDownButton.svg';
 import { useContext } from 'react';
-import { LeadContext } from '../../context/LeadContextProvider';
+import { LeadContext } from '../../../context/LeadContextProvider';
 
 export default function DrawerFooter() {
   const { currentStepIndex, stepsProgress, drawerOpen, setDrawerOpen } = useContext(LeadContext);

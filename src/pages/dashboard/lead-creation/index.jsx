@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import SwipeableDrawerComponent from '../../../components/SwipeableDrawer/SwipeableDrawerComponent';
+import SwipeableDrawerComponent from '../../../components/SwipeableDrawer/LeadDrawer';
 
 const AddressDetails = lazy(() => import('./address-details'));
 const ApplicantDetails = lazy(() => import('./applicant-details'));
