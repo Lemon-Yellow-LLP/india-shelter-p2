@@ -7,8 +7,6 @@ import { residenceData, yearsResidingData } from './AddressDropdownData';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
-const TEST_ADDRESS_ID = 1;
-
 export default function AddressDetails() {
   const {
     inputDisabled,
@@ -26,7 +24,7 @@ export default function AddressDetails() {
   } = useContext(LeadContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    type_of_residence: false,
+    current_type_of_residence: false,
     current_flat_no_building_name: false,
     current_street_area_locality: false,
     current_town: false,
@@ -44,25 +42,28 @@ export default function AddressDetails() {
 
   const handleRadioChange = useCallback(
     (e) => {
-      setFieldValue('address_details.' + e.name, e.value);
+      setFieldValue(`applicants[${activeIndex}].address_detail.${e.name}`, e.value);
 
-      editAddressById(TEST_ADDRESS_ID, {
-        [e.name === 'type_of_residence' ? 'current_type_of_residence' : e.name]: e.value,
+      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+        [e.name]: e.value,
       });
 
       if (
-        values?.applicants?.[activeIndex]?.address_details?.extra_params
+        values?.applicants?.[activeIndex]?.address_detail?.extra_params
           .permanent_address_same_as_current &&
         e.name === 'current_no_of_year_residing'
       ) {
-        setFieldValue('address_details.permanent_no_of_year_residing', e.value);
-        editAddressById(TEST_ADDRESS_ID, {
+        setFieldValue(
+          `applicants[${activeIndex}].address_detail.permanent_no_of_year_residing`,
+          e.value,
+        );
+        editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
           permanent_no_of_year_residing:
-            values?.applicants?.[activeIndex]?.address_details?.current_no_of_year_residing,
+            values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing,
         });
       }
 
-      const name = e.name.split('.')[0];
+      const name = e.name;
 
       if (!requiredFieldsStatus[name]) {
         updateProgress(2, requiredFieldsStatus);
@@ -74,38 +75,38 @@ export default function AddressDetails() {
 
   const handleCurrentPincodeChange = useCallback(async () => {
     if (
-      !values?.applicants?.[activeIndex]?.address_details?.current_pincode ||
-      values?.applicants?.[activeIndex]?.address_details?.current_pincode.toString().length < 5
+      !values?.applicants?.[activeIndex]?.address_detail?.current_pincode ||
+      values?.applicants?.[activeIndex]?.address_detail?.current_pincode.toString().length < 5
     )
       return;
 
     const res = await checkIsValidStatePincode(
-      values?.applicants?.[activeIndex]?.address_details?.current_pincode,
+      values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
     );
     if (!res) {
-      setFieldError('address_details.current_pincode', 'Invalid Pincode');
+      setFieldError(`applicants[${activeIndex}].address_detail.current_pincode`, 'Invalid Pincode');
       return;
     }
 
-    editAddressById(TEST_ADDRESS_ID, {
+    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
       current_city: res.city,
       current_state: res.state,
     });
 
-    setFieldValue('address_details.current_city', res.city);
-    setFieldValue('address_details.current_state', res.state);
+    setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, res.city);
+    setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, res.state);
 
     if (
-      values?.applicants?.[activeIndex]?.address_details?.extra_params
+      values?.applicants?.[activeIndex]?.address_detail?.extra_params
         .permanent_address_same_as_current
     ) {
-      editAddressById(TEST_ADDRESS_ID, {
+      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
         permanent_city: res.city,
         permanent_state: res.state,
       });
 
-      setFieldValue('address_details.permanent_city', res.city);
-      setFieldValue('address_details.permanent_state', res.state);
+      setFieldValue(`applicants[${activeIndex}].address_detail.permanent_city`, res.city);
+      setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, res.state);
     }
 
     if (!requiredFieldsStatus['current_pincode']) {
@@ -113,8 +114,8 @@ export default function AddressDetails() {
       setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: true }));
     }
   }, [
-    errors?.applicants?.[activeIndex]?.address_details?.current_pincode,
-    values?.applicants?.[activeIndex]?.address_details?.current_pincode,
+    errors?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+    values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
     setFieldError,
     setFieldValue,
     requiredFieldsStatus,
@@ -122,32 +123,32 @@ export default function AddressDetails() {
 
   useEffect(() => {
     if (
-      values?.applicants?.[activeIndex]?.address_details?.extra_params
+      values?.applicants?.[activeIndex]?.address_detail?.extra_params
         ?.permanent_address_same_as_current
     ) {
       let newData = JSON.parse(JSON.stringify(values));
 
-      newData.applicants[activeIndex].address_details = {
-        ...newData.applicants[activeIndex].address_details,
+      newData.applicants[activeIndex].address_detail = {
+        ...newData.applicants[activeIndex].address_detail,
         permanent_flat_no_building_name:
-          values?.applicants?.[activeIndex]?.address_details?.current_flat_no_building_name,
+          values?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name,
         permanent_street_area_locality:
-          values?.applicants?.[activeIndex]?.address_details?.current_street_area_locality,
-        permanent_town: values?.applicants?.[activeIndex]?.address_details?.current_town,
-        permanent_landmark: values?.applicants?.[activeIndex]?.address_details?.current_landmark,
-        permanent_pincode: values?.applicants?.[activeIndex]?.address_details?.current_pincode,
-        permanent_city: values?.applicants?.[activeIndex]?.address_details?.current_city,
-        permanent_state: values?.applicants?.[activeIndex]?.address_details?.current_state,
+          values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality,
+        permanent_town: values?.applicants?.[activeIndex]?.address_detail?.current_town,
+        permanent_landmark: values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
+        permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+        permanent_city: values?.applicants?.[activeIndex]?.address_detail?.current_city,
+        permanent_state: values?.applicants?.[activeIndex]?.address_detail?.current_state,
         permanent_no_of_year_residing:
-          values?.applicants?.[activeIndex]?.address_details?.current_no_of_year_residing,
+          values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing,
       };
 
       setValues(newData);
     } else {
       let newData = JSON.parse(JSON.stringify(values));
 
-      newData.applicants[activeIndex].address_details = {
-        ...newData.applicants[activeIndex].address_details,
+      newData.applicants[activeIndex].address_detail = {
+        ...newData.applicants[activeIndex].address_detail,
         permanent_flat_no_building_name: '',
         permanent_street_area_locality: '',
         permanent_town: '',
@@ -160,62 +161,69 @@ export default function AddressDetails() {
 
       setValues(newData);
     }
-    if (values?.applicants?.[activeIndex]?.address_details?.type_of_residence) {
-      editAddressById(TEST_ADDRESS_ID, {
+
+    if (values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence) {
+      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
         permanent_flat_no_building_name:
-          values?.applicants?.[activeIndex]?.address_details?.current_flat_no_building_name,
+          values?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name,
         permanent_street_area_locality:
-          values?.applicants?.[activeIndex]?.address_details?.current_street_area_locality,
-        permanent_town: values?.applicants?.[activeIndex]?.address_details?.current_town,
-        permanent_landmark: values?.applicants?.[activeIndex]?.address_details?.current_landmark,
-        permanent_pincode: values?.applicants?.[activeIndex]?.address_details?.current_pincode,
-        permanent_city: values?.applicants?.[activeIndex]?.address_details?.current_city,
-        permanent_state: values?.applicants?.[activeIndex]?.address_details?.current_state,
+          values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality,
+        permanent_town: values?.applicants?.[activeIndex]?.address_detail?.current_town,
+        permanent_landmark: values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
+        permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+        permanent_city: values?.applicants?.[activeIndex]?.address_detail?.current_city,
+        permanent_state: values?.applicants?.[activeIndex]?.address_detail?.current_state,
         permanent_no_of_year_residing:
-          values?.applicants?.[activeIndex]?.address_details?.current_no_of_year_residing,
+          values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing,
       });
     }
   }, [
-    values?.applicants?.[activeIndex]?.address_details?.extra_params
+    values?.applicants?.[activeIndex]?.address_detail?.extra_params
       .permanent_address_same_as_current,
   ]);
 
   useEffect(() => {
-    if (values?.applicants?.[activeIndex]?.address_details?.type_of_residence === 'Rented') {
-      setFieldValue('address_details.extra_params.permanent_address_same_as_current', false);
+    if (values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence === 'Rented') {
+      setFieldValue(
+        `applicants[${activeIndex}].address_detail.extra_params.permanent_address_same_as_current`,
+        false,
+      );
     }
-  }, [values?.applicants?.[activeIndex]?.address_details?.type_of_residence]);
+  }, [values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence]);
 
   const handlePermanentPincodeChange = useCallback(async () => {
     if (
-      !values?.applicants?.[activeIndex]?.address_details?.permanent_pincode ||
-      values?.applicants?.[activeIndex]?.address_details?.permanent_pincode.toString().length < 5
+      !values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode ||
+      values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode.toString().length < 5
     )
       return;
 
     const res = await checkIsValidStatePincode(
-      values?.applicants?.[activeIndex]?.address_details?.permanent_pincode,
+      values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode,
     );
     if (!res) {
-      setFieldError('address_details.permanent_pincode', 'Invalid Pincode');
+      setFieldError(
+        `applicants[${activeIndex}].address_detail.permanent_pincode`,
+        'Invalid Pincode',
+      );
       return;
     }
 
-    editAddressById(TEST_ADDRESS_ID, {
+    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
       permanent_city: res.city,
       permanent_state: res.state,
     });
 
-    setFieldValue('address_details.permanent_city', res.city);
-    setFieldValue('address_details.permanent_state', res.state);
+    setFieldValue(`applicants[${activeIndex}].address_detail.permanent_city`, res.city);
+    setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, res.state);
 
     if (!requiredFieldsStatus['permanent_pincode']) {
       updateProgress(2, requiredFieldsStatus);
       setRequiredFieldsStatus((prev) => ({ ...prev, ['permanent_pincode']: true }));
     }
   }, [
-    errors?.applicants?.[activeIndex]?.address_details?.permanent_pincode,
-    values?.applicants?.[activeIndex]?.address_details?.permanent_pincode,
+    errors?.applicants?.[activeIndex]?.address_detail?.permanent_pincode,
+    values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode,
     setFieldError,
     setFieldValue,
     requiredFieldsStatus,
@@ -237,9 +245,9 @@ export default function AddressDetails() {
             <CardRadio
               key={index}
               label={residence.label}
-              name='type_of_residence'
+              name='current_type_of_residence'
               value={residence.value}
-              current={values?.applicants?.[activeIndex]?.address_details?.type_of_residence}
+              current={values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence}
               onChange={handleRadioChange}
             >
               {residence.icon}
@@ -248,7 +256,7 @@ export default function AddressDetails() {
         </div>
       </div>
 
-      {values?.applicants?.[activeIndex]?.address_details?.type_of_residence ? (
+      {values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence ? (
         <>
           {/* Current Address */}
           <label
@@ -262,44 +270,39 @@ export default function AddressDetails() {
             label='Flat no/Building name'
             placeholder='Eg: C-101'
             required
-            name='address_details.current_flat_no_building_name'
-            value={
-              values?.applicants?.[activeIndex]?.address_details?.current_flat_no_building_name
-            }
-            error={
-              errors?.applicants?.[activeIndex]?.address_details?.current_flat_no_building_name
-            }
+            name='address_detail.current_flat_no_building_name'
+            value={values?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name}
             touched={
-              touched?.applicants?.[activeIndex]?.address_details?.current_flat_no_building_name
+              touched?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name
             }
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors?.applicants?.[activeIndex]?.address_details
-                  ?.current_flat_no_building_name &&
-                values?.applicants?.[activeIndex]?.address_details?.current_flat_no_building_name
+                !errors?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name &&
+                values?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name
               ) {
                 if (
-                  values?.applicants?.[activeIndex]?.address_details?.extra_params
+                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
                     .permanent_address_same_as_current
                 ) {
                   setFieldValue(
-                    'address_details.permanent_flat_no_building_name',
-                    values?.applicants?.[activeIndex]?.address_details
+                    `applicants[${activeIndex}].address_detail.permanent_flat_no_building_name`,
+                    values?.applicants?.[activeIndex]?.address_detail
                       ?.current_flat_no_building_name,
                   );
-                  editAddressById(TEST_ADDRESS_ID, {
+                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                     current_flat_no_building_name:
-                      values?.applicants?.[activeIndex]?.address_details
+                      values?.applicants?.[activeIndex]?.address_detail
                         ?.current_flat_no_building_name,
                     permanent_flat_no_building_name:
-                      values?.applicants?.[activeIndex]?.address_details
+                      values?.applicants?.[activeIndex]?.address_detail
                         ?.current_flat_no_building_name,
                   });
                 } else {
-                  editAddressById(TEST_ADDRESS_ID, {
+                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                     current_flat_no_building_name:
-                      values?.applicants?.[activeIndex]?.address_details
+                      values?.applicants?.[activeIndex]?.address_detail
                         ?.current_flat_no_building_name,
                   });
                 }
@@ -310,9 +313,11 @@ export default function AddressDetails() {
               const value = e.currentTarget.value;
               const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
               if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+                setFieldValue(
+                  `applicants[${activeIndex}].${e.currentTarget.name}`,
+                  value.charAt(0).toUpperCase() + value.slice(1),
+                );
               }
-
               const name = e.target.name.split('.')[1];
               if (!requiredFieldsStatus[name]) {
                 updateProgress(2, requiredFieldsStatus);
@@ -326,39 +331,38 @@ export default function AddressDetails() {
             label='Street/Area/Locality'
             placeholder='Eg: Senapati road'
             required
-            name='address_details.current_street_area_locality'
-            value={values?.applicants?.[activeIndex]?.address_details?.current_street_area_locality}
-            error={errors?.applicants?.[activeIndex]?.address_details?.current_street_area_locality}
+            name='address_detail.current_street_area_locality'
+            value={values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality}
             touched={
-              touched?.applicants?.[activeIndex]?.address_details?.current_street_area_locality
+              touched?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality
             }
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors?.applicants?.[activeIndex]?.address_details?.current_street_area_locality &&
-                values?.applicants?.[activeIndex]?.address_details?.current_street_area_locality
+                !errors?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality &&
+                values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality
               ) {
                 if (
-                  values?.applicants?.[activeIndex]?.address_details?.extra_params
+                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
                     .permanent_address_same_as_current
                 ) {
                   setFieldValue(
-                    'address_details.permanent_street_area_locality',
-                    values?.applicants?.[activeIndex]?.address_details
-                      ?.current_street_area_locality,
+                    `applicants[${activeIndex}].address_detail.permanent_street_area_locality`,
+                    values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality,
                   );
-                  editAddressById(TEST_ADDRESS_ID, {
+                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                     current_street_area_locality:
-                      values?.applicants?.[activeIndex]?.address_details
+                      values?.applicants?.[activeIndex]?.address_detail
                         ?.current_street_area_locality,
                     permanent_street_area_locality:
-                      values?.applicants?.[activeIndex]?.address_details
+                      values?.applicants?.[activeIndex]?.address_detail
                         ?.current_street_area_locality,
                   });
                 } else {
-                  editAddressById(TEST_ADDRESS_ID, {
+                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                     current_street_area_locality:
-                      values?.applicants?.[activeIndex]?.address_details
+                      values?.applicants?.[activeIndex]?.address_detail
                         ?.current_street_area_locality,
                   });
                 }
@@ -369,7 +373,10 @@ export default function AddressDetails() {
               const value = e.currentTarget.value;
               const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
               if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+                setFieldValue(
+                  `applicants[${activeIndex}].${e.currentTarget.name}`,
+                  value.charAt(0).toUpperCase() + value.slice(1),
+                );
               }
 
               const name = e.target.name.split('.')[1];
@@ -385,32 +392,31 @@ export default function AddressDetails() {
             label='Town'
             placeholder='Eg: Igatpuri'
             required
-            name='address_details.current_town'
-            value={values?.applicants?.[activeIndex]?.address_details?.current_town}
-            error={errors?.applicants?.[activeIndex]?.address_details?.current_town}
-            touched={touched?.applicants?.[activeIndex]?.address_details?.current_town}
+            name='address_detail.current_town'
+            value={values?.applicants?.[activeIndex]?.address_detail?.current_town}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.current_town}
+            touched={touched?.applicants?.[activeIndex]?.address_detail?.current_town}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors?.applicants?.[activeIndex]?.address_details?.current_town &&
-                values?.applicants?.[activeIndex]?.address_details?.current_town
+                !errors?.applicants?.[activeIndex]?.address_detail?.current_town &&
+                values?.applicants?.[activeIndex]?.address_detail?.current_town
               ) {
                 if (
-                  values?.applicants?.[activeIndex]?.address_details?.extra_params
+                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
                     .permanent_address_same_as_current
                 ) {
                   setFieldValue(
-                    'address_details.permanent_town',
-                    values?.applicants?.[activeIndex]?.address_details?.current_town,
+                    `applicants[${activeIndex}].address_detail.permanent_town`,
+                    values?.applicants?.[activeIndex]?.address_detail?.current_town,
                   );
-                  editAddressById(TEST_ADDRESS_ID, {
-                    current_town: values?.applicants?.[activeIndex]?.address_details?.current_town,
-                    permanent_town:
-                      values?.applicants?.[activeIndex]?.address_details?.current_town,
+                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                    current_town: values?.applicants?.[activeIndex]?.address_detail?.current_town,
+                    permanent_town: values?.applicants?.[activeIndex]?.address_detail?.current_town,
                   });
                 } else {
-                  editAddressById(TEST_ADDRESS_ID, {
-                    current_town: values?.applicants?.[activeIndex]?.address_details?.current_town,
+                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                    current_town: values?.applicants?.[activeIndex]?.address_detail?.current_town,
                   });
                 }
               }
@@ -420,7 +426,10 @@ export default function AddressDetails() {
               const value = e.currentTarget.value;
               const pattern = /^[A-Za-z\s]+$/;
               if (pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+                setFieldValue(
+                  `applicants[${activeIndex}].${e.currentTarget.name}`,
+                  value.charAt(0).toUpperCase() + value.slice(1),
+                );
               }
 
               const name = e.target.name.split('.')[1];
@@ -436,34 +445,34 @@ export default function AddressDetails() {
             label='Landmark'
             placeholder='Eg: Near apollo hospital'
             required
-            name='address_details.current_landmark'
-            value={values?.applicants?.[activeIndex]?.address_details?.current_landmark}
-            error={errors?.applicants?.[activeIndex]?.address_details?.current_landmark}
-            touched={touched?.applicants?.[activeIndex]?.address_details?.current_landmark}
+            name='address_detail.current_landmark'
+            value={values?.applicants?.[activeIndex]?.address_detail?.current_landmark}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.current_landmark}
+            touched={touched?.applicants?.[activeIndex]?.address_detail?.current_landmark}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors?.applicants?.[activeIndex]?.address_details?.current_landmark &&
-                values?.applicants?.[activeIndex]?.address_details?.current_landmark
+                !errors?.applicants?.[activeIndex]?.address_detail?.current_landmark &&
+                values?.applicants?.[activeIndex]?.address_detail?.current_landmark
               ) {
                 if (
-                  values?.applicants?.[activeIndex]?.address_details?.extra_params
+                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
                     .permanent_address_same_as_current
                 ) {
                   setFieldValue(
-                    'address_details.permanent_landmark',
-                    values?.applicants?.[activeIndex]?.address_details?.current_landmark,
+                    `applicants[${activeIndex}].address_detail.permanent_landmark`,
+                    values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
                   );
-                  editAddressById(TEST_ADDRESS_ID, {
+                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                     current_landmark:
-                      values?.applicants?.[activeIndex]?.address_details?.current_landmark,
+                      values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
                     permanent_landmark:
-                      values?.applicants?.[activeIndex]?.address_details?.current_landmark,
+                      values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
                   });
                 } else {
-                  editAddressById(TEST_ADDRESS_ID, {
+                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                     current_landmark:
-                      values?.applicants?.[activeIndex]?.address_details?.current_landmark,
+                      values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
                   });
                 }
               }
@@ -473,7 +482,10 @@ export default function AddressDetails() {
               const value = e.currentTarget.value;
               const pattern = /^[A-Za-z\s]+$/;
               if (pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+                setFieldValue(
+                  `applicants[${activeIndex}].${e.currentTarget.name}`,
+                  value.charAt(0).toUpperCase() + value.slice(1),
+                );
               }
 
               const name = e.target.name.split('.')[1];
@@ -489,12 +501,12 @@ export default function AddressDetails() {
             label='Pincode'
             placeholder='Eg: 123456'
             required
-            name='address_details.current_pincode'
+            name='address_detail.current_pincode'
             type='tel'
             // hint='City and State fields will get filled based on Pincode'
-            value={values?.applicants?.[activeIndex]?.address_details?.current_pincode}
-            error={errors?.applicants?.[activeIndex]?.address_details?.current_pincode}
-            touched={touched?.applicants?.[activeIndex]?.address_details?.current_pincode}
+            value={values?.applicants?.[activeIndex]?.address_detail?.current_pincode}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.current_pincode}
+            touched={touched?.applicants?.[activeIndex]?.address_detail?.current_pincode}
             disabled={inputDisabled}
             onBlur={(e) => {
               handleBlur(e);
@@ -547,13 +559,13 @@ export default function AddressDetails() {
           <TextInput
             label='City'
             placeholder='Eg: Nashik'
-            name='address_details.current_city'
-            value={values?.applicants?.[activeIndex]?.address_details?.current_city}
-            error={errors?.applicants?.[activeIndex]?.address_details?.current_city}
-            touched={touched?.applicants?.[activeIndex]?.address_details?.current_city}
+            name='address_detail.current_city'
+            value={values?.applicants?.[activeIndex]?.address_detail?.current_city}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.current_city}
+            touched={touched?.applicants?.[activeIndex]?.address_detail?.current_city}
             onBlur={handleBlur}
             disabled={true}
-            labelDisabled={!values?.applicants?.[activeIndex]?.address_details?.current_city}
+            labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.current_city}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -561,13 +573,13 @@ export default function AddressDetails() {
           <TextInput
             label='State'
             placeholder='Eg: Maharashtra'
-            name='address_details.current_state'
-            value={values?.applicants?.[activeIndex]?.address_details?.current_state}
-            error={errors?.applicants?.[activeIndex]?.address_details?.current_state}
-            touched={touched?.applicants?.[activeIndex]?.address_details?.current_state}
+            name='address_detail.current_state'
+            value={values?.applicants?.[activeIndex]?.address_detail?.current_state}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.current_state}
+            touched={touched?.applicants?.[activeIndex]?.address_detail?.current_state}
             onBlur={handleBlur}
             disabled={true}
-            labelDisabled={!values?.applicants?.[activeIndex]?.address_details?.current_state}
+            labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.current_state}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -587,15 +599,14 @@ export default function AddressDetails() {
                   name='current_no_of_year_residing'
                   value={data.value}
                   current={
-                    values?.applicants?.[activeIndex]?.address_details?.current_no_of_year_residing
+                    values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing
                   }
                   onChange={handleRadioChange}
                 >
                   <span
                     className={`${
                       index ==
-                      values?.applicants?.[activeIndex]?.address_details
-                        ?.current_no_of_year_residing
+                      values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing
                         ? 'text-secondary-green font-semibold'
                         : 'text-primary-black font-normal'
                     }`}
@@ -606,29 +617,29 @@ export default function AddressDetails() {
               ))}
             </div>
           </div>
-          {values?.applicants?.[activeIndex]?.address_details?.type_of_residence ===
+          {values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence ===
           'Self owned' ? (
             <div className='flex items-center gap-2 mt-6'>
               <Checkbox
                 checked={
-                  values?.applicants?.[activeIndex]?.address_details?.extra_params
+                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
                     .permanent_address_same_as_current
                 }
                 name='permanent_address_same_as_current'
-                onChange={(e) => {
+                onTouchEnd={(e) => {
                   let isChecked = !!e.target.checked;
                   setFieldValue(
-                    'address_details.extra_params.permanent_address_same_as_current',
+                    `applicants[${activeIndex}].address_detail.extra_params.permanent_address_same_as_current`,
                     isChecked,
                   );
-                  editAddressById(TEST_ADDRESS_ID, {
+                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                     extra_params: {
                       [e.target.name]: isChecked,
                     },
                   });
                 }}
                 disabled={
-                  values?.applicants?.[activeIndex]?.address_details?.type_of_residence !==
+                  values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence !==
                   'Self owned'
                 }
               />
@@ -651,40 +662,43 @@ export default function AddressDetails() {
             label='Flat no/Building name'
             placeholder='Eg: C-101'
             required
-            name='address_details.permanent_flat_no_building_name'
+            name='address_detail.permanent_flat_no_building_name'
             value={
-              values?.applicants?.[activeIndex]?.address_details?.permanent_flat_no_building_name
+              values?.applicants?.[activeIndex]?.address_detail?.permanent_flat_no_building_name
             }
             error={
-              errors?.applicants?.[activeIndex]?.address_details?.permanent_flat_no_building_name
+              errors?.applicants?.[activeIndex]?.address_detail?.permanent_flat_no_building_name
             }
             touched={
-              touched?.applicants?.[activeIndex]?.address_details?.permanent_flat_no_building_name
+              touched?.applicants?.[activeIndex]?.address_detail?.permanent_flat_no_building_name
             }
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors?.applicants?.[activeIndex]?.address_details
+                !errors?.applicants?.[activeIndex]?.address_detail
                   ?.permanent_flat_no_building_name &&
-                values?.applicants?.[activeIndex]?.address_details?.permanent_flat_no_building_name
+                values?.applicants?.[activeIndex]?.address_detail?.permanent_flat_no_building_name
               ) {
-                editAddressById(TEST_ADDRESS_ID, {
+                editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                   permanent_flat_no_building_name:
-                    values?.applicants?.[activeIndex]?.address_details
+                    values?.applicants?.[activeIndex]?.address_detail
                       ?.permanent_flat_no_building_name,
                 });
               }
             }}
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.address_details?.extra_params
+              values?.applicants?.[activeIndex]?.address_detail?.extra_params
                 .permanent_address_same_as_current
             }
             onChange={(e) => {
               const value = e.currentTarget.value;
               const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
               if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+                setFieldValue(
+                  `applicants[${activeIndex}].${e.currentTarget.name}`,
+                  value.charAt(0).toUpperCase() + value.slice(1),
+                );
               }
 
               const name = e.target.name.split('.')[1];
@@ -700,40 +714,43 @@ export default function AddressDetails() {
             label='Street/Area/Locality'
             placeholder='Eg: Senapati road'
             required
-            name='address_details.permanent_street_area_locality'
+            name='address_detail.permanent_street_area_locality'
             value={
-              values?.applicants?.[activeIndex]?.address_details?.permanent_street_area_locality
+              values?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
             }
             error={
-              errors?.applicants?.[activeIndex]?.address_details?.permanent_street_area_locality
+              errors?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
             }
             touched={
-              touched?.applicants?.[activeIndex]?.address_details?.permanent_street_area_locality
+              touched?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
             }
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors?.applicants?.[activeIndex]?.address_details
+                !errors?.applicants?.[activeIndex]?.address_detail
                   ?.permanent_street_area_locality &&
-                values?.applicants?.[activeIndex]?.address_details?.permanent_street_area_locality
+                values?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
               ) {
-                editAddressById(TEST_ADDRESS_ID, {
+                editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                   permanent_street_area_locality:
-                    values?.applicants?.[activeIndex]?.address_details
+                    values?.applicants?.[activeIndex]?.address_detail
                       ?.permanent_street_area_locality,
                 });
               }
             }}
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.address_details?.extra_params
+              values?.applicants?.[activeIndex]?.address_detail?.extra_params
                 .permanent_address_same_as_current
             }
             onChange={(e) => {
               const value = e.currentTarget.value;
               const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
               if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+                setFieldValue(
+                  `applicants[${activeIndex}].${e.currentTarget.name}`,
+                  value.charAt(0).toUpperCase() + value.slice(1),
+                );
               }
 
               const name = e.target.name.split('.')[1];
@@ -749,32 +766,34 @@ export default function AddressDetails() {
             label='Town'
             placeholder='Eg: Igatpuri'
             required
-            name='address_details.permanent_town'
-            value={values?.applicants?.[activeIndex]?.address_details?.permanent_town}
-            error={errors?.applicants?.[activeIndex]?.address_details?.permanent_town}
-            touched={touched?.applicants?.[activeIndex]?.address_details?.permanent_town}
+            name='address_detail.permanent_town'
+            value={values?.applicants?.[activeIndex]?.address_detail?.permanent_town}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_town}
+            touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_town}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors?.applicants?.[activeIndex]?.address_details?.permanent_town &&
-                values?.applicants?.[activeIndex]?.address_details?.permanent_town
+                !errors?.applicants?.[activeIndex]?.address_detail?.permanent_town &&
+                values?.applicants?.[activeIndex]?.address_detail?.permanent_town
               ) {
-                editAddressById(TEST_ADDRESS_ID, {
-                  permanent_town:
-                    values?.applicants?.[activeIndex]?.address_details?.permanent_town,
+                editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                  permanent_town: values?.applicants?.[activeIndex]?.address_detail?.permanent_town,
                 });
               }
             }}
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.address_details?.extra_params
+              values?.applicants?.[activeIndex]?.address_detail?.extra_params
                 .permanent_address_same_as_current
             }
             onChange={(e) => {
               const value = e.currentTarget.value;
               const pattern = /^[A-Za-z\s]+$/;
               if (pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+                setFieldValue(
+                  `applicants[${activeIndex}].${e.currentTarget.name}`,
+                  value.charAt(0).toUpperCase() + value.slice(1),
+                );
               }
 
               const name = e.target.name.split('.')[1];
@@ -790,32 +809,35 @@ export default function AddressDetails() {
             label='Landmark'
             placeholder='Eg: Near apollo hospital'
             required
-            name='address_details.permanent_landmark'
-            value={values?.applicants?.[activeIndex]?.address_details?.permanent_landmark}
-            error={errors?.applicants?.[activeIndex]?.address_details?.permanent_landmark}
-            touched={touched?.applicants?.[activeIndex]?.address_details?.permanent_landmark}
+            name='address_detail.permanent_landmark'
+            value={values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_landmark}
+            touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_landmark}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors?.applicants?.[activeIndex]?.address_details?.permanent_landmark &&
-                values?.applicants?.[activeIndex]?.address_details?.permanent_landmark
+                !errors?.applicants?.[activeIndex]?.address_detail?.permanent_landmark &&
+                values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark
               ) {
-                editAddressById(TEST_ADDRESS_ID, {
+                editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                   permanent_landmark:
-                    values?.applicants?.[activeIndex]?.address_details?.permanent_landmark,
+                    values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark,
                 });
               }
             }}
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.address_details?.extra_params
+              values?.applicants?.[activeIndex]?.address_detail?.extra_params
                 .permanent_address_same_as_current
             }
             onChange={(e) => {
               const value = e.currentTarget.value;
               const pattern = /^[A-Za-z\s]+$/;
               if (pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+                setFieldValue(
+                  `applicants[${activeIndex}].${e.currentTarget.name}`,
+                  value.charAt(0).toUpperCase() + value.slice(1),
+                );
               }
 
               const name = e.target.name.split('.')[1];
@@ -831,15 +853,15 @@ export default function AddressDetails() {
             label='Pincode'
             placeholder='Eg: 123456'
             required
-            name='address_details.permanent_pincode'
+            name='address_detail.permanent_pincode'
             type='tel'
             hint='City and State fields will get filled based on Pincode'
-            value={values?.applicants?.[activeIndex]?.address_details?.permanent_pincode}
-            error={errors?.applicants?.[activeIndex]?.address_details?.permanent_pincode}
-            touched={touched?.applicants?.[activeIndex]?.address_details?.permanent_pincode}
+            value={values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
+            touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.address_details?.extra_params
+              values?.applicants?.[activeIndex]?.address_detail?.extra_params
                 .permanent_address_same_as_current
             }
             onBlur={(e) => {
@@ -893,13 +915,13 @@ export default function AddressDetails() {
           <TextInput
             label='City'
             placeholder='Eg: Nashik'
-            name='address_details.permanent_city'
-            value={values?.applicants?.[activeIndex]?.address_details?.permanent_city}
-            error={errors?.applicants?.[activeIndex]?.address_details?.permanent_city}
-            touched={touched?.applicants?.[activeIndex]?.address_details?.permanent_city}
+            name='address_detail.permanent_city'
+            value={values?.applicants?.[activeIndex]?.address_detail?.permanent_city}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_city}
+            touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_city}
             onBlur={handleBlur}
             disabled={true}
-            labelDisabled={!values?.applicants?.[activeIndex]?.address_details?.permanent_city}
+            labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.permanent_city}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -907,13 +929,13 @@ export default function AddressDetails() {
           <TextInput
             label='State'
             placeholder='Eg: Maharashtra'
-            name='address_details.permanent_state'
-            value={values?.applicants?.[activeIndex]?.address_details?.permanent_state}
-            error={errors?.applicants?.[activeIndex]?.address_details?.permanent_state}
-            touched={touched?.applicants?.[activeIndex]?.address_details?.permanent_state}
+            name='address_detail.permanent_state'
+            value={values?.applicants?.[activeIndex]?.address_detail?.permanent_state}
+            error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_state}
+            touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_state}
             onBlur={handleBlur}
             disabled={true}
-            labelDisabled={!values?.applicants?.[activeIndex]?.address_details?.permanent_state}
+            labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.permanent_state}
             onChange={() => {}}
             inputClasses='capitalize'
           />
@@ -933,21 +955,20 @@ export default function AddressDetails() {
                   name='permanent_no_of_year_residing'
                   value={data.value}
                   current={
-                    values?.applicants?.[activeIndex]?.address_details
-                      ?.permanent_no_of_year_residing
+                    values?.applicants?.[activeIndex]?.address_detail?.permanent_no_of_year_residing
                   }
                   onChange={handleRadioChange}
                   disabled={
-                    values?.applicants?.[activeIndex]?.address_details?.extra_params
+                    values?.applicants?.[activeIndex]?.address_detail?.extra_params
                       .permanent_address_same_as_current
                   }
                 >
                   <span
                     className={`${
                       index ==
-                      values?.applicants?.[activeIndex]?.address_details
+                      values?.applicants?.[activeIndex]?.address_detail
                         ?.permanent_no_of_year_residing
-                        ? values?.applicants?.[activeIndex]?.address_details?.extra_params
+                        ? values?.applicants?.[activeIndex]?.address_detail?.extra_params
                             .permanent_address_same_as_current
                           ? 'text-[#373435] font-semibold'
                           : 'text-secondary-green font-semibold'

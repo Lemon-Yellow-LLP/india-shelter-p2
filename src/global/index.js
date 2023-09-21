@@ -117,11 +117,6 @@ async function checkExistingCustomer(body) {
     mode: 'no-cors',
   };
 
-  // const res = await axios.post(
-  //   `https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run`,
-  //   body,
-  // );
-
   await fetch(
     'https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run',
     requestOptions2,

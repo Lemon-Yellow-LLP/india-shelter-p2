@@ -52,7 +52,101 @@ const LeadContextProvider = ({ children }) => {
   const addApplicant = () => {
     formik.setValues((prev) => {
       let newData = { ...prev };
-      newData.applicants.push({ ...defaultValuesLead.applicants[0] });
+      newData.applicants.push({
+        applicant_details: {
+          lead_id: null,
+          is_primary: false,
+          first_name: '',
+          middle_name: '',
+          last_name: '',
+          date_of_birth: null,
+          mobile_number: '',
+          is_mobile_verified: false,
+          extra_params: {
+            progress: 0,
+          },
+        },
+        personal_details: {
+          how_would_you_like_to_proceed: null,
+          id_type: null,
+          id_number: '',
+          selected_address_proof: null,
+          address_proof_number: '',
+          first_name: '',
+          middle_name: '',
+          last_name: '',
+          gender: null,
+          date_of_birth: null,
+          mobile_number: '',
+          father_husband_name: '',
+          mother_name: '',
+          marital_status: null,
+          religion: '',
+          preferred_language: '',
+          qualification: '',
+          email: '',
+          is_email_verified: false,
+          extra_params: {
+            same_as_id_type: false,
+            progress: 0,
+          },
+        },
+        address_detail: {
+          current_type_of_residence: '',
+          current_flat_no_building_name: '',
+          current_street_area_locality: '',
+          current_town: '',
+          current_landmark: '',
+          current_pincode: '',
+          current_city: '',
+          current_state: '',
+          current_no_of_year_residing: null,
+          permanent_type_of_residence: '',
+          permanent_flat_no_building_name: '',
+          permanent_street_area_locality: '',
+          permanent_town: '',
+          permanent_landmark: '',
+          permanent_pincode: '',
+          permanent_city: '',
+          permanent_state: '',
+          permanent_no_of_year_residing: null,
+          extra_params: {
+            permanent_address_same_as_current: false,
+            progress: 0,
+          },
+        },
+        work_income_details: {
+          profession: '',
+          company_name: '',
+          total_income: '',
+          pf_uan: '',
+          no_current_loan: '',
+          ongoing_emi: '',
+          working_since: '',
+          mode_of_salary: '',
+          flat_no_building_name: '',
+          street_area_locality: '',
+          town: '',
+          landmark: '',
+          pincode: '',
+          city: '',
+          state: '',
+          total_family_number: '',
+          total_household_income: '',
+          no_of_dependents: '',
+          business_name: '',
+          industries: '',
+          gst_number: '',
+          pention_amount: '',
+          geo_lat: '',
+          geo_long: '',
+          extra_params: {
+            extra_company_name: '',
+            extra_industries: '',
+            progress: 0,
+          },
+        },
+      });
 
       return newData;
     });
@@ -77,6 +171,7 @@ const LeadContextProvider = ({ children }) => {
   });
 
   // console.log(formik.values);
+  // console.log(activeIndex);
 
   return (
     <LeadContext.Provider

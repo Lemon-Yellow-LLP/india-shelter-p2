@@ -88,7 +88,7 @@ export const defaultValuesLead = {
           progress: 0,
         },
       },
-      address_details: {
+      address_detail: {
         current_type_of_residence: '',
         current_flat_no_building_name: '',
         current_street_area_locality: '',

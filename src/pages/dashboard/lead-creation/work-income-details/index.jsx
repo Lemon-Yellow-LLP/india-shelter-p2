@@ -34,128 +34,6 @@ const WorkIncomeDetails = () => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   if (values.work_income_details.profession === 'Salaried') {
-  //     editFieldsById(1, 'work-income', {
-  //       business_name: null,
-  //       industries: null,
-  //       gst_number: null,
-  //       pention_amount: null,
-  //     });
-  //     // setValues({
-  //     //   ...values,
-  //     //   work_income_details: {
-  //     //     ...values.work_income_details,
-  //     //     business_name: '',
-  //     //     industries: '',
-  //     //     gst_number: '',
-  //     //     pention_amount: '',
-  //     //   },
-  //     // });
-  //   } else if (values.work_income_details.profession === 'Self-employed') {
-  //     editFieldsById(1, 'work-income', {
-  //       company_name: null,
-  //       total_income: null,
-  //       pf_uan: null,
-  //       working_since: null,
-  //       mode_of_salary: null,
-  //       pention_amount: null,
-  //     });
-  //     setValues({
-  //       ...values,
-  //       work_income_details: {
-  //         ...values.work_income_details,
-  //         company_name: '',
-  //         total_income: '',
-  //         pf_uan: '',
-  //         working_since: '',
-  //         mode_of_salary: '',
-  //         pention_amount: '',
-  //       },
-  //     });
-  //   } else if (values.work_income_details.profession === 'Unemployed') {
-  //     editFieldsById(1, 'work-income', {
-  //       company_name: null,
-  //       total_income: null,
-  //       pf_uan: null,
-  //       working_since: null,
-  //       mode_of_salary: null,
-  //       flat_no_building_name: null,
-  //       street_area_locality: null,
-  //       town: null,
-  //       landmark: null,
-  //       pincode: null,
-  //       city: null,
-  //       state: null,
-  //       business_name: null,
-  //       industries: null,
-  //       gst_number: null,
-  //       pention_amount: null,
-  //     });
-  //     setValues({
-  //       ...values,
-  //       work_income_details: {
-  //         ...values.work_income_details,
-  //         company_name: '',
-  //         total_income: '',
-  //         pf_uan: '',
-  //         working_since: '',
-  //         mode_of_salary: '',
-  //         flat_no_building_name: '',
-  //         street_area_locality: '',
-  //         town: '',
-  //         landmark: '',
-  //         pincode: '',
-  //         city: '',
-  //         state: '',
-  //         business_name: '',
-  //         industries: '',
-  //         gst_number: '',
-  //         pention_amount: '',
-  //       },
-  //     });
-  //   } else {
-  //     editFieldsById(1, 'work-income', {
-  //       company_name: null,
-  //       total_income: null,
-  //       pf_uan: null,
-  //       working_since: null,
-  //       mode_of_salary: null,
-  //       flat_no_building_name: null,
-  //       street_area_locality: null,
-  //       town: null,
-  //       landmark: null,
-  //       pincode: null,
-  //       city: null,
-  //       state: null,
-  //       business_name: null,
-  //       industries: null,
-  //       gst_number: null,
-  //     });
-  //     setValues({
-  //       ...values,
-  //       work_income_details: {
-  //         ...values.work_income_details,
-  //         company_name: '',
-  //         total_income: '',
-  //         pf_uan: '',
-  //         working_since: '',
-  //         mode_of_salary: '',
-  //         flat_no_building_name: '',
-  //         street_area_locality: '',
-  //         town: '',
-  //         landmark: '',
-  //         pincode: '',
-  //         city: '',
-  //         state: '',
-  //         business_name: '',
-  //         industries: '',
-  //         gst_number: '',
-  //       },
-  //     });
-  //   }
-  // }, [values.work_income_details.profession]);
-
   const handleOnPincodeChange = useCallback(async () => {
     if (
       !values.work_income_details.pincode ||
@@ -180,17 +58,11 @@ const WorkIncomeDetails = () => {
 
     setFieldValue('work_income_details.city', res.city);
     setFieldValue('work_income_details.state', res.state);
-
-    // if (!requiredFieldsStatus['pincode']) {
-    //   updateProgress(4, requiredFieldsStatus);
-    //   setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: true }));
-    // }
   }, [
     errors.work_income_details?.pincode,
     values.work_income_details.pincode,
     setFieldError,
     setFieldValue,
-    // requiredFieldsStatus,
   ]);
 
   return (
@@ -481,20 +353,6 @@ const WorkIncomeDetails = () => {
                   );
                 })}
               </div>
-
-              {/* {errors.work_income_details?.total_family_number &&
-              !touched.work_income_details?.total_family_number &&
-              !values.work_income_details.total_family_number ? (
-                <span className='text-sm text-primary-red'>
-                  {errors.work_income_details.total_family_number}
-                </span>
-              ) : null} */}
-
-              {/* {errors.work_income_details?.total_family_number && (
-                <span className='text-sm text-primary-red'>
-                  {errors.work_income_details.total_family_number}
-                </span>
-              )} */}
             </div>
 
             <CurrencyInput
@@ -526,12 +384,6 @@ const WorkIncomeDetails = () => {
                     value.charAt(0).toUpperCase() + value.slice(1),
                   );
                 }
-
-                // const name = e.target.name.split('.')[1];
-                // if (!requiredFieldsStatus[name]) {
-                //   updateProgress(6, requiredFieldsStatus);
-                //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                // }
               }}
             />
 
@@ -554,25 +406,9 @@ const WorkIncomeDetails = () => {
                   );
                 })}
               </div>
-
-              {/* {errors.work_income_details?.no_of_dependents &&
-              !touched.work_income_details?.no_of_dependents &&
-              !values.work_income_details.no_of_dependents ? (
-                <span className='text-sm text-primary-red'>
-                  {errors.work_income_details.no_of_dependents}
-                </span>
-              ) : null} */}
-
-              {/* {errors.work_income_details?.no_of_dependents && (
-                <span className='text-sm text-primary-red'>
-                  {errors.work_income_details.no_of_dependents}
-                </span>
-              )} */}
             </div>
           </>
         ) : null}
-
-        {/* <button onClick={handleSubmit}>submit</button> */}
       </div>
     </div>
   );

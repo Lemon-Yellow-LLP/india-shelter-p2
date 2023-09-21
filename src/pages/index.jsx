@@ -10,10 +10,7 @@ import axios from 'axios';
 
 const DashboardRoutes = () => {
   const { isAuthenticated } = useContext(AuthContext);
-  const { setValues, values, setActiveIndex } = useContext(LeadContext);
-  // const [data, setData] = useState([]);
-
-  // console.log('values', values);
+  const { setValues, setActiveIndex } = useContext(LeadContext);
 
   const getData = async () => {
     await axios

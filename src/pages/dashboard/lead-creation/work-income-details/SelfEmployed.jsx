@@ -4,49 +4,14 @@ import TextInput from '../../../../components/TextInput';
 import DropDown from '../../../../components/DropDown';
 import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
+import { industriesOptions } from './WorkIncomeDropdownData';
 
 export default function SelfEmployed() {
   const { values, errors, handleBlur, touched, setFieldValue, setFieldError } =
     useContext(LeadContext);
 
-  const industriesOptions = [
-    {
-      label: 'Others',
-      value: 'Others',
-    },
-    {
-      label: 'IT',
-      value: 'IT',
-    },
-    {
-      label: 'Architecture',
-      value: 'Architecture',
-    },
-    {
-      label: 'Fashion Designer',
-      value: 'Fashion Designer',
-    },
-    {
-      label: 'Designer',
-      value: 'Designer',
-    },
-    {
-      label: 'Engineer',
-      value: 'Engineer',
-    },
-    {
-      label: 'HR',
-      value: 'HR',
-    },
-  ];
-
   const handleDropdownChange = useCallback((value) => {
     setFieldValue('work_income_details.industries', value);
-
-    // if (!requiredFieldsStatus['reference_2_type']) {
-    //   updateProgress(6, requiredFieldsStatus);
-    //   setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_type']: true }));
-    // }
 
     editFieldsById(1, 'work-income', {
       industries: value,
@@ -140,12 +105,6 @@ export default function SelfEmployed() {
             if (address_pattern.exec(value[value.length - 1])) {
               setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
             }
-
-            // const name = e.target.name.split('.')[1];
-            // if (!requiredFieldsStatus[name]) {
-            //   updateProgress(6, requiredFieldsStatus);
-            //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-            // }
           }}
         />
       )}

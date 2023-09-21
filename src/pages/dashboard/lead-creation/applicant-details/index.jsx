@@ -181,9 +181,11 @@ const ApplicantDetails = () => {
         e.preventDefault();
         return;
       }
+
       if (phoneNumber.length > 10) {
         return;
       }
+
       if (
         phoneNumber.charAt(0) === '0' ||
         phoneNumber.charAt(0) === '1' ||
@@ -734,9 +736,6 @@ const ApplicantDetails = () => {
               )
             }
             min='0'
-            onInput={(e) => {
-              if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
-            }}
           />
 
           {showOTPInput && (
