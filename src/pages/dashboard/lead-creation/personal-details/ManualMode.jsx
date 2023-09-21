@@ -25,6 +25,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     activeIndex,
     setActiveIndex,
     setFieldError,
+    setValues,
   } = useContext(LeadContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
@@ -177,26 +178,32 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-      setFieldValue(
-        `applicants[${activeIndex}].personal_details.selected_address_proof`,
-        values?.applicants[activeIndex]?.personal_details?.id_type,
-      );
-      setFieldValue(
-        `applicants[${activeIndex}].personal_details.address_proof_number`,
-        values?.applicants[activeIndex]?.personal_details?.id_number,
-      );
+      let newData = JSON.parse(JSON.stringify(values));
+
+      newData.applicants[activeIndex].personal_details = {
+        ...newData.applicants[activeIndex].personal_details,
+        selected_address_proof: values?.applicants[activeIndex]?.personal_details?.id_type,
+        address_proof_number: values?.applicants[activeIndex]?.personal_details?.id_number,
+      };
+
+      setValues(newData);
     }
 
     if (
       values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
       values?.applicants[activeIndex]?.personal_details?.id_type === 'PAN Card'
     ) {
-      setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
-      setFieldValue(`applicants[${activeIndex}].personal_details.selected_address_proof`, '');
-      setFieldValue(
-        `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
-        false,
-      );
+      let newData = JSON.parse(JSON.stringify(values));
+
+      newData.applicants[activeIndex].personal_details = {
+        ...newData.applicants[activeIndex].personal_details,
+        selected_address_proof: '',
+        address_proof_number: '',
+      };
+
+      newData.applicants[activeIndex].personal_details.extra_params.same_as_id_type = false;
+
+      setValues(newData);
     }
   }, [
     values?.applicants[activeIndex]?.personal_details?.id_type,

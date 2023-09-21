@@ -5,19 +5,7 @@ import { validationSchemaLead } from '../schemas/index';
 import { defaultErrorsLead } from './defaultErrorsLead';
 import { defaultValuesLead } from './defaultValuesLead';
 import { useNavigate } from 'react-router-dom';
-import {
-  ApplicantDetailsIcon,
-  WorkIncomeIcon,
-  UploadIcon,
-  ReferenceDetailsIcon,
-  QualifierIcon,
-  PropertyDetailsIcon,
-  PreviewIcon,
-  PersonalDetailsIcon,
-  LnTIcon,
-  BankingDetailsIcon,
-  AddressDetailsIcon,
-} from '../assets/icons';
+import { applicantSteps, coApplicantSteps } from './Steps';
 
 export const LeadContext = createContext(defaultValuesLead);
 
@@ -29,93 +17,9 @@ const LeadContextProvider = ({ children }) => {
   const [isExisting, setIsExisting] = useState(true);
   const [existingData, setExistingData] = useState({});
 
-  const [stepsProgress, setStepProgress] = useState([
-    {
-      title: 'Applicant Details',
-      description: 'Name, Mobile Number, Loan Type',
-      progress: 0,
-      url: '/lead/applicant-details',
-      Icon: ApplicantDetailsIcon,
-    },
-    {
-      title: 'Personal Details',
-      description: 'OCR, e-KYC, Address',
-      progress: 0,
-      url: '/lead/personal-details',
-      lock: true,
-      Icon: PersonalDetailsIcon,
-    },
-    {
-      title: 'Address Details',
-      description: 'OCR, e-KYC, Address',
-      progress: 0,
-      url: '/lead/address-details',
-      lock: true,
-      Icon: AddressDetailsIcon,
-    },
-    {
-      title: 'Work/Income Details',
-      description: 'Profession details, Family Income',
-      progress: 0,
-      url: '/lead/work-income-details',
-      lock: true,
-      Icon: WorkIncomeIcon,
-    },
-    {
-      title: 'Qualifier is not activated',
-      description: 'Complete Applicant, Personal, Address and Work & Income details to activate',
-      url: '/lead/work-income-details',
-      hideProgress: true,
-      Icon: QualifierIcon,
-    },
-    {
-      title: 'L&T Charges',
-      description: 'Fee details',
-      progress: 0,
-      url: '/lead/lnt-charges',
-      lock: true,
-      Icon: LnTIcon,
-    },
-    {
-      title: 'Property Details',
-      description: 'Profession details, Family Income',
-      progress: 0,
-      url: '/lead/property-details',
-      lock: true,
-      Icon: PropertyDetailsIcon,
-    },
-    {
-      title: 'Banking Details',
-      description: 'IFSC Details, Bank Statement',
-      progress: 0,
-      url: '/lead/banking-details',
-      lock: true,
-      Icon: BankingDetailsIcon,
-    },
-    {
-      title: 'Reference Details',
-      description: 'Reference person name, Mobile number',
-      progress: 0,
-      url: '/lead/reference-details',
-      lock: true,
-      Icon: ReferenceDetailsIcon,
-    },
-    {
-      title: 'Upload Documents',
-      description: 'Aadhar, PAN, Property document',
-      progress: 0,
-      url: '/lead/upload-documents',
-      lock: true,
-      Icon: UploadIcon,
-    },
-    {
-      title: 'Preview',
-      description: '',
-      url: '/lead/upload-documents',
-      hideProgress: true,
-      Icon: PreviewIcon,
-    },
-  ]);
+  const [applicantStepsProgress, setApplicantSetpsProgress] = useState([...applicantSteps]);
+
+  const [coApplicantStepsProgress, setCoApplicantSetpsProgress] = useState([...coApplicantSteps]);
 
   const updateProgress = (updateIndex, requiredFieldsStatus) => {
     let trueCount = 0;
@@ -128,8 +32,8 @@ const LeadContextProvider = ({ children }) => {
 
     // console.log(trueCount, Object.keys(requiredFieldsStatus).length);
 
-    setStepProgress((prevStepsProgress) => {
-      const newData = prevStepsProgress.map((step, index) => {
+    setApplicantSetpsProgress((prevApplicantStepsProgress) => {
+      const newData = prevApplicantStepsProgress.map((step, index) => {
         if (index === updateIndex && step.progress !== 100) {
           return {
             ...step,
@@ -178,7 +82,7 @@ const LeadContextProvider = ({ children }) => {
     <LeadContext.Provider
       value={{
         ...formik,
-        stepsProgress,
+        applicantStepsProgress,
         updateProgress,
         addApplicant,
         currentStepIndex,
@@ -193,6 +97,8 @@ const LeadContextProvider = ({ children }) => {
         setIsExisting,
         existingData,
         setExistingData,
+        coApplicantStepsProgress,
+        setCoApplicantSetpsProgress,
       }}
     >
       {children}

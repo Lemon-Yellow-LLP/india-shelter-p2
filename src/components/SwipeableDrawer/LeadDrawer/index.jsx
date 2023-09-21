@@ -59,13 +59,14 @@ function a11yProps(index) {
 
 export default function SwipeableDrawerComponent() {
   const {
-    stepsProgress,
+    applicantStepsProgress,
     updateProgress,
     addApplicant,
     drawerOpen,
     setDrawerOpen,
     values,
     setActiveIndex,
+    coApplicantStepsProgress,
   } = useContext(LeadContext);
 
   const theme = useTheme();
@@ -208,8 +209,8 @@ export default function SwipeableDrawerComponent() {
                 dir={theme.direction}
               >
                 <div className='flex flex-col gap-[16px] w-[100%] pb-[80px] p-[15px]'>
-                  {stepsProgress &&
-                    stepsProgress.map((e, index) => (
+                  {applicantStepsProgress &&
+                    applicantStepsProgress.map((e, index) => (
                       <DrawerSteps key={index} details={e} steps={true} index={primaryIndex} />
                     ))}
                 </div>
@@ -301,8 +302,8 @@ export default function SwipeableDrawerComponent() {
                             </div>
                           </div>
                           <div className='flex flex-col gap-[16px] w-[100%] pb-[80px]'>
-                            {stepsProgress &&
-                              stepsProgress.map((e, index) => (
+                            {coApplicantStepsProgress &&
+                              coApplicantStepsProgress.map((e, index) => (
                                 <DrawerSteps
                                   key={index}
                                   details={e}
