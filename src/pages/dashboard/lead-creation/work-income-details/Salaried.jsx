@@ -8,16 +8,16 @@ import { editFieldsById, getCompanyNamesList } from '../../../../global';
 import { workingSinceOptions, modeOfSalary } from './WorkIncomeDropdownData';
 
 export default function Salaried() {
-  const { values, errors, touched, handleBlur, setFieldValue, setFieldError } =
+  const { values, errors, touched, handleBlur, setFieldValue, setFieldError, activeIndex } =
     useContext(LeadContext);
 
   const [companyNameOptions, setCompanyNameOptions] = useState([]);
 
   const searchableTextInputChange = useCallback((name, value) => {
-    setFieldValue(name, value?.label);
+    setFieldValue(`applicants[${activeIndex}].${name}`, value?.value);
     const new_name = name.split('.')[1];
 
-    editFieldsById(1, 'work-income', {
+    editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
       [new_name]: value?.label,
     });
   }, []);
@@ -48,9 +48,8 @@ export default function Salaried() {
   }, []);
 
   const handleDropdownChange = useCallback((value) => {
-    setFieldValue('work_income_details.mode_of_salary', value);
-
-    editFieldsById(1, 'work-income', {
+    setFieldValue(`applicants[${activeIndex}].work_income_detail.mode_of_salary`, value);
+    editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
       mode_of_salary: value,
     });
   }, []);
@@ -61,20 +60,24 @@ export default function Salaried() {
         label='Company name'
         placeholder='Search company name'
         required
-        name='work_income_details.company_name'
-        value={values.work_income_details.company_name}
-        error={errors.work_income_details?.company_name}
-        touched={touched.work_income_details?.company_name}
+        name='work_income_detail.company_name'
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.company_name}
+        error={errors?.applicants?.[activeIndex]?.work_income_detail?.company_name}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.company_name}
         onBlur={(e) => {
           handleBlur(e);
 
           if (
-            !errors.work_income_details?.company_name &&
-            values.work_income_details.company_name
+            !errors?.applicants?.[activeIndex]?.work_income_detail?.company_name &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.company_name
           ) {
-            editFieldsById(1, 'work-income', {
-              company_name: values.work_income_details.company_name,
-            });
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                company_name: values?.applicants?.[activeIndex]?.work_income_detail?.company_name,
+              },
+            );
           }
         }}
         onChange={searchableTextInputChange}
@@ -82,34 +85,51 @@ export default function Salaried() {
         options={companyNameOptions}
       />
 
-      {values.work_income_details.company_name === 'Others' && (
+      {values?.applicants?.[activeIndex]?.work_income_detail?.company_name === 'Others' && (
         <TextInput
           label=''
           placeholder='Enter company name'
-          name='work_income_details.extra_params.extra_company_name'
-          value={values.work_income_details.extra_params.extra_company_name}
-          error={errors.work_income_details?.extra_params?.extra_company_name}
-          touched={touched.work_income_details?.extra_params?.extra_company_name}
+          name='work_income_detail.extra_params.extra_company_name'
+          value={
+            values?.applicants?.[activeIndex]?.work_income_detail?.extra_params.extra_company_name
+          }
+          error={
+            errors?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.extra_company_name
+          }
+          touched={
+            touched?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.extra_company_name
+          }
           onBlur={(e) => {
             handleBlur(e);
 
             if (
-              !errors.work_income_details?.extra_params?.extra_company_name &&
-              values.work_income_details.extra_params?.extra_company_name
+              !errors?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+                ?.extra_company_name &&
+              values?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+                ?.extra_company_name
             ) {
-              editFieldsById(1, 'work-income', {
-                company_name: values.work_income_details.extra_params?.extra_company_name,
-                extra_params: {
-                  extra_company_name: 'Others',
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                'work-income',
+                {
+                  company_name:
+                    values?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+                      ?.extra_company_name,
+                  extra_params: {
+                    extra_company_name: 'Others',
+                  },
                 },
-              });
+              );
             }
           }}
           onChange={(e) => {
             const value = e.currentTarget.value;
             const pattern = /^[a-zA-Z\s]+$/;
             if (pattern.exec(value[value.length - 1])) {
-              setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+              setFieldValue(
+                `applicants[${activeIndex}].${e.currentTarget.name}`,
+                value.charAt(0).toUpperCase() + value.slice(1),
+              );
             }
           }}
         />
@@ -119,27 +139,34 @@ export default function Salaried() {
         label='Total income'
         placeholder='Eg: 1,00,000'
         required
-        name='work_income_details.total_income'
-        value={values.work_income_details.total_income}
-        error={errors.work_income_details?.total_income}
-        touched={touched.work_income_details?.total_income}
+        name='work_income_detail.total_income'
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.total_income}
+        error={errors?.applicants?.[activeIndex]?.work_income_detail?.total_income}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.total_income}
         onBlur={(e) => {
           handleBlur(e);
 
           if (
-            !errors.work_income_details?.total_income &&
-            values.work_income_details.total_income
+            !errors?.applicants?.[activeIndex]?.work_income_detail?.total_income &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.total_income
           ) {
-            editFieldsById(1, 'work-income', {
-              total_income: values.work_income_details.total_income,
-            });
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                total_income: values?.applicants?.[activeIndex]?.work_income_detail?.total_income,
+              },
+            );
           }
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            setFieldValue(
+              `applicants[${activeIndex}].${e.currentTarget.name}`,
+              value.charAt(0).toUpperCase() + value.slice(1),
+            );
           }
         }}
       />
@@ -147,17 +174,24 @@ export default function Salaried() {
       <TextInput
         label='PF UAN'
         placeholder='Eg: 100563503285'
-        name='work_income_details.pf_uan'
-        value={values.work_income_details.pf_uan}
-        error={errors.work_income_details?.pf_uan}
-        touched={touched.work_income_details?.pf_uan}
+        name='work_income_detail.pf_uan'
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
+        error={errors?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
         onBlur={(e) => {
           handleBlur(e);
 
-          if (!errors.work_income_details?.pf_uan && values.work_income_details.pf_uan) {
-            editFieldsById(1, 'work-income', {
-              pf_uan: values.work_income_details.pf_uan,
-            });
+          if (
+            !errors?.applicants?.[activeIndex]?.work_income_detail?.pf_uan &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan
+          ) {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                pf_uan: values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan,
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -167,16 +201,19 @@ export default function Salaried() {
           }
           const address_pattern = /^[0-9]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            setFieldValue(
+              `applicants[${activeIndex}].${e.currentTarget.name}`,
+              value.charAt(0).toUpperCase() + value.slice(1),
+            );
           }
         }}
         onKeyDown={(e) => {
           if (e.key === 'Backspace') {
             setFieldValue(
-              'work_income_details.pf_uan',
-              values.work_income_details.pf_uan.slice(
+              `applicants[${activeIndex}].work_income_detail.pf_uan`,
+              values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan.slice(
                 0,
-                values.work_income_details.pf_uan.length - 1,
+                values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan.length - 1,
               ),
             );
           }
@@ -187,42 +224,55 @@ export default function Salaried() {
         label='No. of current loan(s)'
         placeholder='Choose no. of current loan(s)'
         required
-        name='work_income_details.no_current_loan'
-        value={values.work_income_details.no_current_loan}
-        error={errors.work_income_details?.no_current_loan}
-        touched={touched.work_income_details?.no_current_loan}
+        name='work_income_detail.no_current_loan'
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
+        error={errors?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
         onBlur={(e) => {
           handleBlur(e);
-          if (values.work_income_details.no_current_loan == 0) {
-            setFieldValue('work_income_details.ongoing_emi', '');
-            editFieldsById(1, 'work-income', {
-              ongoing_emi: null,
-            });
+          if (values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0) {
+            setFieldValue(`applicants[${activeIndex}].work_income_detail.ongoing_emi`, '');
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                ongoing_emi: null,
+              },
+            );
           }
 
           if (
-            !errors.work_income_details?.no_current_loan &&
-            values.work_income_details.no_current_loan
+            !errors?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan
           ) {
-            editFieldsById(1, 'work-income', {
-              no_current_loan: parseInt(values.work_income_details.no_current_loan),
-            });
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                no_current_loan: parseInt(
+                  values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan,
+                ),
+              },
+            );
           }
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const address_pattern = /^[0-9]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            setFieldValue(
+              `applicants[${activeIndex}].${e.currentTarget.name}`,
+              value.charAt(0).toUpperCase() + value.slice(1),
+            );
           }
         }}
         onKeyDown={(e) => {
           if (e.key === 'Backspace') {
             setFieldValue(
-              'work_income_details.no_current_loan',
-              values.work_income_details.no_current_loan.slice(
+              `applicants[${activeIndex}].work_income_detail.no_current_loan`,
+              values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.slice(
                 0,
-                values.work_income_details.no_current_loan.length - 1,
+                values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.length - 1,
               ),
             );
           }
@@ -233,42 +283,54 @@ export default function Salaried() {
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'
         required
-        name='work_income_details.ongoing_emi'
-        value={values.work_income_details.ongoing_emi}
+        name='work_income_detail.ongoing_emi'
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi}
         error={
-          values.work_income_details.no_current_loan != 0
-            ? errors.work_income_details?.ongoing_emi
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan != 0
+            ? errors?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi
             : null
         }
-        touched={touched.work_income_details?.ongoing_emi}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi}
         onBlur={(e) => {
           handleBlur(e);
 
-          if (!errors.work_income_details?.ongoing_emi && values.work_income_details.ongoing_emi) {
-            editFieldsById(1, 'work-income', {
-              ongoing_emi: values.work_income_details.ongoing_emi,
-            });
+          if (
+            !errors?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi
+          ) {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
+              },
+            );
           }
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            setFieldValue(
+              `applicants[${activeIndex}].${e.currentTarget.name}`,
+              value.charAt(0).toUpperCase() + value.slice(1),
+            );
           }
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
-        disabled={values.work_income_details.no_current_loan == 0 ? true : false}
+        disabled={
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
+        }
       />
 
       <SearchableTextInput
         label='Working since'
         placeholder='Search year'
         required
-        name='work_income_details.working_since'
-        value={values.work_income_details.working_since}
-        error={errors.work_income_details?.working_since}
-        touched={touched.work_income_details?.working_since}
+        name='work_income_detail.working_since'
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.working_since}
+        error={errors?.applicants?.[activeIndex]?.work_income_detail?.working_since}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.working_since}
         onBlur={handleBlur}
         onChange={searchableTextInputChange}
         type='search'
@@ -281,11 +343,11 @@ export default function Salaried() {
         options={modeOfSalary}
         placeholder='Choose mode of salary'
         onChange={handleDropdownChange}
-        name='work_income_details.mode_of_salary'
-        defaultSelected={values.work_income_details.mode_of_salary}
-        value={values.work_income_details.mode_of_salary}
-        error={errors.work_income_details?.mode_of_salary}
-        touched={touched.work_income_details?.mode_of_salary}
+        name='work_income_detail.mode_of_salary'
+        defaultSelected={values?.applicants?.[activeIndex]?.work_income_detail?.mode_of_salary}
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.mode_of_salary}
+        error={errors?.applicants?.[activeIndex]?.work_income_detail?.mode_of_salary}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.mode_of_salary}
         onBlur={handleBlur}
       />
     </>

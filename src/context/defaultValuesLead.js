@@ -61,6 +61,7 @@ export const defaultValuesLead = {
         is_mobile_verified: false,
         extra_params: {
           progress: 0,
+          is_existing: true,
         },
       },
       personal_details: {
@@ -112,7 +113,7 @@ export const defaultValuesLead = {
           progress: 0,
         },
       },
-      work_income_details: {
+      work_income_detail: {
         profession: '',
         company_name: '',
         total_income: '',

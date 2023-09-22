@@ -11,17 +11,17 @@ export const LeadContext = createContext(defaultValuesLead);
 
 const LeadContextProvider = ({ children }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isExisting, setIsExisting] = useState(true);
+
   const [existingData, setExistingData] = useState({});
 
   const [applicantStepsProgress, setApplicantSetpsProgress] = useState([...applicantSteps]);
 
   const [coApplicantStepsProgress, setCoApplicantSetpsProgress] = useState([...coApplicantSteps]);
 
-  const updateProgress = (updateIndex, requiredFieldsStatus) => {
+  const updateProgress = (updateIndex, requiredFieldsStatus, applicantIndex) => {
     let trueCount = 0;
 
     for (const field in requiredFieldsStatus) {
@@ -64,6 +64,7 @@ const LeadContextProvider = ({ children }) => {
           is_mobile_verified: false,
           extra_params: {
             progress: 0,
+            is_existing: false,
           },
         },
         personal_details: {
@@ -115,7 +116,7 @@ const LeadContextProvider = ({ children }) => {
             progress: 0,
           },
         },
-        work_income_details: {
+        work_income_detail: {
           profession: '',
           company_name: '',
           total_income: '',
@@ -188,8 +189,6 @@ const LeadContextProvider = ({ children }) => {
         setToastMessage,
         activeIndex,
         setActiveIndex,
-        isExisting,
-        setIsExisting,
         existingData,
         setExistingData,
         coApplicantStepsProgress,

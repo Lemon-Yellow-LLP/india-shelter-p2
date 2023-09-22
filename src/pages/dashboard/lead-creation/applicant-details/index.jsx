@@ -41,11 +41,8 @@ const ApplicantDetails = () => {
     handleSubmit,
     activeIndex,
     setActiveIndex,
-    isExisting,
-    setIsExisting,
-    existingData,
-    setExistingData,
     setValues,
+    setCurrentStepIndex,
   } = useContext(LeadContext);
   const { lo_id } = useContext(AuthContext);
 
@@ -352,7 +349,10 @@ const ApplicantDetails = () => {
           mother_name,
         };
         setValues(newData);
-        setIsExisting(true);
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+          true,
+        );
       });
     } else {
       setFieldError(
@@ -383,133 +383,6 @@ const ApplicantDetails = () => {
         setVerifiedOnce(true);
         return false;
       });
-  };
-
-  //TEst------------
-  const test = async () => {
-    const { body } = {
-      ErrorCode: 200,
-      body: [
-        {
-          is_existing_customer: 'TRUE',
-          pre_approved_amount: '1000000',
-
-          id_type: 'PAN',
-          id_number: 'AAAPB2117A',
-
-          selected_address_proof: 'AADHAR',
-          address_proof_number: '654987321659',
-
-          first_name: 'SANTOSH YADAV',
-          middle_name: 'JHON',
-          last_name: 'DOE',
-
-          gender: 'MALE',
-          father_husband_name: 'XYZ',
-          mother_name: 'XYZ',
-
-          current_flat_no_building_name: '12',
-          current_street_area_locality: 'Thane',
-          current_town: 'Delhi',
-          current_landmark: 'ABC',
-          current_pincode: '421202',
-          current_city: 'Dombivli',
-          current_state: 'Maharashtra',
-          current_no_of_year_residing: '20',
-          permanent_flat_no_building_name: '12',
-          permanent_street_area_locality: 'Thane',
-          permanent_town: 'Delhi',
-          permanent_landmark: 'ABC',
-          permanent_pincode: '421202',
-          permanent_city: 'Dombivli',
-          permanent_state: 'Maharashtra',
-          permanent_no_of_year_residing: '20',
-        },
-      ],
-    };
-
-    let {
-      is_existing_customer,
-      pre_approved_amount,
-      id_type,
-      id_number,
-      selected_address_proof,
-      address_proof_number,
-      first_name,
-      middle_name,
-      last_name,
-      gender,
-      father_husband_name,
-      mother_name,
-      current_flat_no_building_name,
-      current_street_area_locality,
-      current_town,
-      current_landmark,
-      current_pincode,
-      current_city,
-      current_state,
-      current_no_of_year_residing,
-      permanent_flat_no_building_name,
-      permanent_street_area_locality,
-      permanent_town,
-      permanent_landmark,
-      permanent_pincode,
-      permanent_city,
-      permanent_state,
-      permanent_no_of_year_residing,
-    } = body[0];
-
-    let mappedData = {
-      existing_customer_is_existing_customer: is_existing_customer,
-      existing_customer_pre_approved_amount: pre_approved_amount,
-
-      existing_customer_id_type: id_type,
-      existing_customer_id_number: id_number,
-
-      existing_customer_selected_address_proof: selected_address_proof,
-      existing_customer_address_proof_number: address_proof_number,
-
-      existing_customer_first_name: first_name,
-      existing_customer_middle_name: middle_name,
-      existing_customer_last_name: last_name,
-
-      existing_customer_gender: gender,
-      existing_customer_father_husband_name: father_husband_name,
-      existing_customer_mother_name: mother_name,
-
-      existing_customer_current_flat_no_building_name: current_flat_no_building_name,
-      existing_customer_current_street_area_locality: current_street_area_locality,
-      existing_customer_current_town: current_town,
-      existing_customer_current_landmark: current_landmark,
-      existing_customer_current_pincode: current_pincode,
-      existing_customer_current_city: current_city,
-      existing_customer_current_state: current_state,
-      existing_customer_current_no_of_year_residing: current_no_of_year_residing,
-
-      existing_customer_permanent_flat_no_building_name: permanent_flat_no_building_name,
-      existing_customer_permanent_street_area_locality: permanent_street_area_locality,
-      existing_customer_permanent_town: permanent_town,
-      existing_customer_permanent_landmark: permanent_landmark,
-      existing_customer_permanent_pincode: permanent_pincode,
-      existing_customer_permanent_city: permanent_city,
-      existing_customer_permanent_state: permanent_state,
-      existing_customer_permanent_no_of_year_residing: permanent_no_of_year_residing,
-    };
-
-    let newData = { ...values };
-
-    newData.applicants[activeIndex].applicant_details = {
-      ...newData.applicants[activeIndex].applicant_details,
-      ...mappedData,
-    };
-
-    setValues(newData);
-
-    const res = await editFieldsById(
-      values?.applicants[activeIndex]?.applicant_details?.id,
-      'applicant',
-      mappedData,
-    );
   };
 
   // console.log('values', values.applicants[activeIndex]?.applicant_details);
@@ -801,14 +674,16 @@ const ApplicantDetails = () => {
               (errors?.applicants && errors.applicants[activeIndex]?.applicant_details) ||
               errors.lead
             }
-            onNextClick={
-              isExisting
-                ? () => {
-                    setOpenExistingPopup(true);
-                  }
-                : undefined
+            onNextClick={() => {
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing
+                ? setOpenExistingPopup(true)
+                : setCurrentStepIndex(1);
+            }}
+            linkNext={
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing
+                ? undefined
+                : '/lead/personal-details'
             }
-            linkNext={isExisting ? undefined : '/lead/personal-details'}
           />
         </div>
       </div>
@@ -838,7 +713,7 @@ const ApplicantDetails = () => {
           <Button
             primary={true}
             inputClasses='w-full h-[46px]'
-            onClick={() => test()}
+            onClick={() => setCurrentStepIndex(1)}
             link='/lead/personal-details'
           >
             Continue

@@ -19,6 +19,7 @@ export const applicantSteps = [
     progress: 0,
     url: '/lead/applicant-details',
     Icon: ApplicantDetailsIcon,
+    name: 'applicant_details',
   },
   {
     title: 'Personal Details',
@@ -27,6 +28,7 @@ export const applicantSteps = [
     url: '/lead/personal-details',
     lock: true,
     Icon: PersonalDetailsIcon,
+    name: 'personal_details',
   },
   {
     title: 'Address Details',
@@ -35,6 +37,7 @@ export const applicantSteps = [
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,
+    name: 'address_detail',
   },
   {
     title: 'Work/Income Details',
@@ -43,6 +46,7 @@ export const applicantSteps = [
     url: '/lead/work-income-details',
     lock: true,
     Icon: WorkIncomeIcon,
+    name: 'work_income_detail',
   },
   {
     title: 'Qualifier is not activated',
@@ -50,6 +54,7 @@ export const applicantSteps = [
     url: '/lead/work-income-details',
     hideProgress: true,
     Icon: QualifierIcon,
+    name: 'qualifier',
   },
   {
     title: 'L&T Charges',
@@ -58,6 +63,7 @@ export const applicantSteps = [
     url: '/lead/lnt-charges',
     lock: true,
     Icon: LnTIcon,
+    name: 'lt_charges',
   },
   {
     title: 'Property Details',
@@ -66,6 +72,7 @@ export const applicantSteps = [
     url: '/lead/property-details',
     lock: true,
     Icon: PropertyDetailsIcon,
+    name: 'property_details',
   },
   {
     title: 'Banking Details',
@@ -82,6 +89,7 @@ export const applicantSteps = [
     url: '/lead/reference-details',
     lock: true,
     Icon: ReferenceDetailsIcon,
+    name: 'reference_details',
   },
   {
     title: 'Upload Documents',
@@ -107,6 +115,7 @@ export const coApplicantSteps = [
     progress: 0,
     url: '/lead/applicant-details',
     Icon: ApplicantDetailsIcon,
+    name: 'applicant_details',
   },
   {
     title: 'Personal Details',
@@ -115,6 +124,7 @@ export const coApplicantSteps = [
     url: '/lead/personal-details',
     lock: true,
     Icon: PersonalDetailsIcon,
+    name: 'personal_details',
   },
   {
     title: 'Address Details',
@@ -123,6 +133,7 @@ export const coApplicantSteps = [
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,
+    name: 'address_detail',
   },
   {
     title: 'Work/Income Details',
@@ -131,6 +142,7 @@ export const coApplicantSteps = [
     url: '/lead/work-income-details',
     lock: true,
     Icon: WorkIncomeIcon,
+    name: 'work_income_detail',
   },
   {
     title: 'Qualifier is not activated',

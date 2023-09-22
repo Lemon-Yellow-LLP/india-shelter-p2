@@ -47,7 +47,7 @@ export const defaultErrorsLead = {
     permanent_no_of_year_residing: null,
   },
 
-  work_income_details: {
+  work_income_detail: {
     profession: null,
     company_name: null,
     total_income: null,

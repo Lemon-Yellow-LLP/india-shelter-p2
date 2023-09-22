@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { LeadContext } from '../../../context/LeadContextProvider';
 import { LockIcon } from '../../../assets/icons';
 
-export default function DrawerSteps({ details, steps, index }) {
-  const { setCurrentStepIndex, setDrawerOpen, drawerOpen, setActiveIndex } =
+export default function DrawerSteps({ details, steps, index, stepIndex }) {
+  const { setCurrentStepIndex, setDrawerOpen, drawerOpen, setActiveIndex, values } =
     useContext(LeadContext);
   const navigate = useNavigate();
 
@@ -13,7 +13,7 @@ export default function DrawerSteps({ details, steps, index }) {
     if (steps) {
       setActiveIndex(
         index,
-        setDrawerOpen(false, setCurrentStepIndex(index), navigate(details.url)),
+        setDrawerOpen(false, setCurrentStepIndex(stepIndex), navigate(details.url)),
       );
     }
   };

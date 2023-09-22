@@ -17,9 +17,9 @@ const PersonalDetails = memo(() => {
     setFieldValue,
     activeIndex,
     setActiveIndex,
-    isExisting,
     existingData,
     setValues,
+    setCurrentStepIndex,
   } = useContext(LeadContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
@@ -40,7 +40,9 @@ const PersonalDetails = memo(() => {
     qualification: false,
   });
 
-  const [openExistingPopup, setOpenExistingPopup] = useState(isExisting);
+  const [openExistingPopup, setOpenExistingPopup] = useState(
+    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing || false,
+  );
 
   const updateFields = async (name, value) => {
     let newData = {};
@@ -83,6 +85,7 @@ const PersonalDetails = memo(() => {
   }, [requiredFieldsStatus]);
 
   const handleNextClick = () => {
+    setCurrentStepIndex(2);
     updateFields();
   };
 
@@ -140,6 +143,16 @@ const PersonalDetails = memo(() => {
 
     setOpenExistingPopup(false);
   };
+
+  useEffect(() => {
+    if (values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing) {
+      setOpenExistingPopup(
+        values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
+      );
+    } else {
+      setOpenExistingPopup(false);
+    }
+  }, [values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing]);
 
   return (
     <>
@@ -199,6 +212,7 @@ const PersonalDetails = memo(() => {
             linkPrevious='/lead/applicant-details'
             linkNext='/lead/address-details'
             onNextClick={handleNextClick}
+            onPreviousClick={() => setCurrentStepIndex(0)}
           />
         </div>
       </div>

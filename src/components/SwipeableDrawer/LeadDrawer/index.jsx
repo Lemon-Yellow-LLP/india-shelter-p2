@@ -211,7 +211,13 @@ export default function SwipeableDrawerComponent() {
                 <div className='flex flex-col gap-[16px] w-[100%] pb-[80px] p-[15px]'>
                   {applicantStepsProgress &&
                     applicantStepsProgress.map((e, index) => (
-                      <DrawerSteps key={index} details={e} steps={true} index={primaryIndex} />
+                      <DrawerSteps
+                        key={index}
+                        details={e}
+                        steps={true}
+                        index={primaryIndex}
+                        stepIndex={index}
+                      />
                     ))}
                 </div>
               </TabPanel>
@@ -309,6 +315,7 @@ export default function SwipeableDrawerComponent() {
                                   details={e}
                                   steps={true}
                                   index={activeCoApplicantIndex}
+                                  stepIndex={index}
                                 />
                               ))}
                           </div>

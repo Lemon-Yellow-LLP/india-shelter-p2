@@ -258,7 +258,7 @@ export const validationSchemaLead = Yup.object().shape({
       .max(6, 'Pincode a valid Pincode'),
     permanent_no_of_year_residing: Yup.string().required('This field is mandatory'),
   }),
-  work_income_details: Yup.object().shape({
+  work_income_detail: Yup.object().shape({
     profession: Yup.string().required('This field is mandatory'),
     company_name: Yup.string().required('This field is mandatory'),
     extra_params: Yup.object().shape({

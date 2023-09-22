@@ -1,9 +1,16 @@
 import { useContext, useState, useCallback, useEffect } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
-import { CardRadio, TextInput } from '../../../../components';
-import { checkIsValidStatePincode, editAddressById } from '../../../../global';
+import { Button, CardRadio, TextInput } from '../../../../components';
+import {
+  addApi,
+  checkIsValidStatePincode,
+  editAddressById,
+  editFieldsById,
+} from '../../../../global';
 import Checkbox from '../../../../components/Checkbox';
 import { residenceData, yearsResidingData } from './AddressDropdownData';
+import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
+import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -21,7 +28,12 @@ export default function AddressDetails() {
     updateProgress,
     activeIndex,
     setValues,
+    setCurrentStepIndex,
   } = useContext(LeadContext);
+
+  const [openExistingPopup, setOpenExistingPopup] = useState(
+    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing || false,
+  );
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     current_type_of_residence: false,
@@ -70,7 +82,7 @@ export default function AddressDetails() {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus, setFieldValue],
+    [requiredFieldsStatus, setFieldValue, values],
   );
 
   const handleCurrentPincodeChange = useCallback(async () => {
@@ -229,760 +241,1086 @@ export default function AddressDetails() {
     requiredFieldsStatus,
   ]);
 
+  const handleNextClick = () => {
+    setCurrentStepIndex(3);
+    // updateFields();
+  };
+
+  useEffect(() => {
+    if (values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing) {
+      setOpenExistingPopup(
+        values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
+      );
+    } else {
+      setOpenExistingPopup(false);
+    }
+  }, [values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing]);
+
+  const handleAutofill = async () => {
+    const fillData = { ...values.applicants?.[activeIndex]?.applicant_details };
+
+    const {
+      existing_customer_current_flat_no_building_name,
+      existing_customer_current_street_area_locality,
+      existing_customer_current_town,
+      existing_customer_current_landmark,
+      existing_customer_current_pincode,
+      existing_customer_current_city,
+      existing_customer_current_state,
+      existing_customer_current_no_of_year_residing,
+
+      existing_customer_permanent_flat_no_building_name,
+      existing_customer_permanent_street_area_locality,
+      existing_customer_permanent_town,
+      existing_customer_permanent_landmark,
+      existing_customer_permanent_pincode,
+      existing_customer_permanent_city,
+      existing_customer_permanent_state,
+      existing_customer_permanent_no_of_year_residing,
+    } = fillData;
+
+    const mappedData = {
+      current_flat_no_building_name: existing_customer_current_flat_no_building_name,
+      current_street_area_locality: existing_customer_current_street_area_locality,
+      current_town: existing_customer_current_town,
+      current_landmark: existing_customer_current_landmark,
+      current_pincode: existing_customer_current_pincode,
+      current_city: existing_customer_current_city,
+      current_state: existing_customer_current_state,
+      current_no_of_year_residing: existing_customer_current_no_of_year_residing,
+
+      permanent_flat_no_building_name: existing_customer_permanent_flat_no_building_name,
+      permanent_street_area_locality: existing_customer_permanent_street_area_locality,
+      permanent_town: existing_customer_permanent_town,
+      permanent_landmark: existing_customer_permanent_landmark,
+      permanent_pincode: existing_customer_permanent_pincode,
+      permanent_city: existing_customer_permanent_city,
+      permanent_state: existing_customer_permanent_state,
+      permanent_no_of_year_residing: existing_customer_permanent_no_of_year_residing,
+    };
+
+    let finalData = { ...values };
+
+    finalData.applicants[activeIndex].address_detail = {
+      ...finalData.applicants[activeIndex].address_detail,
+      ...mappedData,
+    };
+
+    setValues(finalData);
+
+    if (values?.applicants[activeIndex]?.address_detail?.id) {
+      const res = await editFieldsById(
+        values?.applicants[activeIndex]?.address_detail?.id,
+        'address',
+        mappedData,
+      );
+    } else {
+      const res = await addApi('address', mappedData);
+      setFieldValue(`applicants[${activeIndex}].address_detail.id`, res.id);
+    }
+
+    setOpenExistingPopup(false);
+  };
+
   return (
-    <div className='flex flex-col bg-medium-grey gap-2 h-[95vh] overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[62px]'>
-      <div className='flex flex-col gap-2'>
-        <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
-          Type of residence <span className='text-primary-red text-xs'>*</span>
-        </label>
-
-        <div
-          className={`flex gap-4 w-full ${
-            inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
-          }`}
-        >
-          {residenceData.map((residence, index) => (
-            <CardRadio
-              key={index}
-              label={residence.label}
-              name='current_type_of_residence'
-              value={residence.value}
-              current={values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence}
-              onChange={handleRadioChange}
-            >
-              {residence.icon}
-            </CardRadio>
-          ))}
-        </div>
-      </div>
-
-      {values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence ? (
-        <>
-          {/* Current Address */}
-          <label
-            htmlFor='loan-purpose'
-            className='flex gap-0.5 font-medium text-primary-black text-xl mt-3'
-          >
-            Current Address
-          </label>
-
-          <TextInput
-            label='Flat no/Building name'
-            placeholder='Eg: C-101'
-            required
-            name='address_detail.current_flat_no_building_name'
-            value={values?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name}
-            touched={
-              touched?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name
-            }
-            onBlur={(e) => {
-              handleBlur(e);
-              if (
-                !errors?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name &&
-                values?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name
-              ) {
-                if (
-                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    .permanent_address_same_as_current
-                ) {
-                  setFieldValue(
-                    `applicants[${activeIndex}].address_detail.permanent_flat_no_building_name`,
-                    values?.applicants?.[activeIndex]?.address_detail
-                      ?.current_flat_no_building_name,
-                  );
-                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                    current_flat_no_building_name:
-                      values?.applicants?.[activeIndex]?.address_detail
-                        ?.current_flat_no_building_name,
-                    permanent_flat_no_building_name:
-                      values?.applicants?.[activeIndex]?.address_detail
-                        ?.current_flat_no_building_name,
-                  });
-                } else {
-                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                    current_flat_no_building_name:
-                      values?.applicants?.[activeIndex]?.address_detail
-                        ?.current_flat_no_building_name,
-                  });
-                }
-              }
-            }}
-            disabled={inputDisabled}
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-              if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(
-                  `applicants[${activeIndex}].${e.currentTarget.name}`,
-                  value.charAt(0).toUpperCase() + value.slice(1),
-                );
-              }
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                updateProgress(2, requiredFieldsStatus);
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
-            inputClasses='capitalize'
-          />
-
-          <TextInput
-            label='Street/Area/Locality'
-            placeholder='Eg: Senapati road'
-            required
-            name='address_detail.current_street_area_locality'
-            value={values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality}
-            touched={
-              touched?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality
-            }
-            onBlur={(e) => {
-              handleBlur(e);
-              if (
-                !errors?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality &&
-                values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality
-              ) {
-                if (
-                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    .permanent_address_same_as_current
-                ) {
-                  setFieldValue(
-                    `applicants[${activeIndex}].address_detail.permanent_street_area_locality`,
-                    values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality,
-                  );
-                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                    current_street_area_locality:
-                      values?.applicants?.[activeIndex]?.address_detail
-                        ?.current_street_area_locality,
-                    permanent_street_area_locality:
-                      values?.applicants?.[activeIndex]?.address_detail
-                        ?.current_street_area_locality,
-                  });
-                } else {
-                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                    current_street_area_locality:
-                      values?.applicants?.[activeIndex]?.address_detail
-                        ?.current_street_area_locality,
-                  });
-                }
-              }
-            }}
-            disabled={inputDisabled}
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-              if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(
-                  `applicants[${activeIndex}].${e.currentTarget.name}`,
-                  value.charAt(0).toUpperCase() + value.slice(1),
-                );
-              }
-
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                updateProgress(2, requiredFieldsStatus);
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
-            inputClasses='capitalize'
-          />
-
-          <TextInput
-            label='Town'
-            placeholder='Eg: Igatpuri'
-            required
-            name='address_detail.current_town'
-            value={values?.applicants?.[activeIndex]?.address_detail?.current_town}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.current_town}
-            touched={touched?.applicants?.[activeIndex]?.address_detail?.current_town}
-            onBlur={(e) => {
-              handleBlur(e);
-              if (
-                !errors?.applicants?.[activeIndex]?.address_detail?.current_town &&
-                values?.applicants?.[activeIndex]?.address_detail?.current_town
-              ) {
-                if (
-                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    .permanent_address_same_as_current
-                ) {
-                  setFieldValue(
-                    `applicants[${activeIndex}].address_detail.permanent_town`,
-                    values?.applicants?.[activeIndex]?.address_detail?.current_town,
-                  );
-                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                    current_town: values?.applicants?.[activeIndex]?.address_detail?.current_town,
-                    permanent_town: values?.applicants?.[activeIndex]?.address_detail?.current_town,
-                  });
-                } else {
-                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                    current_town: values?.applicants?.[activeIndex]?.address_detail?.current_town,
-                  });
-                }
-              }
-            }}
-            disabled={inputDisabled}
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const pattern = /^[A-Za-z\s]+$/;
-              if (pattern.exec(value[value.length - 1])) {
-                setFieldValue(
-                  `applicants[${activeIndex}].${e.currentTarget.name}`,
-                  value.charAt(0).toUpperCase() + value.slice(1),
-                );
-              }
-
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                updateProgress(2, requiredFieldsStatus);
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
-            inputClasses='capitalize'
-          />
-
-          <TextInput
-            label='Landmark'
-            placeholder='Eg: Near apollo hospital'
-            required
-            name='address_detail.current_landmark'
-            value={values?.applicants?.[activeIndex]?.address_detail?.current_landmark}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.current_landmark}
-            touched={touched?.applicants?.[activeIndex]?.address_detail?.current_landmark}
-            onBlur={(e) => {
-              handleBlur(e);
-              if (
-                !errors?.applicants?.[activeIndex]?.address_detail?.current_landmark &&
-                values?.applicants?.[activeIndex]?.address_detail?.current_landmark
-              ) {
-                if (
-                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    .permanent_address_same_as_current
-                ) {
-                  setFieldValue(
-                    `applicants[${activeIndex}].address_detail.permanent_landmark`,
-                    values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
-                  );
-                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                    current_landmark:
-                      values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
-                    permanent_landmark:
-                      values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
-                  });
-                } else {
-                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                    current_landmark:
-                      values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
-                  });
-                }
-              }
-            }}
-            disabled={inputDisabled}
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const pattern = /^[A-Za-z\s]+$/;
-              if (pattern.exec(value[value.length - 1])) {
-                setFieldValue(
-                  `applicants[${activeIndex}].${e.currentTarget.name}`,
-                  value.charAt(0).toUpperCase() + value.slice(1),
-                );
-              }
-
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                updateProgress(2, requiredFieldsStatus);
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
-            inputClasses='capitalize'
-          />
-
-          <TextInput
-            label='Pincode'
-            placeholder='Eg: 123456'
-            required
-            name='address_detail.current_pincode'
-            type='tel'
-            // hint='City and State fields will get filled based on Pincode'
-            value={values?.applicants?.[activeIndex]?.address_detail?.current_pincode}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.current_pincode}
-            touched={touched?.applicants?.[activeIndex]?.address_detail?.current_pincode}
-            disabled={inputDisabled}
-            onBlur={(e) => {
-              handleBlur(e);
-              handleCurrentPincodeChange();
-            }}
-            min='0'
-            onInput={(e) => {
-              if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
-            }}
-            onChange={(e) => {
-              if (e.currentTarget.value.length > 6) {
-                e.preventDefault();
-                return;
-              }
-              const value = e.currentTarget.value;
-              if (value.charAt(0) === '0') {
-                e.preventDefault();
-                return;
-              }
-              handleChange(e);
-            }}
-            onKeyDown={(e) => {
-              //capturing ctrl V and ctrl C
-              (e.key == 'v' && (e.metaKey || e.ctrlKey)) ||
-              DISALLOW_CHAR.includes(e.key) ||
-              e.key === 'ArrowUp' ||
-              e.key === 'ArrowDown'
-                ? e.preventDefault()
-                : null;
-            }}
-            pattern='\d*'
-            onFocus={(e) =>
-              e.target.addEventListener(
-                'wheel',
-                function (e) {
-                  e.preventDefault();
-                },
-                { passive: false },
-              )
-            }
-            onPaste={(e) => {
-              e.preventDefault();
-              const text = (e.originalEvent || e).clipboardData.getData('text/plain').replace('');
-              e.target.value = text;
-              handleChange(e);
-            }}
-            inputClasses='hidearrow'
-          />
-
-          <TextInput
-            label='City'
-            placeholder='Eg: Nashik'
-            name='address_detail.current_city'
-            value={values?.applicants?.[activeIndex]?.address_detail?.current_city}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.current_city}
-            touched={touched?.applicants?.[activeIndex]?.address_detail?.current_city}
-            onBlur={handleBlur}
-            disabled={true}
-            labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.current_city}
-            onChange={() => {}}
-            inputClasses='capitalize'
-          />
-
-          <TextInput
-            label='State'
-            placeholder='Eg: Maharashtra'
-            name='address_detail.current_state'
-            value={values?.applicants?.[activeIndex]?.address_detail?.current_state}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.current_state}
-            touched={touched?.applicants?.[activeIndex]?.address_detail?.current_state}
-            onBlur={handleBlur}
-            disabled={true}
-            labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.current_state}
-            onChange={() => {}}
-            inputClasses='capitalize'
-          />
-
+    <>
+      <div className='overflow-hidden flex flex-col h-[100vh]'>
+        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
           <div className='flex flex-col gap-2'>
             <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
-              No. of years residing <span className='text-primary-red text-xs'>*</span>
+              Type of residence <span className='text-primary-red text-xs'>*</span>
             </label>
+
             <div
               className={`flex gap-4 w-full ${
                 inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
               }`}
             >
-              {yearsResidingData.map((data, index) => (
+              {residenceData.map((residence, index) => (
                 <CardRadio
                   key={index}
-                  name='current_no_of_year_residing'
-                  value={data.value}
+                  label={residence.label}
+                  name='current_type_of_residence'
+                  value={residence.value}
                   current={
-                    values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing
+                    values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence
                   }
                   onChange={handleRadioChange}
                 >
-                  <span
-                    className={`${
-                      index ==
-                      values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing
-                        ? 'text-secondary-green font-semibold'
-                        : 'text-primary-black font-normal'
-                    }`}
-                  >
-                    {data.label}
-                  </span>
+                  {residence.icon}
                 </CardRadio>
               ))}
             </div>
           </div>
-          {values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence ===
-          'Self owned' ? (
-            <div className='flex items-center gap-2 mt-6'>
-              <Checkbox
-                checked={
+
+          {values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence ? (
+            <>
+              {/* Current Address */}
+              <label
+                htmlFor='loan-purpose'
+                className='flex gap-0.5 font-medium text-primary-black text-xl mt-3'
+              >
+                Current Address
+              </label>
+
+              <TextInput
+                label='Flat no/Building name'
+                placeholder='Eg: C-101'
+                required
+                name='address_detail.current_flat_no_building_name'
+                value={
+                  values?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name
+                }
+                error={
+                  errors?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name
+                }
+                touched={
+                  touched?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name
+                }
+                onBlur={(e) => {
+                  handleBlur(e);
+                  if (
+                    !errors?.applicants?.[activeIndex]?.address_detail
+                      ?.current_flat_no_building_name &&
+                    values?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name
+                  ) {
+                    if (
+                      values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                        .permanent_address_same_as_current
+                    ) {
+                      setFieldValue(
+                        `applicants[${activeIndex}].address_detail.permanent_flat_no_building_name`,
+                        values?.applicants?.[activeIndex]?.address_detail
+                          ?.current_flat_no_building_name,
+                      );
+                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                        current_flat_no_building_name:
+                          values?.applicants?.[activeIndex]?.address_detail
+                            ?.current_flat_no_building_name,
+                        permanent_flat_no_building_name:
+                          values?.applicants?.[activeIndex]?.address_detail
+                            ?.current_flat_no_building_name,
+                      });
+                    } else {
+                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                        current_flat_no_building_name:
+                          values?.applicants?.[activeIndex]?.address_detail
+                            ?.current_flat_no_building_name,
+                      });
+                    }
+                  }
+                }}
+                disabled={inputDisabled}
+                onChange={(e) => {
+                  const value = e.currentTarget.value;
+                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  if (address_pattern.exec(value[value.length - 1])) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      value.charAt(0).toUpperCase() + value.slice(1),
+                    );
+                  }
+                  const name = e.target.name.split('.')[1];
+                  if (!requiredFieldsStatus[name]) {
+                    updateProgress(2, requiredFieldsStatus);
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                  }
+                }}
+                inputClasses='capitalize'
+              />
+
+              <TextInput
+                label='Street/Area/Locality'
+                placeholder='Eg: Senapati road'
+                required
+                name='address_detail.current_street_area_locality'
+                value={
+                  values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality
+                }
+                error={
+                  errors?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality
+                }
+                touched={
+                  touched?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality
+                }
+                onBlur={(e) => {
+                  handleBlur(e);
+                  if (
+                    !errors?.applicants?.[activeIndex]?.address_detail
+                      ?.current_street_area_locality &&
+                    values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality
+                  ) {
+                    if (
+                      values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                        .permanent_address_same_as_current
+                    ) {
+                      setFieldValue(
+                        `applicants[${activeIndex}].address_detail.permanent_street_area_locality`,
+                        values?.applicants?.[activeIndex]?.address_detail
+                          ?.current_street_area_locality,
+                      );
+                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                        current_street_area_locality:
+                          values?.applicants?.[activeIndex]?.address_detail
+                            ?.current_street_area_locality,
+                        permanent_street_area_locality:
+                          values?.applicants?.[activeIndex]?.address_detail
+                            ?.current_street_area_locality,
+                      });
+                    } else {
+                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                        current_street_area_locality:
+                          values?.applicants?.[activeIndex]?.address_detail
+                            ?.current_street_area_locality,
+                      });
+                    }
+                  }
+                }}
+                disabled={inputDisabled}
+                onChange={(e) => {
+                  const value = e.currentTarget.value;
+                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  if (address_pattern.exec(value[value.length - 1])) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      value.charAt(0).toUpperCase() + value.slice(1),
+                    );
+                  }
+
+                  const name = e.target.name.split('.')[1];
+                  if (!requiredFieldsStatus[name]) {
+                    updateProgress(2, requiredFieldsStatus);
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                  }
+                }}
+                inputClasses='capitalize'
+              />
+
+              <TextInput
+                label='Town'
+                placeholder='Eg: Igatpuri'
+                required
+                name='address_detail.current_town'
+                value={values?.applicants?.[activeIndex]?.address_detail?.current_town}
+                error={errors?.applicants?.[activeIndex]?.address_detail?.current_town}
+                touched={touched?.applicants?.[activeIndex]?.address_detail?.current_town}
+                onBlur={(e) => {
+                  handleBlur(e);
+                  if (
+                    !errors?.applicants?.[activeIndex]?.address_detail?.current_town &&
+                    values?.applicants?.[activeIndex]?.address_detail?.current_town
+                  ) {
+                    if (
+                      values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                        .permanent_address_same_as_current
+                    ) {
+                      setFieldValue(
+                        `applicants[${activeIndex}].address_detail.permanent_town`,
+                        values?.applicants?.[activeIndex]?.address_detail?.current_town,
+                      );
+                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                        current_town:
+                          values?.applicants?.[activeIndex]?.address_detail?.current_town,
+                        permanent_town:
+                          values?.applicants?.[activeIndex]?.address_detail?.current_town,
+                      });
+                    } else {
+                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                        current_town:
+                          values?.applicants?.[activeIndex]?.address_detail?.current_town,
+                      });
+                    }
+                  }
+                }}
+                disabled={inputDisabled}
+                onChange={(e) => {
+                  const value = e.currentTarget.value;
+                  const pattern = /^[A-Za-z\s]+$/;
+                  if (pattern.exec(value[value.length - 1])) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      value.charAt(0).toUpperCase() + value.slice(1),
+                    );
+                  }
+
+                  const name = e.target.name.split('.')[1];
+                  if (!requiredFieldsStatus[name]) {
+                    updateProgress(2, requiredFieldsStatus);
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                  }
+                }}
+                inputClasses='capitalize'
+              />
+
+              <TextInput
+                label='Landmark'
+                placeholder='Eg: Near apollo hospital'
+                required
+                name='address_detail.current_landmark'
+                value={values?.applicants?.[activeIndex]?.address_detail?.current_landmark}
+                error={errors?.applicants?.[activeIndex]?.address_detail?.current_landmark}
+                touched={touched?.applicants?.[activeIndex]?.address_detail?.current_landmark}
+                onBlur={(e) => {
+                  handleBlur(e);
+                  if (
+                    !errors?.applicants?.[activeIndex]?.address_detail?.current_landmark &&
+                    values?.applicants?.[activeIndex]?.address_detail?.current_landmark
+                  ) {
+                    if (
+                      values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                        .permanent_address_same_as_current
+                    ) {
+                      setFieldValue(
+                        `applicants[${activeIndex}].address_detail.permanent_landmark`,
+                        values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
+                      );
+                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                        current_landmark:
+                          values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
+                        permanent_landmark:
+                          values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
+                      });
+                    } else {
+                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                        current_landmark:
+                          values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
+                      });
+                    }
+                  }
+                }}
+                disabled={inputDisabled}
+                onChange={(e) => {
+                  const value = e.currentTarget.value;
+                  const pattern = /^[A-Za-z\s]+$/;
+                  if (pattern.exec(value[value.length - 1])) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      value.charAt(0).toUpperCase() + value.slice(1),
+                    );
+                  }
+
+                  const name = e.target.name.split('.')[1];
+                  if (!requiredFieldsStatus[name]) {
+                    updateProgress(2, requiredFieldsStatus);
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                  }
+                }}
+                inputClasses='capitalize'
+              />
+
+              <TextInput
+                label='Pincode'
+                placeholder='Eg: 123456'
+                required
+                name='address_detail.current_pincode'
+                type='tel'
+                // hint='City and State fields will get filled based on Pincode'
+                value={values?.applicants?.[activeIndex]?.address_detail?.current_pincode}
+                error={errors?.applicants?.[activeIndex]?.address_detail?.current_pincode}
+                touched={touched?.applicants?.[activeIndex]?.address_detail?.current_pincode}
+                disabled={inputDisabled}
+                onBlur={(e) => {
+                  handleBlur(e);
+                  handleCurrentPincodeChange();
+                }}
+                min='0'
+                onInput={(e) => {
+                  if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
+                }}
+                onChange={(e) => {
+                  if (e.currentTarget.value.length > 6) {
+                    e.preventDefault();
+                    return;
+                  }
+                  const value = e.currentTarget.value;
+                  if (value.charAt(0) === '0') {
+                    e.preventDefault();
+                    return;
+                  }
+                  handleChange(e);
+                }}
+                onKeyDown={(e) => {
+                  //capturing ctrl V and ctrl C
+                  (e.key == 'v' && (e.metaKey || e.ctrlKey)) ||
+                  DISALLOW_CHAR.includes(e.key) ||
+                  e.key === 'ArrowUp' ||
+                  e.key === 'ArrowDown'
+                    ? e.preventDefault()
+                    : null;
+                }}
+                pattern='\d*'
+                onFocus={(e) =>
+                  e.target.addEventListener(
+                    'wheel',
+                    function (e) {
+                      e.preventDefault();
+                    },
+                    { passive: false },
+                  )
+                }
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const text = (e.originalEvent || e).clipboardData
+                    .getData('text/plain')
+                    .replace('');
+                  e.target.value = text;
+                  handleChange(e);
+                }}
+                inputClasses='hidearrow'
+              />
+
+              <TextInput
+                label='City'
+                placeholder='Eg: Nashik'
+                name='address_detail.current_city'
+                value={values?.applicants?.[activeIndex]?.address_detail?.current_city}
+                error={errors?.applicants?.[activeIndex]?.address_detail?.current_city}
+                touched={touched?.applicants?.[activeIndex]?.address_detail?.current_city}
+                onBlur={handleBlur}
+                disabled={true}
+                labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.current_city}
+                onChange={() => {}}
+                inputClasses='capitalize'
+              />
+
+              <TextInput
+                label='State'
+                placeholder='Eg: Maharashtra'
+                name='address_detail.current_state'
+                value={values?.applicants?.[activeIndex]?.address_detail?.current_state}
+                error={errors?.applicants?.[activeIndex]?.address_detail?.current_state}
+                touched={touched?.applicants?.[activeIndex]?.address_detail?.current_state}
+                onBlur={handleBlur}
+                disabled={true}
+                labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.current_state}
+                onChange={() => {}}
+                inputClasses='capitalize'
+              />
+
+              <div className='flex flex-col gap-2'>
+                <label
+                  htmlFor='loan-purpose'
+                  className='flex gap-0.5 font-medium text-primary-black'
+                >
+                  No. of years residing <span className='text-primary-red text-xs'>*</span>
+                </label>
+                <div
+                  className={`flex gap-4 w-full ${
+                    inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
+                  }`}
+                >
+                  {yearsResidingData.map((data, index) => (
+                    <CardRadio
+                      key={index}
+                      name='current_no_of_year_residing'
+                      value={data.value}
+                      current={
+                        values?.applicants?.[activeIndex]?.address_detail
+                          ?.current_no_of_year_residing
+                      }
+                      onChange={handleRadioChange}
+                    >
+                      <span
+                        className={`${
+                          index ==
+                          values?.applicants?.[activeIndex]?.address_detail
+                            ?.current_no_of_year_residing
+                            ? 'text-secondary-green font-semibold'
+                            : 'text-primary-black font-normal'
+                        }`}
+                      >
+                        {data.label}
+                      </span>
+                    </CardRadio>
+                  ))}
+                </div>
+              </div>
+              {values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence ===
+              'Self owned' ? (
+                <div className='flex items-center gap-2 mt-6'>
+                  <Checkbox
+                    checked={
+                      values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                        .permanent_address_same_as_current
+                    }
+                    name='permanent_address_same_as_current'
+                    onTouchEnd={(e) => {
+                      let isChecked = !!e.target.checked;
+                      setFieldValue(
+                        `applicants[${activeIndex}].address_detail.extra_params.permanent_address_same_as_current`,
+                        isChecked,
+                      );
+                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                        extra_params: {
+                          [e.target.name]: isChecked,
+                        },
+                      });
+                    }}
+                    disabled={
+                      values?.applicants?.[activeIndex]?.address_detail
+                        ?.current_type_of_residence !== 'Self owned'
+                    }
+                  />
+
+                  <span className='text-[#373435] text-xs font-normal'>
+                    Permanent address is same as Current address
+                  </span>
+                </div>
+              ) : null}
+
+              {/* Permanent Address */}
+              <label
+                htmlFor='loan-purpose'
+                className='flex gap-0.5 font-medium text-primary-black text-xl mt-3'
+              >
+                Permanent Address
+              </label>
+
+              <TextInput
+                label='Flat no/Building name'
+                placeholder='Eg: C-101'
+                required
+                name='address_detail.permanent_flat_no_building_name'
+                value={
+                  values?.applicants?.[activeIndex]?.address_detail?.permanent_flat_no_building_name
+                }
+                error={
+                  errors?.applicants?.[activeIndex]?.address_detail?.permanent_flat_no_building_name
+                }
+                touched={
+                  touched?.applicants?.[activeIndex]?.address_detail
+                    ?.permanent_flat_no_building_name
+                }
+                onBlur={(e) => {
+                  handleBlur(e);
+                  if (
+                    !errors?.applicants?.[activeIndex]?.address_detail
+                      ?.permanent_flat_no_building_name &&
+                    values?.applicants?.[activeIndex]?.address_detail
+                      ?.permanent_flat_no_building_name
+                  ) {
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      permanent_flat_no_building_name:
+                        values?.applicants?.[activeIndex]?.address_detail
+                          ?.permanent_flat_no_building_name,
+                    });
+                  }
+                }}
+                disabled={
+                  inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
                     .permanent_address_same_as_current
                 }
-                name='permanent_address_same_as_current'
-                onTouchEnd={(e) => {
-                  let isChecked = !!e.target.checked;
-                  setFieldValue(
-                    `applicants[${activeIndex}].address_detail.extra_params.permanent_address_same_as_current`,
-                    isChecked,
-                  );
-                  editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                    extra_params: {
-                      [e.target.name]: isChecked,
-                    },
-                  });
+                onChange={(e) => {
+                  const value = e.currentTarget.value;
+                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  if (address_pattern.exec(value[value.length - 1])) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      value.charAt(0).toUpperCase() + value.slice(1),
+                    );
+                  }
+
+                  const name = e.target.name.split('.')[1];
+                  if (!requiredFieldsStatus[name]) {
+                    updateProgress(2, requiredFieldsStatus);
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                  }
                 }}
-                disabled={
-                  values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence !==
-                  'Self owned'
-                }
+                inputClasses='capitalize'
               />
 
+              <TextInput
+                label='Street/Area/Locality'
+                placeholder='Eg: Senapati road'
+                required
+                name='address_detail.permanent_street_area_locality'
+                value={
+                  values?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
+                }
+                error={
+                  errors?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
+                }
+                touched={
+                  touched?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
+                }
+                onBlur={(e) => {
+                  handleBlur(e);
+                  if (
+                    !errors?.applicants?.[activeIndex]?.address_detail
+                      ?.permanent_street_area_locality &&
+                    values?.applicants?.[activeIndex]?.address_detail
+                      ?.permanent_street_area_locality
+                  ) {
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      permanent_street_area_locality:
+                        values?.applicants?.[activeIndex]?.address_detail
+                          ?.permanent_street_area_locality,
+                    });
+                  }
+                }}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                    .permanent_address_same_as_current
+                }
+                onChange={(e) => {
+                  const value = e.currentTarget.value;
+                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  if (address_pattern.exec(value[value.length - 1])) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      value.charAt(0).toUpperCase() + value.slice(1),
+                    );
+                  }
+
+                  const name = e.target.name.split('.')[1];
+                  if (!requiredFieldsStatus[name]) {
+                    updateProgress(2, requiredFieldsStatus);
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                  }
+                }}
+                inputClasses='capitalize'
+              />
+
+              <TextInput
+                label='Town'
+                placeholder='Eg: Igatpuri'
+                required
+                name='address_detail.permanent_town'
+                value={values?.applicants?.[activeIndex]?.address_detail?.permanent_town}
+                error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_town}
+                touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_town}
+                onBlur={(e) => {
+                  handleBlur(e);
+                  if (
+                    !errors?.applicants?.[activeIndex]?.address_detail?.permanent_town &&
+                    values?.applicants?.[activeIndex]?.address_detail?.permanent_town
+                  ) {
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      permanent_town:
+                        values?.applicants?.[activeIndex]?.address_detail?.permanent_town,
+                    });
+                  }
+                }}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                    .permanent_address_same_as_current
+                }
+                onChange={(e) => {
+                  const value = e.currentTarget.value;
+                  const pattern = /^[A-Za-z\s]+$/;
+                  if (pattern.exec(value[value.length - 1])) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      value.charAt(0).toUpperCase() + value.slice(1),
+                    );
+                  }
+
+                  const name = e.target.name.split('.')[1];
+                  if (!requiredFieldsStatus[name]) {
+                    updateProgress(2, requiredFieldsStatus);
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                  }
+                }}
+                inputClasses='capitalize'
+              />
+
+              <TextInput
+                label='Landmark'
+                placeholder='Eg: Near apollo hospital'
+                required
+                name='address_detail.permanent_landmark'
+                value={values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark}
+                error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_landmark}
+                touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_landmark}
+                onBlur={(e) => {
+                  handleBlur(e);
+                  if (
+                    !errors?.applicants?.[activeIndex]?.address_detail?.permanent_landmark &&
+                    values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark
+                  ) {
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      permanent_landmark:
+                        values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark,
+                    });
+                  }
+                }}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                    .permanent_address_same_as_current
+                }
+                onChange={(e) => {
+                  const value = e.currentTarget.value;
+                  const pattern = /^[A-Za-z\s]+$/;
+                  if (pattern.exec(value[value.length - 1])) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      value.charAt(0).toUpperCase() + value.slice(1),
+                    );
+                  }
+
+                  const name = e.target.name.split('.')[1];
+                  if (!requiredFieldsStatus[name]) {
+                    updateProgress(2, requiredFieldsStatus);
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                  }
+                }}
+                inputClasses='capitalize'
+              />
+
+              <TextInput
+                label='Pincode'
+                placeholder='Eg: 123456'
+                required
+                name='address_detail.permanent_pincode'
+                type='tel'
+                hint='City and State fields will get filled based on Pincode'
+                value={values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
+                error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
+                touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                    .permanent_address_same_as_current
+                }
+                onBlur={(e) => {
+                  handleBlur(e);
+                  handlePermanentPincodeChange();
+                }}
+                min='0'
+                onInput={(e) => {
+                  if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
+                }}
+                onChange={(e) => {
+                  if (e.currentTarget.value.length > 6) {
+                    e.preventDefault();
+                    return;
+                  }
+                  const value = e.currentTarget.value;
+                  if (value.charAt(0) === '0') {
+                    e.preventDefault();
+                    return;
+                  }
+                  handleChange(e);
+                }}
+                onKeyDown={(e) => {
+                  //capturing ctrl V and ctrl C
+                  (e.key == 'v' && (e.metaKey || e.ctrlKey)) ||
+                  DISALLOW_CHAR.includes(e.key) ||
+                  e.key === 'ArrowUp' ||
+                  e.key === 'ArrowDown'
+                    ? e.preventDefault()
+                    : null;
+                }}
+                pattern='\d*'
+                onFocus={(e) =>
+                  e.target.addEventListener(
+                    'wheel',
+                    function (e) {
+                      e.preventDefault();
+                    },
+                    { passive: false },
+                  )
+                }
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const text = (e.originalEvent || e).clipboardData
+                    .getData('text/plain')
+                    .replace('');
+                  e.target.value = text;
+                  handleChange(e);
+                }}
+                inputClasses='hidearrow'
+              />
+
+              <TextInput
+                label='City'
+                placeholder='Eg: Nashik'
+                name='address_detail.permanent_city'
+                value={values?.applicants?.[activeIndex]?.address_detail?.permanent_city}
+                error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_city}
+                touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_city}
+                onBlur={handleBlur}
+                disabled={true}
+                labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.permanent_city}
+                onChange={() => {}}
+                inputClasses='capitalize'
+              />
+
+              <TextInput
+                label='State'
+                placeholder='Eg: Maharashtra'
+                name='address_detail.permanent_state'
+                value={values?.applicants?.[activeIndex]?.address_detail?.permanent_state}
+                error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_state}
+                touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_state}
+                onBlur={handleBlur}
+                disabled={true}
+                labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.permanent_state}
+                onChange={() => {}}
+                inputClasses='capitalize'
+              />
+
+              <div className='flex flex-col gap-2'>
+                <label
+                  htmlFor='loan-purpose'
+                  className='flex gap-0.5 font-medium text-primary-black'
+                >
+                  No. of years residing <span className='text-primary-red text-xs'>*</span>
+                </label>
+                <div
+                  className={`flex gap-4 w-full ${
+                    inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
+                  }`}
+                >
+                  {yearsResidingData.map((data, index) => (
+                    <CardRadio
+                      key={index}
+                      name='permanent_no_of_year_residing'
+                      value={data.value}
+                      current={
+                        values?.applicants?.[activeIndex]?.address_detail
+                          ?.permanent_no_of_year_residing
+                      }
+                      onChange={handleRadioChange}
+                      disabled={
+                        values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                          .permanent_address_same_as_current
+                      }
+                    >
+                      <span
+                        className={`${
+                          index ==
+                          values?.applicants?.[activeIndex]?.address_detail
+                            ?.permanent_no_of_year_residing
+                            ? values?.applicants?.[activeIndex]?.address_detail?.extra_params
+                                .permanent_address_same_as_current
+                              ? 'text-[#373435] font-semibold'
+                              : 'text-secondary-green font-semibold'
+                            : ''
+                        }`}
+                      >
+                        {data.label}
+                      </span>
+                    </CardRadio>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : null}
+        </div>
+        <div className='bottom-0 fixed'>
+          <PreviousNextButtons
+            linkPrevious='/lead/personal-details'
+            linkNext='/lead/work-income-details'
+            onNextClick={handleNextClick}
+            onPreviousClick={() => setCurrentStepIndex(1)}
+          />
+        </div>
+      </div>
+
+      <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>
+        <div className='flex flex-col items-center h-full'>
+          <span className='w-full font-semibold text-[14px] leading-[21px]'>
+            This is an existing customer.
+          </span>
+          <div className='flex flex-col flex-1 w-full gap-[7px] overflow-auto mt-[10px] mb-[10px]'>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Type of residence</span>
+              <span className='w-full text-[12px]'>
+                {values?.applicants?.[activeIndex]?.applicant_details?.current_type_of_residence ||
+                  ''}
+              </span>
+            </div>
+            <span className='w-full font-semibold text-[12px] leading-[18px]'>CURRENT ADDRESS</span>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Flat no/Building name</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_current_flat_no_building_name
+                }
+              </span>
+            </div>
+
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Street/Area/Locality</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_current_street_area_locality
+                }
+              </span>
+            </div>
+
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Town</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_current_town
+                }
+              </span>
+            </div>
+
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Landmark</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_current_landmark
+                }
+              </span>
+            </div>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Pincode</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_current_pincode
+                }
+              </span>
+            </div>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>City</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_current_city
+                }
+              </span>
+            </div>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>State</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_current_state
+                }
+              </span>
+            </div>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>No. of years residing</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_current_no_of_year_residing
+                }
+              </span>
+            </div>
+
+            <span className='w-full font-semibold text-[12px] leading-[18px]'>
+              PERMANENT ADDRESS
+            </span>
+            <div className='flex items-center gap-2'>
+              <Checkbox
+                checked={
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_permanent_address_same_as_current || false
+                }
+                name='permanent_address_same_as_current'
+                onTouchEnd
+                disabled={true}
+              />
               <span className='text-[#373435] text-xs font-normal'>
                 Permanent address is same as Current address
               </span>
             </div>
-          ) : null}
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Flat no/Building name</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_permanent_flat_no_building_name
+                }
+              </span>
+            </div>
 
-          {/* Permanent Address */}
-          <label
-            htmlFor='loan-purpose'
-            className='flex gap-0.5 font-medium text-primary-black text-xl mt-3'
-          >
-            Permanent Address
-          </label>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Street/Area/Locality</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_permanent_street_area_locality
+                }
+              </span>
+            </div>
 
-          <TextInput
-            label='Flat no/Building name'
-            placeholder='Eg: C-101'
-            required
-            name='address_detail.permanent_flat_no_building_name'
-            value={
-              values?.applicants?.[activeIndex]?.address_detail?.permanent_flat_no_building_name
-            }
-            error={
-              errors?.applicants?.[activeIndex]?.address_detail?.permanent_flat_no_building_name
-            }
-            touched={
-              touched?.applicants?.[activeIndex]?.address_detail?.permanent_flat_no_building_name
-            }
-            onBlur={(e) => {
-              handleBlur(e);
-              if (
-                !errors?.applicants?.[activeIndex]?.address_detail
-                  ?.permanent_flat_no_building_name &&
-                values?.applicants?.[activeIndex]?.address_detail?.permanent_flat_no_building_name
-              ) {
-                editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                  permanent_flat_no_building_name:
-                    values?.applicants?.[activeIndex]?.address_detail
-                      ?.permanent_flat_no_building_name,
-                });
-              }
-            }}
-            disabled={
-              inputDisabled ||
-              values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                .permanent_address_same_as_current
-            }
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-              if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(
-                  `applicants[${activeIndex}].${e.currentTarget.name}`,
-                  value.charAt(0).toUpperCase() + value.slice(1),
-                );
-              }
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Town</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_permanent_town
+                }
+              </span>
+            </div>
 
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                updateProgress(2, requiredFieldsStatus);
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
-            inputClasses='capitalize'
-          />
-
-          <TextInput
-            label='Street/Area/Locality'
-            placeholder='Eg: Senapati road'
-            required
-            name='address_detail.permanent_street_area_locality'
-            value={
-              values?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
-            }
-            error={
-              errors?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
-            }
-            touched={
-              touched?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
-            }
-            onBlur={(e) => {
-              handleBlur(e);
-              if (
-                !errors?.applicants?.[activeIndex]?.address_detail
-                  ?.permanent_street_area_locality &&
-                values?.applicants?.[activeIndex]?.address_detail?.permanent_street_area_locality
-              ) {
-                editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                  permanent_street_area_locality:
-                    values?.applicants?.[activeIndex]?.address_detail
-                      ?.permanent_street_area_locality,
-                });
-              }
-            }}
-            disabled={
-              inputDisabled ||
-              values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                .permanent_address_same_as_current
-            }
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-              if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(
-                  `applicants[${activeIndex}].${e.currentTarget.name}`,
-                  value.charAt(0).toUpperCase() + value.slice(1),
-                );
-              }
-
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                updateProgress(2, requiredFieldsStatus);
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
-            inputClasses='capitalize'
-          />
-
-          <TextInput
-            label='Town'
-            placeholder='Eg: Igatpuri'
-            required
-            name='address_detail.permanent_town'
-            value={values?.applicants?.[activeIndex]?.address_detail?.permanent_town}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_town}
-            touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_town}
-            onBlur={(e) => {
-              handleBlur(e);
-              if (
-                !errors?.applicants?.[activeIndex]?.address_detail?.permanent_town &&
-                values?.applicants?.[activeIndex]?.address_detail?.permanent_town
-              ) {
-                editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                  permanent_town: values?.applicants?.[activeIndex]?.address_detail?.permanent_town,
-                });
-              }
-            }}
-            disabled={
-              inputDisabled ||
-              values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                .permanent_address_same_as_current
-            }
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const pattern = /^[A-Za-z\s]+$/;
-              if (pattern.exec(value[value.length - 1])) {
-                setFieldValue(
-                  `applicants[${activeIndex}].${e.currentTarget.name}`,
-                  value.charAt(0).toUpperCase() + value.slice(1),
-                );
-              }
-
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                updateProgress(2, requiredFieldsStatus);
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
-            inputClasses='capitalize'
-          />
-
-          <TextInput
-            label='Landmark'
-            placeholder='Eg: Near apollo hospital'
-            required
-            name='address_detail.permanent_landmark'
-            value={values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_landmark}
-            touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_landmark}
-            onBlur={(e) => {
-              handleBlur(e);
-              if (
-                !errors?.applicants?.[activeIndex]?.address_detail?.permanent_landmark &&
-                values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark
-              ) {
-                editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                  permanent_landmark:
-                    values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark,
-                });
-              }
-            }}
-            disabled={
-              inputDisabled ||
-              values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                .permanent_address_same_as_current
-            }
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const pattern = /^[A-Za-z\s]+$/;
-              if (pattern.exec(value[value.length - 1])) {
-                setFieldValue(
-                  `applicants[${activeIndex}].${e.currentTarget.name}`,
-                  value.charAt(0).toUpperCase() + value.slice(1),
-                );
-              }
-
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                updateProgress(2, requiredFieldsStatus);
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
-            inputClasses='capitalize'
-          />
-
-          <TextInput
-            label='Pincode'
-            placeholder='Eg: 123456'
-            required
-            name='address_detail.permanent_pincode'
-            type='tel'
-            hint='City and State fields will get filled based on Pincode'
-            value={values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
-            touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
-            disabled={
-              inputDisabled ||
-              values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                .permanent_address_same_as_current
-            }
-            onBlur={(e) => {
-              handleBlur(e);
-              handlePermanentPincodeChange();
-            }}
-            min='0'
-            onInput={(e) => {
-              if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
-            }}
-            onChange={(e) => {
-              if (e.currentTarget.value.length > 6) {
-                e.preventDefault();
-                return;
-              }
-              const value = e.currentTarget.value;
-              if (value.charAt(0) === '0') {
-                e.preventDefault();
-                return;
-              }
-              handleChange(e);
-            }}
-            onKeyDown={(e) => {
-              //capturing ctrl V and ctrl C
-              (e.key == 'v' && (e.metaKey || e.ctrlKey)) ||
-              DISALLOW_CHAR.includes(e.key) ||
-              e.key === 'ArrowUp' ||
-              e.key === 'ArrowDown'
-                ? e.preventDefault()
-                : null;
-            }}
-            pattern='\d*'
-            onFocus={(e) =>
-              e.target.addEventListener(
-                'wheel',
-                function (e) {
-                  e.preventDefault();
-                },
-                { passive: false },
-              )
-            }
-            onPaste={(e) => {
-              e.preventDefault();
-              const text = (e.originalEvent || e).clipboardData.getData('text/plain').replace('');
-              e.target.value = text;
-              handleChange(e);
-            }}
-            inputClasses='hidearrow'
-          />
-
-          <TextInput
-            label='City'
-            placeholder='Eg: Nashik'
-            name='address_detail.permanent_city'
-            value={values?.applicants?.[activeIndex]?.address_detail?.permanent_city}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_city}
-            touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_city}
-            onBlur={handleBlur}
-            disabled={true}
-            labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.permanent_city}
-            onChange={() => {}}
-            inputClasses='capitalize'
-          />
-
-          <TextInput
-            label='State'
-            placeholder='Eg: Maharashtra'
-            name='address_detail.permanent_state'
-            value={values?.applicants?.[activeIndex]?.address_detail?.permanent_state}
-            error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_state}
-            touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_state}
-            onBlur={handleBlur}
-            disabled={true}
-            labelDisabled={!values?.applicants?.[activeIndex]?.address_detail?.permanent_state}
-            onChange={() => {}}
-            inputClasses='capitalize'
-          />
-
-          <div className='flex flex-col gap-2'>
-            <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
-              No. of years residing <span className='text-primary-red text-xs'>*</span>
-            </label>
-            <div
-              className={`flex gap-4 w-full ${
-                inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
-              }`}
-            >
-              {yearsResidingData.map((data, index) => (
-                <CardRadio
-                  key={index}
-                  name='permanent_no_of_year_residing'
-                  value={data.value}
-                  current={
-                    values?.applicants?.[activeIndex]?.address_detail?.permanent_no_of_year_residing
-                  }
-                  onChange={handleRadioChange}
-                  disabled={
-                    values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                      .permanent_address_same_as_current
-                  }
-                >
-                  <span
-                    className={`${
-                      index ==
-                      values?.applicants?.[activeIndex]?.address_detail
-                        ?.permanent_no_of_year_residing
-                        ? values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                            .permanent_address_same_as_current
-                          ? 'text-[#373435] font-semibold'
-                          : 'text-secondary-green font-semibold'
-                        : ''
-                    }`}
-                  >
-                    {data.label}
-                  </span>
-                </CardRadio>
-              ))}
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Landmark</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_permanent_landmark
+                }
+              </span>
+            </div>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>Pincode</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_permanent_pincode
+                }
+              </span>
+            </div>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>City</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_permanent_city
+                }
+              </span>
+            </div>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>State</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_permanent_state
+                }
+              </span>
+            </div>
+            <div className='flex justify-between w-full'>
+              <span className='w-full text-[12px] text-[#727376]'>No. of years residing</span>
+              <span className='w-full text-[12px]'>
+                {
+                  values?.applicants?.[activeIndex]?.applicant_details
+                    ?.existing_customer_permanent_no_of_year_residing
+                }
+              </span>
             </div>
           </div>
-        </>
-      ) : null}
-    </div>
+          <span className='w-full text-[#96989A] font-normal text-[12px] text-left leading-[18px]'>
+            ** Editable fields
+          </span>
+          <span className='w-full font-medium text-[14px] text-left mt-[6px] leading-[21px]'>
+            Would the customer prefer to proceed with the same details?
+          </span>
+          <div className='w-full flex gap-4 mt-3'>
+            <Button inputClasses='w-full h-[46px]' onClick={() => setOpenExistingPopup(false)}>
+              No
+            </Button>
+            <Button primary={true} inputClasses=' w-full h-[46px]' onClick={handleAutofill}>
+              Yes
+            </Button>
+          </div>
+        </div>
+      </DynamicDrawer>
+    </>
   );
 }
