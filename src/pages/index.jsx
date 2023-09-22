@@ -5,6 +5,7 @@ import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
+import DashboardApplicant from './dashboard/DashboardApplicant';
 
 const DashboardRoutes = () => {
   const { isAuthenticated } = useContext(AuthContext);
@@ -22,6 +23,14 @@ const DashboardRoutes = () => {
           element={
             // <RequireAuth>
             <Dashboard />
+            // </RequireAuth>
+          }
+        />
+        <Route
+          path='dashboard/:id'
+          element={
+            // <RequireAuth>
+            <DashboardApplicant />
             // </RequireAuth>
           }
         />

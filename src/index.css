@@ -336,3 +336,7 @@ body {
     width: 10px;
   }
 }
+
+.rdrDateDisplayWrapper {
+  display: none;
+}
