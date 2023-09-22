@@ -2,37 +2,67 @@ import InfoIcon from '../../../../assets/icons/info.svg';
 import { Link } from 'react-router-dom';
 import { Button } from '../../../../components';
 import loading from '../../../../assets/icons/loading.svg';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   checkBre99,
-  checkBureau,
+  checkCibil,
+  checkCrif,
   checkDedupe,
-  getAllLoanOfficers,
-  getCompanyNamesList,
   verifyDL,
   verifyGST,
   verifyPFUAN,
   verifyPan,
   verifyVoterID,
 } from '../../../../global';
-import { func } from 'prop-types';
+import { array, func } from 'prop-types';
+import { AnimatePresence, motion } from 'framer-motion';
+import { create } from '@lottiefiles/lottie-interactivity';
+import SpeedoMeterAnimation from '../../../../components/speedometer';
 
 const pan = false;
 const dl = true;
 const voterId = false;
-const pf = false;
-const gst = true;
+const pf = true;
+const gst = false;
+// values.applicants[activeIndex]?.personal_details.id_type === 'PAN'
+// values.applicants[activeIndex]?.personal_details.id_type === 'DL'
+// values.applicants[activeIndex]?.personal_details.id_type === 'VoterID'
+// values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN'
+// values.applicants[activeIndex]?.personal_details.selected_address_proof === 'DL'
+// values.applicants[activeIndex]?.personal_details.selected_address_proof === 'VoterID'
+// values.applicants[activeIndex]?.work_income_details.pf_uan
+// values.applicants[activeIndex]?.work_income_details.gst_number
 
 const BRE_ONE = () => {
+  const SpeedoMeterAnimationRef = useRef(null);
   const [progress, setProgress] = useState(0);
-  const [personalDetailsApi, setPersonalDetailsApi] = useState({
-    label: '',
+  // const [personalDetailsApi, setPersonalDetailsApi] = useState({
+  //   label: '',
+  //   res: false,
+  //   loader: false,
+  //   ran: false,
+  // });
+  const [PAN, setPAN] = useState({
     res: false,
     loader: false,
     ran: false,
   });
-  const [workIncomeApi, setWorkIncomeApi] = useState({
-    label: '',
+  const [DL, setDL] = useState({
+    res: false,
+    loader: false,
+    ran: false,
+  });
+  const [voterID, setVoterID] = useState({
+    res: false,
+    loader: false,
+    ran: false,
+  });
+  const [pfUAN, setPfUAN] = useState({
+    res: false,
+    loader: false,
+    ran: false,
+  });
+  const [GST, setGST] = useState({
     res: false,
     loader: false,
     ran: false,
@@ -47,381 +77,352 @@ const BRE_ONE = () => {
     loader: false,
     ran: false,
   });
-  const [bureauOrCrif, setBureauOrCrif] = useState({
-    label: '',
+  const [bureau, setBureau] = useState({
     res: false,
     loader: false,
     ran: false,
   });
-  // const [bre101, setBre101] = useState({
-  //   res: false,
-  //   loader: false,
-  //   ran: false,
-  // });
+  const [bre101, setBre101] = useState(false);
+  const [breres, setBreres] = useState({
+    res: false,
+    red: false,
+    orange: false,
+    green: false,
+  });
 
   useEffect(() => {
-    async function bre101() {
+    async function breOne() {
       if (pan) {
-        setPersonalDetailsApi({
-          ...personalDetailsApi,
+        setPAN((prev) => ({
+          ...prev,
           loader: true,
           ran: true,
-          label: 'PAN card',
-        });
+        }));
         setProgress(1);
 
-        // try {
-        //   const pan_res = await verifyPan();
+        try {
+          const pan_res = await verifyPan(1, {});
 
-        //   if (pan_res.valid) {
-        //     setPersonalDetailsApi({
-        //       ...personalDetailsApi,
-        //       loader: false,
-        //       ran: true,
-        //       label: 'PAN card',
-        //       res: 'Valid Match',
-        //     });
-        //   } else {
-        //     setPersonalDetailsApi({
-        //       ...personalDetailsApi,
-        //       loader: false,
-        //       ran: true,
-        //       label: 'PAN card',
-        //       res: 'Invalid',
-        //     });
-        //   }
-        // } catch (err) {
-        //   console.log(err);
-        //   setPersonalDetailsApi({
-        //     ...personalDetailsApi,
-        //     loader: false,
-        //     ran: true,
-        //     label: 'PAN card',
-        //     res: 'Error',
-        //   });
-        // }
+          if (pan_res.pan_response.status === 'Valid') {
+            setPAN((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Valid Match',
+            }));
+          } else {
+            setPAN((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Invalid',
+            }));
+          }
+        } catch (err) {
+          console.log(err);
+          setPAN((prev) => ({
+            ...prev,
+            loader: false,
+            res: 'Error',
+          }));
+        }
       }
 
       if (dl) {
-        setPersonalDetailsApi({
-          ...personalDetailsApi,
+        setDL((prev) => ({
+          ...prev,
           loader: true,
           ran: true,
-          label: 'Driving license',
-        });
+        }));
         setProgress(1);
 
-        // try {
-        //   const dl_res = await verifyDL();
+        try {
+          const dl_res = await verifyDL(1, {});
 
-        //   if (dl_res.valid) {
-        //     setPersonalDetailsApi({
-        //       ...personalDetailsApi,
-        //       loader: false,
-        //       ran: true,
-        //       label: 'Driving license',
-        //       res: 'Valid Match',
-        //     });
-        //   } else {
-        //     setPersonalDetailsApi({
-        //       ...personalDetailsApi,
-        //       loader: false,
-        //       ran: true,
-        //       label: 'Driving license',
-        //       res: 'Invalid',
-        //     });
-        //   }
-        // } catch (err) {
-        //   console.log(err);
-        //   setPersonalDetailsApi({
-        //     ...personalDetailsApi,
-        //     loader: false,
-        //     ran: true,
-        //     label: 'Driving license',
-        //     res: 'Error',
-        //   });
-        // }
+          if (dl_res.dl_response.result && dl_res.dl_response.statusCode === 101) {
+            setDL((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Valid Match',
+            }));
+          } else {
+            setDL((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Invalid',
+            }));
+          }
+        } catch (err) {
+          console.log(err);
+          setDL((prev) => ({
+            ...prev,
+            loader: false,
+            res: 'Error',
+          }));
+        }
       }
 
       if (voterId) {
-        setPersonalDetailsApi({
-          ...personalDetailsApi,
+        setVoterID((prev) => ({
+          ...prev,
           loader: true,
           ran: true,
-          label: 'Voter ID',
-        });
+        }));
         setProgress(1);
 
-        // try {
-        //   const voterId_res = verifyVoterID();
+        try {
+          const voterId_res = await verifyVoterID(1, {});
 
-        //   if (voterId_res.valid) {
-        //     setPersonalDetailsApi({
-        //       ...personalDetailsApi,
-        //       loader: false,
-        //       ran: true,
-        //       label: 'Voter ID',
-        //       res: 'Valid Match',
-        //     });
-        //   } else {
-        //     setPersonalDetailsApi({
-        //       ...personalDetailsApi,
-        //       loader: false,
-        //       ran: true,
-        //       label: 'Voter ID',
-        //       res: 'Invalid',
-        //     });
-        //   }
-        // } catch (err) {
-        //   console.log(err);
-        //   setPersonalDetailsApi({
-        //     ...personalDetailsApi,
-        //     loader: false,
-        //     ran: true,
-        //     label: 'Voter ID',
-        //     res: 'Error',
-        //   });
-        // }
+          if (voterId_res.voter_response.result && voterId_res.voter_response.statusCode === 101) {
+            setVoterID((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Valid Match',
+            }));
+          } else {
+            setVoterID((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Invalid',
+            }));
+          }
+        } catch (err) {
+          console.log(err);
+          setVoterID((prev) => ({
+            ...prev,
+            loader: false,
+            res: 'Error',
+          }));
+        }
       }
 
       if (pf) {
-        setWorkIncomeApi({ ...workIncomeApi, loader: true, ran: true, label: 'PF UAN' });
+        setPfUAN((prev) => ({ ...prev, loader: true, ran: true }));
         setProgress(2);
 
-        // try {
-        //   const pf_res = verifyPFUAN();
+        try {
+          const pf_res = await verifyPFUAN(1, {});
 
-        //   if (pf_res.valid) {
-        //     setWorkIncomeApi({
-        //       ...workIncomeApi,
-        //       loader: false,
-        //       ran: true,
-        //       label: 'PF UAN',
-        //       res: 'Valid Match',
-        //     });
-        //   } else {
-        //     setWorkIncomeApi({
-        //       ...workIncomeApi,
-        //       loader: false,
-        //       ran: true,
-        //       label: 'PF UAN',
-        //       res: 'Invalid',
-        //     });
-        //   }
-        // } catch (err) {
-        //   console.log(err);
-        //   setWorkIncomeApi({
-        //     ...workIncomeApi,
-        //     loader: false,
-        //     ran: true,
-        //     label: 'PF UAN',
-        //     res: 'Error',
-        //   });
-        // }
+          if (pf_res.uan_response.result && pf_res.uan_response.statusCode === 101) {
+            setPfUAN((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Valid Match',
+            }));
+          } else {
+            setPfUAN((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Invalid',
+            }));
+          }
+        } catch (err) {
+          console.log('error in pf');
+          console.log(err);
+          setPfUAN((prev) => ({
+            ...prev,
+            loader: false,
+            res: 'Error',
+          }));
+        }
       }
 
       if (gst) {
-        setWorkIncomeApi({ ...workIncomeApi, loader: true, ran: true, label: 'GST IN' });
+        setGST((prev) => ({ ...prev, loader: true, ran: true }));
         setProgress(2);
 
-        // try {
-        //   const gst_res = verifyGST();
+        try {
+          const gst_res = await verifyGST(1, {});
 
-        //   if (gst_res.valid) {
-        //     setWorkIncomeApi({
-        //       ...workIncomeApi,
-        //       loader: false,
-        //       ran: true,
-        //       label: 'GST IN',
-        //       res: 'Valid Match',
-        //     });
-        //   } else {
-        //     setWorkIncomeApi({
-        //       ...workIncomeApi,
-        //       loader: false,
-        //       ran: true,
-        //       label: 'GST IN',
-        //       res: 'InValid',
-        //     });
-        //   }
-        // } catch (err) {
-        //   console.log(err);
-        //   setWorkIncomeApi({
-        //     ...workIncomeApi,
-        //     loader: false,
-        //     ran: true,
-        //     label: 'GST IN',
-        //     res: 'Error',
-        //   });
-        // }
+          if (gst_res.gst_response.result && gst_res.gst_response.statusCode === 101) {
+            setGST((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Valid Match',
+            }));
+          } else {
+            setGST((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'InValid',
+            }));
+          }
+        } catch (err) {
+          console.log(err);
+          setGST((prev) => ({
+            ...prev,
+            loader: false,
+            res: 'Error',
+          }));
+        }
       }
 
-      setDedupe({ ...dedupe, loader: true, ran: true });
+      // try {
+      //   const array = await Promise.allSettled([
+      //     pan ? verifyPan(1, {}) : null,
+      //     dl ? verifyDL(1, {}) : null,
+      //     voterID ? verifyVoterID(1, {}) : null,
+      //   ]);
+
+      //   const fulfilled_arr = array.map((api) => {
+      //     return api.status === 'fulfilled';
+      //   });
+
+      //   const rejected_arr = array.map((api) => {
+      //     return api.status === 'rejected';
+      //   });
+
+      //   console.log(fulfilled_arr);
+      //   console.log(rejected_arr);
+
+      //   if (array[0].status === 'fulfilled') {
+      //     setPAN((prev) => ({
+      //       ...prev,
+      //       loader: false,
+      //       res: array[0].value === 'yes' ? 'Valid Match' : 'Invalid',
+      //     }));
+      //   } else {
+      //     setPAN((prev) => ({ ...prev, loader: false, res: 'Error' }));
+      //   }
+
+      //   if (array[1].status === 'fulfilled') {
+      //     setPAN((prev) => ({
+      //       ...prev,
+      //       loader: false,
+      //       res: array[1].value === 'yes' ? 'Valid Match' : 'Invalid',
+      //     }));
+      //   } else {
+      //     setPAN((prev) => ({ ...prev, loader: false, res: 'Error' }));
+      //   }
+
+      //   if (array[2].status === 'fulfilled') {
+      //     setPAN((prev) => ({
+      //       ...prev,
+      //       loader: false,
+      //       res: array[2].value === 'yes' ? 'Valid Match' : 'Invalid',
+      //     }));
+      //   } else {
+      //     setPAN((prev) => ({ ...prev, loader: false, res: 'Error' }));
+      //   }
+      // } catch (err) {
+      //   console.log(err);
+      // }
+
+      setDedupe((prev) => ({ ...prev, loader: true, ran: true }));
       setProgress(3);
 
-      // try {
-      //   const dedupe_res = await checkDedupe();
+      try {
+        const dedupe_res = await checkDedupe(1, {});
 
-      //   if (dedupe_res === 200) {
-      //     setDedupe({ ...dedupe, loader: false, ran: true, res: 'Valid Match' });
-      //   }
-      // } catch (err) {
-      //   console.log(err);
-      //   setDedupe({ ...dedupe, loader: false, ran: true, res: 'Error' });
-      // }
+        if (dedupe_res.status === 200) {
+          setDedupe((prev) => ({ ...prev, loader: false, res: 'Valid Match' }));
+        }
+      } catch (err) {
+        console.log(err);
+        setDedupe((prev) => ({ ...prev, loader: false, res: 'Error' }));
+      }
 
-      setBre99({ ...bre99, loader: true, ran: true });
+      setBre99((prev) => ({ ...prev, loader: true, ran: true }));
       setProgress(4);
 
-      // try {
-      //   const bre99_res = await checkBre99();
+      let callCibilOrCrif = '';
 
-      //   if (bre99_res === 200) {
-      //     setBre99({ ...bre99, loader: false, ran: true, res: 'Valid Match' });
-      //   }
-      // } catch (err) {
-      //   console.log(err);
-      //   setBre99({ ...bre99, loader: false, ran: true, res: 'Error' });
-      // }
+      try {
+        const bre99_res = await checkBre99(1, {});
 
-      const bre99_res = {
-        value: 'Bureau',
-      };
+        console.log(bre99_res);
 
-      if (bre99_res.value === 'Bureau') {
-        setBureauOrCrif({ ...bureauOrCrif, loader: true, ran: true, label: 'Bureau' });
-        setProgress(5);
+        if (bre99_res.bre_99_response.statusCode === 200) {
+          setBre99((prev) => ({ ...prev, loader: false, res: 'Valid Match' }));
 
-        // try {
-        //   const bureau_res = await checkBureau();
-
-        //   if (bureau_res === 200) {
-        //     setBureauOrCrif({ ...bre99, loader: false, ran: true, res: 'Valid Match', label: 'Bureau' });
-        //   }
-        // } catch (err) {
-        //   console.log(err);
-        //   setBureauOrCrif({ ...bre99, loader: false, ran: true, res: 'Error', label: 'Bureau' });
-        // }
-      } else {
-        setBureauOrCrif({ ...bureauOrCrif, loader: true, ran: true, label: 'CRIF' });
-        setProgress(5);
-
-        // try {
-        //   const bureau_res = await checkCRIF();
-
-        //   if (crif_res === 200) {
-        //     setBureauOrCrif({ ...bre99, loader: false, ran: true, res: 'Valid Match', label: 'CRIF' });
-        //   }
-        // } catch (err) {
-        //   console.log(err);
-        //   setBureauOrCrif({ ...bre99, loader: false, ran: true, res: 'Error', label: 'CRIF' });
-        // }
+          const bre99body = bre99_res.bre_99_response.body;
+          callCibilOrCrif = bre99body.find((data) => data.Rule_Name === 'Bureau_Type');
+        }
+      } catch (err) {
+        console.log(err);
+        setBre99((prev) => ({ ...prev, loader: false, res: 'Error' }));
       }
+
+      setBureau((prev) => ({ ...prev, loader: true, ran: true }));
+      setProgress(5);
+
+      if (callCibilOrCrif.Rule_Value === 'CIBIL') {
+        console.log('cibil');
+        try {
+          const cibil_res = await checkCibil(1, {});
+
+          if (cibil_res.status === 200) {
+            setBureau((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Valid Match',
+            }));
+          }
+        } catch (err) {
+          console.log(err);
+          setBureau((prev) => ({
+            ...prev,
+            loader: false,
+            res: 'Error',
+          }));
+        }
+      } else {
+        console.log('crif');
+        try {
+          const crif_res = await checkCrif(1, {});
+
+          if (crif_res.status === 200) {
+            setBureau((prev) => ({
+              ...prev,
+              loader: false,
+              res: 'Valid Match',
+            }));
+          }
+        } catch (err) {
+          console.log(err);
+          setBureau((prev) => ({
+            ...prev,
+            loader: false,
+            res: 'Error',
+          }));
+        }
+      }
+
+      // setTimeout(() => {
+      //   setBreres((prev) => ({ ...prev, green: true, res: true }));
+      // }, 3000);
     }
-    bre101();
+    breOne();
   }, []);
 
-  // useEffect(() => {
-  //   console.log(personalDetailsApi.label);
-  //   console.log(workIncomeApi.label);
-  //   async function verifydetails() {
-  //     await Promise.all([getCompanyNamesList(), getAllLoanOfficers()])
-  //       .then((res) => {
-  //         console.log(res.status);
-  //       })
-  //       .catch((err) => {
-  //         console.log(err);
-  //       });
-  //   }
-  //   verifydetails();
-  // }, [personalDetailsApi.label, workIncomeApi.label]);
+  function checkELigibilty() {
+    if (breres.red) {
+      return [1, 3];
+    }
+    if (breres.orange) {
+      return [1, 42.5];
+    }
+    if (breres.green) {
+      return [1, 30];
+    } else {
+      [];
+    }
+  }
 
-  // useEffect(() => {
-  //   async function verifydetails() {
-  //     if (personalDetailsApi.res && workIncomeApi.res && dedupe.res) {
-  //       try {
-  //         const bre99_res = await checkBre99();
-  //       } catch (err) {
-  //         console.log(err);
-  //       }
+  // console.log(breres.res);
 
-  //       try {
-  //         if (bre99_res === 'CIBIL') {
-  //           const bureau_res = await checkBereau();
-  //         } else {
-  //           // call CRIF
-  //         }
-  //       } catch (err) {
-  //         console.log(err);
-  //       }
-  //     }
-  //   }
-  //   verifydetails();
-  // }, [personalDetailsApi, workIncomeApi]);
-
-  // setTimeout(() => {
-  //   setBre99({ ...bre99, loader: true, ran: true });
-  //   setProgress(4);
-
-  //   if (pan) {
-  //     setPersonalDetailsApi({
-  //       ...personalDetailsApi,
-  //       loader: false,
-  //       ran: true,
-  //       label: 'PAN card',
-  //       res: 'Valid Match',
-  //     });
-  //   }
-  //   if (dl) {
-  //     setPersonalDetailsApi({
-  //       ...personalDetailsApi,
-  //       loader: false,
-  //       ran: true,
-  //       label: 'Driving license',
-  //       res: 'Error',
-  //     });
-  //   }
-  //   if (voterId) {
-  //     setPersonalDetailsApi({
-  //       ...personalDetailsApi,
-  //       loader: false,
-  //       ran: true,
-  //       label: 'Voter ID',
-  //       res: 'Valid Match',
-  //     });
-  //   }
-  //   if (pf) {
-  //     setWorkIncomeApi({
-  //       ...workIncomeApi,
-  //       loader: false,
-  //       ran: true,
-  //       label: 'PF UAN',
-  //       res: 'Valid Match',
-  //     });
-  //   }
-  //   if (gst) {
-  //     setWorkIncomeApi({
-  //       ...workIncomeApi,
-  //       loader: false,
-  //       ran: true,
-  //       label: 'GST IN',
-  //       res: 'Valid Match',
-  //     });
-  //   }
-
-  //   setDedupe({ ...dedupe, loader: false, ran: true, res: 'Valid Match' });
-  // }, 6000);
-
-  // setTimeout(() => {
-  //   setBureau({ ...bureau, loader: true, ran: true });
-  //   setProgress(5);
-
-  //   setBre99({ ...bre99, loader: false, ran: true, res: 'Valid Match' });
-  // }, 12000);
-
-  // setTimeout(() => {
-  //   setBureau({ ...bureau, loader: false, ran: true, res: 'Valid Match' });
-  // }, 18000);
+  useEffect(() => {
+    if (SpeedoMeterAnimationRef.current && breres.res);
+    create({
+      player: SpeedoMeterAnimationRef.current,
+      mode: 'chain',
+      actions: [
+        {
+          state: 'autoplay',
+          frames: breres && checkELigibilty(),
+          repeat: 1,
+        },
+      ],
+    });
+  }, [breres]);
 
   return (
     <div className='p-4 relative h-screen'>
@@ -441,131 +442,263 @@ const BRE_ONE = () => {
         </div>
 
         <div className='flex justify-center mt-3'>
-          <svg
-            width='152'
-            height='78'
-            viewBox='0 0 152 78'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <path
-              d='M152 75.9875C152 55.8343 143.993 36.5066 129.74 22.2562C115.487 8.0058 96.1565 1.53945e-06 76 1.79328e-08C55.8436 -1.50359e-06 36.5127 8.0058 22.2599 22.2562C8.00713 36.5066 3.14666e-06 55.8343 1.03116e-07 75.9875H19C19 60.8726 25.0053 46.3768 35.6949 35.689C46.3845 25.0012 60.8827 18.9969 76 18.9969C91.1174 18.9969 105.616 25.0012 116.305 35.689C126.995 46.3768 133 60.8726 133 75.9875H152Z'
-              fill='#3DB267'
-            />
-            <path
-              d='M39.1918 9.50665C27.2832 16.0979 17.3636 25.7658 10.4694 37.5004C3.57531 49.2349 -0.0403256 62.6053 0.000339267 76.2145L19.0003 76.1577C18.9698 65.9508 21.6815 55.923 26.8521 47.1221C32.0227 38.3212 39.4624 31.0703 48.3939 26.1269L39.1918 9.50665Z'
-              fill='#E15555'
-            />
-            <path
-              d='M114 10.1804C102.475 3.52772 89.4056 0.0172316 76.0981 6.3276e-05C62.7905 -0.017105 49.7118 3.45965 38.17 10.0826L47.6275 26.5588C56.2838 21.5916 66.0929 18.984 76.0735 18.9969C86.0542 19.0098 95.8565 21.6427 104.5 26.6322L114 10.1804Z'
-              fill='#FF9D4A'
-            />
-            <path
-              d='M21.0002 41.536L77.589 69.9524L73.9079 76.3271L21.0002 41.536Z'
-              fill='#272525'
-            />
-            <path
-              d='M76.5428 68.9797C78.5408 70.133 79.265 72.6189 78.1603 74.532C77.0556 76.4451 74.5403 77.0609 72.5423 75.9076C70.5443 74.7542 69.8201 72.2684 70.9248 70.3553C72.0295 68.4422 74.5448 67.8263 76.5428 68.9797Z'
-              fill='#272525'
-            />
-          </svg>
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, transitionDuration: 2 }}
+              exit={{ opacity: 0 }}
+            >
+              <SpeedoMeterAnimation
+                id='speedo-meter-animation'
+                className='w-[152px]'
+                // className={`absolute h-[78px] top-0 md:top-auto md:bottom-0 left-0 w-full max-h-[600px]`}
+                loop
+                play
+                ref={SpeedoMeterAnimationRef}
+              />
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
 
       <div className='mt-4 flex flex-col gap-2'>
-        <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-          <div className='flex items-center gap-1'>
-            {!personalDetailsApi.ran ? (
-              <svg
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                  stroke='#EC7739'
-                  strokeWidth='1.5'
-                />
-              </svg>
-            ) : (
-              <svg
-                width='24'
-                height='13'
-                viewBox='0 0 18 13'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M17 1L6 12L1 7'
-                  stroke='#147257'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            )}
+        {pan && (
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!PAN.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
 
-            <p className='text-sm text-primary-black'>{personalDetailsApi.label}</p>
-          </div>
-          {personalDetailsApi.loader ? (
-            <div className='ml-auto'>
-              <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+              <p className='text-sm text-primary-black'>PAN card</p>
             </div>
-          ) : null}
-          {personalDetailsApi.res && (
-            <span className='text-xs font-normal text-light-grey'>{personalDetailsApi.res}</span>
-          )}
-        </div>
-
-        <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-          <div className='flex items-center gap-1'>
-            {!workIncomeApi.ran ? (
-              <svg
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                  stroke='#EC7739'
-                  strokeWidth='1.5'
-                />
-              </svg>
-            ) : (
-              <svg
-                width='24'
-                height='13'
-                viewBox='0 0 18 13'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M17 1L6 12L1 7'
-                  stroke='#147257'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            )}
-
-            <p className='text-sm text-primary-black'>{workIncomeApi.label}</p>
-          </div>
-          <div>
-            {workIncomeApi.loader ? (
+            {PAN.loader ? (
               <div className='ml-auto'>
                 <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
               </div>
             ) : null}
-            {workIncomeApi.res && (
-              <span className='text-xs font-normal text-light-grey'>{workIncomeApi.res}</span>
+            {PAN.res && <span className='text-xs font-normal text-light-grey'>{PAN.res}</span>}
+          </div>
+        )}
+
+        {dl && (
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!DL.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>Driving license</p>
+            </div>
+            {DL.loader ? (
+              <div className='ml-auto'>
+                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+              </div>
+            ) : null}
+            {DL.res && <span className='text-xs font-normal text-light-grey'>{DL.res}</span>}
+          </div>
+        )}
+
+        {voterId && (
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!voterID.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>Voter ID</p>
+            </div>
+            {voterID.loader ? (
+              <div className='ml-auto'>
+                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+              </div>
+            ) : null}
+            {voterID.res && (
+              <span className='text-xs font-normal text-light-grey'>{voterID.res}</span>
             )}
           </div>
-        </div>
+        )}
+
+        {pf && (
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!pfUAN.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>PF UAN</p>
+            </div>
+            <div>
+              {pfUAN.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {pfUAN.res && (
+                <span className='text-xs font-normal text-light-grey'>{pfUAN.res}</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {gst && (
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!GST.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>GST</p>
+            </div>
+            <div>
+              {GST.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {GST.res && <span className='text-xs font-normal text-light-grey'>{GST.res}</span>}
+            </div>
+          </div>
+        )}
 
         <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
           <div className='flex items-center gap-1'>
@@ -661,59 +794,9 @@ const BRE_ONE = () => {
           </div>
         </div>
 
-        {bre99.res && (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!bureauOrCrif.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>{bureauOrCrif.label}</p>
-            </div>
-            <div>
-              {bureauOrCrif.loader ? (
-                <div className='ml-auto'>
-                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-                </div>
-              ) : null}
-              {bureauOrCrif.res && (
-                <span className='text-xs font-normal text-light-grey'>{bureauOrCrif.res}</span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+        <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
           <div className='flex items-center gap-1'>
-            {!bre101.ran ? (
+            {!bureau.ran ? (
               <svg
                 width='24'
                 height='24'
@@ -745,17 +828,19 @@ const BRE_ONE = () => {
               </svg>
             )}
 
-            <p className='text-sm text-primary-black'>PAN card</p>
+            <p className='text-sm text-primary-black'>Bureau</p>
           </div>
           <div>
-            {bre101.loader ? (
+            {bureau.loader ? (
               <div className='ml-auto'>
                 <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
               </div>
             ) : null}
-            {gst.res && <span className='text-xs font-normal text-light-grey'>Valid Match</span>}
+            {bureau.res && (
+              <span className='text-xs font-normal text-light-grey'>{bureau.res}</span>
+            )}
           </div>
-        </div> */}
+        </div>
       </div>
 
       <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center'>
@@ -770,14 +855,14 @@ const BRE_ONE = () => {
             Eligibility can be increased by adding Co-applicant{' '}
             <Link
               className={`underline ${
-                !bureauOrCrif.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
+                !bureau.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
               }`}
             >
               Add now
             </Link>
           </p>
         </div>
-        <Button disabled={!bureauOrCrif.res} inputClasses='w-full h-14' primary={true}>
+        <Button disabled={!bureau.res} inputClasses='w-full h-14' primary={true}>
           Next
         </Button>
       </div>
