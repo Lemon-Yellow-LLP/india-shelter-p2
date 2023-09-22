@@ -75,12 +75,12 @@ async function getAllLoanOfficers() {
 
 //BRE SCREEN
 
-async function verifyPan(id) {
+async function verifyPan(id, options) {
   const res = await axios.post(
-    `${API_URL}/pan/${id}`,
+    `${API_URL}/applicant/pan/${id}`,
     {},
     {
-      ...requestOptions,
+      ...options,
       timeout: 30000,
       'axios-retry': {
         retries: 3,
@@ -92,81 +92,129 @@ async function verifyPan(id) {
   return res.data;
 }
 
-async function verifyDL(data, options) {
-  const res = await axios.post('https://testapi.karza.in/v3/dl', data, {
-    ...options,
-    timeout: 30000,
-    'axios-retry': {
-      retries: 3,
-      retryCondition: () => true,
-    },
-  });
-
-  return res.data;
-}
-
-async function verifyVoterID(data) {
-  const res = await axios.post('https://testapi.karza.in/v3/voter', data, {
-    headers: {
-      x_karza_key: '',
-    },
-    timeout: 30000,
-    'axios-retry': {
-      retries: 3,
-      retryCondition: () => true,
-    },
-  });
-
-  return res.data;
-}
-
-async function verifyGST(data) {
-  const res = await axios.post('https://api.karza.in/gst/uat/v2/gstdetailed', data, {
-    headers: {
-      x_karza_key: '',
-    },
-    timeout: 30000,
-    'axios-retry': {
-      retries: 3,
-      retryCondition: () => true,
-    },
-  });
-
-  return res.data;
-}
-
-async function verifyPFUAN(data) {
-  const res = await axios.post('https://testapi.karza.in/v3/epf-auth', data, {
-    headers: {
-      x_karza_key: '',
-    },
-    timeout: 30000,
-    'axios-retry': {
-      retries: 3,
-      retryCondition: () => true,
-    },
-  });
-
-  return res.data;
-}
-
-async function checkDedupe(id) {
-  const res = await axios.post(`${API_URL}/dedupe/${id}`, {}, requestOptions);
-  return res;
-}
-
-async function checkBre99(id) {
-  const res = await axios.post(`${API_URL}/bre-99/${id}`, {}, requestOptions);
-  return res;
-}
-
-async function checkBureau(id) {
+async function verifyDL(id, options) {
   const res = await axios.post(
-    `${API_URL}/cibil/${id}`,
+    `${API_URL}/applicant/driver-license/${id}`,
     {},
     {
-      ...requestOptions,
-      timeout: 90000,
+      ...options,
+      timeout: 30000,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+
+  return res.data;
+}
+
+async function verifyVoterID(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/voter/${id}`,
+    {},
+    {
+      ...options,
+      timeout: 30000,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+
+  return res.data;
+}
+
+async function verifyGST(id, options) {
+  const res = await axios.post(
+    `${API_URL}/work-income/gst/${id}`,
+    {},
+    {
+      ...options,
+      timeout: 30000,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+
+  return res.data;
+}
+
+async function verifyPFUAN(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/uan/${id}`,
+    {},
+    {
+      ...options,
+      timeout: 30000,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+
+  return res.data;
+}
+
+async function checkDedupe(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/dedupe/${id}`,
+    {},
+    {
+      ...options,
+      timeout: 30000,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res;
+}
+
+async function checkBre99(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/bre-99/${id}`,
+    {},
+    {
+      ...options,
+      timeout: 30000,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res.data;
+}
+
+async function checkCibil(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/cibil/${id}`,
+    {},
+    {
+      ...options,
+      timeout: 30000,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res;
+}
+
+async function checkCrif(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/crif/${id}`,
+    {},
+    {
+      ...options,
+      timeout: 30000,
       'axios-retry': {
         retries: 3,
         retryCondition: () => true,
@@ -364,5 +412,6 @@ export {
   verifyPFUAN,
   checkDedupe,
   checkBre99,
-  checkBureau,
+  checkCibil,
+  checkCrif,
 };
