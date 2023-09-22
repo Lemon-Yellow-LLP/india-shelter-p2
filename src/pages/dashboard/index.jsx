@@ -14,7 +14,6 @@ import NoSearchResultIllustration from '../../assets/icons/no-search-lead';
 import DateRangePicker from '../../components/DateRangePicker';
 import ProgressBadge from '../../components/ProgressBadge';
 import moment from 'moment';
-import Fuse from 'fuse.js';
 import { parseISO } from 'date-fns';
 
 const leadData = [
@@ -143,7 +142,7 @@ const DashboardMainScreen = () => {
   }, [selectionRange]);
 
   useEffect(() => {
-    const data = leadList.map((lead) => lead?.find((app) => app?.is_primary));
+    const data = leadList.map((lead) => lead?.find((applicant) => applicant?.is_primary));
     setPrimaryApplicantList(data);
     setFilteredList(data);
   }, [leadList]);

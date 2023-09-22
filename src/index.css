@@ -243,6 +243,14 @@ body {
   text-transform: none !important;
 }
 
+.tabLabels2 {
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  line-height: 18px !important;
+  font-family: 'Poppins', sans-serif !important;
+  text-transform: none !important;
+}
+
 .MuiDrawer-root>.MuiPaper-root {
   border-radius: 8px;
 }
