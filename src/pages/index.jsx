@@ -5,6 +5,7 @@ import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
+import DashboardApplicant from './dashboard/DashboardApplicant';
 
 const DashboardRoutes = () => {
   const { isAuthenticated } = useContext(AuthContext);
@@ -20,17 +21,25 @@ const DashboardRoutes = () => {
         <Route
           path='/'
           element={
-            <RequireAuth>
-              <Dashboard />
-            </RequireAuth>
+            // <RequireAuth>
+            <Dashboard />
+            // </RequireAuth>
+          }
+        />
+        <Route
+          path='dashboard/:id'
+          element={
+            // <RequireAuth>
+            <DashboardApplicant />
+            // </RequireAuth>
           }
         />
         <Route
           path='/lead/*'
           element={
-            <RequireAuth>
-              <LeadCreationRoutes />
-            </RequireAuth>
+            // <RequireAuth>
+            <LeadCreationRoutes />
+            // </RequireAuth>
           }
         />
         <Route path='*' element={<h1>404, Page not found!</h1>} />
