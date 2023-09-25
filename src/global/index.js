@@ -7,6 +7,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'https://lo.scotttiger.in/api';
 
 const requestOptions = {};
 
+const bre_timeout = 900000;
+
 axiosRetry(axios, { retries: 0 });
 
 async function pingAPI() {
@@ -33,10 +35,14 @@ async function editPropertyById(id, propertyData) {
   return res.data;
 }
 
+//WORK AND INCOME SCREEN
+
 async function getCompanyNamesList() {
   const res = await axios.get(`${API_URL}/company-list`, requestOptions);
   return res.data;
 }
+
+//LOGIN SCREEN
 
 async function getLoginOtp(mobile_no) {
   const res = await axios.get(
@@ -62,6 +68,178 @@ async function logout(status, options) {
 
 async function testLogout(options) {
   const res = await axios.post(`${API_URL}/session/check-auth/login`, {}, options);
+  return res.data;
+}
+
+async function getAllLoanOfficers() {
+  const res = await axios.get(`${API_URL}/account`, requestOptions);
+  return res.data;
+}
+
+//BRE SCREEN
+
+async function verifyPan(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/pan/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+
+  return res.data;
+}
+
+async function verifyDL(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/driver-license/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+
+  return res.data;
+}
+
+async function verifyVoterID(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/voter/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+
+  return res.data;
+}
+
+async function verifyGST(id, options) {
+  const res = await axios.post(
+    `${API_URL}/work-income/gst/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+
+  return res.data;
+}
+
+async function verifyPFUAN(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/uan/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+
+  return res.data;
+}
+
+async function checkDedupe(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/dedupe/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res;
+}
+
+async function checkBre99(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/bre-99/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res.data;
+}
+
+async function checkCibil(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/cibil/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res;
+}
+
+async function checkCrif(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/crif/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res;
+}
+
+async function checkBre101(id, options) {
+  const res = await axios.post(
+    `${API_URL}/lead/bre-101/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
   return res.data;
 }
 
@@ -277,4 +455,15 @@ export {
   verifyLoginOtp,
   logout,
   testLogout,
+  getAllLoanOfficers,
+  verifyPan,
+  verifyDL,
+  verifyVoterID,
+  verifyGST,
+  verifyPFUAN,
+  checkDedupe,
+  checkBre99,
+  checkCibil,
+  checkCrif,
+  checkBre101,
 };

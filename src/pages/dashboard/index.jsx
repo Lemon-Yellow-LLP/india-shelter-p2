@@ -266,6 +266,7 @@ export const DashboardTest = () => {
       >
         go-to-L&T-charges-page
       </Link>
+
       <Link
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
         to='/dashboard'
@@ -284,6 +285,13 @@ export const DashboardTest = () => {
       ) : (
         <span>ACTIVE LOGIN STATUS WILL BE SHOWN HERE</span>
       )}
+
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/qualifier'
+      >
+        go-to-qualifier-page
+      </Link>
     </div>
   );
 };
