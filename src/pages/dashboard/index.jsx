@@ -82,6 +82,7 @@ const Dashboard = () => {
       >
         go-to-L&T-charges-page
       </Link>
+
       <button
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
         onClick={handleActiveLogin}
@@ -94,6 +95,13 @@ const Dashboard = () => {
       ) : (
         <span>ACTIVE LOGIN STATUS WILL BE SHOWN HERE</span>
       )}
+
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/qualifier'
+      >
+        go-to-qualifier-page
+      </Link>
     </div>
   );
 };
