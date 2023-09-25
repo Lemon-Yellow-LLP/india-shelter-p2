@@ -57,7 +57,7 @@ export default function Dashboard() {
       });
 
       const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
-      setLeadList(formatted.map((l) => l?.applicants));
+      setLeadList(formatted?.map((l) => l?.applicants));
     })();
   }, [selectionRange]);
 
@@ -100,7 +100,7 @@ export default function Dashboard() {
       <div className='px-4 h-full bg-[#FAFAFA] overflow-auto'>
         {/* List of leads */}
 
-        {leadList.length === 0 ? (
+        {leadList?.length === 0 ? (
           <div className='relative flex-1 flex h-full justify-center translate-y-20'>
             <NoLeadIllustration />
           </div>
@@ -109,11 +109,19 @@ export default function Dashboard() {
             {filteredList.map((applicant, i) => (
               <LeadCard
                 key={i}
-                id={applicant.lead_id}
-                title={`${applicant.first_name} ${applicant.middle_name} ${applicant.last_name}`}
-                progress={applicant.extra_params?.progress ?? 0}
-                created={moment(applicant.created_at).format('DD/MM/YYYY')}
-                mobile={applicant.mobile_number}
+                id={applicant?.lead_id ?? '-'}
+                title={`${
+                  applicant
+                    ? applicant.first_name +
+                      ' ' +
+                      applicant?.middle_name +
+                      ' ' +
+                      applicant?.last_name
+                    : '-'
+                }`}
+                progress={applicant?.extra_params?.progress ?? 0}
+                created={moment(applicant?.created_at).format('DD/MM/YYYY')}
+                mobile={applicant?.mobile_number ?? '-'}
               />
             ))}
             <div className='h-[250px]'></div>

@@ -6,7 +6,7 @@ import { AuthContext } from '../../context/AuthContextProvider';
 import { Box, Button, Tabs, Tab } from '@mui/material';
 import ProgressBadge from '../../components/ProgressBadge';
 import { getDashboardLeadById } from '../../global';
-import { DropDown } from '../../components';
+import { CheckBox, DropDown } from '../../components';
 import moment from 'moment';
 
 const PrimaryDropdownOptions = [
@@ -142,10 +142,11 @@ export default function DashboardApplicant() {
           ),
         );
 
-        // Get All success lnt charges
+        // Get completed lnt charges
         setLntCharges(
           data?.lt_charges?.find((charge) => {
-            charge?.airpay_response_json?.airpay_verify_transaction_status == '200';
+            charge?.airpay_verify_transaction_status == '200' ||
+              charge?.extra_params?.status == 'success';
           }),
         );
       } catch (err) {
@@ -436,6 +437,21 @@ export default function DashboardApplicant() {
                 label: '',
                 value: '',
                 subtitle: 'PERMANENT ADDRESS',
+                children: (
+                  <div className='flex gap-2'>
+                    <CheckBox
+                      name=''
+                      checked={
+                        primaryApplicant?.address_detail?.extra_params
+                          ?.permanent_address_same_as_current
+                      }
+                      disabled={true}
+                    />
+                    <p className='text-xs not-italic font-medium text-primary-black'>
+                      Permanent address is same as Current address
+                    </p>
+                  </div>
+                ),
               },
 
               {
@@ -571,15 +587,21 @@ export default function DashboardApplicant() {
           <FormDetails
             title='L&T CHARGES'
             ref={primarySelectedStep == 'lnt_charges' ? primarySelectedStepRef : null}
-            progress={90}
-            data={[]}
+            progress={null}
+            data={[
+              {
+                label: 'Payment method',
+                value: lntCharges?.airpay_verify_chmod ?? lntCharges?.extra_params?.method ?? '-',
+              },
+            ]}
+            message={!lntCharges ? 'L&T charges is pending' : null}
           />
           <Separator />
 
           <FormDetails
             title='PROPERTY DETAILS'
             ref={primarySelectedStep == 'property_details' ? primarySelectedStepRef : null}
-            progress={90}
+            progress={primaryApplicant?.property_details?.extra_params?.progress}
             data={[
               {
                 label: 'Property identification',
@@ -620,7 +642,7 @@ export default function DashboardApplicant() {
           <FormDetails
             title='BANKING DETAILS'
             ref={primarySelectedStep == 'banking_details' ? primarySelectedStepRef : null}
-            progress={90}
+            progress={primaryApplicant?.banking_details?.extra_params?.progress}
             data={[]}
           />
           <Separator />
@@ -628,7 +650,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={primarySelectedStep == 'reference_details' ? primarySelectedStepRef : null}
             title='REFERENCE DETAILS'
-            progress={90}
+            progress={primaryApplicant?.reference_details?.extra_params?.progress}
             data={[
               {
                 subtitle: 'REFERENCE DETAIL 1',
@@ -751,10 +773,27 @@ export default function DashboardApplicant() {
         </div>
 
         <div ref={coApplicantListRef} className='h-full px-4 overflow-auto'>
+          <div className='flex justify-between pb-6'>
+            <div>
+              <span className='not-italic font-medium text-[10px] text-light-grey'>CREATED: </span>
+              <span className='not-italic font-medium text-[10px] text-dark-grey'>
+                {moment(activeCoApplicant?.applicant_details?.created_at).format('DD/MM/YYYY')}
+              </span>
+            </div>
+
+            <div>
+              <span className='not-italic font-medium text-[10px] text-light-grey'>
+                completed:{' '}
+              </span>
+              <span className='text-right text-sm not-italic font-medium text-primary-red'>
+                {`${leadData?.lead?.extra_params?.progress ?? 0}%`}
+              </span>
+            </div>
+          </div>
           <FormDetails
             ref={coApplicantSelectedStep == 'applicant_details' ? coApplicantSelectedStepRef : null}
             title='APPLICANT DETAILS'
-            progress={90}
+            progress={primaryApplicant?.applicant_details?.extra_params?.progress}
             data={[
               {
                 label: 'Loan type',
@@ -799,7 +838,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={coApplicantSelectedStep == 'personal_details' ? coApplicantSelectedStepRef : null}
             title='PERSONAL DETAILS'
-            progress={90}
+            progress={primaryApplicant?.personal_details?.extra_params?.progress}
             data={[
               {
                 label: 'ID Type',
@@ -868,7 +907,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={coApplicantSelectedStep == 'address_details' ? coApplicantSelectedStepRef : null}
             title='ADDRESS DETAILS'
-            progress={90}
+            progress={primaryApplicant?.address_details?.extra_params?.progress}
             data={[
               {
                 label: 'Type of residence',
@@ -911,6 +950,21 @@ export default function DashboardApplicant() {
                 label: '',
                 value: '',
                 subtitle: 'PERMANENT ADDRESS',
+                children: (
+                  <div className='flex gap-2'>
+                    <CheckBox
+                      name=''
+                      checked={
+                        primaryApplicant?.address_detail?.extra_params
+                          ?.permanent_address_same_as_current
+                      }
+                      disabled={true}
+                    />
+                    <p className='text-xs not-italic font-medium text-primary-black'>
+                      Permanent address is same as Current address
+                    </p>
+                  </div>
+                ),
               },
 
               {
@@ -958,7 +1012,7 @@ export default function DashboardApplicant() {
               coApplicantSelectedStep == 'work_income_details' ? coApplicantSelectedStepRef : null
             }
             title='WORK & INCOME DETAILS'
-            progress={90}
+            progress={primaryApplicant?.work_income_details?.extra_params?.progress}
             data={[
               {
                 label: 'Profession',
@@ -1040,7 +1094,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={coApplicantSelectedStep == 'banking_details' ? coApplicantSelectedStepRef : null}
             title='BANKING DETAILS'
-            progress={90}
+            progress={0}
             data={[]}
           />
           <Separator />
@@ -1048,7 +1102,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={coApplicantSelectedStep == 'upload_documents' ? coApplicantSelectedStepRef : null}
             title='UPLOAD DOCUMENTS'
-            progress={90}
+            progress={0}
             data={[]}
             message={'Will fill this once Banking details is done'}
           />
@@ -1057,7 +1111,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={coApplicantSelectedStep == 'qualifier' ? coApplicantSelectedStepRef : null}
             title='QUALIFIER'
-            progress={90}
+            progress={null}
             data={[]}
           />
 
@@ -1111,21 +1165,21 @@ function CustomTabPanel(props) {
 }
 
 const FormDetails = React.forwardRef(function FormDetails(
-  { title, progress = 0, children, data, message, className },
+  { title, progress = 0, data, message, className },
   ref,
 ) {
   return (
     <div ref={ref} className={className}>
       <div className='flex justify-between items-center mb-3'>
         <h3 className='text-sm not-italic font-medium text-primary-black'>{title}</h3>
-        {message ? null : <ProgressBadge progress={progress} />}
+        {message || progress === null ? null : <ProgressBadge progress={progress} />}
       </div>
       {message ? (
         <p className='text-xs not-italic font-normal text-dark-grey'>{message}</p>
       ) : (
         <div className='flex flex-col gap-2'>
           {data && data.length ? (
-            data.map(({ label, value, subtitle }, i) => (
+            data.map(({ label, value, subtitle, children }, i) => (
               <div key={i} className='flex flex-col gap-4'>
                 {subtitle ? (
                   <p className='text-xs not-italic font-semibold text-primary-black mt-1'>
@@ -1140,6 +1194,7 @@ const FormDetails = React.forwardRef(function FormDetails(
                     </p>
                   </div>
                 ) : null}
+                {children ? children : null}
               </div>
             ))
           ) : (
