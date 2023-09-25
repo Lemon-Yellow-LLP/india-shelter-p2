@@ -26,9 +26,10 @@ const LeadCreationRoutes = () => {
         <Route path='personal-details' element={<PersonalDetails />} />
         <Route path='reference-details' element={<ReferenceDetails />} />
         <Route path='work-income-details' element={<WorkIncomeDetails />} />
-        <Route path='bre' element={<BRE_ONE />} />
+        <Route path='qualifier' element={<BRE_ONE />} />
         <Route path='property-details' element={<PropertyDetails />} />
         <Route path='upload-documents' element={<UploadDocuments />} />
+        <Route path='*' element={<h1>404, Page not found!</h1>} />
       </Routes>
     </>
   );
