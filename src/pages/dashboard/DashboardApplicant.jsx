@@ -572,6 +572,22 @@ export default function DashboardApplicant() {
                 label: 'No. of dependents',
                 value: primaryApplicant?.work_income_detail?.no_of_dependents,
               },
+              {
+                label: 'Business name',
+                value: primaryApplicant?.work_income_detail?.business_name,
+              },
+              {
+                label: 'Industries',
+                value: primaryApplicant?.work_income_detail?.industries,
+              },
+              {
+                label: 'GST Number',
+                value: primaryApplicant?.work_income_detail?.gst_number,
+              },
+              {
+                label: 'Pension amount',
+                value: primaryApplicant?.work_income_detail?.pention_amount,
+              },
             ]}
           />
           <Separator />
@@ -601,39 +617,39 @@ export default function DashboardApplicant() {
           <FormDetails
             title='PROPERTY DETAILS'
             ref={primarySelectedStep == 'property_details' ? primarySelectedStepRef : null}
-            progress={primaryApplicant?.property_details?.extra_params?.progress}
+            progress={leadData?.property_details?.extra_params?.progress}
             data={[
               {
                 label: 'Property identification',
-                value: '',
+                value: leadData?.property_details?.property_identification_is,
               },
               {
                 label: 'Property estimated value',
-                value: '',
+                value: leadData?.property_details?.property_value_estimate,
               },
               {
                 label: 'Owner name',
-                value: '',
+                value: leadData?.property_details?.owner_name,
               },
               {
                 label: 'Plot/House/Flat no',
-                value: '',
+                value: leadData?.property_details?.plot_house_flat,
               },
               {
                 label: 'Project/Society/Colony name',
-                value: '',
+                value: leadData?.property_details?.project_society_colony,
               },
               {
                 label: 'Pincode',
-                value: '',
+                value: leadData?.property_details?.pincode,
               },
               {
                 label: 'City',
-                value: '',
+                value: leadData?.property_details?.city,
               },
               {
                 label: 'State',
-                value: '',
+                value: leadData?.property_details?.state,
               },
             ]}
           />
@@ -650,73 +666,73 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={primarySelectedStep == 'reference_details' ? primarySelectedStepRef : null}
             title='REFERENCE DETAILS'
-            progress={primaryApplicant?.reference_details?.extra_params?.progress}
+            progress={leadData?.reference_details?.extra_params?.progress}
             data={[
               {
                 subtitle: 'REFERENCE DETAIL 1',
                 label: 'Reference type',
-                value: '',
+                value: leadData?.reference_details?.reference_1_type,
               },
               {
                 label: 'Full name',
-                value: '',
+                value: leadData?.reference_details?.reference_1_full_name,
               },
               {
                 label: 'Mobile number',
-                value: '',
+                value: leadData?.reference_details?.reference_1_phone_number,
               },
               {
                 label: 'Address',
-                value: '',
+                value: leadData?.reference_details?.reference_1_address,
               },
               {
                 label: 'Pincode',
-                value: '',
+                value: leadData?.reference_details?.reference_1_pincode,
               },
               {
                 label: 'City',
-                value: '',
+                value: leadData?.reference_details?.reference_1_city,
               },
               {
                 label: 'State',
-                value: '',
+                value: leadData?.reference_details?.reference_1_state,
               },
               {
                 label: 'Email',
-                value: '',
+                value: leadData?.reference_details?.reference_1_email,
               },
               {
                 subtitle: 'REFERENCE DETAIL 2',
                 label: 'Reference type',
-                value: '',
+                value: leadData?.reference_details?.reference_2_type,
               },
               {
                 label: 'Full name',
-                value: '',
+                value: leadData?.reference_details?.reference_2_full_name,
               },
               {
                 label: 'Mobile number',
-                value: '',
+                value: leadData?.reference_details?.reference_2_phone_number,
               },
               {
                 label: 'Address',
-                value: '',
+                value: leadData?.reference_details?.reference_2_address,
               },
               {
                 label: 'Pincode',
-                value: '',
+                value: leadData?.reference_details?.reference_2_pincode,
               },
               {
                 label: 'City',
-                value: '',
+                value: leadData?.reference_details?.reference_2_city,
               },
               {
                 label: 'State',
-                value: '',
+                value: leadData?.reference_details?.reference_2_state,
               },
               {
                 label: 'Email',
-                value: '',
+                value: leadData?.reference_details?.reference_2_email,
               },
             ]}
           />
@@ -1129,7 +1145,7 @@ const Titlebar = ({ title, id }) => {
       id='titlebar'
       className='sticky inset-0 bg-neutral-white h-fit flex items-start px-4 py-3 border border-[#ECECEC]'
     >
-      <button classes={{ padding: '0' }} onClick={() => navigate('/')} className='mr-3'>
+      <button classes={{ padding: '0' }} onClick={() => navigate('/dashboard')} className='mr-3'>
         <BackIcon2 />
       </button>
       <div className='flex-1'>
