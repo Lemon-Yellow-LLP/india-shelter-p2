@@ -228,7 +228,8 @@ export async function getDashboardLeadById(id, values) {
     const { data } = await axios.get(`${API_URL}/dashboard/lead/${id}`, values);
     return data;
   } catch (err) {
-    console.log(err);
+    cer;
+    return err;
   }
 }
 

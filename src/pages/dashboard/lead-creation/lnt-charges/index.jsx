@@ -24,7 +24,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 
-const LEAD_ID = 1;
+const LEAD_ID = 5;
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
 

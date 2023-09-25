@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getDashboardLeadList, testLogout } from '../../global';
 import { AuthContext } from '../../context/AuthContextProvider';
 import { Header } from '../../components';
@@ -27,6 +27,7 @@ export default function Dashboard() {
     endDate: parseISO(moment().endOf('month').format()),
     key: 'selection',
   });
+  const navigate = useNavigate();
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -105,14 +106,14 @@ export default function Dashboard() {
           </div>
         ) : filteredList.length ? (
           <div className='relative flex-1 flex flex-col gap-2'>
-            {filteredList.map((app, i) => (
+            {filteredList.map((applicant, i) => (
               <LeadCard
                 key={i}
-                id={app.lead_id}
-                title={`${app.first_name} ${app.middle_name} ${app.last_name}`}
-                progress={app.extra_params?.progress ?? 70}
-                created={moment(app.created_at).format('DD/MM/YYYY')}
-                mobile={app.mobile_number}
+                id={applicant.lead_id}
+                title={`${applicant.first_name} ${applicant.middle_name} ${applicant.last_name}`}
+                progress={applicant.extra_params?.progress ?? 0}
+                created={moment(applicant.created_at).format('DD/MM/YYYY')}
+                mobile={applicant.mobile_number}
               />
             ))}
             <div className='h-[250px]'></div>
@@ -123,7 +124,10 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-      <button className='fixed bottom-4 right-4 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'>
+      <button
+        onClick={() => navigate('/lead/applicant-details')}
+        className='fixed bottom-4 right-4 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'
+      >
         <AddLeadIcon />
         <span className='text-sm not-italic font-medium text-white'>Add new lead</span>
       </button>

@@ -7,6 +7,7 @@ import { Box, Button, Tabs, Tab } from '@mui/material';
 import ProgressBadge from '../../components/ProgressBadge';
 import { getDashboardLeadById } from '../../global';
 import { DropDown } from '../../components';
+import moment from 'moment';
 
 const PrimaryDropdownOptions = [
   {
@@ -94,6 +95,7 @@ const CoApplicantDropdownOptions = [
 export default function DashboardApplicant() {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState(0);
+  const navigate = useNavigate();
 
   const [leadData, setLeadData] = useState([]);
   const [primaryApplicant, setPrimaryApplicant] = useState({});
@@ -106,6 +108,8 @@ export default function DashboardApplicant() {
   const [coApplicantSelectedStep, setCoApplicantSelectedStep] = useState(
     CoApplicantDropdownOptions[0].value,
   );
+
+  const [lntCharges, setLntCharges] = useState(null);
 
   function a11yProps(index) {
     return {
@@ -120,27 +124,40 @@ export default function DashboardApplicant() {
 
   useEffect(() => {
     (async () => {
-      const data = await getDashboardLeadById(id);
-      setLeadData(data);
+      try {
+        const data = await getDashboardLeadById(id);
+        setLeadData(data);
 
-      // Find Primary Applicant
-      const _primaryApplicant = data?.applicants?.find(
-        (applicant) => applicant?.applicant_details?.is_primary,
-      );
-      setPrimaryApplicant(_primaryApplicant);
+        // Find Primary Applicant
+        const _primaryApplicant = data?.applicants?.find(
+          (applicant) => applicant?.applicant_details?.is_primary,
+        );
+        setPrimaryApplicant(_primaryApplicant);
 
-      // Get All CoApplicants
-      setCoApplicants(
-        data?.applicants?.filter(
-          (applicant) =>
-            applicant?.applicant_details?.id !== _primaryApplicant?.applicant_details?.id,
-        ),
-      );
+        // Get All CoApplicants
+        setCoApplicants(
+          data?.applicants?.filter(
+            (applicant) =>
+              applicant?.applicant_details?.id !== _primaryApplicant?.applicant_details?.id,
+          ),
+        );
+
+        // Get All success lnt charges
+        setLntCharges(
+          data?.lt_charges?.find((charge) => {
+            charge?.airpay_response_json?.airpay_verify_transaction_status == '200';
+          }),
+        );
+      } catch (err) {
+        console.error(err?.response?.status);
+        navigate('/');
+      }
     })();
   }, []);
 
   useEffect(() => {
     // Co Applicants Dropdown options
+    if (!coApplicants) return;
     const options = [];
     coApplicants.map((applicant) => {
       options.push({
@@ -154,6 +171,7 @@ export default function DashboardApplicant() {
 
   useEffect(() => {
     // Active CoApplicant - whose data will be shown
+    if (!coApplicants) return;
     setActiveCoApplicant(
       coApplicants.find(
         (applicant) => applicant?.applicant_details?.id == coApplicantSelectedOption,
@@ -241,9 +259,26 @@ export default function DashboardApplicant() {
           />
         </div>
         <div ref={primaryListRef} className='px-4 h-full overflow-auto'>
+          <div className='flex justify-between pb-6'>
+            <div>
+              <span className='not-italic font-medium text-[10px] text-light-grey'>CREATED: </span>
+              <span className='not-italic font-medium text-[10px] text-dark-grey'>
+                {moment(primaryApplicant?.applicant_details?.created_at).format('DD/MM/YYYY')}
+              </span>
+            </div>
+
+            <div>
+              <span className='not-italic font-medium text-[10px] text-light-grey'>
+                completed:{' '}
+              </span>
+              <span className='text-right text-sm not-italic font-medium text-primary-red'>
+                {`${leadData?.lead?.extra_params?.progress ?? 0}%`}
+              </span>
+            </div>
+          </div>
           <FormDetails
             title='APPLICANT DETAILS'
-            progress={90}
+            progress={primaryApplicant?.applicant_details?.extra_params?.progress}
             ref={primarySelectedStep == 'applicant_details' ? primarySelectedStepRef : null}
             data={[
               {
@@ -289,7 +324,7 @@ export default function DashboardApplicant() {
           <FormDetails
             title='PERSONAL DETAILS'
             ref={primarySelectedStep == 'personal_details' ? primarySelectedStepRef : null}
-            progress={90}
+            progress={primaryApplicant?.personal_details?.extra_params?.progress}
             data={[
               {
                 label: 'ID Type',
@@ -358,7 +393,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={primarySelectedStep == 'address_details' ? primarySelectedStepRef : null}
             title='ADDRESS DETAILS'
-            progress={90}
+            progress={primaryApplicant?.address_detail?.extra_params?.progress}
             data={[
               {
                 label: 'Type of residence',
@@ -446,7 +481,7 @@ export default function DashboardApplicant() {
           <FormDetails
             title='WORK & INCOME DETAILS'
             ref={primarySelectedStep == 'work_income_details' ? primarySelectedStepRef : null}
-            progress={90}
+            progress={primaryApplicant?.work_income_details?.extra_params?.progress}
             data={[
               {
                 label: 'Profession',
@@ -528,7 +563,7 @@ export default function DashboardApplicant() {
           <FormDetails
             title='QUALIFIER'
             ref={primarySelectedStep == 'qualifier' ? primarySelectedStepRef : null}
-            progress={90}
+            progress={0}
             data={[]}
           />
           <Separator />
@@ -668,7 +703,6 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={primarySelectedStep == 'upload_documents' ? primarySelectedStepRef : null}
             title='UPLOAD DOCUMENTS'
-            progress={90}
             data={[]}
             message={'Will fill this once Banking details is done'}
           />
@@ -677,7 +711,6 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={primarySelectedStep == 'preview' ? primarySelectedStepRef : null}
             title='PREVIEW'
-            progress={90}
             data={[]}
             message={'Will fill this once Banking details is done'}
           />
@@ -686,7 +719,6 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={primarySelectedStep == 'eligibility' ? primarySelectedStepRef : null}
             title='ELIGIBILITY'
-            progress={90}
             data={[]}
             message={'Will fill this once Banking details is done'}
           />
@@ -1079,7 +1111,7 @@ function CustomTabPanel(props) {
 }
 
 const FormDetails = React.forwardRef(function FormDetails(
-  { title, progress, children, data, message, className },
+  { title, progress = 0, children, data, message, className },
   ref,
 ) {
   return (
@@ -1100,12 +1132,14 @@ const FormDetails = React.forwardRef(function FormDetails(
                     {subtitle}
                   </p>
                 ) : null}
-                <div className='w-full flex gap-4' key={i}>
-                  <p className='w-1/2 text-xs not-italic font-normal text-dark-grey'>{label}</p>
-                  <p className='w-1/2 text-xs not-italic font-medium text-primary-black'>
-                    {value || '-'}
-                  </p>
-                </div>
+                {label ? (
+                  <div className='w-full flex gap-4' key={i}>
+                    <p className='w-1/2 text-xs not-italic font-normal text-dark-grey'>{label}</p>
+                    <p className='w-1/2 text-xs not-italic font-medium text-primary-black'>
+                      {value || '-'}
+                    </p>
+                  </div>
+                ) : null}
               </div>
             ))
           ) : (
