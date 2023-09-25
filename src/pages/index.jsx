@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import Dashboard from './dashboard';
+import Dashboard, { DashboardTest } from './dashboard';
 import LeadCreationRoutes from './dashboard/lead-creation';
 import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
@@ -21,25 +21,33 @@ const DashboardRoutes = () => {
         <Route
           path='/'
           element={
-            // <RequireAuth>
-            <Dashboard />
-            // </RequireAuth>
+            <RequireAuth>
+              <DashboardTest />
+            </RequireAuth>
           }
         />
         <Route
-          path='dashboard/:id'
+          path='/dashboard'
           element={
-            // <RequireAuth>
-            <DashboardApplicant />
-            // </RequireAuth>
+            <RequireAuth>
+              <Dashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path='/dashboard/:id'
+          element={
+            <RequireAuth>
+              <DashboardApplicant />
+            </RequireAuth>
           }
         />
         <Route
           path='/lead/*'
           element={
-            // <RequireAuth>
-            <LeadCreationRoutes />
-            // </RequireAuth>
+            <RequireAuth>
+              <LeadCreationRoutes />
+            </RequireAuth>
           }
         />
         <Route path='*' element={<h1>404, Page not found!</h1>} />

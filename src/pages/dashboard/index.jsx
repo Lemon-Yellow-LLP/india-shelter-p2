@@ -187,7 +187,7 @@ function LeadCard({ title, progress, id, mobile, created }) {
   );
 }
 
-const DashboardTest = () => {
+export const DashboardTest = () => {
   const { token, setIsAuthenticated } = useContext(AuthContext);
   const [activeLoginRes, setActiveLoginRes] = useState(null);
 
@@ -265,6 +265,12 @@ const DashboardTest = () => {
         to='/lead/lnt-charges'
       >
         go-to-L&T-charges-page
+      </Link>
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/dashboard'
+      >
+        go-to-Dashboard-page
       </Link>
       <button
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
