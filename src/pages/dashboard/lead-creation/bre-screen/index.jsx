@@ -1,8 +1,9 @@
+import { useContext, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { create } from '@lottiefiles/lottie-interactivity';
+
 import InfoIcon from '../../../../assets/icons/info.svg';
-import { Link } from 'react-router-dom';
-import { Button } from '../../../../components';
 import loading from '../../../../assets/icons/loading.svg';
-import { useEffect, useRef, useState } from 'react';
 import {
   checkBre99,
   checkCibil,
@@ -13,15 +14,15 @@ import {
   verifyPFUAN,
   verifyPan,
   verifyVoterID,
+  checkBre101,
 } from '../../../../global';
-import { array, func } from 'prop-types';
-import { AnimatePresence, motion } from 'framer-motion';
-import { create } from '@lottiefiles/lottie-interactivity';
+import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
+import LeadContextProvider from '../../../../context/LeadContextProvider';
 
-const pan = false;
-const dl = true;
-const voterId = false;
+const pan = true;
+const dl = false;
+const voterId = true;
 const pf = true;
 const gst = false;
 // values.applicants[activeIndex]?.personal_details.id_type === 'PAN'
@@ -34,14 +35,9 @@ const gst = false;
 // values.applicants[activeIndex]?.work_income_details.gst_number
 
 const BRE_ONE = () => {
+  const addApplicant = useContext(LeadContextProvider);
   const SpeedoMeterAnimationRef = useRef(null);
   const [progress, setProgress] = useState(0);
-  // const [personalDetailsApi, setPersonalDetailsApi] = useState({
-  //   label: '',
-  //   res: false,
-  //   loader: false,
-  //   ran: false,
-  // });
   const [PAN, setPAN] = useState({
     res: false,
     loader: false,
@@ -82,11 +78,10 @@ const BRE_ONE = () => {
     loader: false,
     ran: false,
   });
-  const [bre101, setBre101] = useState(false);
-  const [breres, setBreres] = useState({
+  const [bre101, setBre101] = useState({
     res: false,
     red: false,
-    orange: false,
+    amber: false,
     green: false,
   });
 
@@ -101,28 +96,9 @@ const BRE_ONE = () => {
         setProgress(1);
 
         try {
-          const pan_res = await verifyPan(1, {});
-
-          if (pan_res.pan_response.status === 'Valid') {
-            setPAN((prev) => ({
-              ...prev,
-              loader: false,
-              res: 'Valid Match',
-            }));
-          } else {
-            setPAN((prev) => ({
-              ...prev,
-              loader: false,
-              res: 'Invalid',
-            }));
-          }
+          const pan_res = await verifyPan(293, {});
         } catch (err) {
           console.log(err);
-          setPAN((prev) => ({
-            ...prev,
-            loader: false,
-            res: 'Error',
-          }));
         }
       }
 
@@ -132,31 +108,12 @@ const BRE_ONE = () => {
           loader: true,
           ran: true,
         }));
-        setProgress(1);
+        setProgress(2);
 
         try {
-          const dl_res = await verifyDL(1, {});
-
-          if (dl_res.dl_response.result && dl_res.dl_response.statusCode === 101) {
-            setDL((prev) => ({
-              ...prev,
-              loader: false,
-              res: 'Valid Match',
-            }));
-          } else {
-            setDL((prev) => ({
-              ...prev,
-              loader: false,
-              res: 'Invalid',
-            }));
-          }
+          const dl_res = await verifyDL(293, {});
         } catch (err) {
           console.log(err);
-          setDL((prev) => ({
-            ...prev,
-            loader: false,
-            res: 'Error',
-          }));
         }
       }
 
@@ -166,154 +123,44 @@ const BRE_ONE = () => {
           loader: true,
           ran: true,
         }));
-        setProgress(1);
+        setProgress(2);
 
         try {
-          const voterId_res = await verifyVoterID(1, {});
-
-          if (voterId_res.voter_response.result && voterId_res.voter_response.statusCode === 101) {
-            setVoterID((prev) => ({
-              ...prev,
-              loader: false,
-              res: 'Valid Match',
-            }));
-          } else {
-            setVoterID((prev) => ({
-              ...prev,
-              loader: false,
-              res: 'Invalid',
-            }));
-          }
+          const voterId_res = await verifyVoterID(293, {});
         } catch (err) {
           console.log(err);
-          setVoterID((prev) => ({
-            ...prev,
-            loader: false,
-            res: 'Error',
-          }));
         }
       }
 
       if (pf) {
         setPfUAN((prev) => ({ ...prev, loader: true, ran: true }));
-        setProgress(2);
+        setProgress(dl || voterId ? 3 : 2);
 
         try {
-          const pf_res = await verifyPFUAN(1, {});
-
-          if (pf_res.uan_response.result && pf_res.uan_response.statusCode === 101) {
-            setPfUAN((prev) => ({
-              ...prev,
-              loader: false,
-              res: 'Valid Match',
-            }));
-          } else {
-            setPfUAN((prev) => ({
-              ...prev,
-              loader: false,
-              res: 'Invalid',
-            }));
-          }
+          const pf_res = await verifyPFUAN(293, {});
         } catch (err) {
-          console.log('error in pf');
           console.log(err);
-          setPfUAN((prev) => ({
-            ...prev,
-            loader: false,
-            res: 'Error',
-          }));
         }
       }
 
       if (gst) {
         setGST((prev) => ({ ...prev, loader: true, ran: true }));
-        setProgress(2);
+        setProgress(dl || voterId ? 3 : 2);
 
         try {
-          const gst_res = await verifyGST(1, {});
-
-          if (gst_res.gst_response.result && gst_res.gst_response.statusCode === 101) {
-            setGST((prev) => ({
-              ...prev,
-              loader: false,
-              res: 'Valid Match',
-            }));
-          } else {
-            setGST((prev) => ({
-              ...prev,
-              loader: false,
-              res: 'InValid',
-            }));
-          }
+          const gst_res = await verifyGST(293, {});
         } catch (err) {
           console.log(err);
-          setGST((prev) => ({
-            ...prev,
-            loader: false,
-            res: 'Error',
-          }));
         }
       }
 
-      // try {
-      //   const array = await Promise.allSettled([
-      //     pan ? verifyPan(1, {}) : null,
-      //     dl ? verifyDL(1, {}) : null,
-      //     voterID ? verifyVoterID(1, {}) : null,
-      //   ]);
-
-      //   const fulfilled_arr = array.map((api) => {
-      //     return api.status === 'fulfilled';
-      //   });
-
-      //   const rejected_arr = array.map((api) => {
-      //     return api.status === 'rejected';
-      //   });
-
-      //   console.log(fulfilled_arr);
-      //   console.log(rejected_arr);
-
-      //   if (array[0].status === 'fulfilled') {
-      //     setPAN((prev) => ({
-      //       ...prev,
-      //       loader: false,
-      //       res: array[0].value === 'yes' ? 'Valid Match' : 'Invalid',
-      //     }));
-      //   } else {
-      //     setPAN((prev) => ({ ...prev, loader: false, res: 'Error' }));
-      //   }
-
-      //   if (array[1].status === 'fulfilled') {
-      //     setPAN((prev) => ({
-      //       ...prev,
-      //       loader: false,
-      //       res: array[1].value === 'yes' ? 'Valid Match' : 'Invalid',
-      //     }));
-      //   } else {
-      //     setPAN((prev) => ({ ...prev, loader: false, res: 'Error' }));
-      //   }
-
-      //   if (array[2].status === 'fulfilled') {
-      //     setPAN((prev) => ({
-      //       ...prev,
-      //       loader: false,
-      //       res: array[2].value === 'yes' ? 'Valid Match' : 'Invalid',
-      //     }));
-      //   } else {
-      //     setPAN((prev) => ({ ...prev, loader: false, res: 'Error' }));
-      //   }
-      // } catch (err) {
-      //   console.log(err);
-      // }
-
       setDedupe((prev) => ({ ...prev, loader: true, ran: true }));
-      setProgress(3);
+      setProgress(dl || voterId ? 4 : 3);
 
       try {
-        const dedupe_res = await checkDedupe(1, {});
-
+        const dedupe_res = await checkDedupe(293, {});
         if (dedupe_res.status === 200) {
-          setDedupe((prev) => ({ ...prev, loader: false, res: 'Valid Match' }));
+          setDedupe((prev) => ({ ...prev, loader: false, res: 'Valid' }));
         }
       } catch (err) {
         console.log(err);
@@ -321,18 +168,15 @@ const BRE_ONE = () => {
       }
 
       setBre99((prev) => ({ ...prev, loader: true, ran: true }));
-      setProgress(4);
+      setProgress(dl || voterId ? 5 : 4);
 
       let callCibilOrCrif = '';
 
       try {
-        const bre99_res = await checkBre99(1, {});
-
-        console.log(bre99_res);
+        const bre99_res = await checkBre99(293, {});
 
         if (bre99_res.bre_99_response.statusCode === 200) {
-          setBre99((prev) => ({ ...prev, loader: false, res: 'Valid Match' }));
-
+          setBre99((prev) => ({ ...prev, loader: false, res: 'Valid' }));
           const bre99body = bre99_res.bre_99_response.body;
           callCibilOrCrif = bre99body.find((data) => data.Rule_Name === 'Bureau_Type');
         }
@@ -342,18 +186,16 @@ const BRE_ONE = () => {
       }
 
       setBureau((prev) => ({ ...prev, loader: true, ran: true }));
-      setProgress(5);
+      setProgress(dl || voterId ? 6 : 5);
 
       if (callCibilOrCrif.Rule_Value === 'CIBIL') {
-        console.log('cibil');
         try {
-          const cibil_res = await checkCibil(1, {});
-
+          const cibil_res = await checkCibil(293, {});
           if (cibil_res.status === 200) {
             setBureau((prev) => ({
               ...prev,
               loader: false,
-              res: 'Valid Match',
+              res: 'Valid',
             }));
           }
         } catch (err) {
@@ -365,15 +207,13 @@ const BRE_ONE = () => {
           }));
         }
       } else {
-        console.log('crif');
         try {
-          const crif_res = await checkCrif(1, {});
-
+          const crif_res = await checkCrif(293, {});
           if (crif_res.status === 200) {
             setBureau((prev) => ({
               ...prev,
               loader: false,
-              res: 'Valid Match',
+              res: 'Valid',
             }));
           }
         } catch (err) {
@@ -386,43 +226,88 @@ const BRE_ONE = () => {
         }
       }
 
-      // setTimeout(() => {
-      //   setBreres((prev) => ({ ...prev, green: true, res: true }));
-      // }, 3000);
+      try {
+        const bre_res = await checkBre101(89, {});
+
+        if (bre_res.bre_101_response.statusCode !== '200') return;
+
+        setDL((prev) => ({
+          ...prev,
+          loader: false,
+          res: bre_res.bre_101_response.body.DL_Status,
+        }));
+
+        setVoterID((prev) => ({
+          ...prev,
+          loader: false,
+          res: bre_res.bre_101_response.body.Voter_Status,
+        }));
+
+        setPfUAN((prev) => ({
+          ...prev,
+          loader: false,
+          res: bre_res.bre_101_response.body.UAN_Status,
+        }));
+
+        setGST((prev) => ({
+          ...prev,
+          loader: false,
+          res: bre_res.bre_101_response.body.GST_Status,
+        }));
+
+        setPAN((prev) => ({
+          ...prev,
+          loader: false,
+          res: bre_res.bre_101_response.body.PAN_status,
+        }));
+
+        if (bre_res.bre_101_response.body.red_amber_green === 'Red') {
+          setBre101((prev) => ({ ...prev, red: true, res: true }));
+        }
+        if (bre_res.bre_101_response.body.red_amber_green === 'Amber') {
+          setBre101((prev) => ({ ...prev, amber: true, res: true }));
+        }
+        if (bre_res.bre_101_response.body.red_amber_green === 'Green') {
+          setBre101((prev) => ({ ...prev, green: true, res: true }));
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
+
     breOne();
   }, []);
 
+  useEffect(() => {}, []);
+
   function checkELigibilty() {
-    if (breres.red) {
+    if (bre101.red) {
       return [1, 3];
     }
-    if (breres.orange) {
+    if (bre101.amber) {
       return [1, 42.5];
     }
-    if (breres.green) {
+    if (bre101.green) {
       return [1, 30];
     } else {
       [];
     }
   }
 
-  // console.log(breres.res);
-
   useEffect(() => {
-    if (SpeedoMeterAnimationRef.current && breres.res);
+    if (SpeedoMeterAnimationRef.current && bre101.res);
     create({
       player: SpeedoMeterAnimationRef.current,
       mode: 'chain',
       actions: [
         {
           state: 'autoplay',
-          frames: breres && checkELigibilty(),
+          frames: bre101.res && checkELigibilty(),
           repeat: 1,
         },
       ],
     });
-  }, [breres]);
+  }, [bre101]);
 
   return (
     <div className='p-4 relative h-screen'>
@@ -438,7 +323,9 @@ const BRE_ONE = () => {
         <p className='text-xs text-primary-black font-normal'>Applicant name: Santosh Yadav</p>
         <div className='flex justify-between text-primary-black font-medium'>
           <h3>Verification in progress</h3>
-          <h3>{progress}/5</h3>
+          <h3>
+            {progress}/{voterId || dl ? 6 : 5}
+          </h3>
         </div>
 
         <div className='flex justify-center mt-3'>
@@ -853,16 +740,17 @@ const BRE_ONE = () => {
           <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
           <p className='text-sm not-italic font-normal text-dark-grey'>
             Eligibility can be increased by adding Co-applicant{' '}
-            <Link
+            <Button
               className={`underline ${
-                !bureau.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
+                !bre101.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
               }`}
+              onClick={() => addApplicant()}
             >
               Add now
-            </Link>
+            </Button>
           </p>
         </div>
-        <Button disabled={!bureau.res} inputClasses='w-full h-14' primary={true}>
+        <Button disabled={!bre101.res} inputClasses='w-full h-14' primary={true}>
           Next
         </Button>
       </div>
