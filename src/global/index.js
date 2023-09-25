@@ -1,6 +1,7 @@
 import { reference } from '@popperjs/core';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import moment from 'moment';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://lo.scotttiger.in/api';
 
@@ -394,6 +395,38 @@ export async function makePaymentByCash(id, values) {
 export async function makePaymentByLink(id, values) {
   try {
     const { data } = await axios.post(`${API_URL}/lt-charges/invoice-create/${id}`, values);
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export async function getDashboardLeadById(id, values) {
+  try {
+    const { data } = await axios.get(`${API_URL}/dashboard/lead/${id}`, values);
+    return data;
+  } catch (err) {
+    cer;
+    return err;
+  }
+}
+
+export async function getDashboardLeadList(
+  {
+    // dd-mm-yyyy
+    fromDate,
+    toDate,
+  },
+  values,
+) {
+  fromDate = moment(fromDate).format('DD-MM-YYYY');
+  toDate = moment(toDate).format('DD-MM-YYYY');
+
+  try {
+    const { data } = await axios.get(
+      `${API_URL}/dashboard/lead-list/l?fromDate=${fromDate}&toDate=${toDate}`,
+      values,
+    );
     return data;
   } catch (err) {
     console.log(err);

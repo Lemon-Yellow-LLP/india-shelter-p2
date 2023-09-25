@@ -1,10 +1,11 @@
 import { Route, Routes } from 'react-router-dom';
-import Dashboard from './dashboard';
+import Dashboard, { DashboardTest } from './dashboard';
 import LeadCreationRoutes from './dashboard/lead-creation';
 import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
+import DashboardApplicant from './dashboard/DashboardApplicant';
 
 const DashboardRoutes = () => {
   const { isAuthenticated } = useContext(AuthContext);
@@ -21,7 +22,23 @@ const DashboardRoutes = () => {
           path='/'
           element={
             <RequireAuth>
+              <DashboardTest />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path='/dashboard'
+          element={
+            <RequireAuth>
               <Dashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path='/dashboard/:id'
+          element={
+            <RequireAuth>
+              <DashboardApplicant />
             </RequireAuth>
           }
         />

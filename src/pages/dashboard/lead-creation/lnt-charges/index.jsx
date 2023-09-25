@@ -24,7 +24,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 
-const LEAD_ID = 1;
+const LEAD_ID = 5;
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
 
@@ -42,7 +42,7 @@ const LnTCharges = ({ amount = 1500 }) => {
     updateProgress,
   } = useContext(LeadContext);
 
-  const { toastMessage, setToastMessage } = useContext(AuthContext);
+  const [toastMessage, setToastMessage] = useState('');
 
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState('');
@@ -85,7 +85,13 @@ const LnTCharges = ({ amount = 1500 }) => {
       setLntId(resp.id);
       await fetchQR();
     })();
-  }, []);
+
+    // Reset
+    setHasSentOTPOnce(false);
+    setShowResendLink(false);
+    setFieldValue('lnt_charges.mobile_number', '');
+    setActiveItem('');
+  }, [paymentStatus]);
 
   const handleCheckingStatus = async (label = '') => {
     try {
@@ -162,15 +168,16 @@ const LnTCharges = ({ amount = 1500 }) => {
   };
 
   const sendPaymentLink = async () => {
-    setToastMessage('Link has been sent to the entered mobile number');
+    setDisablePhoneNumber(true);
+    setHasSentOTPOnce(true);
 
     const resp = await makePaymentByLink(LEAD_ID, {
       mobile_number: values.lnt_charges?.mobile_number,
     });
-    alert(`Payment Link: ${resp?.airpay_response.payment_url}`);
-    setHasSentOTPOnce(true);
+    if (resp) {
+      setToastMessage('Link has been sent to the entered mobile number');
+    }
     setShowResendLink(false);
-    setDisablePhoneNumber(true);
     setSendLinkTime(LINK_RESEND_TIME);
     const interval = setInterval(() => {
       setSendLinkTime((prev) => {
@@ -399,7 +406,6 @@ const LnTCharges = ({ amount = 1500 }) => {
           }}
           next={() => console.log('Goto next page')}
           skip={showConfirmSkip}
-          reload={handleSkipPayment}
         />
       ) : null}
 
@@ -492,7 +498,7 @@ const PaymentFailure = ({ back, next, skip, reload }) => {
         </div>
       </div>
       <div className='mt-auto w-full p-4 space-y-4 '>
-        <Button inputClasses='h-12' primary={true} onClick={reload}>
+        <Button inputClasses='h-12' primary={true} onClick={back}>
           Select other payment method
         </Button>
         <Button

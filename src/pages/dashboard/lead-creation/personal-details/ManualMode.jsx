@@ -95,6 +95,16 @@ export default function ManualMode({
         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
 
+      if (
+        e.target.name == 'personal_details.father_husband_name' ||
+        e.target.name == 'personal_details.mother_name'
+      ) {
+        const value = e.target.value;
+        const pattern2 = /^[a-zA-Z ]+$/;
+        if (pattern2.test(value))
+          setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+      }
+
       if (e.target.name === 'personal_details.email') {
         setFieldValue(e.target.name, value);
         setHasSentOTPOnce(false);
@@ -110,7 +120,7 @@ export default function ManualMode({
           values.personal_details.id_type === 'Aadhar'
         ) {
           let aadharPattern = /^\d$/;
-          if (aadharPattern.exec(value[value.length - 1])) {
+          if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
             const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
             const maskedAadhar = maskedPortion + value.slice(8);
             setFieldValue(e.target.name, maskedAadhar);
@@ -122,7 +132,7 @@ export default function ManualMode({
           values.personal_details.selected_address_proof === 'Aadhar'
         ) {
           let aadharPattern = /^\d$/;
-          if (aadharPattern.exec(value[value.length - 1])) {
+          if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
             const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
             const maskedAadhar = maskedPortion + value.slice(8);
             setFieldValue(e.target.name, maskedAadhar);

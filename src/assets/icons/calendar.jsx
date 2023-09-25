@@ -1,6 +1,13 @@
-export default function IconCalendar() {
+export default function IconCalendar({ className }) {
   return (
-    <svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+    <svg
+      className={className}
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+    >
       <g clipPath='url(#clip0_340_31906)'>
         <path
           d='M6.85986 4.81V2.75'
