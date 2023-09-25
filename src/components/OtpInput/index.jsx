@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo, useContext } from 'react';
 import PropTypes from 'prop-types';
 import otpVerified from '../../assets/icons/otp-verified.svg';
 import otpNotVerified from '../../assets/icons/otp-not-verified.svg';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -18,6 +19,7 @@ const OtpInput = ({
   verifiedOnce,
   setVerifiedOnce,
 }) => {
+  const { otpFailCount } = useContext(AuthContext);
   const [otp, setOtp] = useState('');
   const [activeOtpIndex, setActiveOtpIndex] = useState(null);
   const [inputDisabled, setInputDisabled] = useState(true);
@@ -88,6 +90,14 @@ const OtpInput = ({
     if (verified) return 'border-dark-grey';
   }, [verified, hasSentOTPOnce, verifiedOnce]);
 
+  const otpCount = useMemo(() => {
+    if (otpFailCount === 1) return 'Invalid OTP. You have 2 attempt(s) left';
+    if (otpFailCount === 2) return 'Invalid OTP. You have 1 attempt(s) left';
+    if (otpFailCount === 3)
+      return 'You have entered invalid OTP 3 times. Your lead is temporarily suspended';
+    else return 'Multiple attempts to verify OTP failed, try again tomorrow';
+  });
+
   return (
     <div className='otp-container'>
       <h3 className='flex gap-0.5 text-primary-black'>
@@ -138,13 +148,15 @@ const OtpInput = ({
               <img src={otpVerified} alt='Otp Verified' role='presentation' />
             </span>
           )}
-          {!verified && verifiedOnce && (
-            <span className='flex text-[#E33439] text-xs leading-[18px]'>
+          {!verified && verifiedOnce ? (
+            <span className='flex text-[#E33439] text-xs leading-[18px] gap-2'>
               <img src={otpNotVerified} alt='Otp Verified' role='presentation' />
-              Invalid OTP. Please try again
+              {otpCount}
             </span>
-          )}
+          ) : null}
         </div>
+      </div>
+      <div className='w-full flex justify-end'>
         {hasSentOTPOnce && disableSendOTP && !timer && verified !== true ? (
           <button
             type='button'
