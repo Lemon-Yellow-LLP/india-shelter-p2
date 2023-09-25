@@ -6,6 +6,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'https://lo.scotttiger.in/api';
 
 const requestOptions = {};
 
+const bre_timeout = 900000;
+
 axiosRetry(axios, { retries: 0 });
 
 async function pingAPI() {
@@ -81,7 +83,7 @@ async function verifyPan(id, options) {
     {},
     {
       ...options,
-      timeout: 30000,
+      timeout: bre_timeout,
       'axios-retry': {
         retries: 3,
         retryCondition: () => true,
@@ -98,7 +100,7 @@ async function verifyDL(id, options) {
     {},
     {
       ...options,
-      timeout: 30000,
+      timeout: bre_timeout,
       'axios-retry': {
         retries: 3,
         retryCondition: () => true,
@@ -115,7 +117,7 @@ async function verifyVoterID(id, options) {
     {},
     {
       ...options,
-      timeout: 30000,
+      timeout: bre_timeout,
       'axios-retry': {
         retries: 3,
         retryCondition: () => true,
@@ -132,7 +134,7 @@ async function verifyGST(id, options) {
     {},
     {
       ...options,
-      timeout: 30000,
+      timeout: bre_timeout,
       'axios-retry': {
         retries: 3,
         retryCondition: () => true,
@@ -149,7 +151,7 @@ async function verifyPFUAN(id, options) {
     {},
     {
       ...options,
-      timeout: 30000,
+      timeout: bre_timeout,
       'axios-retry': {
         retries: 3,
         retryCondition: () => true,
@@ -166,7 +168,7 @@ async function checkDedupe(id, options) {
     {},
     {
       ...options,
-      timeout: 30000,
+      timeout: bre_timeout,
       'axios-retry': {
         retries: 3,
         retryCondition: () => true,
@@ -182,7 +184,7 @@ async function checkBre99(id, options) {
     {},
     {
       ...options,
-      timeout: 30000,
+      timeout: bre_timeout,
       'axios-retry': {
         retries: 3,
         retryCondition: () => true,
@@ -198,7 +200,7 @@ async function checkCibil(id, options) {
     {},
     {
       ...options,
-      timeout: 30000,
+      timeout: bre_timeout,
       'axios-retry': {
         retries: 3,
         retryCondition: () => true,
@@ -214,7 +216,7 @@ async function checkCrif(id, options) {
     {},
     {
       ...options,
-      timeout: 30000,
+      timeout: bre_timeout,
       'axios-retry': {
         retries: 3,
         retryCondition: () => true,
@@ -222,6 +224,22 @@ async function checkCrif(id, options) {
     },
   );
   return res;
+}
+
+async function checkBre101(id, options) {
+  const res = await axios.post(
+    `${API_URL}/lead/bre-101/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res.data;
 }
 
 async function updateLeadDataOnBlur(leadId, fieldName, value) {
@@ -414,4 +432,5 @@ export {
   checkBre99,
   checkCibil,
   checkCrif,
+  checkBre101,
 };
