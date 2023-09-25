@@ -4,7 +4,17 @@ import DatePickerHeader from './DatePickerHeader';
 import { useEffect, useRef, useState } from 'react';
 import DatePickerInput from './DatePickerInput';
 
-const DatePicker = ({ value, setDate, label, error, touched, onBlur, reference, ...props }) => {
+const DatePicker = ({
+  value,
+  setDate,
+  label,
+  error,
+  touched,
+  onBlur,
+  reference,
+  check,
+  ...props
+}) => {
   const datePickerRef = useRef(null);
   const [startDate, setStartDate] = useState(null);
 
@@ -16,6 +26,8 @@ const DatePicker = ({ value, setDate, label, error, touched, onBlur, reference, 
       var year = parseInt(dateParts[0], 10);
       const newStartDate = new Date(year, month, day);
       setStartDate(newStartDate);
+    } else {
+      setStartDate(null);
     }
   }, [value]);
 
@@ -78,6 +90,8 @@ const DatePicker = ({ value, setDate, label, error, touched, onBlur, reference, 
           const finalDate = `${year}-${month}-${dayOfMonth}`;
 
           setDate(finalDate);
+
+          check();
         }
       }}
       // maxDate={today}

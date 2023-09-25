@@ -23,7 +23,7 @@ export default function SelfEmployed() {
       /^([0-9]{2}[a-zA-Z]{4}([a-zA-Z]{1}|[0-9]{1})[0-9]{4}[a-zA-Z]{1}([a-zA-Z]|[0-9]){3}){0,15}$/;
     const cleanedGSTNumber = values?.applicants?.[
       activeIndex
-    ]?.work_income_detail?.gst_number.replace(/\s/g, '');
+    ]?.work_income_detail?.gst_number?.replace(/\s/g, '');
     if (
       !gstPattern.test(cleanedGSTNumber) &&
       values?.applicants?.[activeIndex]?.work_income_detail?.gst_number

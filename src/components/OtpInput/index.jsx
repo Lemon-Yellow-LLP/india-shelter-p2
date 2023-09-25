@@ -88,8 +88,6 @@ const OtpInput = ({
     if (verified) return 'border-dark-grey';
   }, [verified, hasSentOTPOnce, verifiedOnce]);
 
-  console.log(verifiedOnce);
-
   return (
     <div className='otp-container'>
       <h3 className='flex gap-0.5 text-primary-black'>

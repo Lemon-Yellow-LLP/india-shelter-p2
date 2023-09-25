@@ -9,7 +9,7 @@ import TextInput from '../../../../components/TextInput';
 import UnEmployed from './UnEmployed';
 import Retired from './Retired';
 import CurrencyInput from '../../../../components/CurrencyInput';
-import { checkIsValidStatePincode, editFieldsById } from '../../../../global';
+import { addApi, checkIsValidStatePincode, editFieldsById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { Button } from '../../../../components';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
@@ -36,18 +36,37 @@ const WorkIncomeDetails = () => {
   );
 
   const handleRadioChange = useCallback(
-    (e) => {
-      console.log(e);
+    async (e) => {
       setFieldValue(`applicants[${activeIndex}].work_income_detail.${e.name}`, e.value);
 
-      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-        [e.name]: e.value,
-      });
+      if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
+        editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
+          [e.name]: e.value,
+        });
+      } else {
+        await addApi('work-income', {
+          [e.name]: e.value,
+          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+        })
+          .then(async (res) => {
+            setFieldValue(`applicants[${activeIndex}].work_income_detail.id`, res.id);
+            await editFieldsById(
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
+              'applicant',
+              { work_income_detail: res.id },
+            );
+            return res;
+          })
+          .catch((err) => {
+            console.log(err);
+            return err;
+          });
+      }
     },
     [values],
   );
 
-  const handleOnPincodeChange = useCallback(async () => {
+  const handleOnPincodeChange = async () => {
     if (
       !values?.applicants?.[activeIndex]?.work_income_detail?.pincode ||
       values?.applicants?.[activeIndex]?.work_income_detail?.pincode.toString().length < 5 ||
@@ -61,6 +80,7 @@ const WorkIncomeDetails = () => {
     const res = await checkIsValidStatePincode(
       values?.applicants?.[activeIndex]?.work_income_detail?.pincode,
     );
+
     if (!res) {
       setFieldError(`applicants[${activeIndex}].work_income_detail.pincode`, 'Invalid Pincode');
       return;
@@ -73,12 +93,7 @@ const WorkIncomeDetails = () => {
 
     setFieldValue(`applicants[${activeIndex}].work_income_detail.city`, res.city);
     setFieldValue(`applicants[${activeIndex}].work_income_detail.state`, res.state);
-  }, [
-    errors?.applicants?.[activeIndex]?.work_income_detail?.pincode,
-    values?.applicants?.[activeIndex]?.work_income_detail?.pincode,
-    setFieldError,
-    setFieldValue,
-  ]);
+  };
 
   const handleNextClick = () => {
     setCurrentStepIndex(4);
@@ -298,6 +313,7 @@ const WorkIncomeDetails = () => {
                 touched={touched?.applicants?.[activeIndex]?.work_income_detail?.pincode}
                 onBlur={(e) => {
                   handleBlur(e);
+
                   handleOnPincodeChange();
 
                   if (
@@ -327,7 +343,10 @@ const WorkIncomeDetails = () => {
                     e.preventDefault();
                     return;
                   }
-                  handleChange(e);
+                  setFieldValue(
+                    `applicants[${activeIndex}].work_income_detail.pincode`,
+                    e.target.value,
+                  );
                 }}
                 onKeyDown={(e) => {
                   //capturing ctrl V and ctrl C
@@ -354,7 +373,10 @@ const WorkIncomeDetails = () => {
                     .getData('text/plain')
                     .replace('');
                   e.target.value = text;
-                  handleChange(e);
+                  setFieldValue(
+                    `applicants[${activeIndex}].work_income_detail.pincode`,
+                    e.target.value,
+                  );
                 }}
                 inputClasses='hidearrow'
               />
@@ -510,7 +532,9 @@ const WorkIncomeDetails = () => {
         </div>
       </div>
 
-      <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>
+      {/* For Phase 2----------------------- */}
+
+      {/* <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>
         <div className='flex flex-col items-center h-full'>
           <span className='w-full font-semibold text-[14px] leading-[21px]'>
             This is an existing customer.
@@ -659,7 +683,7 @@ const WorkIncomeDetails = () => {
             </Button>
           </div>
         </div>
-      </DynamicDrawer>
+      </DynamicDrawer> */}
     </>
   );
 };

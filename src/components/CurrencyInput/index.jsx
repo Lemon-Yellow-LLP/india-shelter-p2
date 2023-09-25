@@ -6,7 +6,7 @@ import { memo } from 'react';
 
 export const currencyFormatter = new Intl.NumberFormat('en-In', { maximumFractionDigits: 0 });
 export const currencyToFloat = (amount) =>
-  parseFloat(amount.replace('.', '').replace(',', '').replace(/\D/g, ''));
+  parseFloat(amount?.replace('.', '').replace(',', '').replace(/\D/g, ''));
 
 const CurrencyInput = memo(({ ...props }) => {
   let amount = currencyToFloat(props.value);

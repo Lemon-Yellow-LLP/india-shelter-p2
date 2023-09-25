@@ -23,7 +23,13 @@ import {
 import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWithSendOtp';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
-import { loanTypeOptions, loanOptions, loanPurposeData } from './ApplicantDropDownData';
+import {
+  loanTypeOptions,
+  loanOptions,
+  loanPurposeData,
+  loanOptionsLap,
+  loanPurposeDataLap,
+} from './ApplicantDropDownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const ApplicantDetails = () => {
@@ -64,7 +70,7 @@ const ApplicantDetails = () => {
 
   useEffect(() => {
     setDate(values?.applicants[activeIndex]?.applicant_details.date_of_birth);
-  }, [values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
+  }, [activeIndex, values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     loan_type: false,
@@ -87,9 +93,15 @@ const ApplicantDetails = () => {
       );
       return res;
     } else {
-      const res = await addApi('applicant', newData);
-      setFieldValue(`applicants[${activeIndex}].applicant_details.id`, res.id);
-      return res;
+      await addApi('applicant', values?.applicants?.[activeIndex]?.applicant_details)
+        .then((res) => {
+          setFieldValue(`applicants[${activeIndex}].applicant_details.id`, res.id);
+          return res;
+        })
+        .catch((err) => {
+          console.log(err);
+          return err;
+        });
     }
   };
 
@@ -101,9 +113,15 @@ const ApplicantDetails = () => {
       const res = await editFieldsById(values?.lead?.id, 'lead', newData);
       return res;
     } else {
-      const res = await addApi('lead', newData);
-      setFieldValue('lead.id', res.id);
-      return res;
+      await addApi('lead', values?.lead)
+        .then((res) => {
+          setFieldValue('lead.id', res.id);
+          return res;
+        })
+        .catch((err) => {
+          console.log(err);
+          return err;
+        });
     }
   };
 
@@ -236,7 +254,7 @@ const ApplicantDetails = () => {
     if (!isEighteenOrAbove(date)) {
       setFieldError(
         `applicants[${activeIndex}].applicant_details.date_of_birth`,
-        'To apply for loan the minimum age must be 18 or 18+',
+        'Date of Birth is Required. Minimum age must be 18 or 18+',
       );
       // setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
@@ -359,7 +377,7 @@ const ApplicantDetails = () => {
         `applicants[${activeIndex}].applicant_details.date_of_birth`,
         'Date of Birth is Required. Minimum age must be 18 or 18+',
       );
-      setFieldTouched(`applicants[${activeIndex}].date_of_birth`);
+      setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
       dateInputRef.current.focus();
     }
   };
@@ -369,7 +387,6 @@ const ApplicantDetails = () => {
       .then(async () => {
         await updateFieldsLead().then((res) => {
           setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
-          setFieldValue(`applicants[${activeIndex}].personal_details.lead_id`, res.id);
           updateFieldsApplicant('lead_id', res.id);
           setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
           updateFieldsApplicant('is_mobile_verified', true);
@@ -413,7 +430,7 @@ const ApplicantDetails = () => {
                   current={values.lead?.loan_type}
                   onChange={onLoanTypeChange}
                   containerClasses='flex-1'
-                  disabled={!values?.applicants?.[activeIndex].applicant_details.is_primary}
+                  disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
                 >
                   {data.icon}
                 </CardRadio>
@@ -430,7 +447,7 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
             onChange={handleLoanAmountChange}
             displayError={false}
-            disabled={!values?.applicants?.[activeIndex].applicant_details.is_primary}
+            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
             inputClasses='font-semibold'
           />
 
@@ -441,7 +458,7 @@ const ApplicantDetails = () => {
             initialValue={values.lead?.applied_amount}
             min={100000}
             max={5000000}
-            disabled={!values?.applicants?.[activeIndex].applicant_details.is_primary}
+            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
             step={50000}
           />
 
@@ -454,8 +471,8 @@ const ApplicantDetails = () => {
             placeholder='Eg: Suresh, Priya'
             required
             name={`applicants[${activeIndex}].applicant_details.first_name`}
-            value={values.applicants[activeIndex]?.applicant_details.first_name || ''}
-            error={errors?.applicants[activeIndex]?.applicant_details?.first_name}
+            value={values.applicants?.[activeIndex]?.applicant_details?.first_name || ''}
+            error={errors?.applicants?.[activeIndex]?.applicant_details?.first_name}
             touched={
               touched?.applicants && touched?.applicants[activeIndex]?.applicant_details?.first_name
             }
@@ -483,8 +500,8 @@ const ApplicantDetails = () => {
                 label='Middle Name'
                 placeholder='Eg: Ramji, Sreenath'
                 name={`applicants[${activeIndex}].applicant_details.middle_name`}
-                value={values.applicants[activeIndex]?.applicant_details?.middle_name || ''}
-                error={errors?.applicants[activeIndex]?.applicant_details?.middle_name}
+                value={values?.applicants?.[activeIndex]?.applicant_details?.middle_name || ''}
+                error={errors?.applicants?.[activeIndex]?.applicant_details?.middle_name}
                 touched={
                   touched.applicants &&
                   touched?.applicants[activeIndex]?.applicant_details?.middle_name
@@ -507,8 +524,8 @@ const ApplicantDetails = () => {
             <div className='w-full'>
               <TextInput
                 label='Last Name'
-                value={values.applicants[activeIndex]?.applicant_details?.last_name || ''}
-                error={errors?.applicants[activeIndex]?.applicant_details?.last_name}
+                value={values?.applicants?.[activeIndex]?.applicant_details?.last_name || ''}
+                error={errors?.applicants?.[activeIndex]?.applicant_details?.last_name}
                 touched={
                   touched.applicants &&
                   touched?.applicants[activeIndex]?.applicant_details?.last_name
@@ -543,7 +560,7 @@ const ApplicantDetails = () => {
             required
             name={`applicants[${activeIndex}].applicant_details.date_of_birth`}
             label='Date of Birth'
-            error={errors?.applicants[activeIndex]?.applicant_details?.date_of_birth}
+            error={errors?.applicants?.[activeIndex]?.applicant_details?.date_of_birth}
             touched={
               touched?.applicants &&
               touched?.applicants[activeIndex]?.applicant_details?.date_of_birth
@@ -553,6 +570,7 @@ const ApplicantDetails = () => {
               checkDate();
             }}
             reference={dateInputRef}
+            check={checkDate}
           />
 
           <TextInputWithSendOtp
@@ -562,26 +580,26 @@ const ApplicantDetails = () => {
             placeholder='Eg: 1234567890'
             required
             name={`applicants[${activeIndex}].applicant_details.mobile_number`}
-            value={values.applicants[activeIndex]?.applicant_details?.mobile_number}
+            value={values.applicants?.[activeIndex]?.applicant_details?.mobile_number}
             onChange={handleOnPhoneNumberChange}
-            error={errors.applicants[activeIndex]?.applicant_details?.mobile_number}
+            error={errors?.applicants?.[activeIndex]?.applicant_details?.mobile_number}
             touched={
               touched.applicants &&
-              touched.applicants[activeIndex]?.applicant_details?.mobile_number
+              touched.applicants?.[activeIndex]?.applicant_details?.mobile_number
             }
             onOTPSendClick={sendMobileOtp}
             disabledOtpButton={
-              !values.applicants[activeIndex]?.applicant_details?.mobile_number ||
-              !!errors?.applicants[activeIndex]?.applicant_details?.mobile_number ||
-              values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified ||
+              !values.applicants?.[activeIndex]?.applicant_details?.mobile_number ||
+              !!errors?.applicants?.[activeIndex]?.applicant_details?.mobile_number ||
+              values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
               hasSentOTPOnce
             }
             disabled={
               disablePhoneNumber ||
-              values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified
+              values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified
             }
             message={
-              values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified
+              values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified
                 ? `<img src="${otpVerified}" alt='Otp Verified' role='presentation' /> OTP Verfied`
                 : null
             }
@@ -589,12 +607,12 @@ const ApplicantDetails = () => {
               handleBlur(e);
               const name = e.target.name.split('.')[1];
               if (
-                !errors?.applicants[activeIndex]?.applicant_details?.[name] &&
-                values?.applicants[activeIndex]?.applicant_details?.[name]
+                !errors?.applicants?.[activeIndex]?.applicant_details?.[name] &&
+                values?.applicants?.[activeIndex]?.applicant_details?.[name]
               ) {
                 updateFieldsApplicant(
                   name,
-                  values.applicants[activeIndex]?.applicant_details?.[name],
+                  values.applicants?.[activeIndex]?.applicant_details?.[name],
                 );
               }
             }}
@@ -615,14 +633,14 @@ const ApplicantDetails = () => {
             <OtpInput
               label='Enter OTP'
               required
-              verified={values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified}
+              verified={values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified}
               setOTPVerified={() => console.log('hii')}
               verifiedOnce={verifiedOnce}
               setVerifiedOnce={setVerifiedOnce}
               onSendOTPClick={sendMobileOtp}
               defaultResendTime={30}
               disableSendOTP={
-                !values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified
+                !values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified
               }
               verifyOTPCB={verifyOTP}
               hasSentOTPOnce={hasSentOTPOnce}
@@ -633,7 +651,7 @@ const ApplicantDetails = () => {
             label='Purpose of loan'
             name='lead.purpose_of_loan'
             required
-            options={loanPurposeOptions}
+            options={values?.lead.loan_type === 'HL' ? loanPurposeOptions : loanPurposeDataLap}
             placeholder='Eg: Choose reference type'
             onChange={handleLoanPurposeChange}
             touched={touched && touched?.lead?.purpose_of_loan}
@@ -641,7 +659,7 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
             defaultSelected={values.lead?.purpose_of_loan}
             inputClasses='mt-2'
-            disabled={!values?.applicants?.[activeIndex].applicant_details.is_primary}
+            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
           />
 
           <DropDown
@@ -650,19 +668,26 @@ const ApplicantDetails = () => {
             required
             placeholder='Eg: Residential'
             options={
-              loanFields[values.lead?.purpose_of_loan] || [
-                {
-                  label: 'Residential House',
-                  value: 'Residential House',
-                },
-              ]
+              values?.lead.loan_type === 'HL'
+                ? loanFields[values.lead?.purpose_of_loan] || [
+                    {
+                      label: 'Residential House',
+                      value: 'Residential House',
+                    },
+                  ]
+                : loanOptionsLap[values.lead?.purpose_of_loan] || [
+                    {
+                      label: 'Residential House',
+                      value: 'Residential House',
+                    },
+                  ]
             }
             onChange={handlePropertyType}
             defaultSelected={values.lead?.property_type}
             touched={touched && touched?.lead?.property_type}
             error={errors && errors?.lead?.property_type}
             onBlur={handleBlur}
-            disabled={!values?.applicants?.[activeIndex].applicant_details.is_primary}
+            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
           />
         </div>
 
@@ -670,17 +695,19 @@ const ApplicantDetails = () => {
           <PreviousNextButtons
             disablePrevious={true}
             disableNext={
-              !values?.applicants[activeIndex]?.applicant_details?.is_mobile_verified ||
-              (errors?.applicants && errors.applicants[activeIndex]?.applicant_details) ||
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
+              (errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details) ||
               errors.lead
             }
             onNextClick={() => {
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
                 ? setOpenExistingPopup(true)
                 : setCurrentStepIndex(1);
             }}
             linkNext={
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
                 ? undefined
                 : '/lead/personal-details'
             }
@@ -698,7 +725,7 @@ const ApplicantDetails = () => {
               values?.applicants?.[activeIndex]?.applicant_details
                 ?.existing_customer_pre_approved_amount
                 ? parseInt(
-                    values.applicants[activeIndex].applicant_details
+                    values.applicants?.[activeIndex].applicant_details
                       .existing_customer_pre_approved_amount,
                   )
                     .toLocaleString('en-IN', {

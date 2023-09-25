@@ -8,7 +8,7 @@ import { addApi, editFieldsById } from '../../../../global';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import { Button } from '../../../../components';
 
-const PersonalDetails = memo(() => {
+const PersonalDetails = () => {
   const {
     values,
     updateProgress,
@@ -41,7 +41,9 @@ const PersonalDetails = memo(() => {
   });
 
   const [openExistingPopup, setOpenExistingPopup] = useState(
-    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing || false,
+    (values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+      values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done) ||
+      false,
   );
 
   const updateFields = async (name, value) => {
@@ -55,8 +57,21 @@ const PersonalDetails = memo(() => {
         newData,
       );
     } else {
-      const res = await addApi('personal', newData);
-      setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
+      await addApi('personal', {
+        ...newData,
+        applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+      })
+        .then(async (res) => {
+          setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
+          await editFieldsById(
+            values?.applicants[activeIndex]?.applicant_details?.id,
+            'applicant',
+            { personal_detail: res.id },
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
 
     if (!name) {
@@ -119,6 +134,7 @@ const PersonalDetails = memo(() => {
       gender: existing_customer_gender,
       father_husband_name: existing_customer_father_husband_name,
       mother_name: existing_customer_mother_name,
+      extra_params: {},
     };
 
     let finalData = { ...values };
@@ -130,29 +146,44 @@ const PersonalDetails = memo(() => {
 
     setValues(finalData);
 
+    setFieldValue(
+      `applicants[${activeIndex}].personal_details.extra_params.is_existing_done`,
+      true,
+    );
+
     if (values?.applicants[activeIndex]?.personal_details?.id) {
       const res = await editFieldsById(
         values?.applicants[activeIndex]?.personal_details?.id,
         'personal',
         mappedData,
-      );
+      ).then((res) => {
+        updateFields();
+      });
     } else {
       const res = await addApi('personal', mappedData);
       setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
+      updateFields();
     }
 
     setOpenExistingPopup(false);
   };
 
   useEffect(() => {
-    if (values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing) {
+    if (
+      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+      values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done
+    ) {
       setOpenExistingPopup(
-        values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
+        values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done,
       );
     } else {
       setOpenExistingPopup(false);
     }
-  }, [values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing]);
+  }, [
+    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
+    values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done,
+  ]);
 
   return (
     <>
@@ -171,7 +202,7 @@ const PersonalDetails = memo(() => {
                     name={`applicants[${activeIndex}].personal_details.how_would_you_like_to_proceed`}
                     value={option.value}
                     current={
-                      values?.applicants[activeIndex]?.personal_details
+                      values?.applicants?.[activeIndex]?.personal_details
                         ?.how_would_you_like_to_proceed
                     }
                     onChange={handleRadioChange}
@@ -182,9 +213,9 @@ const PersonalDetails = memo(() => {
                 );
               })}
             </div>
-            {errors?.applicants[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
+            {errors?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
             touched?.applicants &&
-            touched?.applicants[activeIndex]?.personal_details?.how_would_you_like_to_proceed ? (
+            touched?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed ? (
               <span
                 className='text-xs text-primary-red'
                 dangerouslySetInnerHTML={{
@@ -197,7 +228,7 @@ const PersonalDetails = memo(() => {
               ''
             )}
           </div>
-          {values?.applicants[activeIndex]?.personal_details?.how_would_you_like_to_proceed ===
+          {values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed ===
             'Manual' && (
             <ManualMode
               requiredFieldsStatus={requiredFieldsStatus}
@@ -352,7 +383,17 @@ const PersonalDetails = memo(() => {
             Would the customer prefer to proceed with the same details?
           </span>
           <div className='w-full flex gap-4 mt-3'>
-            <Button inputClasses='w-full h-[46px]' onClick={() => setOpenExistingPopup(false)}>
+            <Button
+              inputClasses='w-full h-[46px]'
+              onClick={() => {
+                setOpenExistingPopup(false);
+                setFieldValue(
+                  `applicants[${activeIndex}].personal_details.extra_params.is_existing_done`,
+                  true,
+                );
+                updateFields();
+              }}
+            >
               No
             </Button>
             <Button primary={true} inputClasses=' w-full h-[46px]' onClick={handleAutofill}>
@@ -363,6 +404,6 @@ const PersonalDetails = memo(() => {
       </DynamicDrawer>
     </>
   );
-});
+};
 
 export default PersonalDetails;

@@ -51,6 +51,7 @@ export const defaultValuesLead = {
   applicants: [
     {
       applicant_details: {
+        applicant_type: 'Primary Applicant',
         lead_id: null,
         is_primary: true,
         first_name: '',
@@ -61,7 +62,8 @@ export const defaultValuesLead = {
         is_mobile_verified: false,
         extra_params: {
           progress: 0,
-          is_existing: true,
+          is_existing: false,
+          is_existing_done: false,
         },
       },
       personal_details: {
@@ -87,6 +89,7 @@ export const defaultValuesLead = {
         extra_params: {
           same_as_id_type: false,
           progress: 0,
+          is_existing_done: false,
         },
       },
       address_detail: {
@@ -111,6 +114,7 @@ export const defaultValuesLead = {
         extra_params: {
           permanent_address_same_as_current: false,
           progress: 0,
+          is_existing_done: false,
         },
       },
       work_income_detail: {

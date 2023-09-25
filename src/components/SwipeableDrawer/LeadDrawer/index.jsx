@@ -12,10 +12,13 @@ import Tab from '@mui/material/Tab';
 import DrawerFooter from './DrawerFooter';
 import DrawerSteps from './DrawerSteps';
 import { LeadContext } from '../../../context/LeadContextProvider';
-import { CommingSoon, DustbinIcon, ToolTipIcon } from '../../../assets/icons';
+import { CommingSoon, DustbinIcon, IconClose, ToolTipIcon } from '../../../assets/icons';
 import { ClickAwayListener, IconButton, Tooltip } from '@mui/material';
 import DropDown from '../../DropDown';
 import ToggleSwitch from '../../ToggleSwitch';
+import { editFieldsById } from '../../../global';
+import DynamicDrawer from '../DynamicDrawer';
+import Button from '../../Button';
 
 const drawerBleeding = 0;
 
@@ -66,7 +69,10 @@ export default function SwipeableDrawerComponent() {
     setDrawerOpen,
     values,
     setActiveIndex,
+    activeIndex,
     coApplicantStepsProgress,
+    setFieldValue,
+    setValues,
   } = useContext(LeadContext);
 
   const theme = useTheme();
@@ -75,11 +81,17 @@ export default function SwipeableDrawerComponent() {
 
   const [open, setOpen] = useState(false);
 
+  const [toggle, setToggle] = useState(false);
+
   const [primaryIndex, setPrimaryIndex] = useState(0);
 
   const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
 
   const [coApplicants, setCoApplicants] = useState([]);
+
+  const [changePrimaryAlert, setChangePrimaryAlert] = useState(false);
+
+  const [deleteAlert, setDeleteAlert] = useState(false);
 
   const handleTooltipClose = () => {
     setOpen(false);
@@ -123,6 +135,71 @@ export default function SwipeableDrawerComponent() {
       }
     });
   }, [values.applicants]);
+
+  const handleMakePrimary = async () => {
+    setToggle(true);
+
+    let newData = JSON.parse(JSON.stringify(values));
+
+    newData.applicants[activeCoApplicantIndex].applicant_details = {
+      ...newData.applicants[activeCoApplicantIndex].applicant_details,
+      is_primary: true,
+      applicant_type: 'Primary Applicant',
+    };
+
+    newData.applicants[primaryIndex].applicant_details = {
+      ...newData.applicants[primaryIndex].applicant_details,
+      is_primary: false,
+      applicant_type: 'Co Applicant',
+    };
+
+    setValues(newData);
+
+    setToggle(false);
+
+    await editFieldsById(
+      values?.applicants[activeCoApplicantIndex]?.applicant_details?.id,
+      'applicant',
+      {
+        is_primary: true,
+        applicant_type: 'Primary Applicant',
+      },
+    );
+
+    await editFieldsById(values?.applicants[primaryIndex]?.applicant_details?.id, 'applicant', {
+      is_primary: false,
+      applicant_type: 'Co Applicant',
+    });
+
+    setChangePrimaryAlert(false);
+  };
+
+  const handleDelete = async () => {
+    let ogData = JSON.parse(JSON.stringify(values));
+
+    let newData = JSON.parse(JSON.stringify(ogData));
+
+    newData.applicants = newData.applicants.filter((e, index) => index !== activeCoApplicantIndex);
+
+    newData.applicants.map((e, index) => {
+      if (e.applicant_details.is_primary) {
+        setPrimaryIndex(index);
+        setActiveIndex(index);
+      }
+    });
+
+    setValues(newData);
+
+    await editFieldsById(
+      ogData?.applicants[activeCoApplicantIndex]?.applicant_details?.id,
+      'applicant',
+      {
+        is_deleted: true,
+      },
+    );
+
+    setDeleteAlert(false);
+  };
 
   return (
     <Root>
@@ -267,7 +344,12 @@ export default function SwipeableDrawerComponent() {
 
                           <button
                             onClick={addApplicant}
-                            className='text-primary-red font-medium text-[16px]'
+                            className={
+                              values?.applicants.length >= 5
+                                ? 'text-[#96989A] font-medium text-[16px]'
+                                : 'text-primary-red font-medium text-[16px]'
+                            }
+                            disabled={values?.applicants.length >= 5}
                           >
                             + Add
                           </button>
@@ -277,7 +359,7 @@ export default function SwipeableDrawerComponent() {
                         </span>
                       </div>
 
-                      {values?.applicants && values.applicants.length > 1 ? (
+                      {values?.applicants && values.applicants.length >= 2 ? (
                         <div className='flex flex-col gap-4'>
                           <DropDown
                             options={coApplicants}
@@ -292,7 +374,8 @@ export default function SwipeableDrawerComponent() {
                               </span>
                               <ToggleSwitch
                                 name='make_it_primary'
-                                onChange={(e) => console.log(e.target.name)}
+                                checked={toggle}
+                                onChange={(e) => setChangePrimaryAlert(true)}
                               />
                             </div>
                             <div className='flex justify-end gap-2 items-center'>
@@ -302,7 +385,7 @@ export default function SwipeableDrawerComponent() {
                                   Amber
                                 </span>
                               </span>
-                              <button onClick={() => console.log(activeCoApplicantIndex)}>
+                              <button onClick={() => setDeleteAlert(true)}>
                                 <DustbinIcon />
                               </button>
                             </div>
@@ -346,6 +429,63 @@ export default function SwipeableDrawerComponent() {
         </StyledBox>
       </SwipeableDrawer>
       <DrawerFooter />
+      <DynamicDrawer open={changePrimaryAlert} setOpen={setChangePrimaryAlert} height='223px'>
+        <div className='flex gap-1'>
+          <div className=''>
+            <h4 className='text-center text-base not-italic font-semibold text-primary-black mb-2'>
+              Are you sure you want to make this Co-applicant a Primary?
+            </h4>
+            <p className='text-center text-xs not-italic font-normal text-primary-black'>
+              Changing the primary applicant will change the primary owner of the application
+            </p>
+          </div>
+          <div className=''>
+            <button onClick={() => setChangePrimaryAlert(false)}>
+              <IconClose />
+            </button>
+          </div>
+        </div>
+
+        <div className='w-full flex gap-4 mt-6'>
+          <Button inputClasses='w-full h-[46px]' onClick={() => setChangePrimaryAlert(false)}>
+            No
+          </Button>
+          <Button
+            primary={true}
+            inputClasses=' w-full h-[46px]'
+            onClick={() => handleMakePrimary()}
+          >
+            Yes
+          </Button>
+        </div>
+      </DynamicDrawer>
+
+      <DynamicDrawer open={deleteAlert} setOpen={setDeleteAlert} height='223px'>
+        <div className='flex gap-1'>
+          <div className=''>
+            <h4 className='text-center text-base not-italic font-semibold text-primary-black mb-2'>
+              Are you sure you want to remove this Co-applicant?
+            </h4>
+            <p className='text-center text-xs not-italic font-normal text-primary-black'>
+              The data will be lost forever
+            </p>
+          </div>
+          <div className=''>
+            <button onClick={() => setDeleteAlert(false)}>
+              <IconClose />
+            </button>
+          </div>
+        </div>
+
+        <div className='w-full flex gap-4 mt-6'>
+          <Button inputClasses='w-full h-[46px]' onClick={() => setDeleteAlert(false)}>
+            No, keep
+          </Button>
+          <Button primary={true} inputClasses=' w-full h-[46px]' onClick={() => handleDelete()}>
+            Yes, remove
+          </Button>
+        </div>
+      </DynamicDrawer>
     </Root>
   );
 }

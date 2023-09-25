@@ -57,6 +57,14 @@ export const loanOptions = {
       label: 'Ready Built Flat',
       value: 'Ready Built Flat',
     },
+    {
+      label: 'Owned Plot',
+      value: 'Owned Plot',
+    },
+    {
+      label: 'Plot + Construction',
+      value: 'Plot + Construction',
+    },
   ],
 };
 
@@ -78,3 +86,75 @@ export const loanPurposeData = [
     value: 'BT+Top-up',
   },
 ];
+
+export const loanPurposeDataLap = [
+  {
+    label: 'Business',
+    value: 'Business',
+  },
+  {
+    label: 'Personal usage',
+    value: 'Personal usage',
+  },
+  {
+    label: 'Personal usage BT+Top-up',
+    value: 'Personal usage BT+Top-up',
+  },
+];
+
+export const loanOptionsLap = {
+  Business: [
+    {
+      label: 'Residential House',
+      value: 'Residential House',
+    },
+    {
+      label: 'Ready Built Flat',
+      value: 'Ready Built Flat',
+    },
+    {
+      label: 'Commercial Shop/Unit',
+      value: 'Commercial Shop/Unit',
+    },
+    {
+      label: 'Commercial Building',
+      value: 'Commercial Building',
+    },
+  ],
+  'Personal usage': [
+    {
+      label: 'Residential House',
+      value: 'Residential House',
+    },
+    {
+      label: 'Ready Built Flat',
+      value: 'Ready Built Flat',
+    },
+    {
+      label: 'Commercial Shop/Unit',
+      value: 'Commercial Shop/Unit',
+    },
+    {
+      label: 'Commercial Building',
+      value: 'Commercial Building',
+    },
+  ],
+  'Personal usage BT+Top-up': [
+    {
+      label: 'Residential House',
+      value: 'Residential House',
+    },
+    {
+      label: 'Ready Built Flat',
+      value: 'Ready Built Flat',
+    },
+    {
+      label: 'Commercial Shop/Unit',
+      value: 'Commercial Shop/Unit',
+    },
+    {
+      label: 'Commercial Building',
+      value: 'Commercial Building',
+    },
+  ],
+};

@@ -54,6 +54,7 @@ const LeadContextProvider = ({ children }) => {
       let newData = { ...prev };
       newData.applicants.push({
         applicant_details: {
+          applicant_type: 'Co Applicant',
           lead_id: null,
           is_primary: false,
           first_name: '',
@@ -65,6 +66,7 @@ const LeadContextProvider = ({ children }) => {
           extra_params: {
             progress: 0,
             is_existing: false,
+            is_existing_done: false,
           },
         },
         personal_details: {
@@ -90,6 +92,7 @@ const LeadContextProvider = ({ children }) => {
           extra_params: {
             same_as_id_type: false,
             progress: 0,
+            is_existing_done: false,
           },
         },
         address_detail: {
@@ -114,6 +117,7 @@ const LeadContextProvider = ({ children }) => {
           extra_params: {
             permanent_address_same_as_current: false,
             progress: 0,
+            is_existing_done: false,
           },
         },
         work_income_detail: {
@@ -171,7 +175,7 @@ const LeadContextProvider = ({ children }) => {
     },
   });
 
-  // console.log(formik.values);
+  console.log(formik.values);
   // console.log(activeIndex);
 
   return (

@@ -53,16 +53,36 @@ export default function AddressDetails() {
   });
 
   const handleRadioChange = useCallback(
-    (e) => {
+    async (e) => {
       setFieldValue(`applicants[${activeIndex}].address_detail.${e.name}`, e.value);
 
-      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-        [e.name]: e.value,
-      });
+      if (values?.applicants?.[activeIndex]?.address_detail?.id) {
+        await editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+          [e.name]: e.value,
+        });
+      } else {
+        await addApi('address', {
+          [e.name]: e.value,
+          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+        })
+          .then(async (res) => {
+            setFieldValue(`applicants[${activeIndex}].address_detail.id`, res.id);
+            await editFieldsById(
+              values?.applicants[activeIndex]?.applicant_details?.id,
+              'applicant',
+              { address_detail: res.id },
+            );
+            return res;
+          })
+          .catch((err) => {
+            console.log(err);
+            return err;
+          });
+      }
 
       if (
         values?.applicants?.[activeIndex]?.address_detail?.extra_params
-          .permanent_address_same_as_current &&
+          ?.permanent_address_same_as_current &&
         e.name === 'current_no_of_year_residing'
       ) {
         setFieldValue(
@@ -89,8 +109,9 @@ export default function AddressDetails() {
     if (
       !values?.applicants?.[activeIndex]?.address_detail?.current_pincode ||
       values?.applicants?.[activeIndex]?.address_detail?.current_pincode.toString().length < 5
-    )
+    ) {
       return;
+    }
 
     const res = await checkIsValidStatePincode(
       values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
@@ -104,13 +125,13 @@ export default function AddressDetails() {
       current_city: res.city,
       current_state: res.state,
     });
-
+    console.log('jii');
     setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, res.city);
     setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, res.state);
 
     if (
       values?.applicants?.[activeIndex]?.address_detail?.extra_params
-        .permanent_address_same_as_current
+        ?.permanent_address_same_as_current
     ) {
       editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
         permanent_city: res.city,
@@ -191,7 +212,7 @@ export default function AddressDetails() {
     }
   }, [
     values?.applicants?.[activeIndex]?.address_detail?.extra_params
-      .permanent_address_same_as_current,
+      ?.permanent_address_same_as_current,
   ]);
 
   useEffect(() => {
@@ -308,15 +329,27 @@ export default function AddressDetails() {
 
     setValues(finalData);
 
+    setFieldValue(
+      `applicants[${activeIndex}].personal_details.extra_params.is_existing_done`,
+      true,
+    );
+
     if (values?.applicants[activeIndex]?.address_detail?.id) {
       const res = await editFieldsById(
         values?.applicants[activeIndex]?.address_detail?.id,
         'address',
         mappedData,
-      );
+      ).then(async (res) => {
+        await editFieldsById(
+          values?.applicants[activeIndex]?.address_detail?.id,
+          'address',
+          values,
+        );
+      });
     } else {
       const res = await addApi('address', mappedData);
       setFieldValue(`applicants[${activeIndex}].address_detail.id`, res.id);
+      await editFieldsById(res.id, 'address', values);
     }
 
     setOpenExistingPopup(false);
@@ -386,7 +419,7 @@ export default function AddressDetails() {
                   ) {
                     if (
                       values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                        .permanent_address_same_as_current
+                        ?.permanent_address_same_as_current
                     ) {
                       setFieldValue(
                         `applicants[${activeIndex}].address_detail.permanent_flat_no_building_name`,
@@ -452,7 +485,7 @@ export default function AddressDetails() {
                   ) {
                     if (
                       values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                        .permanent_address_same_as_current
+                        ?.permanent_address_same_as_current
                     ) {
                       setFieldValue(
                         `applicants[${activeIndex}].address_detail.permanent_street_area_locality`,
@@ -512,7 +545,7 @@ export default function AddressDetails() {
                   ) {
                     if (
                       values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                        .permanent_address_same_as_current
+                        ?.permanent_address_same_as_current
                     ) {
                       setFieldValue(
                         `applicants[${activeIndex}].address_detail.permanent_town`,
@@ -568,7 +601,7 @@ export default function AddressDetails() {
                   ) {
                     if (
                       values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                        .permanent_address_same_as_current
+                        ?.permanent_address_same_as_current
                     ) {
                       setFieldValue(
                         `applicants[${activeIndex}].address_detail.permanent_landmark`,
@@ -637,7 +670,10 @@ export default function AddressDetails() {
                     e.preventDefault();
                     return;
                   }
-                  handleChange(e);
+                  setFieldValue(
+                    `applicants[${activeIndex}].address_detail.current_pincode`,
+                    e.currentTarget.value,
+                  );
                 }}
                 onKeyDown={(e) => {
                   //capturing ctrl V and ctrl C
@@ -664,7 +700,10 @@ export default function AddressDetails() {
                     .getData('text/plain')
                     .replace('');
                   e.target.value = text;
-                  handleChange(e);
+                  setFieldValue(
+                    `applicants[${activeIndex}].address_detail.current_pincode`,
+                    e.target.value,
+                  );
                 }}
                 inputClasses='hidearrow'
               />
@@ -741,7 +780,7 @@ export default function AddressDetails() {
                   <Checkbox
                     checked={
                       values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                        .permanent_address_same_as_current
+                        ?.permanent_address_same_as_current
                     }
                     name='permanent_address_same_as_current'
                     onTouchEnd={(e) => {
@@ -809,7 +848,7 @@ export default function AddressDetails() {
                 disabled={
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    .permanent_address_same_as_current
+                    ?.permanent_address_same_as_current
                 }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
@@ -862,7 +901,7 @@ export default function AddressDetails() {
                 disabled={
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    .permanent_address_same_as_current
+                    ?.permanent_address_same_as_current
                 }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
@@ -906,7 +945,7 @@ export default function AddressDetails() {
                 disabled={
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    .permanent_address_same_as_current
+                    ?.permanent_address_same_as_current
                 }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
@@ -950,7 +989,7 @@ export default function AddressDetails() {
                 disabled={
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    .permanent_address_same_as_current
+                    ?.permanent_address_same_as_current
                 }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
@@ -984,7 +1023,7 @@ export default function AddressDetails() {
                 disabled={
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    .permanent_address_same_as_current
+                    ?.permanent_address_same_as_current
                 }
                 onBlur={(e) => {
                   handleBlur(e);
@@ -1004,7 +1043,10 @@ export default function AddressDetails() {
                     e.preventDefault();
                     return;
                   }
-                  handleChange(e);
+                  setFieldValue(
+                    `applicants[${activeIndex}].address_detail.current_pincode`,
+                    e.target.value,
+                  );
                 }}
                 onKeyDown={(e) => {
                   //capturing ctrl V and ctrl C
@@ -1031,7 +1073,10 @@ export default function AddressDetails() {
                     .getData('text/plain')
                     .replace('');
                   e.target.value = text;
-                  handleChange(e);
+                  setFieldValue(
+                    `applicants[${activeIndex}].address_detail.current_pincode`,
+                    e.target.value,
+                  );
                 }}
                 inputClasses='hidearrow'
               />
@@ -1088,7 +1133,7 @@ export default function AddressDetails() {
                       onChange={handleRadioChange}
                       disabled={
                         values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                          .permanent_address_same_as_current
+                          ?.permanent_address_same_as_current
                       }
                     >
                       <span
@@ -1097,7 +1142,7 @@ export default function AddressDetails() {
                           values?.applicants?.[activeIndex]?.address_detail
                             ?.permanent_no_of_year_residing
                             ? values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                                .permanent_address_same_as_current
+                                ?.permanent_address_same_as_current
                               ? 'text-[#373435] font-semibold'
                               : 'text-secondary-green font-semibold'
                             : ''
