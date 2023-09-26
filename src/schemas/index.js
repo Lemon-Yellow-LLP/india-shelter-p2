@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import { parse, isDate } from 'date-fns';
+import { checkIsValidStatePincode } from '../global';
 
 function parseDateString(_, originalValue) {
   const parsedDate = isDate(originalValue)
@@ -43,7 +44,12 @@ export const signUpSchema = Yup.object({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode'),
+      .max(6, 'Enter a valid Pincode')
+      .test('property_details_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
   }),
   referenceSchema: Yup.object().shape({
     reference_1_type: Yup.string().trim().required('This field is mandatory'),
@@ -69,7 +75,12 @@ export const signUpSchema = Yup.object({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode'),
+      .max(6, 'Enter a valid Pincode')
+      .test('reference_1_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
     reference_1_email: Yup.string()
       .trim()
       .email('Enter a valid Email')
@@ -97,7 +108,12 @@ export const signUpSchema = Yup.object({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode'),
+      .max(6, 'Enter a valid Pincode')
+      .test('reference_2_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
     reference_2_email: Yup.string()
       .trim()
       .email('Enter a valid Email')
@@ -134,7 +150,12 @@ export const signUpSchema = Yup.object({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Pincode a valid Pincode')
-      .max(6, 'Pincode a valid Pincode'),
+      .max(6, 'Pincode a valid Pincode')
+      .test('address_current_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
     current_no_of_year_residing: Yup.string().required('This field is mandatory'),
 
     permanent_type_of_residence: Yup.string().required('This field is mandatory'),
@@ -167,7 +188,12 @@ export const signUpSchema = Yup.object({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Pincode a valid Pincode')
-      .max(6, 'Pincode a valid Pincode'),
+      .max(6, 'Pincode a valid Pincode')
+      .test('address_permanent_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
     permanent_no_of_year_residing: Yup.string().required('This field is mandatory'),
   }),
   work_income_details: Yup.object().shape({
