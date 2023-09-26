@@ -52,10 +52,9 @@ const DashboardRoutes = () => {
         <Route
           path='/'
           element={
-            <DashboardTest />
-            // <RequireAuth>
-            //   <DashboardTest />
-            // </RequireAuth>
+            <RequireAuth>
+              <DashboardTest />
+            </RequireAuth>
           }
         />
         <Route
@@ -77,10 +76,9 @@ const DashboardRoutes = () => {
         <Route
           path='/lead/*'
           element={
-            <LeadCreationRoutes />
-            // <RequireAuth>
-            //   <LeadCreationRoutes />
-            // </RequireAuth>
+            <RequireAuth>
+              <LeadCreationRoutes />
+            </RequireAuth>
           }
         />
         <Route path='*' element={<h1>404, Page not found!</h1>} />
