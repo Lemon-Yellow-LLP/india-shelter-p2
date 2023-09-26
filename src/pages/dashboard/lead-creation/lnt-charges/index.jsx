@@ -580,7 +580,7 @@ const StatusButton = memo(
         className={`p-2 md:py-3 text-base md:text-lg rounded md:w-64 flex justify-center items-center gap-2 h-12 w-full
        ${
          isLoading ? 'pointer-events-none' : 'pointer-events-auto'
-       } bg-primary-red border border-primary-red text-white disabled:bg-[#D9D9D9] disabled:text-[#96989A] disabled:border-transparent transition-colors ease-out duration-300 
+       } bg-primary-red border border-primary-red text-white disabled:bg-[#D9D9D9] disabled:text-[#96989A] disabled:border-transparent transition-colors ease-out duration-300
        `}
         {...props}
       >

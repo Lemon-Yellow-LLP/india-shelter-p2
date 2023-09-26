@@ -6,12 +6,10 @@ import { Navigate } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
 import { LeadContext } from '../context/LeadContextProvider';
-import axios from 'axios';
 import DashboardApplicant from './dashboard/DashboardApplicant';
 
 const DashboardRoutes = () => {
-  const { isAuthenticated } = useContext(AuthContext);
-  const { setValues, setActiveIndex } = useContext(LeadContext);
+  // const { setValues, setActiveIndex } = useContext(LeadContext);
 
   // const getData = async () => {
   //   await axios
@@ -36,7 +34,14 @@ const DashboardRoutes = () => {
   // }, []);
 
   const RequireAuth = ({ children }) => {
-    return isAuthenticated ? children : <Navigate to={'/login'}></Navigate>;
+    const { isAuthenticated } = useContext(AuthContext);
+
+    // Check authentication once and render accordingly
+    if (isAuthenticated) {
+      return children;
+    } else {
+      return <Navigate to='/login' />;
+    }
   };
 
   return (
