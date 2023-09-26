@@ -5,7 +5,8 @@ import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
 
 export default function Retired() {
-  const { values, errors, handleBlur, touched, setFieldValue } = useContext(LeadContext);
+  const { values, errors, handleBlur, touched, setFieldValue, activeIndex } =
+    useContext(LeadContext);
 
   return (
     <>
@@ -13,27 +14,35 @@ export default function Retired() {
         label='Total pension amount'
         placeholder='Eg: 1,00,000'
         required
-        name='work_income_details.pention_amount'
-        value={values.work_income_details.pention_amount}
-        error={errors.work_income_details?.pention_amount}
-        touched={touched.work_income_details?.pention_amount}
+        name='work_income_detail.pention_amount'
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.pention_amount}
+        error={errors?.applicants?.[activeIndex]?.work_income_detail?.pention_amount}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.pention_amount}
         onBlur={(e) => {
           handleBlur(e);
 
           if (
-            !errors.work_income_details?.pention_amount &&
-            values.work_income_details.pention_amount
+            !errors?.applicants?.[activeIndex]?.work_income_detail?.pention_amount &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.pention_amount
           ) {
-            editFieldsById(1, 'work-income', {
-              pention_amount: values.work_income_details.pention_amount,
-            });
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                pention_amount:
+                  values?.applicants?.[activeIndex]?.work_income_detail?.pention_amount,
+              },
+            );
           }
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
           if (pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            setFieldValue(
+              `applicants[${activeIndex}].${e.currentTarget.name}`,
+              value.charAt(0).toUpperCase() + value.slice(1),
+            );
           }
         }}
       />
@@ -42,42 +51,54 @@ export default function Retired() {
         label='No. of current loan(s)'
         placeholder='Choose no. of current loan(s)'
         required
-        name='work_income_details.no_current_loan'
-        value={values.work_income_details.no_current_loan}
-        error={errors.work_income_details?.no_current_loan}
-        touched={touched.work_income_details?.no_current_loan}
+        name='work_income_detail.no_current_loan'
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
+        error={errors?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
         onBlur={(e) => {
           handleBlur(e);
-          if (values.work_income_details.no_current_loan == 0) {
-            setFieldValue('work_income_details.ongoing_emi', '');
-            editFieldsById(1, 'work-income', {
-              ongoing_emi: null,
-            });
+          if (values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0) {
+            setFieldValue(`applicants[${activeIndex}].work_income_detail.ongoing_emi`, '');
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                ongoing_emi: null,
+              },
+            );
           }
-
           if (
-            !errors.work_income_details?.no_current_loan &&
-            values.work_income_details.no_current_loan
+            !errors?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan
           ) {
-            editFieldsById(1, 'work-income', {
-              no_current_loan: parseInt(values.work_income_details.no_current_loan),
-            });
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                no_current_loan: parseInt(
+                  values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan,
+                ),
+              },
+            );
           }
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const address_pattern = /^[0-9]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            setFieldValue(
+              `applicants[${activeIndex}].${e.currentTarget.name}`,
+              value.charAt(0).toUpperCase() + value.slice(1),
+            );
           }
         }}
         onKeyDown={(e) => {
           if (e.key === 'Backspace') {
             setFieldValue(
-              'work_income_details.no_current_loan',
-              values.work_income_details.no_current_loan.slice(
+              `applicants[${activeIndex}].work_income_detail.no_current_loan`,
+              values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.slice(
                 0,
-                values.work_income_details.no_current_loan.length - 1,
+                values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.length - 1,
               ),
             );
           }
@@ -88,32 +109,44 @@ export default function Retired() {
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'
         required
-        name='work_income_details.ongoing_emi'
-        value={values.work_income_details.ongoing_emi}
+        name='work_income_detail.ongoing_emi'
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi}
         error={
-          values.work_income_details.no_current_loan != 0
-            ? errors.work_income_details?.ongoing_emi
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan != 0
+            ? errors?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi
             : null
         }
-        touched={touched.work_income_details?.ongoing_emi}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi}
         onBlur={(e) => {
           handleBlur(e);
 
-          if (!errors.work_income_details?.ongoing_emi && values.work_income_details.ongoing_emi) {
-            editFieldsById(1, 'work-income', {
-              ongoing_emi: values.work_income_details.ongoing_emi,
-            });
+          if (
+            !errors?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi
+          ) {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
+              },
+            );
           }
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            setFieldValue(
+              `applicants[${activeIndex}].${e.currentTarget.name}`,
+              value.charAt(0).toUpperCase() + value.slice(1),
+            );
           }
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
-        disabled={values.work_income_details.no_current_loan == 0 ? true : false}
+        disabled={
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
+        }
       />
     </>
   );

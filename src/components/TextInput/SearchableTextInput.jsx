@@ -78,6 +78,7 @@ const SearchableTextInput = memo(
             id={name}
             name={name}
             value={props.value}
+            isOptionEqualToValue={(option, value) => option.value === value}
             onBlur={props.onBlur}
             onChange={(e, value) => onChange(name, value)}
             options={options}

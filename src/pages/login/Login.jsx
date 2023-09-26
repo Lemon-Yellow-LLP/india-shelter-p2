@@ -8,6 +8,7 @@ import otpVerified from '../../assets/icons/otp-verified.svg';
 import DynamicDrawer from '../../components/SwipeableDrawer/DynamicDrawer';
 import { Header } from '../../components';
 import { useNavigate } from 'react-router-dom';
+import OtpInputNoEdit from '../../components/OtpInput/OtpInputNoEdit';
 
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
@@ -224,7 +225,7 @@ export default function Login() {
           />
 
           {showOTPInput && (
-            <OtpInput
+            <OtpInputNoEdit
               label='Enter OTP'
               required
               verified={mobileVerified}

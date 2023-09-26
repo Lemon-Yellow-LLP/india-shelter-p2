@@ -6,7 +6,7 @@ import { AuthContext } from '../../context/AuthContextProvider';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
-const OtpInput = ({
+const OtpInputNoEdit = ({
   label,
   required,
   verified,
@@ -16,8 +16,6 @@ const OtpInput = ({
   verifyOTPCB,
   defaultResendTime,
   hasSentOTPOnce,
-  verifiedOnce,
-  setVerifiedOnce,
 }) => {
   const { otpFailCount } = useContext(AuthContext);
   const [otp, setOtp] = useState('');
@@ -45,7 +43,6 @@ const OtpInput = ({
     setInputDisabled(false);
     onSendOTPClick();
     setTimer(true);
-    setVerifiedOnce(false);
   }, [onSendOTPClick]);
 
   useEffect(() => {
@@ -58,7 +55,7 @@ const OtpInput = ({
   useEffect(() => {
     let interval = null;
     if (timer) {
-      // setOTPVerified(false);
+      setOTPVerified(null);
       let time = defaultResendTime || 10;
       interval = setInterval(() => {
         time -= 1;
@@ -84,11 +81,11 @@ const OtpInput = ({
 
   const inputClasses = useMemo(() => {
     if (!hasSentOTPOnce) return 'border-stroke bg-white';
-    if (hasSentOTPOnce && !verified && !verifiedOnce)
+    if (hasSentOTPOnce && verified === null)
       return 'border-secondary-blue shadow-secondary-blue shadow-primary';
-    if (!verified && verifiedOnce) return 'border-primary-red shadow-primary shadow-primary-red';
+    if (!verified) return 'border-primary-red shadow-primary shadow-primary-red';
     if (verified) return 'border-dark-grey';
-  }, [verified, hasSentOTPOnce, verifiedOnce]);
+  }, [verified, hasSentOTPOnce]);
 
   const otpCount = useMemo(() => {
     if (otpFailCount === 1) return 'Invalid OTP. You have 2 attempt(s) left';
@@ -139,7 +136,7 @@ const OtpInput = ({
       </div>
       <div className='mt-3 flex justify-between items-center'>
         <div className='flex gap-0.5'>
-          {!verified && !verifiedOnce && timer && (
+          {verified === null && timer && (
             <span className='text-primary-red text-xs leading-[18px]'>0:{resendTime}s</span>
           )}
           {verified === true && !timer && (
@@ -148,7 +145,7 @@ const OtpInput = ({
               <img src={otpVerified} alt='Otp Verified' role='presentation' />
             </span>
           )}
-          {!verified && verifiedOnce ? (
+          {verified === false ? (
             <span className='flex text-[#E33439] text-xs leading-[18px] gap-2'>
               <img src={otpNotVerified} alt='Otp Verified' role='presentation' />
               {otpCount}
@@ -177,9 +174,9 @@ const OtpInput = ({
   );
 };
 
-export default OtpInput;
+export default OtpInputNoEdit;
 
-OtpInput.propTypes = {
+OtpInputNoEdit.propTypes = {
   label: PropTypes.string.isRequired,
   required: PropTypes.bool,
   verified: PropTypes.any,
