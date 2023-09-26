@@ -23,8 +23,8 @@ import LeadContextProvider from '../../../../context/LeadContextProvider';
 const pan = true;
 const dl = false;
 const voterId = true;
-const pf = true;
-const gst = false;
+const pf = false;
+const gst = true;
 // values.applicants[activeIndex]?.personal_details.id_type === 'PAN'
 // values.applicants[activeIndex]?.personal_details.id_type === 'DL'
 // values.applicants[activeIndex]?.personal_details.id_type === 'VoterID'
@@ -94,12 +94,6 @@ const BRE_ONE = () => {
           ran: true,
         }));
         setProgress(1);
-
-        try {
-          const pan_res = await verifyPan(293, {});
-        } catch (err) {
-          console.log(err);
-        }
       }
 
       if (dl) {
@@ -109,12 +103,6 @@ const BRE_ONE = () => {
           ran: true,
         }));
         setProgress(2);
-
-        try {
-          const dl_res = await verifyDL(293, {});
-        } catch (err) {
-          console.log(err);
-        }
       }
 
       if (voterId) {
@@ -124,47 +112,77 @@ const BRE_ONE = () => {
           ran: true,
         }));
         setProgress(2);
-
-        try {
-          const voterId_res = await verifyVoterID(293, {});
-        } catch (err) {
-          console.log(err);
-        }
       }
 
       if (pf) {
         setPfUAN((prev) => ({ ...prev, loader: true, ran: true }));
         setProgress(dl || voterId ? 3 : 2);
-
-        try {
-          const pf_res = await verifyPFUAN(293, {});
-        } catch (err) {
-          console.log(err);
-        }
       }
 
       if (gst) {
         setGST((prev) => ({ ...prev, loader: true, ran: true }));
         setProgress(dl || voterId ? 3 : 2);
-
-        try {
-          const gst_res = await verifyGST(293, {});
-        } catch (err) {
-          console.log(err);
-        }
       }
 
       setDedupe((prev) => ({ ...prev, loader: true, ran: true }));
       setProgress(dl || voterId ? 4 : 3);
 
       try {
-        const dedupe_res = await checkDedupe(293, {});
-        if (dedupe_res.status === 200) {
+        let response = null;
+
+        if (dl && gst) {
+          response = await Promise.allSettled([
+            verifyPan(293, {}),
+            verifyDL(293, {}),
+            verifyGST(293, {}),
+            checkDedupe(293, {}),
+          ]);
+        } else if (dl && pf) {
+          response = await Promise.allSettled([
+            verifyPan(293, {}),
+            verifyDL(293, {}),
+            verifyPFUAN(293, {}),
+            checkDedupe(293, {}),
+          ]);
+        } else if (voterId && gst) {
+          response = await Promise.allSettled([
+            verifyPan(293, {}),
+            verifyVoterID(293, {}),
+            verifyGST(293, {}),
+            checkDedupe(293, {}),
+          ]);
+        } else if (voterId && pf) {
+          response = await Promise.allSettled([
+            verifyPan(293, {}),
+            verifyVoterID(293, {}),
+            verifyPFUAN(293, {}),
+            checkDedupe(293, {}),
+          ]);
+        } else if (pf) {
+          response = await Promise.allSettled([
+            verifyPan(293, {}),
+            verifyPFUAN(293, {}),
+            checkDedupe(293, {}),
+          ]);
+        } else {
+          response = await Promise.allSettled([
+            verifyPan(293, {}),
+            verifyGST(293, {}),
+            checkDedupe(293, {}),
+          ]);
+        }
+
+        const filtered_dedupe_res = response.find((res) => {
+          return res.value.status == 200;
+        });
+
+        if (!filtered_dedupe_res) {
+          setDedupe((prev) => ({ ...prev, loader: false, res: 'Error' }));
+        } else {
           setDedupe((prev) => ({ ...prev, loader: false, res: 'Valid' }));
         }
       } catch (err) {
-        console.log(err);
-        setDedupe((prev) => ({ ...prev, loader: false, res: 'Error' }));
+        console.log('error occured');
       }
 
       setBre99((prev) => ({ ...prev, loader: true, ran: true }));
@@ -277,8 +295,6 @@ const BRE_ONE = () => {
 
     breOne();
   }, []);
-
-  useEffect(() => {}, []);
 
   function checkELigibilty() {
     if (bre101.red) {
