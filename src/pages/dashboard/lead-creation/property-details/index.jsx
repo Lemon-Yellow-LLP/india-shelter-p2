@@ -22,7 +22,7 @@ const propertyIdentificationOptions = [
 const selectedLoanType = 'LAP';
 
 const PropertyDetails = () => {
-  const { values, updateProgress, errors, touched, setFieldValue, handleSubmit } =
+  const { values, updateProgress, errors, touched, setFieldValue, handleSubmit, setValues } =
     useContext(LeadContext);
   const [propertyIdentification, setPropertyIdentification] = useState(null);
 
@@ -53,6 +53,31 @@ const PropertyDetails = () => {
       editPropertyById(1, {
         property_identification_is: e.value,
       });
+
+      if (e.value === 'not-yet') {
+        editPropertyById(1, {
+          property_value_estimate: '',
+          owner_name: '',
+          plot_house_flat: '',
+          project_society_colony: '',
+          pincode: '',
+          city: '',
+          state: '',
+        });
+
+        setValues({
+          ...values,
+          propertySchema: {
+            property_value_estimate: '',
+            owner_name: '',
+            plot_house_flat: '',
+            project_society_colony: '',
+            pincode: '',
+            city: '',
+            state: '',
+          },
+        });
+      }
     },
     [requiredFieldsStatus, setFieldValue],
   );
