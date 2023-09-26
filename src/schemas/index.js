@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import { parse, isDate } from 'date-fns';
+import { checkIsValidStatePincode } from '../global';
 
 function parseDateString(_, originalValue) {
   const parsedDate = isDate(originalValue)
@@ -157,23 +158,31 @@ export const validationSchemaLead = Yup.object().shape({
       .trim()
       .required('This field is mandatory')
       .min(2, 'Name must be atleast 2 characters long')
-      .max(90, 'Name can be max 90 characters long'),
+      .max(90, 'Name can be max 90 characters long')
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
     plot_house_flat: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Address must be atleast 2 characters long')
-      .max(90, 'Address can be max 90 characters long'),
+      .max(90, 'Address can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
     project_society_colony: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(10, 'Address must be atleast 10 characters long')
-      .max(90, 'Address can be max 90 characters long'),
+      .max(90, 'Address can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
     pincode: Yup.string()
       .trim()
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode'),
+      .max(6, 'Enter a valid Pincode')
+      .test('property_details_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
   }),
   referenceSchema: Yup.object().shape({
     reference_1_type: Yup.string().trim().required('This field is mandatory'),
@@ -181,12 +190,14 @@ export const validationSchemaLead = Yup.object().shape({
       .trim()
       .required('This field is mandatory')
       .min(2, 'Name must be atleast 2 characters long')
-      .max(90, 'Name can be max 90 characters long'),
+      .max(90, 'Name can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9 ]+$/, 'Invalid characters'),
     reference_1_address: Yup.string()
       .trim()
       .min(10, 'Address must be atleast 10 characters long')
       .max(90, 'Address can be max 90 characters long')
-      .required('This field is mandatory'),
+      .required('This field is mandatory')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
     reference_1_phone_number: Yup.string()
       .trim()
       .min(10, 'Enter a valid 10 digit mobile number')
@@ -197,7 +208,12 @@ export const validationSchemaLead = Yup.object().shape({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode'),
+      .max(6, 'Enter a valid Pincode')
+      .test('reference_1_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
     reference_1_email: Yup.string()
       .trim()
       .email('Enter a valid Email')
@@ -208,12 +224,14 @@ export const validationSchemaLead = Yup.object().shape({
       .trim()
       .required('This field is mandatory')
       .min(2, 'Name must be atleast 2 characters long')
-      .max(90, 'Name can be max 90 characters long'),
+      .max(90, 'Name can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9 ]+$/, 'Invalid characters'),
     reference_2_address: Yup.string()
       .trim()
       .min(10, 'Address must be atleast 10 characters long')
       .max(90, 'Address can be max 90 characters long')
-      .required('This field is mandatory'),
+      .required('This field is mandatory')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
     reference_2_phone_number: Yup.string()
       .trim()
       .min(10, 'Enter a valid 10 digit mobile number')
@@ -224,7 +242,12 @@ export const validationSchemaLead = Yup.object().shape({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode'),
+      .max(6, 'Enter a valid Pincode')
+      .test('reference_2_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
     reference_2_email: Yup.string()
       .trim()
       .email('Enter a valid Email')
@@ -236,28 +259,37 @@ export const validationSchemaLead = Yup.object().shape({
       .trim()
       .required('This field is mandatory')
       .min(2, 'Flat no/Building name must be atleast 2 characters long')
-      .max(90, 'Flat no/Building name can be max 90 characters long'),
+      .max(90, 'Flat no/Building name can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
     current_street_area_locality: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Street/Area/Locality must be atleast 2 characters long')
-      .max(90, 'Street/Area/Locality can be max 90 characters long'),
+      .max(90, 'Street/Area/Locality can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
     current_town: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Town must be atleast 2 characters long')
-      .max(90, 'Town can be max 90 characters long'),
+      .max(90, 'Town can be max 90 characters long')
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
     current_landmark: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Landmark must be atleast 2 characters long')
-      .max(90, 'Landmark can be max 90 characters long'),
+      .max(90, 'Landmark can be max 90 characters long')
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
     current_pincode: Yup.string()
       .trim()
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Pincode a valid Pincode')
-      .max(6, 'Pincode a valid Pincode'),
+      .max(6, 'Pincode a valid Pincode')
+      .test('address_current_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
     current_no_of_year_residing: Yup.string().required('This field is mandatory'),
 
     permanent_type_of_residence: Yup.string().required('This field is mandatory'),
@@ -265,28 +297,37 @@ export const validationSchemaLead = Yup.object().shape({
       .trim()
       .required('This field is mandatory')
       .min(2, 'Flat no/Building name must be atleast 2 characters long')
-      .max(90, 'Flat no/Building name can be max 90 characters long'),
+      .max(90, 'Flat no/Building name can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
     permanent_street_area_locality: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Street/Area/Locality must be atleast 2 characters long')
-      .max(90, 'Street/Area/Locality can be max 90 characters long'),
+      .max(90, 'Street/Area/Locality can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
     permanent_town: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Town must be atleast 2 characters long')
-      .max(90, 'Town can be max 90 characters long'),
+      .max(90, 'Town can be max 90 characters long')
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
     permanent_landmark: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Landmark must be atleast 2 characters long')
-      .max(90, 'Landmark can be max 90 characters long'),
+      .max(90, 'Landmark can be max 90 characters long')
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
     permanent_pincode: Yup.string()
       .trim()
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Pincode a valid Pincode')
-      .max(6, 'Pincode a valid Pincode'),
+      .max(6, 'Pincode a valid Pincode')
+      .test('address_permanent_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
     permanent_no_of_year_residing: Yup.string().required('This field is mandatory'),
   }),
   work_income_detail: Yup.object().shape({
