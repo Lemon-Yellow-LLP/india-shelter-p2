@@ -50,6 +50,9 @@ const ApplicantDetails = () => {
     setValues,
     setCurrentStepIndex,
   } = useContext(LeadContext);
+
+  const { setOtpFailCount } = useContext(AuthContext);
+
   const { lo_id } = useContext(AuthContext);
 
   const [openExistingPopup, setOpenExistingPopup] = useState(false);
@@ -69,8 +72,14 @@ const ApplicantDetails = () => {
   );
 
   useEffect(() => {
+    if (values?.applicants[activeIndex]?.applicant_details.date_of_birth?.length) {
+      setDate(values?.applicants[activeIndex]?.applicant_details.date_of_birth);
+    }
+  }, [values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
+
+  useEffect(() => {
     setDate(values?.applicants[activeIndex]?.applicant_details.date_of_birth);
-  }, [activeIndex, values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
+  }, [activeIndex]);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     loan_type: false,
@@ -136,6 +145,37 @@ const ApplicantDetails = () => {
       updateFieldsLead(name, e.value);
       if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+      }
+    },
+    [requiredFieldsStatus, values],
+  );
+
+  const handleFirstNameChange = useCallback(
+    (e) => {
+      const value = e.currentTarget.value;
+      const pattern = /^[A-Za-z][A-Za-z\s]*$/;
+      if (pattern.exec(value)) {
+        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+        const name = e.currentTarget.name.split('.')[2];
+        if (
+          requiredFieldsStatus[name] !== undefined &&
+          !requiredFieldsStatus[name] &&
+          value.length > 1
+        ) {
+          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+        }
+      }
+
+      if (values?.applicants?.[activeIndex]?.applicant_details?.first_name.length > value) {
+        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+        const name = e.currentTarget.name.split('.')[2];
+        if (
+          requiredFieldsStatus[name] !== undefined &&
+          !requiredFieldsStatus[name] &&
+          value.length > 1
+        ) {
+          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+        }
       }
     },
     [requiredFieldsStatus, values],
@@ -221,14 +261,6 @@ const ApplicantDetails = () => {
         setHasSentOTPOnce(false);
         updateFieldsApplicant('mobile_number', phoneNumber);
       }
-
-      if (
-        phoneNumber.length === 10 &&
-        requiredFieldsStatus['mobile_number'] !== undefined &&
-        !requiredFieldsStatus['mobile_number']
-      ) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
-      }
     },
     [requiredFieldsStatus, values],
   );
@@ -247,7 +279,7 @@ const ApplicantDetails = () => {
     [requiredFieldsStatus, values],
   );
 
-  const checkDate = () => {
+  const checkDate = (date) => {
     if (!date) {
       return;
     }
@@ -256,11 +288,17 @@ const ApplicantDetails = () => {
         `applicants[${activeIndex}].applicant_details.date_of_birth`,
         'Date of Birth is Required. Minimum age must be 18 or 18+',
       );
-      // setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
+      setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
     } else {
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, date);
       updateFieldsApplicant('date_of_birth', date);
+      if (
+        requiredFieldsStatus['date_of_birth'] !== undefined &&
+        !requiredFieldsStatus['date_of_birth']
+      ) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['date_of_birth']: true }));
+      }
     }
   };
 
@@ -391,6 +429,12 @@ const ApplicantDetails = () => {
           setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
           updateFieldsApplicant('is_mobile_verified', true);
           setShowOTPInput(false);
+          if (
+            requiredFieldsStatus['mobile_number'] !== undefined &&
+            !requiredFieldsStatus['mobile_number']
+          ) {
+            setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
+          }
           return true;
         });
       })
@@ -398,6 +442,8 @@ const ApplicantDetails = () => {
         setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
         setShowOTPInput(true);
         setVerifiedOnce(true);
+        console.log(err);
+        setOtpFailCount(err.response.data.fail_count);
         return false;
       });
   };
@@ -490,7 +536,7 @@ const ApplicantDetails = () => {
               }
             }}
             disabled={inputDisabled}
-            onChange={handleTextInputChange}
+            onChange={handleFirstNameChange}
             inputClasses='capitalize'
           />
 
@@ -554,8 +600,7 @@ const ApplicantDetails = () => {
             // value={values?.applicants[activeIndex]?.applicant_details?.date_of_birth}
             value={date}
             setDate={(e) => {
-              setDate(e);
-              checkDate();
+              setDate(e, checkDate(e));
             }}
             required
             name={`applicants[${activeIndex}].applicant_details.date_of_birth`}
@@ -567,10 +612,9 @@ const ApplicantDetails = () => {
             }
             onBlur={(e) => {
               handleBlur(e);
-              checkDate();
+              checkDate(e.target.value);
             }}
             reference={dateInputRef}
-            check={checkDate}
           />
 
           <TextInputWithSendOtp

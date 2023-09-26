@@ -90,8 +90,6 @@ const DatePicker = ({
           const finalDate = `${year}-${month}-${dayOfMonth}`;
 
           setDate(finalDate);
-
-          check();
         }
       }}
       // maxDate={today}

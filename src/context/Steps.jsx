@@ -26,7 +26,7 @@ export const applicantSteps = [
     description: 'OCR, e-KYC, Address',
     progress: 0,
     url: '/lead/personal-details',
-    lock: true,
+    lock: false,
     Icon: PersonalDetailsIcon,
     name: 'personal_details',
   },
