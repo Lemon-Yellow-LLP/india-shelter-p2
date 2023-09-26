@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 export const defaultValues = {
   employee_code: '',
-  username: '7039739099',
+  username: '',
   password: '',
   role: '',
   first_name: '',
