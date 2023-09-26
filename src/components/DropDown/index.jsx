@@ -19,6 +19,7 @@ const DropDown = memo(
     touched,
     onBlur,
     disableOption,
+    labelClassName,
     ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -66,7 +67,7 @@ const DropDown = memo(
 
     return (
       <div ref={containerRef} className={`dropdown relative ${inputClasses}`}>
-        <h3 className='flex gap-0.5 text-primary-black'>
+        <h3 className={`flex gap-0.5 text-primary-black ${labelClassName}`}>
           {label}
           {required && <span className='text-primary-red text-sm'>*</span>}
         </h3>
@@ -82,7 +83,7 @@ const DropDown = memo(
           onMouseLeave={onBlur} // For Iphone
           className={`${getThemes()} w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white disabled:bg-disabled-grey`}
         >
-          {selectedOption ? selectedOption.label : placeholder || 'Click me'} <IconArrowDown />
+          {selectedOption ? selectedOption.label : placeholder || props.value} <IconArrowDown />
         </button>
         {showDropDown && (
           <div
