@@ -38,7 +38,7 @@ const WorkIncomeDetails = () => {
   const handleRadioChange = useCallback(
     async (e) => {
       setFieldValue(e.name, e.value);
-      const name = e.currentTarget.name.split('.')[2];
+      const name = e.name.split('.')[2];
       if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
         editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
           [name]: e.value,

@@ -55,7 +55,7 @@ export default function AddressDetails() {
   const handleRadioChange = useCallback(
     async (e) => {
       setFieldValue(e.name, e.value);
-      const name = e.currentTarget.name.split('.')[2];
+      const name = e.name.split('.')[2];
       if (values?.applicants?.[activeIndex]?.address_detail?.id) {
         await editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
           [name]: e.value,
