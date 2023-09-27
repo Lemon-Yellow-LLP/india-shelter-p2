@@ -20,7 +20,9 @@ const IdentificationDoneFields = ({
     setFieldValue,
     setFieldError,
     updateProgress,
+    activeIndex,
   } = useContext(LeadContext);
+
   const [showMap, setShowMap] = useState(false);
 
   // const onMapButtonClick = useCallback(() => {
@@ -83,7 +85,7 @@ const IdentificationDoneFields = ({
 
   useEffect(() => {
     if (
-      parseInt(values.applicant_details.applied_amount) >
+      parseInt(values?.lead?.applied_amount) >
       parseInt(values.propertySchema.property_value_estimate)
     ) {
       setFieldError(
@@ -119,7 +121,7 @@ const IdentificationDoneFields = ({
           }}
           onBlur={(e) => {
             if (
-              parseInt(values.applicant_details.applied_amount) >
+              parseInt(values?.lead?.applied_amount) >
                 parseInt(values.propertySchema.property_value_estimate) &&
               !errors.propertySchema.property_value_estimate
             ) {
@@ -134,7 +136,7 @@ const IdentificationDoneFields = ({
             if (
               !errors.propertySchema?.property_value_estimate &&
               values.propertySchema.property_value_estimate &&
-              parseInt(values.applicant_details.applied_amount) <
+              parseInt(values?.lead?.applied_amount) <
                 parseInt(values.propertySchema.property_value_estimate)
             ) {
               editPropertyById(1, {

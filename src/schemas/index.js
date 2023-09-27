@@ -223,7 +223,7 @@ const applicantSchema = Yup.object().shape({
     pention_amount: Yup.string().required('This field is mandatory'),
   }),
 
-  addressSchema: Yup.object().shape({
+  address_detail: Yup.object().shape({
     current_type_of_residence: Yup.string().trim().required('This field is mandatory'),
     current_flat_no_building_name: Yup.string()
       .trim()

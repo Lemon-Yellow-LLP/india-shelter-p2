@@ -37,15 +37,15 @@ const WorkIncomeDetails = () => {
 
   const handleRadioChange = useCallback(
     async (e) => {
-      setFieldValue(`applicants[${activeIndex}].work_income_detail.${e.name}`, e.value);
-
+      setFieldValue(e.name, e.value);
+      const name = e.currentTarget.name.split('.')[2];
       if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
         editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-          [e.name]: e.value,
+          [name]: e.value,
         });
       } else {
         await addApi('work-income', {
-          [e.name]: e.value,
+          [name]: e.value,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
         })
           .then(async (res) => {
@@ -118,7 +118,7 @@ const WorkIncomeDetails = () => {
                   <CardRadio
                     key={option.value}
                     label={option.label}
-                    name='profession'
+                    name={`applicants[${activeIndex}].work_income_detail.profession`}
                     value={option.value}
                     current={values?.applicants?.[activeIndex]?.work_income_detail?.profession}
                     onChange={handleRadioChange}
@@ -156,7 +156,7 @@ const WorkIncomeDetails = () => {
                 label='Flat no/Building name'
                 placeholder='Eg: C-101'
                 required
-                name='work_income_detail.flat_no_building_name'
+                name={`applicants[${activeIndex}].work_income_detail.flat_no_building_name`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.flat_no_building_name}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.flat_no_building_name}
                 touched={
@@ -184,7 +184,7 @@ const WorkIncomeDetails = () => {
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
-                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
                   }
@@ -195,7 +195,7 @@ const WorkIncomeDetails = () => {
                 label='Street/Area/Locality'
                 placeholder='Eg: Senapati road'
                 required
-                name='work_income_detail.street_area_locality'
+                name={`applicants[${activeIndex}].work_income_detail.street_area_locality`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.street_area_locality}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.street_area_locality}
                 touched={
@@ -224,7 +224,7 @@ const WorkIncomeDetails = () => {
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
-                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
                   }
@@ -234,7 +234,7 @@ const WorkIncomeDetails = () => {
               <TextInput
                 label='Town'
                 placeholder='Eg: Igatpuri'
-                name='work_income_detail.town'
+                name={`applicants[${activeIndex}].work_income_detail.town`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.town}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.town}
                 touched={touched?.applicants?.[activeIndex]?.work_income_detail?.town}
@@ -259,7 +259,7 @@ const WorkIncomeDetails = () => {
                   const address_pattern = /^[a-zA-Z\s]+$/;
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
-                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
                   }
@@ -270,7 +270,7 @@ const WorkIncomeDetails = () => {
                 label='Landmark'
                 placeholder='Eg: Near apollo hospital'
                 required
-                name='work_income_detail.landmark'
+                name={`applicants[${activeIndex}].work_income_detail.landmark`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.landmark}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.landmark}
                 touched={touched?.applicants?.[activeIndex]?.work_income_detail?.landmark}
@@ -295,7 +295,7 @@ const WorkIncomeDetails = () => {
                   const address_pattern = /^[a-zA-Z\s]+$/;
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
-                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
                   }
@@ -307,7 +307,7 @@ const WorkIncomeDetails = () => {
                 hint='City and State fields will get filled based on Pincode'
                 placeholder='Eg: 123456'
                 label='Pincode'
-                name='work_income_detail.pincode'
+                name={`applicants[${activeIndex}].work_income_detail.pincode`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.pincode}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.pincode}
                 touched={touched?.applicants?.[activeIndex]?.work_income_detail?.pincode}
@@ -385,7 +385,7 @@ const WorkIncomeDetails = () => {
                 label='City'
                 placeholder='Eg: Nashik'
                 disabled
-                name='work_income_detail.city'
+                name={`applicants[${activeIndex}].work_income_detail.city`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.city}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.city}
                 touched={touched?.applicants?.[activeIndex]?.work_income_detail?.city}
@@ -395,7 +395,7 @@ const WorkIncomeDetails = () => {
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
-                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
                   }
@@ -406,7 +406,7 @@ const WorkIncomeDetails = () => {
                 label='State'
                 placeholder='Eg: Maharashtra'
                 disabled
-                name='work_income_detail.state'
+                name={`applicants[${activeIndex}].work_income_detail.state`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.state}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.state}
                 touched={touched?.applicants?.[activeIndex]?.work_income_detail?.state}
@@ -416,7 +416,7 @@ const WorkIncomeDetails = () => {
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
-                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
                   }
@@ -438,7 +438,7 @@ const WorkIncomeDetails = () => {
                       <CardRadioWithoutIcon
                         key={option.value}
                         label={option.label}
-                        name='total_family_number'
+                        name={`applicants[${activeIndex}].work_income_detail.total_family_number`}
                         value={option.value}
                         current={
                           values?.applicants?.[activeIndex]?.work_income_detail?.total_family_number
@@ -455,7 +455,7 @@ const WorkIncomeDetails = () => {
                 label='Total household income'
                 placeholder='Eg: 1,00,000'
                 required
-                name='work_income_detail.total_household_income'
+                name={`applicants[${activeIndex}].work_income_detail.total_household_income`}
                 value={
                   values?.applicants?.[activeIndex]?.work_income_detail?.total_household_income
                 }
@@ -489,7 +489,7 @@ const WorkIncomeDetails = () => {
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
-                      `applicants[${activeIndex}].${e.currentTarget.name}`,
+                      e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
                   }
@@ -506,7 +506,7 @@ const WorkIncomeDetails = () => {
                       <CardRadioWithoutIcon
                         key={option.value}
                         label={option.label}
-                        name='no_of_dependents'
+                        name={`applicants[${activeIndex}].work_income_detail.no_of_dependents`}
                         value={option.value}
                         current={
                           values?.applicants?.[activeIndex]?.work_income_detail?.no_of_dependents
