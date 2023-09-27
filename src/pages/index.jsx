@@ -13,14 +13,12 @@ const DashboardRoutes = () => {
   const RequireAuth = ({ children }) => {
     const { isAuthenticated } = useContext(AuthContext);
 
-    // Check authentication once and render accordingly
-    // if (isAuthenticated) {
-    //   return children;
-    // } else {
-    //   return <Navigate to='/login' />;
-    // }
-
-    return children;
+    //Check authentication once and render accordingly
+    if (isAuthenticated) {
+      return children;
+    } else {
+      return <Navigate to='/login' />;
+    }
   };
 
   return (
