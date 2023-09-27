@@ -14,7 +14,7 @@ export default function Retired() {
         label='Total pension amount'
         placeholder='Eg: 1,00,000'
         required
-        name='work_income_detail.pention_amount'
+        name={`applicants[${activeIndex}].work_income_detail.pention_amount`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.pention_amount}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.pention_amount}
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.pention_amount}
@@ -51,7 +51,7 @@ export default function Retired() {
         label='No. of current loan(s)'
         placeholder='Choose no. of current loan(s)'
         required
-        name='work_income_detail.no_current_loan'
+        name={`applicants[${activeIndex}].work_income_detail.no_current_loan`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
@@ -109,7 +109,7 @@ export default function Retired() {
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'
         required
-        name='work_income_detail.ongoing_emi'
+        name={`applicants[${activeIndex}].work_income_detail.ongoing_emi`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi}
         error={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan != 0

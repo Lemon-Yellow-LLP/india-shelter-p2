@@ -148,6 +148,158 @@ const applicantSchema = Yup.object().shape({
       .required('Please enter your email')
       .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   }),
+
+  work_income_detail: Yup.object().shape({
+    profession: Yup.string().required('This field is mandatory'),
+    company_name: Yup.string().required('This field is mandatory'),
+    extra_params: Yup.object().shape({
+      extra_company_name: Yup.string()
+        .trim()
+        .required('This field is mandatory')
+        .min(2, 'Company name must be atleast 2 characters long')
+        .max(90, 'Company name can be max 90 characters long'),
+      extra_industries: Yup.string()
+        .trim()
+        .required('This field is mandatory')
+        .min(2, 'Industry name must be atleast 2 characters long')
+        .max(90, 'Industry name can be max 90 characters long'),
+    }),
+    business_name: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Business name must be atleast 2 characters long')
+      .max(90, 'Business name can be max 90 characters long'),
+    industries: Yup.string().required('This field is mandatory'),
+    gst_number: Yup.string().required('This field is mandatory'),
+    total_income: Yup.number()
+      .required('This field is mandatory')
+      .required('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
+      .typeError('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
+      .min(10000, 'Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
+      .max(
+        500000000,
+        'Total loan amount should not be less than ₹ 10,000 and more than ₹ 50,00,00,000',
+      ),
+    pf_uan: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(12, 'pf uan number must be atleast 12 characters')
+      .max(12, 'pf uan number must be atleast 12 characters'),
+    no_current_loan: Yup.number()
+      .required('This field is mandatory')
+      .min(0, 'No. of Current loan(s) can be min 0')
+      .max(99, 'No. of Current loan(s) can be max 99'),
+    ongoing_emi: Yup.string().required('This field is mandatory'),
+    working_since: Yup.string().required('This field is mandatory'),
+    mode_of_salary: Yup.string().required('This field is mandatory'),
+    flat_no_building_name: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Address must be atleast 2 characters long')
+      .max(90, 'Address can be max 90 characters long'),
+    street_area_locality: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Address must be atleast 2 characters long')
+      .max(90, 'Address can be max 90 characters long'),
+    town: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Town must be atleast 2 characters long')
+      .max(90, 'Town can be max 90 characters long'),
+    landmark: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Landmark must be atleast 2 characters long')
+      .max(90, 'Landmark can be max 90 characters long'),
+    pincode: Yup.string()
+      .required('This field is mandatory')
+      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
+      .min(6, 'Enter a valid Pincode')
+      .max(6, 'Enter a valid Pincode'),
+    total_family_number: Yup.string().required('This field is mandatory'),
+    total_household_income: Yup.string().required('This field is mandatory'),
+    no_of_dependents: Yup.string().required('This field is mandatory'),
+    pention_amount: Yup.string().required('This field is mandatory'),
+  }),
+
+  address_detail: Yup.object().shape({
+    current_type_of_residence: Yup.string().trim().required('This field is mandatory'),
+    current_flat_no_building_name: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Flat no/Building name must be atleast 2 characters long')
+      .max(90, 'Flat no/Building name can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+    current_street_area_locality: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Street/Area/Locality must be atleast 2 characters long')
+      .max(90, 'Street/Area/Locality can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+    current_town: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Town must be atleast 2 characters long')
+      .max(90, 'Town can be max 90 characters long')
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
+    current_landmark: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Landmark must be atleast 2 characters long')
+      .max(90, 'Landmark can be max 90 characters long')
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
+    current_pincode: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
+      .min(6, 'Pincode a valid Pincode')
+      .max(6, 'Pincode a valid Pincode')
+      .test('address_current_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
+    current_no_of_year_residing: Yup.string().required('This field is mandatory'),
+
+    permanent_type_of_residence: Yup.string().required('This field is mandatory'),
+    permanent_flat_no_building_name: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Flat no/Building name must be atleast 2 characters long')
+      .max(90, 'Flat no/Building name can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+    permanent_street_area_locality: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Street/Area/Locality must be atleast 2 characters long')
+      .max(90, 'Street/Area/Locality can be max 90 characters long')
+      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+    permanent_town: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Town must be atleast 2 characters long')
+      .max(90, 'Town can be max 90 characters long')
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
+    permanent_landmark: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Landmark must be atleast 2 characters long')
+      .max(90, 'Landmark can be max 90 characters long')
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
+    permanent_pincode: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
+      .min(6, 'Pincode a valid Pincode')
+      .max(6, 'Pincode a valid Pincode')
+      .test('address_permanent_pincode', 'Invalid Pincode', async (pincode) => {
+        if (pincode.length != 6) return false;
+        const res = await checkIsValidStatePincode(pincode);
+        return !!res;
+      }),
+    permanent_no_of_year_residing: Yup.string().required('This field is mandatory'),
+  }),
 });
 
 export const validationSchemaLead = Yup.object().shape({
@@ -253,179 +405,6 @@ export const validationSchemaLead = Yup.object().shape({
       .email('Enter a valid Email')
       .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   }),
-  addressSchema: Yup.object().shape({
-    current_type_of_residence: Yup.string().trim().required('This field is mandatory'),
-    current_flat_no_building_name: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Flat no/Building name must be atleast 2 characters long')
-      .max(90, 'Flat no/Building name can be max 90 characters long')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
-    current_street_area_locality: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Street/Area/Locality must be atleast 2 characters long')
-      .max(90, 'Street/Area/Locality can be max 90 characters long')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
-    current_town: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Town must be atleast 2 characters long')
-      .max(90, 'Town can be max 90 characters long')
-      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
-    current_landmark: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Landmark must be atleast 2 characters long')
-      .max(90, 'Landmark can be max 90 characters long')
-      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
-    current_pincode: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
-      .min(6, 'Pincode a valid Pincode')
-      .max(6, 'Pincode a valid Pincode')
-      .test('address_current_pincode', 'Invalid Pincode', async (pincode) => {
-        if (pincode.length != 6) return false;
-        const res = await checkIsValidStatePincode(pincode);
-        return !!res;
-      }),
-    current_no_of_year_residing: Yup.string().required('This field is mandatory'),
-
-    permanent_type_of_residence: Yup.string().required('This field is mandatory'),
-    permanent_flat_no_building_name: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Flat no/Building name must be atleast 2 characters long')
-      .max(90, 'Flat no/Building name can be max 90 characters long')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
-    permanent_street_area_locality: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Street/Area/Locality must be atleast 2 characters long')
-      .max(90, 'Street/Area/Locality can be max 90 characters long')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
-    permanent_town: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Town must be atleast 2 characters long')
-      .max(90, 'Town can be max 90 characters long')
-      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
-    permanent_landmark: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Landmark must be atleast 2 characters long')
-      .max(90, 'Landmark can be max 90 characters long')
-      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
-    permanent_pincode: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
-      .min(6, 'Pincode a valid Pincode')
-      .max(6, 'Pincode a valid Pincode')
-      .test('address_permanent_pincode', 'Invalid Pincode', async (pincode) => {
-        if (pincode.length != 6) return false;
-        const res = await checkIsValidStatePincode(pincode);
-        return !!res;
-      }),
-    permanent_no_of_year_residing: Yup.string().required('This field is mandatory'),
-  }),
-  work_income_detail: Yup.object().shape({
-    profession: Yup.string().required('This field is mandatory'),
-    company_name: Yup.string().required('This field is mandatory'),
-    extra_params: Yup.object().shape({
-      extra_company_name: Yup.string()
-        .trim()
-        .required('This field is mandatory')
-        .min(2, 'Company name must be atleast 2 characters long')
-        .max(90, 'Company name can be max 90 characters long'),
-      extra_industries: Yup.string()
-        .trim()
-        .required('This field is mandatory')
-        .min(2, 'Industry name must be atleast 2 characters long')
-        .max(90, 'Industry name can be max 90 characters long'),
-    }),
-    business_name: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Business name must be atleast 2 characters long')
-      .max(90, 'Business name can be max 90 characters long'),
-    industries: Yup.string().required('This field is mandatory'),
-    gst_number: Yup.string().required('This field is mandatory'),
-    total_income: Yup.number()
-      .required('This field is mandatory')
-      .required('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
-      .typeError('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
-      .min(10000, 'Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
-      .max(
-        500000000,
-        'Total loan amount should not be less than ₹ 10,000 and more than ₹ 50,00,00,000',
-      ),
-    pf_uan: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(12, 'pf uan number must be atleast 12 characters')
-      .max(12, 'pf uan number must be atleast 12 characters'),
-    no_current_loan: Yup.number()
-      .required('This field is mandatory')
-      .min(0, 'No. of Current loan(s) can be min 0')
-      .max(99, 'No. of Current loan(s) can be max 99'),
-    ongoing_emi: Yup.string().required('This field is mandatory'),
-    working_since: Yup.string().required('This field is mandatory'),
-    mode_of_salary: Yup.string().required('This field is mandatory'),
-    flat_no_building_name: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Address must be atleast 2 characters long')
-      .max(90, 'Address can be max 90 characters long'),
-    street_area_locality: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Address must be atleast 2 characters long')
-      .max(90, 'Address can be max 90 characters long'),
-    town: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Town must be atleast 2 characters long')
-      .max(90, 'Town can be max 90 characters long'),
-    landmark: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Landmark must be atleast 2 characters long')
-      .max(90, 'Landmark can be max 90 characters long'),
-    pincode: Yup.string()
-      .required('This field is mandatory')
-      .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
-      .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode'),
-    total_family_number: Yup.string().required('This field is mandatory'),
-    total_household_income: Yup.string().required('This field is mandatory'),
-    no_of_dependents: Yup.string().required('This field is mandatory'),
-    pention_amount: Yup.string().required('This field is mandatory'),
-  }),
-  pan_number: Yup.string()
-    .required('Please enter your valid PAN number')
-    .min(10, 'Pan Number must be in the following format ex. ABCDE1234F')
-    .max(10, 'Pan Number must be in the following format ex. ABCDE1234F'),
-  date_of_birth: Yup.date().transform(parseDateString).required(''),
-  monthly_family_income: Yup.string().required('Please enter your monthly family income'),
-  ongoing_emi: Yup.string().required('Please enter your ongoing emi amount'),
-  property_pincode: Yup.string()
-    .required('Please enter your property pincode')
-    .matches(/^[0-9]+$/, 'Must be only digits')
-    .min(6, 'Enter a valid Pincode')
-    .max(6, 'Enter a valid Pincode'),
-  banker_name: Yup.string().required(
-    'Please enter a right Bank Name. Entered Bank name was not found',
-  ),
-  purpose_of_loan: Yup.string().required('Please select the purpose of the loan.'),
-  property_type: Yup.string().required('Please select the property type.'),
-  loan_tenure: Yup.number()
-    .required('Please enter the Loan tenure period')
-    .min(1, 'Loan Tenure should must be in between 1-30 year')
-    .max(30, 'Loan Tenure should must be in between 1-30 year'),
-  loan_amount: Yup.string().required('Please enter the loan amount.'),
-  purpose_type: Yup.string().required('Property category not selected.'),
 
   lead: Yup.object().shape({
     loan_type: Yup.string().required('This field is mandatory field.'),

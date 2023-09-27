@@ -44,9 +44,7 @@ const ApplicantDetails = () => {
     updateProgress,
     setToastMessage,
     setFieldTouched,
-    handleSubmit,
     activeIndex,
-    setActiveIndex,
     setValues,
     setCurrentStepIndex,
   } = useContext(LeadContext);
