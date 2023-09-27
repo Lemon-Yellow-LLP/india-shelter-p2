@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import DesktopPopUp from '../DesktopPopUp';
 
-function ImageUpload({ files, setFile }) {
+function ImageUpload({ files, setFile, label, ...props }) {
   const [message, setMessage] = useState();
-  const [pdfUpload, setPdfUpload] = useState(false);
   const [imageUpload, setImageUpload] = useState(false);
+  const [show, setShow] = useState(false);
+  const [previewFile, setPreviewFile] = useState(null);
 
   const handleFile = (e) => {
     setMessage('');
@@ -12,17 +14,14 @@ function ImageUpload({ files, setFile }) {
     for (let i = 0; i < file.length; i++) {
       const fileType = file[i]['type'];
 
-      const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'application/pdf'];
+      const validImageTypes = ['image/jpeg'];
 
       if (validImageTypes.includes(fileType)) {
-        if (fileType === 'application/pdf') {
-          setPdfUpload(true);
-        } else {
-          setImageUpload(true);
-        }
+        setImageUpload(true);
+
         setFile([...files, file[i]]);
       } else {
-        setMessage('only images accepted');
+        setMessage('File format not supported');
       }
     }
   };
@@ -31,11 +30,20 @@ function ImageUpload({ files, setFile }) {
     setFile(files.filter((x) => x.name !== i));
   };
 
-  console.log(files);
-  console.log(imageUpload);
+  const getImage = (value) => {
+    setFile(files.filter((img) => img.name !== value.name));
+  };
+
+  //   console.log(files);
+  //   console.log(imageUpload);
 
   return (
-    <div className='p-4'>
+    <div className='w-full'>
+      <label className='flex gap-0.5 items-center text-primary-black font-medium'>
+        {label}
+        {props.required && <span className='text-primary-red text-sm'>*</span>}
+      </label>
+
       {!files.length ? (
         <div className=''>
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
@@ -74,7 +82,7 @@ function ImageUpload({ files, setFile }) {
                   />
                 </svg>
 
-                <p className='text-xs tracking-wider text-secondary-green font-normal'>
+                <p className='text-xs tracking-wider text-secondary-green font-normal mt-1'>
                   Take a photo
                 </p>
 
@@ -89,6 +97,8 @@ function ImageUpload({ files, setFile }) {
                 className='opacity-0'
                 multiple={true}
                 name='files[]'
+                capture='user'
+                accept='image/*'
               />
             </label>
           </div>
@@ -96,86 +106,64 @@ function ImageUpload({ files, setFile }) {
       ) : null}
 
       {imageUpload && files.length ? (
-        <div className='flex justify-start overflow-auto'>
-          <div className='flex gap-2 mt-3'>
-            <div
-              style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
-              className='h-[85px] w-[68px] rounded border-x border-y border-dashed border-stroke flex justify-center items-center'
-            >
-              <button className='w-full h-full relative'>
-                <svg
-                  width='24'
-                  height='25'
-                  viewBox='0 0 24 25'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                  className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
-                >
-                  <g clipPath='url(#clip0_3036_39087)'>
-                    <rect y='0.5' width='24' height='24' rx='12' fill='#DDFFE7' />
-                    <path
-                      d='M12 7V19M18 13L6 13'
-                      stroke='#147257'
-                      strokeWidth='1.5'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id='clip0_3036_39087'>
-                      <rect y='0.5' width='24' height='24' rx='12' fill='white' />
-                    </clipPath>
-                  </defs>
-                </svg>
-                <input
-                  type='file'
-                  onChange={handleFile}
-                  className='opacity-0 w-full h-full'
-                  multiple={true}
-                  name='files[]'
-                />
-              </button>
-            </div>
+        <>
+          <div className='flex justify-start overflow-auto'>
+            <div className='flex gap-2 mt-3'>
+              <div
+                style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
+                className='h-[85px] w-[68px] rounded border-x border-y border-dashed border-stroke flex justify-center items-center'
+              >
+                <button className='w-full h-full relative'>
+                  <svg
+                    width='24'
+                    height='25'
+                    viewBox='0 0 24 25'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
+                  >
+                    <g clipPath='url(#clip0_3036_39087)'>
+                      <rect y='0.5' width='24' height='24' rx='12' fill='#DDFFE7' />
+                      <path
+                        d='M12 7V19M18 13L6 13'
+                        stroke='#147257'
+                        strokeWidth='1.5'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                      />
+                    </g>
+                    <defs>
+                      <clipPath id='clip0_3036_39087'>
+                        <rect y='0.5' width='24' height='24' rx='12' fill='white' />
+                      </clipPath>
+                    </defs>
+                  </svg>
 
-            <div className='flex gap-2'>
-              {files.map((file, key) => {
-                return (
-                  <div key={key} className='overflow-hidden relative w-[68px]'>
-                    <button
-                      onClick={() => {
-                        removeImage(file.name);
-                        if (files.length == 1) {
-                          setImageUpload(false);
-                        }
-                      }}
-                      className='absolute right-0 top-0 z-20'
-                    >
-                      <svg
-                        width='16'
-                        height='16'
-                        viewBox='0 0 16 16'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
+                  <input
+                    type='file'
+                    onChange={handleFile}
+                    className='opacity-0 w-full h-full'
+                    multiple={true}
+                    name='files[]'
+                    capture='user'
+                    accept='image/*'
+                  />
+                </button>
+              </div>
+
+              <div className='flex gap-2 h-[85px]'>
+                {files.map((file, key) => {
+                  return (
+                    <div key={key} className='overflow-hidden relative w-[68px]'>
+                      <button
+                        onClick={() => {
+                          removeImage(file.name);
+                          if (files.length == 1) {
+                            setImageUpload(false);
+                          }
+                        }}
+                        className='absolute right-0 top-0 z-20'
                       >
-                        <rect width='16' height='16' rx='8' fill='#FFE0E1' />
-                        <path
-                          d='M10.9193 5.0835L5.08594 10.9168'
-                          stroke='#E33439'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                        />
-                        <path
-                          d='M5.08594 5.0835L10.9193 10.9168'
-                          stroke='#E33439'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                        />
-                      </svg>
-                    </button>
-
-                    <div className='relative rounded-md h-full w-full'>
-                      <div className='absolute h-full w-full bg-black opacity-40'></div>
-                      <button className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'>
                         <svg
                           width='16'
                           height='16'
@@ -183,99 +171,72 @@ function ImageUpload({ files, setFile }) {
                           fill='none'
                           xmlns='http://www.w3.org/2000/svg'
                         >
+                          <rect width='16' height='16' rx='8' fill='#FFE0E1' />
                           <path
-                            d='M14.0895 6.5689C14.8625 7.38228 14.8625 8.61805 14.0895 9.43143C12.7856 10.8033 10.5463 12.6668 8.0026 12.6668C5.45893 12.6668 3.2196 10.8033 1.91574 9.43143C1.14267 8.61805 1.14267 7.38228 1.91574 6.5689C3.2196 5.19705 5.45893 3.3335 8.0026 3.3335C10.5463 3.3335 12.7856 5.19705 14.0895 6.5689Z'
-                            stroke='#FEFEFE'
+                            d='M10.9193 5.0835L5.08594 10.9168'
+                            stroke='#E33439'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
                           />
                           <path
-                            d='M10.0026 8.00016C10.0026 9.10473 9.10717 10.0002 8.0026 10.0002C6.89803 10.0002 6.0026 9.10473 6.0026 8.00016C6.0026 6.89559 6.89803 6.00016 8.0026 6.00016C9.10717 6.00016 10.0026 6.89559 10.0026 8.00016Z'
-                            stroke='#FEFEFE'
+                            d='M5.08594 5.0835L10.9193 10.9168'
+                            stroke='#E33439'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
                           />
                         </svg>
                       </button>
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt='Gigs'
-                        className='object-cover object-center h-full w-full'
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      ) : null}
 
-      {pdfUpload ? (
-        <div className='border-x border-y border-stroke rounded-lg p-2'>
-          <div className='flex justify-between'>
-            <div className='flex gap-2'>
-              <button>
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M13 2V6C13 8.20914 14.7909 10 17 10L21 10M3 6L3 18C3 20.2091 4.79086 22 7 22H17C19.2091 22 21 20.2091 21 18V11.6569C21 10.596 20.5786 9.57857 19.8284 8.82843L14.1716 3.17157C13.4214 2.42143 12.404 2 11.3431 2L7 2C4.79086 2 3 3.79086 3 6Z'
-                    stroke='#373435'
-                    strokeWidth='1.5'
-                    strokeLinejoin='round'
-                  />
-                  <path
-                    d='M6.4375 18V13.7051H7.8291C8.35645 13.7051 8.7002 13.7266 8.86035 13.7695C9.10645 13.834 9.3125 13.9746 9.47852 14.1914C9.64453 14.4062 9.72754 14.6846 9.72754 15.0264C9.72754 15.29 9.67969 15.5117 9.58398 15.6914C9.48828 15.8711 9.36621 16.0127 9.21777 16.1162C9.07129 16.2178 8.92188 16.2852 8.76953 16.3184C8.5625 16.3594 8.2627 16.3799 7.87012 16.3799H7.30469V18H6.4375ZM7.30469 14.4316V15.6504H7.7793C8.12109 15.6504 8.34961 15.6279 8.46484 15.583C8.58008 15.5381 8.66992 15.4678 8.73438 15.3721C8.80078 15.2764 8.83398 15.165 8.83398 15.0381C8.83398 14.8818 8.78809 14.7529 8.69629 14.6514C8.60449 14.5498 8.48828 14.4863 8.34766 14.4609C8.24414 14.4414 8.03613 14.4316 7.72363 14.4316H7.30469Z'
-                    fill='#373435'
-                  />
-                  <path
-                    d='M10.4365 13.7051H12.0215C12.3789 13.7051 12.6514 13.7324 12.8389 13.7871C13.0908 13.8613 13.3066 13.9932 13.4863 14.1826C13.666 14.3721 13.8027 14.6045 13.8965 14.8799C13.9902 15.1533 14.0371 15.4912 14.0371 15.8936C14.0371 16.2471 13.9932 16.5518 13.9053 16.8076C13.7979 17.1201 13.6445 17.373 13.4453 17.5664C13.2949 17.7129 13.0918 17.8271 12.8359 17.9092C12.6445 17.9697 12.3887 18 12.0684 18H10.4365V13.7051ZM11.3037 14.4316V17.2764H11.9512C12.1934 17.2764 12.3682 17.2627 12.4756 17.2354C12.6162 17.2002 12.7324 17.1406 12.8242 17.0566C12.918 16.9727 12.9941 16.835 13.0527 16.6436C13.1113 16.4502 13.1406 16.1875 13.1406 15.8555C13.1406 15.5234 13.1113 15.2686 13.0527 15.0908C12.9941 14.9131 12.9121 14.7744 12.8066 14.6748C12.7012 14.5752 12.5674 14.5078 12.4053 14.4727C12.2842 14.4453 12.0469 14.4316 11.6934 14.4316H11.3037Z'
-                    fill='#373435'
-                  />
-                  <path
-                    d='M14.7812 18V13.7051H17.7256V14.4316H15.6484V15.4482H17.4414V16.1748H15.6484V18H14.7812Z'
-                    fill='#373435'
-                  />
-                </svg>
-              </button>
-              <div>
-                <p className='text-xs text-primary-black font-normal'>{files[0]?.name}</p>
-                <p className='text-xs text-light-grey font-normal'>
-                  {(files[0]?.size / 1048576).toFixed(2) + ' MB'}
-                </p>
+                      <div className='relative rounded-md h-full w-full'>
+                        <div className='absolute h-full w-full bg-black opacity-40'></div>
+                        <button
+                          className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
+                          onClick={() => {
+                            setPreviewFile(file);
+                            setShow(true);
+                          }}
+                        >
+                          <svg
+                            width='16'
+                            height='16'
+                            viewBox='0 0 16 16'
+                            fill='none'
+                            xmlns='http://www.w3.org/2000/svg'
+                          >
+                            <path
+                              d='M14.0895 6.5689C14.8625 7.38228 14.8625 8.61805 14.0895 9.43143C12.7856 10.8033 10.5463 12.6668 8.0026 12.6668C5.45893 12.6668 3.2196 10.8033 1.91574 9.43143C1.14267 8.61805 1.14267 7.38228 1.91574 6.5689C3.2196 5.19705 5.45893 3.3335 8.0026 3.3335C10.5463 3.3335 12.7856 5.19705 14.0895 6.5689Z'
+                              stroke='#FEFEFE'
+                            />
+                            <path
+                              d='M10.0026 8.00016C10.0026 9.10473 9.10717 10.0002 8.0026 10.0002C6.89803 10.0002 6.0026 9.10473 6.0026 8.00016C6.0026 6.89559 6.89803 6.00016 8.0026 6.00016C9.10717 6.00016 10.0026 6.89559 10.0026 8.00016Z'
+                              stroke='#FEFEFE'
+                            />
+                          </svg>
+                        </button>
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt='Gigs'
+                          className='object-cover object-center h-full w-full'
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-
-            <button
-              onClick={() => {
-                setPdfUpload(false);
-                files.length = 0;
-              }}
-            >
-              <svg
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M6.61905 8.1V16.6C6.61905 18.4778 8.06879 20 9.85714 20H14.7143C16.5026 20 17.9524 18.4778 17.9524 16.6V8.1M13.9048 10.65V15.75M10.6667 10.65L10.6667 15.75M15.5238 5.55L14.3854 3.75701C14.0851 3.28407 13.5796 3 13.0383 3H11.5332C10.9918 3 10.4863 3.28407 10.186 3.75701L9.04762 5.55M15.5238 5.55H9.04762M15.5238 5.55H19.5714M9.04762 5.55H5'
-                  stroke='#373435'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            </button>
           </div>
 
-          <div className='flex justify-between items-center gap-2'>
-            <span className='h-1 w-full bg-secondary-green rounded'></span>
-            <p className='text-[10px] text-primary-black font-normal'>100%</p>
-          </div>
-        </div>
+          <DesktopPopUp
+            showpopup={show}
+            setShowPopUp={setShow}
+            img={previewFile}
+            callback={getImage}
+          />
+
+          <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
+            {message}
+          </span>
+        </>
       ) : null}
     </div>
   );
