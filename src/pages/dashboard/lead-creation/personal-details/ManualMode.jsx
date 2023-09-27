@@ -97,6 +97,16 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
 
+      if (
+        e.target.name == `applicants[${activeIndex}].personal_details.father_husband_name` ||
+        e.target.name == `applicants[${activeIndex}].personal_details.mother_name`
+      ) {
+        const value = e.target.value;
+        const pattern2 = /^[a-zA-Z ]+$/;
+        if (pattern2.test(value))
+          setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+      }
+
       if (e.target.name === `applicants[${activeIndex}].personal_details.email`) {
         setFieldValue(e.target.name, value);
         setHasSentOTPOnce(false);

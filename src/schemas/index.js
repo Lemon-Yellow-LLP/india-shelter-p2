@@ -111,16 +111,19 @@ const applicantSchema = Yup.object().shape({
       }
     }),
     first_name: Yup.string()
+      .trim()
       .min(2, 'First Name must be atleast 2 characters long')
       .max(10, 'First Name can be max 10 characters long')
       .required('First Name is required')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     middle_name: Yup.string()
+      .trim()
       .nullable()
       .min(2, 'Middle Name must be atleast 2 characters long')
       .max(10, 'Middle Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
     last_name: Yup.string()
+      .trim()
       .nullable()
       .min(2, 'Last Name must be atleast 2 characters long')
       .max(10, 'Last Name can be max 10 characters long')
@@ -131,15 +134,17 @@ const applicantSchema = Yup.object().shape({
       .matches(/^(?!.*(\d{5}).*\1)\d{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),
     father_husband_name: Yup.string()
+      .trim()
       .min(2, 'Father/Husbands Name must be atleast 2 characters long')
-      .max(10, 'Father/Husbands Name can be max 10 characters long')
+      .max(90, 'Father/Husbands Name can be max 90 characters long')
       .required('Father/Husbands Name is required')
-      .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
     mother_name: Yup.string()
+      .trim()
       .min(2, 'Mother Name must be atleast 2 characters long')
-      .max(10, 'Mother Name can be max 10 characters long')
+      .max(90, 'Mother Name can be max 90 characters long')
       .required('Mother Name is required')
-      .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
+      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
     marital_status: Yup.string().required('This field is mandatory.'),
     religion: Yup.string().required('Religion is required'),
     preferred_language: Yup.string().required('Preferred Language is required'),
