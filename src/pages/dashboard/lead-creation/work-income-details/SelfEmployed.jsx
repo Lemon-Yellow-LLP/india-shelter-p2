@@ -42,7 +42,7 @@ export default function SelfEmployed() {
         label='Business name'
         placeholder='Eg: Sanjay Enterprises'
         required
-        name='work_income_detail.business_name'
+        name={`applicants[${activeIndex}].work_income_detail.business_name`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.business_name}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.business_name}
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.business_name}
@@ -78,7 +78,7 @@ export default function SelfEmployed() {
         placeholder='Choose industries'
         onChange={handleDropdownChange}
         defaultSelected={values?.applicants?.[activeIndex]?.work_income_detail?.industries}
-        name='work_income_detail.industries'
+        name={`applicants[${activeIndex}].work_income_detail.industries`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.industries}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.industries}
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.industries}
@@ -89,7 +89,7 @@ export default function SelfEmployed() {
         <TextInput
           label=''
           placeholder='Enter industry name'
-          name='work_income_detail.extra_params.extra_industries'
+          name={`applicants[${activeIndex}].work_income_detail.extra_params.extra_industries`}
           value={
             values?.applicants?.[activeIndex]?.work_income_detail?.extra_params.extra_industries
           }
@@ -135,7 +135,7 @@ export default function SelfEmployed() {
         label='GST number'
         placeholder='Eg: ABC45678'
         required
-        name='work_income_detail.gst_number'
+        name={`applicants[${activeIndex}].work_income_detail.gst_number`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
@@ -180,7 +180,7 @@ export default function SelfEmployed() {
         label='No. of current loan(s)'
         placeholder='Choose no. of current loan(s)'
         required
-        name='work_income_detail.no_current_loan'
+        name={`applicants[${activeIndex}].work_income_detail.no_current_loan`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
@@ -222,7 +222,7 @@ export default function SelfEmployed() {
         onKeyDown={(e) => {
           if (e.key === 'Backspace') {
             setFieldValue(
-              'work_income_detail.no_current_loan',
+              e.currentTarget.name,
               values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.slice(
                 0,
                 values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.length - 1,
@@ -236,7 +236,7 @@ export default function SelfEmployed() {
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'
         required
-        name='work_income_detail.ongoing_emi'
+        name={`applicants[${activeIndex}].work_income_detail.ongoing_emi`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi}
         error={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan != 0
