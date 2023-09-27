@@ -1,0 +1,152 @@
+import { useState } from 'react';
+import DesktopPopUp from '../DesktopPopUp';
+
+function PhotoUpload({ files, setFile, label, ...props }) {
+  const [message, setMessage] = useState();
+  const [photoUpload, setPhotoUpload] = useState(false);
+  const [show, setShow] = useState(false);
+
+  const handleFile = (e) => {
+    setMessage('');
+    let file = e.target.files;
+
+    for (let i = 0; i < file.length; i++) {
+      const fileType = file[i]['type'];
+
+      const validImageTypes = ['image/jpeg'];
+
+      if (validImageTypes.includes(fileType)) {
+        setPhotoUpload(true);
+
+        setFile([...files, file[i]]);
+      } else {
+        setMessage('File format not supported');
+      }
+    }
+  };
+
+  return (
+    <div className='w-full'>
+      <label className='flex gap-0.5 items-center text-primary-black font-medium'>
+        {label}
+        {props.required && <span className='text-primary-red text-sm'>*</span>}
+      </label>
+
+      {!files.length ? (
+        <div className=''>
+          <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
+            {message}
+          </span>
+          <div className='flex items-center justify-center w-full'>
+            <label className='flex cursor-pointer flex-col w-full h-[72px] border-2 rounded-md border-dashed border-stroke relative'>
+              <div className='flex flex-col items-center absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'>
+                <svg
+                  width='20'
+                  height='20'
+                  viewBox='0 0 20 20'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M5.83464 5V5.75C6.0854 5.75 6.31957 5.62467 6.45867 5.41603L5.83464 5ZM7.00653 3.24217L6.38249 2.82614V2.82614L7.00653 3.24217ZM12.9961 3.24217L13.6201 2.82614L12.9961 3.24217ZM14.168 5L13.5439 5.41603C13.683 5.62467 13.9172 5.75 14.168 5.75V5ZM11.7513 11.25C11.7513 12.2165 10.9678 13 10.0013 13V14.5C11.7962 14.5 13.2513 13.0449 13.2513 11.25H11.7513ZM10.0013 13C9.0348 13 8.2513 12.2165 8.2513 11.25H6.7513C6.7513 13.0449 8.20638 14.5 10.0013 14.5V13ZM8.2513 11.25C8.2513 10.2835 9.0348 9.5 10.0013 9.5V8C8.20638 8 6.7513 9.45507 6.7513 11.25H8.2513ZM10.0013 9.5C10.9678 9.5 11.7513 10.2835 11.7513 11.25H13.2513C13.2513 9.45507 11.7962 8 10.0013 8V9.5ZM6.45867 5.41603L7.63056 3.65819L6.38249 2.82614L5.2106 4.58397L6.45867 5.41603ZM8.39328 3.25H11.6093V1.75H8.39328V3.25ZM12.372 3.65819L13.5439 5.41603L14.792 4.58397L13.6201 2.82614L12.372 3.65819ZM11.6093 3.25C11.9158 3.25 12.202 3.40318 12.372 3.65819L13.6201 2.82614C13.1719 2.15383 12.4173 1.75 11.6093 1.75V3.25ZM7.63056 3.65819C7.80057 3.40318 8.08678 3.25 8.39328 3.25V1.75C7.58526 1.75 6.8307 2.15383 6.38249 2.82614L7.63056 3.65819ZM17.5846 8.33333V14.1667H19.0846V8.33333H17.5846ZM15.0013 16.75H5.0013V18.25H15.0013V16.75ZM2.41797 14.1667V8.33333H0.917969V14.1667H2.41797ZM5.0013 16.75C3.57457 16.75 2.41797 15.5934 2.41797 14.1667H0.917969C0.917969 16.4218 2.74614 18.25 5.0013 18.25V16.75ZM17.5846 14.1667C17.5846 15.5934 16.428 16.75 15.0013 16.75V18.25C17.2565 18.25 19.0846 16.4218 19.0846 14.1667H17.5846ZM15.0013 5.75C16.428 5.75 17.5846 6.9066 17.5846 8.33333H19.0846C19.0846 6.07817 17.2565 4.25 15.0013 4.25V5.75ZM5.0013 4.25C2.74614 4.25 0.917969 6.07817 0.917969 8.33333H2.41797C2.41797 6.9066 3.57457 5.75 5.0013 5.75V4.25ZM5.0013 5.75H5.83464V4.25H5.0013V5.75ZM15.0013 4.25H14.168V5.75H15.0013V4.25Z'
+                    fill='#373435'
+                  />
+                  <ellipse cx='10.0013' cy='4.99984' rx='0.833333' ry='0.833333' fill='#373435' />
+                </svg>
+
+                <p className='text-xs tracking-wider text-secondary-green font-normal mt-1'>
+                  Take a photo
+                </p>
+              </div>
+
+              <input
+                type='file'
+                onChange={handleFile}
+                className='opacity-0'
+                multiple={true}
+                name='files[]'
+                capture='user'
+                accept='image/*'
+              />
+            </label>
+          </div>
+        </div>
+      ) : null}
+
+      {photoUpload && files.length ? (
+        <>
+          <div className='border-x border-y border-stroke rounded-lg p-2 flex justify-between'>
+            <div className='flex gap-2 items-center'>
+              <div className='relative rounded-md h-10 w-10'>
+                <div className='absolute h-full w-full bg-black opacity-40'></div>
+                <button
+                  className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
+                  onClick={() => setShow(true)}
+                >
+                  <svg
+                    width='16'
+                    height='16'
+                    viewBox='0 0 16 16'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M14.0895 6.5689C14.8625 7.38228 14.8625 8.61805 14.0895 9.43143C12.7856 10.8033 10.5463 12.6668 8.0026 12.6668C5.45893 12.6668 3.2196 10.8033 1.91574 9.43143C1.14267 8.61805 1.14267 7.38228 1.91574 6.5689C3.2196 5.19705 5.45893 3.3335 8.0026 3.3335C10.5463 3.3335 12.7856 5.19705 14.0895 6.5689Z'
+                      stroke='#FEFEFE'
+                    />
+                    <path
+                      d='M10.0026 8.00016C10.0026 9.10473 9.10717 10.0002 8.0026 10.0002C6.89803 10.0002 6.0026 9.10473 6.0026 8.00016C6.0026 6.89559 6.89803 6.00016 8.0026 6.00016C9.10717 6.00016 10.0026 6.89559 10.0026 8.00016Z'
+                      stroke='#FEFEFE'
+                    />
+                  </svg>
+                </button>
+
+                <img
+                  src={URL.createObjectURL(files[0])}
+                  alt=''
+                  className='w-10 h-10 object-cover object-center'
+                />
+              </div>
+
+              <DesktopPopUp showpopup={show} setShowPopUp={setShow} img={files[0]} />
+
+              <div>
+                <p className='text-base text-primary-black font-normal truncate w-[224px]'>
+                  {files[0]?.name}
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setPhotoUpload(false);
+                files.length = 0;
+              }}
+            >
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M6.61905 8.1V16.6C6.61905 18.4778 8.06879 20 9.85714 20H14.7143C16.5026 20 17.9524 18.4778 17.9524 16.6V8.1M13.9048 10.65V15.75M10.6667 10.65L10.6667 15.75M15.5238 5.55L14.3854 3.75701C14.0851 3.28407 13.5796 3 13.0383 3H11.5332C10.9918 3 10.4863 3.28407 10.186 3.75701L9.04762 5.55M15.5238 5.55H9.04762M15.5238 5.55H19.5714M9.04762 5.55H5'
+                  stroke='#373435'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            </button>
+          </div>
+          <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
+            {message}
+          </span>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+export default PhotoUpload;
