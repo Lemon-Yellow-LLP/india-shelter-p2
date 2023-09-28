@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import DesktopPopUp from '../DesktopPopUp';
 
-function PhotoUpload({ files, setFile, label, ...props }) {
+function PhotoUpload({ files, setFile, label, hint, ...props }) {
   const [message, setMessage] = useState();
   const [photoUpload, setPhotoUpload] = useState(false);
   const [show, setShow] = useState(false);
@@ -25,6 +25,10 @@ function PhotoUpload({ files, setFile, label, ...props }) {
     }
   };
 
+  const getImage = (value) => {
+    setFile(files.filter((img) => img.name !== value.name));
+  };
+
   return (
     <div className='w-full'>
       <label className='flex gap-0.5 items-center text-primary-black font-medium'>
@@ -32,13 +36,22 @@ function PhotoUpload({ files, setFile, label, ...props }) {
         {props.required && <span className='text-primary-red text-sm'>*</span>}
       </label>
 
+      {hint && (
+        <span
+          className='mb-1.5 text-light-grey text-xs font-normal'
+          dangerouslySetInnerHTML={{
+            __html: hint,
+          }}
+        />
+      )}
+
       {!files.length ? (
-        <div className=''>
+        <div>
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
             {message}
           </span>
-          <div className='flex items-center justify-center w-full'>
-            <label className='flex cursor-pointer flex-col w-full h-[72px] border-2 rounded-md border-dashed border-stroke relative'>
+          <div className='flex items-center justify-center w-full bg-white'>
+            <label className='flex cursor-pointer flex-col w-full h-[56px] border-2 rounded-md border-dashed border-stroke relative'>
               <div className='flex flex-col items-center absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'>
                 <svg
                   width='20'
@@ -75,7 +88,7 @@ function PhotoUpload({ files, setFile, label, ...props }) {
 
       {photoUpload && files.length ? (
         <>
-          <div className='border-x border-y border-stroke rounded-lg p-2 flex justify-between'>
+          <div className='bg-white border-x border-y border-stroke rounded-lg p-2 flex justify-between mt-1'>
             <div className='flex gap-2 items-center'>
               <div className='relative rounded-md h-10 w-10'>
                 <div className='absolute h-full w-full bg-black opacity-40'></div>
@@ -108,7 +121,12 @@ function PhotoUpload({ files, setFile, label, ...props }) {
                 />
               </div>
 
-              <DesktopPopUp showpopup={show} setShowPopUp={setShow} img={files[0]} />
+              <DesktopPopUp
+                showpopup={show}
+                setShowPopUp={setShow}
+                img={files[0]}
+                callback={getImage}
+              />
 
               <div>
                 <p className='text-base text-primary-black font-normal truncate w-[224px]'>

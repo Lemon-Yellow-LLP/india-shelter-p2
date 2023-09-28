@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import DesktopPopUp from '../DesktopPopUp';
 
-function PdfAndImageUpload({ files, setFile, label, ...props }) {
+function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
   const [message, setMessage] = useState();
   const [pdfUpload, setPdfUpload] = useState(false);
   const [imageUpload, setImageUpload] = useState(false);
@@ -34,6 +34,10 @@ function PdfAndImageUpload({ files, setFile, label, ...props }) {
     setFile(files.filter((x) => x.name !== i));
   };
 
+  const getImage = (value) => {
+    setFile(files.filter((img) => img.name !== value.name));
+  };
+
   return (
     <div className='w-full'>
       <label className='flex gap-0.5 items-center text-primary-black font-medium'>
@@ -41,12 +45,21 @@ function PdfAndImageUpload({ files, setFile, label, ...props }) {
         {props.required && <span className='text-primary-red text-sm'>*</span>}
       </label>
 
+      {hint && (
+        <span
+          className='mb-1.5 text-light-grey text-xs font-normal'
+          dangerouslySetInnerHTML={{
+            __html: hint,
+          }}
+        />
+      )}
+
       {!files.length ? (
         <div className=''>
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
             {message}
           </span>
-          <div className='flex items-center justify-center w-full'>
+          <div className='bg-white flex items-center justify-center w-full'>
             <label className='flex cursor-pointer flex-col w-full h-[72px] border-2 rounded-md border-dashed border-stroke relative'>
               <div className='flex flex-col items-center absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'>
                 <svg
@@ -102,7 +115,7 @@ function PdfAndImageUpload({ files, setFile, label, ...props }) {
 
       {imageUpload && files.length ? (
         <div className='flex justify-start overflow-auto'>
-          <div className='flex gap-2 mt-3'>
+          <div className='flex gap-2 my-2'>
             <div
               style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
               className='h-[85px] w-[68px] rounded border-x border-y border-dashed border-stroke flex justify-center items-center'
@@ -215,13 +228,18 @@ function PdfAndImageUpload({ files, setFile, label, ...props }) {
               })}
             </div>
 
-            <DesktopPopUp showpopup={show} setShowPopUp={setShow} img={previewFile} />
+            <DesktopPopUp
+              showpopup={show}
+              setShowPopUp={setShow}
+              img={previewFile}
+              callback={getImage}
+            />
           </div>
         </div>
       ) : null}
 
       {pdfUpload ? (
-        <div className='border-x border-y border-stroke rounded-lg p-2'>
+        <div className='bg-white border-x border-y border-stroke rounded-lg p-2 mt-1'>
           <div className='flex justify-between'>
             <div className='flex gap-2'>
               <button>
