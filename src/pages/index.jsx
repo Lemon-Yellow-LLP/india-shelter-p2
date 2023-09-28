@@ -3,15 +3,22 @@ import Dashboard, { DashboardTest } from './dashboard';
 import LeadCreationRoutes from './dashboard/lead-creation';
 import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
+import { LeadContext } from '../context/LeadContextProvider';
 import DashboardApplicant from './dashboard/DashboardApplicant';
+import axios from 'axios';
 
 const DashboardRoutes = () => {
-  const { isAuthenticated } = useContext(AuthContext);
-
   const RequireAuth = ({ children }) => {
-    return isAuthenticated ? children : <Navigate to={'/login'}></Navigate>;
+    const { isAuthenticated } = useContext(AuthContext);
+
+    //Check authentication once and render accordingly
+    if (isAuthenticated) {
+      return children;
+    } else {
+      return <Navigate to='/login' />;
+    }
   };
 
   return (

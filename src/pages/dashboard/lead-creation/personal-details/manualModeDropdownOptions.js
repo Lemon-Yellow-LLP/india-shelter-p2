@@ -4,11 +4,11 @@ export const manualModeDropdownOptions = [
     options: [
       {
         label: 'PAN Card',
-        value: 'PAN Card',
+        value: 'PAN',
       },
       {
         label: 'Aadhar',
-        value: 'Aadhar',
+        value: 'AADHAR',
       },
       {
         label: 'Driving license',
@@ -29,7 +29,7 @@ export const manualModeDropdownOptions = [
     options: [
       {
         label: 'Aadhar',
-        value: 'Aadhar',
+        value: 'AADHAR',
       },
       {
         label: 'Driving license',

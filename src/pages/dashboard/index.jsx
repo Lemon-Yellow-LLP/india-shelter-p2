@@ -211,12 +211,6 @@ export const DashboardTest = () => {
   return (
     <div className='flex flex-col gap-5'>
       <h1>Dashboard</h1>
-      {/* <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead'
-      >
-        Applicant Form Test Button
-      </Link> */}
 
       <Link
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
@@ -241,13 +235,6 @@ export const DashboardTest = () => {
 
       <Link
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/applicant-details'
-      >
-        go-to-applicant-details-page
-      </Link>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
         to='/lead/address-details'
       >
         go-to-address-details-page
@@ -259,6 +246,14 @@ export const DashboardTest = () => {
       >
         go-to-work-income-page
       </Link>
+
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/applicant-details'
+      >
+        go-to-applicant-details-page
+      </Link>
+      <div></div>
 
       <Link
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
