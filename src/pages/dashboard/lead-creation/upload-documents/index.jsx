@@ -16,51 +16,71 @@ const UploadDocuments = () => {
   // const labelClassName = 'mb-2 text-lg font-medium text-gray-900';
 
   return (
-    <div>
-      <div className='p-4 flex flex-col gap-9'>
-        <PhotoUpload
-          files={customerPhotos}
-          setFile={setCustomerPhotos}
-          label='Customer photo'
-          required
-        />
+    <div className='p-4 flex flex-col gap-9 bg-medium-grey'>
+      <PhotoUpload
+        files={customerPhotos}
+        setFile={setCustomerPhotos}
+        label='Customer photo'
+        required
+      />
 
-        <ImageUpload files={idProofPhotos} setFile={setIdProofPhotos} label='ID proof' required />
+      <ImageUpload
+        files={idProofPhotos}
+        setFile={setIdProofPhotos}
+        label='ID proof'
+        required
+        hint='File size should be less than 5MB'
+      />
 
-        <ImageUpload
-          files={addressProofPhotos}
-          setFile={setAddressProofPhotos}
-          label='Address proof'
-          required
-        />
+      <ImageUpload
+        files={addressProofPhotos}
+        setFile={setAddressProofPhotos}
+        label='Address proof'
+        required
+        hint='File size should be less than 5MB'
+      />
 
-        <PdfAndImageUpload
-          files={propertyPapers}
-          setFile={setPropertyPapers}
-          label='Property papers'
-          required
-        />
+      <PdfAndImageUpload
+        files={propertyPapers}
+        setFile={setPropertyPapers}
+        label='Property papers'
+        required
+        hint='File size should be less than 5MB'
+      />
 
-        <ImageUpload
-          files={salarySlipPhotos}
-          setFile={setSalarySlipPhotos}
-          label='Salary slip'
-          required
-        />
+      <ImageUpload
+        files={salarySlipPhotos}
+        setFile={setSalarySlipPhotos}
+        label='Salary slip'
+        required
+        hint='File size should be less than 5MB'
+      />
 
-        <ImageUpload files={form60photos} setFile={setForm60photos} label='Form 60' required />
+      <ImageUpload
+        files={form60photos}
+        setFile={setForm60photos}
+        label='Form 60'
+        required
+        hint='File size should be less than 5MB'
+      />
 
-        <ImageUpload
-          files={propertyPhotos}
-          setFile={setPropertyPhotos}
-          label='Property image'
-          required
-        />
+      <ImageUpload
+        files={propertyPhotos}
+        setFile={setPropertyPhotos}
+        label='Property image'
+        required
+        hint='File size should be less than 5MB'
+      />
 
-        <PhotoUpload files={selfie} setFile={setSelfie} label='Upload selfie' required />
+      <PhotoUpload files={selfie} setFile={setSelfie} label='Upload selfie' required />
 
-        <ImageUpload files={docs} setFile={setDocs} label='Other documents' required />
-      </div>
+      <ImageUpload
+        files={docs}
+        setFile={setDocs}
+        label='Other documents'
+        required
+        hint='File size should be less than 5MB'
+      />
     </div>
   );
 };
