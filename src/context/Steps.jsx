@@ -102,7 +102,7 @@ export const applicantSteps = [
   {
     title: 'Preview',
     description: '',
-    url: '/lead/upload-documents',
+    url: '/lead/preview',
     hideProgress: true,
     Icon: PreviewIcon,
   },

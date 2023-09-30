@@ -28,33 +28,33 @@ const DashboardRoutes = () => {
         <Route
           path='/'
           element={
-            <RequireAuth>
-              <DashboardTest />
-            </RequireAuth>
+            // <RequireAuth>
+            <DashboardTest />
+            // </RequireAuth>
           }
         />
         <Route
           path='/dashboard'
           element={
-            <RequireAuth>
-              <Dashboard />
-            </RequireAuth>
+            // <RequireAuth>
+            <Dashboard />
+            // </RequireAuth>
           }
         />
         <Route
           path='/dashboard/:id'
           element={
-            <RequireAuth>
-              <DashboardApplicant />
-            </RequireAuth>
+            // <RequireAuth>
+            <DashboardApplicant />
+            // </RequireAuth>
           }
         />
         <Route
           path='/lead/*'
           element={
-            <RequireAuth>
-              <LeadCreationRoutes />
-            </RequireAuth>
+            // <RequireAuth>
+            <LeadCreationRoutes />
+            // </RequireAuth>
           }
         />
         <Route path='*' element={<h1>404, Page not found!</h1>} />

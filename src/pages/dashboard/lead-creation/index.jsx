@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import SwipeableDrawerComponent from '../../../components/SwipeableDrawer/LeadDrawer';
 import BRE_ONE from './bre-screen';
+import Preview from './preview';
 
 const AddressDetails = lazy(() => import('./address-details'));
 const ApplicantDetails = lazy(() => import('./applicant-details'));
@@ -29,6 +30,7 @@ const LeadCreationRoutes = () => {
         <Route path='qualifier' element={<BRE_ONE />} />
         <Route path='property-details' element={<PropertyDetails />} />
         <Route path='upload-documents' element={<UploadDocuments />} />
+        <Route path='preview' element={<Preview />} />
         <Route path='*' element={<h1>404, Page not found!</h1>} />
       </Routes>
     </>
