@@ -11,7 +11,7 @@ import { Button } from '../../../../components';
 const PersonalDetails = () => {
   const {
     values,
-    updateProgress,
+    updateProgressApplicantSteps,
     errors,
     touched,
     setFieldValue,
@@ -50,36 +50,36 @@ const PersonalDetails = () => {
     let newData = {};
     newData[name] = value;
 
-    if (values?.applicants[activeIndex]?.personal_details?.id) {
-      const res = await editFieldsById(
-        values?.applicants[activeIndex]?.personal_details?.id,
-        'personal',
-        newData,
-      );
-    } else {
-      await addApi('personal', {
-        ...newData,
-        applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
-      })
-        .then(async (res) => {
-          setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
-          await editFieldsById(
-            values?.applicants[activeIndex]?.applicant_details?.id,
-            'applicant',
-            { personal_detail: res.id },
-          );
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-
     if (!name) {
       const res = await editFieldsById(
         values?.applicants[activeIndex]?.personal_details?.id,
         'personal',
         values?.applicants[activeIndex]?.personal_details,
       );
+    } else {
+      if (values?.applicants[activeIndex]?.personal_details?.id) {
+        const res = await editFieldsById(
+          values?.applicants[activeIndex]?.personal_details?.id,
+          'personal',
+          newData,
+        );
+      } else {
+        await addApi('personal', {
+          ...newData,
+          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+        })
+          .then(async (res) => {
+            setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
+            await editFieldsById(
+              values?.applicants[activeIndex]?.applicant_details?.id,
+              'applicant',
+              { personal_detail: res.id },
+            );
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     }
   };
 
@@ -96,7 +96,7 @@ const PersonalDetails = () => {
   );
 
   useEffect(() => {
-    updateProgress(1, requiredFieldsStatus);
+    updateProgressApplicantSteps(1, requiredFieldsStatus);
   }, [requiredFieldsStatus]);
 
   const handleNextClick = () => {
@@ -162,6 +162,9 @@ const PersonalDetails = () => {
     } else {
       const res = await addApi('personal', mappedData);
       setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
+      await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details?.id, 'applicant', {
+        personal_detail: res.id,
+      });
       updateFields();
     }
 

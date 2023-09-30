@@ -6,6 +6,7 @@ import { defaultErrorsLead } from './defaultErrorsLead';
 import { defaultValuesLead } from './defaultValuesLead';
 import { useNavigate } from 'react-router-dom';
 import { applicantSteps, coApplicantSteps } from './Steps';
+import { editFieldsById } from '../global';
 
 export const LeadContext = createContext(defaultValuesLead);
 
@@ -21,7 +22,23 @@ const LeadContextProvider = ({ children }) => {
 
   const [coApplicantStepsProgress, setCoApplicantSetpsProgress] = useState([...coApplicantSteps]);
 
-  const updateProgress = (updateIndex, requiredFieldsStatus, applicantIndex) => {
+  const navigate = useNavigate();
+
+  const formik = useFormik({
+    initialValues: { ...defaultValuesLead },
+    initialErrors: {
+      ...defaultErrorsLead,
+    },
+    validationSchema: validationSchemaLead,
+    onSubmit: (_, action) => {
+      console.log(action);
+      // action.resetForm(defaultValues);
+    },
+  });
+
+  const updateProgress = async (updateStep, requiredFieldsStatus) => {};
+
+  const updateProgressApplicantSteps = async (updateStep, requiredFieldsStatus, page) => {
     let trueCount = 0;
 
     for (const field in requiredFieldsStatus) {
@@ -30,24 +47,35 @@ const LeadContextProvider = ({ children }) => {
       }
     }
 
-    // console.log(trueCount, Object.keys(requiredFieldsStatus).length);
+    let finalProgress = parseInt(
+      (parseInt(trueCount) / parseInt(Object.keys(requiredFieldsStatus).length)) * 100,
+    );
 
-    setApplicantSetpsProgress((prevApplicantStepsProgress) => {
-      const newData = prevApplicantStepsProgress.map((step, index) => {
-        if (index === updateIndex && step.progress !== 100) {
-          return {
-            ...step,
-            progress:
-              (parseInt(trueCount) / parseInt(Object.keys(requiredFieldsStatus).length)) * 100,
-          };
-        }
-        return step;
-      });
-      return newData;
-    });
+    let newData = formik.values;
+
+    if (
+      newData.applicants?.[activeIndex]?.[updateStep]?.extra_params &&
+      typeof newData.applicants[activeIndex][updateStep]?.extra_params === 'object'
+    ) {
+      newData.applicants[activeIndex][updateStep].extra_params.progress = finalProgress;
+      newData.applicants[activeIndex][updateStep].extra_params.required_fields_status =
+        requiredFieldsStatus;
+
+      await editFieldsById(
+        formik.values.applicants[activeIndex][updateStep].id,
+        page,
+        newData.applicants[activeIndex][updateStep],
+      );
+    } else {
+      console.error('Some properties are missing, cannot update progress');
+    }
+
+    formik.setValues(newData);
   };
 
-  const navigate = useNavigate();
+  // console.log(formik.values.applicants[activeIndex]?.['applicant_details']?.extra_params?.progress);
+
+  console.log(formik.values);
 
   const addApplicant = () => {
     formik.setValues((prev) => {
@@ -163,19 +191,6 @@ const LeadContextProvider = ({ children }) => {
     setDrawerOpen(false);
   };
 
-  const formik = useFormik({
-    initialValues: { ...defaultValuesLead },
-    initialErrors: {
-      ...defaultErrorsLead,
-    },
-    validationSchema: validationSchemaLead,
-    onSubmit: (_, action) => {
-      console.log(action);
-      action.resetForm(defaultValues);
-    },
-  });
-
-  console.log(formik.values);
   // console.log(activeIndex);
 
   return (
@@ -184,6 +199,7 @@ const LeadContextProvider = ({ children }) => {
         ...formik,
         applicantStepsProgress,
         updateProgress,
+        updateProgressApplicantSteps,
         addApplicant,
         currentStepIndex,
         setCurrentStepIndex,

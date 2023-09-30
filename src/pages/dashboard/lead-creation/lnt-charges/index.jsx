@@ -172,7 +172,7 @@ const LnTCharges = ({ amount = 1500 }) => {
     setHasSentOTPOnce(true);
 
     const resp = await makePaymentByLink(LEAD_ID, {
-      mobile_number: values.lnt_charges?.mobile_number,
+      mobile_number: values?.lnt_charges?.mobile_number,
     });
     if (resp) {
       setToastMessage('Link has been sent to the entered mobile number');
@@ -287,10 +287,10 @@ const LnTCharges = ({ amount = 1500 }) => {
                       placeholder='Eg: 1234567890'
                       required
                       name='lnt_charges.mobile_number'
-                      value={values.lnt_charges.mobile_number}
+                      value={values?.lnt_charges?.mobile_number}
                       onChange={handleOnPhoneNumberChange}
-                      error={errors.lnt_charges?.mobile_number}
-                      touched={touched.lnt_charges?.mobile_number}
+                      error={errors?.lnt_charges?.mobile_number}
+                      touched={touched?.lnt_charges?.mobile_number}
                       onOTPSendClick={sendPaymentLink}
                       disabledOtpButton={
                         !values.lnt_charges?.mobile_number ||

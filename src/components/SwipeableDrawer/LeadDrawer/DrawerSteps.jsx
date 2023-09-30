@@ -34,7 +34,7 @@ export default function DrawerSteps({ details, steps, index, stepIndex }) {
         {!details.hideProgress ? (
           !details.lock && steps ? (
             <>
-              {details.progress === 100 ? (
+              {values?.applicants?.[index]?.[details.name]?.extra_params?.progress === 100 ? (
                 <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
                   Done
                 </span>
@@ -49,8 +49,13 @@ export default function DrawerSteps({ details, steps, index, stepIndex }) {
           )
         ) : null}
       </div>
-      {(details.progress || details.progress >= 0) && !details.lock ? (
-        <ProgressBar progress={details.progress} />
+
+      {values?.applicants?.[index]?.[details.name]?.extra_params?.progress &&
+      values?.applicants?.[index]?.[details.name]?.extra_params?.progress >= 0 &&
+      !details.lock ? (
+        <ProgressBar
+          progress={values?.applicants?.[index]?.[details.name]?.extra_params?.progress}
+        />
       ) : null}
     </div>
   );

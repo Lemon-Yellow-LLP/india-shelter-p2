@@ -25,7 +25,7 @@ export default function AddressDetails() {
     handleChange,
     setFieldError,
     setFieldValue,
-    updateProgress,
+    updateProgressApplicantSteps,
     activeIndex,
     setValues,
     setCurrentStepIndex,
@@ -71,8 +71,9 @@ export default function AddressDetails() {
               values?.applicants[activeIndex]?.applicant_details?.id,
               'applicant',
               { address_detail: res.id },
-            );
-            return res;
+            ).then(() => {
+              return res;
+            });
           })
           .catch((err) => {
             console.log(err);
@@ -96,7 +97,7 @@ export default function AddressDetails() {
       }
 
       if (!requiredFieldsStatus[name]) {
-        updateProgress(2, requiredFieldsStatus);
+        updateProgressApplicantSteps(2, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
@@ -141,7 +142,7 @@ export default function AddressDetails() {
     }
 
     if (!requiredFieldsStatus['current_pincode']) {
-      updateProgress(2, requiredFieldsStatus);
+      updateProgressApplicantSteps(2, requiredFieldsStatus);
       setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: true }));
     }
   }, [
@@ -249,7 +250,7 @@ export default function AddressDetails() {
     setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, res.state);
 
     if (!requiredFieldsStatus['permanent_pincode']) {
-      updateProgress(2, requiredFieldsStatus);
+      updateProgressApplicantSteps(2, requiredFieldsStatus);
       setRequiredFieldsStatus((prev) => ({ ...prev, ['permanent_pincode']: true }));
     }
   }, [
@@ -453,7 +454,7 @@ export default function AddressDetails() {
                   }
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
+                    updateProgressApplicantSteps(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -520,7 +521,7 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
+                    updateProgressApplicantSteps(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -576,7 +577,7 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
+                    updateProgressApplicantSteps(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -632,7 +633,7 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
+                    updateProgressApplicantSteps(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -860,7 +861,7 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
+                    updateProgressApplicantSteps(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -913,7 +914,7 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
+                    updateProgressApplicantSteps(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -957,7 +958,7 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
+                    updateProgressApplicantSteps(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -1001,7 +1002,7 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
+                    updateProgressApplicantSteps(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}

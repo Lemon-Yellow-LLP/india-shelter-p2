@@ -16,7 +16,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const {
     values,
     errors,
-    updateProgress,
+    updateProgressApplicantSteps,
     touched,
     handleBlur,
     handleSubmit,
@@ -39,7 +39,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
 
   useEffect(() => {
-    updateProgress(1, requiredFieldsStatus);
+    updateProgressApplicantSteps(1, requiredFieldsStatus);
   }, [requiredFieldsStatus]);
 
   const handleRadioChange = useCallback(

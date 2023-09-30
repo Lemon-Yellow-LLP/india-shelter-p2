@@ -63,7 +63,7 @@ function a11yProps(index) {
 export default function SwipeableDrawerComponent() {
   const {
     applicantStepsProgress,
-    updateProgress,
+
     addApplicant,
     drawerOpen,
     setDrawerOpen,
