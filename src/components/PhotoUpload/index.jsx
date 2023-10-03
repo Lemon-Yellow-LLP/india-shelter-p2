@@ -5,9 +5,43 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
   const [message, setMessage] = useState();
   const [photoUpload, setPhotoUpload] = useState(false);
   const [show, setShow] = useState(false);
+  const [lat, setLat] = useState(null);
+  const [long, setLong] = useState(null);
 
   const handleFile = (e) => {
     setMessage('');
+
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      ('The geolocation API is not supported by your browser.');
+    }
+
+    // function myGeolocator() {
+    //   if (userLocation) {
+    //     userLocation.getCurrentPosition(success);
+    //   } else {
+    //     ('The geolocation API is not supported by your browser.');
+    //   }
+    // }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+
+      console.log(lat);
+      console.log(long);
+
+      setLat(lat);
+      setLong(long);
+      // result.innerHTML = 'Latitude: ' + lat + '<br>Longitude: ' + long;
+    }
+
+    console.log(lat);
+    console.log(long);
+
     let file = e.target.files;
 
     for (let i = 0; i < file.length; i++) {
@@ -29,6 +63,10 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
     setFile(files.filter((img) => img.name !== value.name));
   };
 
+  const removeImage = (i) => {
+    setFile(files.filter((x) => x.name !== i));
+  };
+
   return (
     <div className='w-full'>
       <label className='flex gap-0.5 items-center text-primary-black font-medium'>
@@ -47,11 +85,12 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
 
       {!files.length ? (
         <div>
-          <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
-            {message}
-          </span>
           <div className='flex items-center justify-center w-full bg-white'>
-            <label className='flex cursor-pointer flex-col w-full h-[56px] border-2 rounded-md border-dashed border-stroke relative'>
+            <label
+              className={`flex cursor-pointer flex-col w-full h-[56px] border-2  ${
+                message ? 'border-primary-red' : 'border-dashed border-stroke'
+              } rounded-md  relative`}
+            >
               <div className='flex flex-col items-center absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'>
                 <svg
                   width='20'
@@ -83,11 +122,15 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
               />
             </label>
           </div>
+          <span className='mt-1 text-[12px] text-red-500'>{message}</span>
         </div>
       ) : null}
 
       {photoUpload && files.length ? (
-        <>
+        <div>
+          <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
+            {message}
+          </span>
           <div className='bg-white border-x border-y border-stroke rounded-lg p-2 flex justify-between mt-1'>
             <div className='flex gap-2 items-center'>
               <div className='relative rounded-md h-10 w-10'>
@@ -129,7 +172,7 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
               />
 
               <div>
-                <p className='text-base text-primary-black font-normal truncate w-[224px]'>
+                <p className='text-base text-primary-black font-normal truncate'>
                   {files[0]?.name}
                 </p>
               </div>
@@ -138,7 +181,7 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
             <button
               onClick={() => {
                 setPhotoUpload(false);
-                files.length = 0;
+                removeImage(files[0]?.name);
               }}
             >
               <svg
@@ -158,10 +201,7 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
               </svg>
             </button>
           </div>
-          <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
-            {message}
-          </span>
-        </>
+        </div>
       ) : null}
     </div>
   );
