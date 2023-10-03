@@ -138,7 +138,7 @@ export const pages = [
   {
     title: 'Property Details',
     url: '/lead/property-details',
-    name: 'property_details',
+    name: 'propertySchema',
   },
   {
     title: 'Banking Details',
@@ -148,7 +148,7 @@ export const pages = [
   {
     title: 'Reference Details',
     url: '/lead/reference-details',
-    name: 'reference_details',
+    name: 'referenceSchema',
   },
   {
     title: 'Upload Documents',
