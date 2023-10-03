@@ -55,14 +55,13 @@ function ImageUpload({ files, setFile, label, hint, noBorder, ...props }) {
 
       {!files.length ? (
         <div>
-          <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
-            {message}
-          </span>
           <div className='bg-white flex items-center justify-center w-full'>
             <label
               className={`flex cursor-pointer flex-col w-full h-[72px] ${
                 noBorder ? 'border-0' : 'border-2'
-              }  border-dashed border-stroke rounded-md relative`}
+              } ${
+                message ? 'border-primary-red' : 'border-dashed border-stroke'
+              } rounded-md relative`}
             >
               <div className='flex flex-col items-center absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'>
                 <svg
@@ -115,6 +114,7 @@ function ImageUpload({ files, setFile, label, hint, noBorder, ...props }) {
               />
             </label>
           </div>
+          <span className='mt-1 text-[12px] text-red-500'>{message}</span>
         </div>
       ) : null}
 
