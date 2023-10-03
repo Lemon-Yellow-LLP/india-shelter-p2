@@ -29,7 +29,7 @@ const UploadDocsInput = memo(
     const inputRef = useRef();
 
     return (
-      <div className='flex flex-col gap-1 w-[174px]'>
+      <div className='flex flex-col gap-1 w-full'>
         <label
           htmlFor={name}
           className={`'flex gap-0.5 items-center' ${labelDisabled ? 'opacity-60' : 'opacity-100'}`}
@@ -75,7 +75,7 @@ const UploadDocsInput = memo(
           <span
             className='text-xs text-primary-red'
             dangerouslySetInnerHTML={{
-              __html: error && touched ? error : String.fromCharCode(160),
+              __html: error && touched ? error : String.fromCharCode(0),
             }}
           />
         ) : (
@@ -99,7 +99,7 @@ const UploadDocsInput = memo(
 export default UploadDocsInput;
 
 UploadDocsInput.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   name: PropTypes.string.isRequired,
   hint: PropTypes.string,
   required: PropTypes.bool,
