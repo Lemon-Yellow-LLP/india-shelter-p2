@@ -48,22 +48,22 @@ const IdentificationDoneFields = ({
 
   const handleOnPincodeChange = useCallback(async () => {
     if (
-      !values.propertySchema.pincode ||
-      values.propertySchema.pincode.toString().length < 5 ||
-      errors.propertySchema?.pincode
+      !values?.propertySchema?.pincode ||
+      values?.propertySchema?.pincode.toString().length < 5 ||
+      errors?.propertySchema?.pincode
     ) {
       setFieldValue('propertySchema.city', '');
       setFieldValue('propertySchema.state', '');
       return;
     }
 
-    const res = await checkIsValidStatePincode(values.propertySchema.pincode);
+    const res = await checkIsValidStatePincode(values?.propertySchema?.pincode);
     if (!res) {
       setFieldError('propertySchema.pincode', 'Invalid Pincode');
       return;
     }
 
-    editPropertyById(1, {
+    editPropertyById(values?.propertySchema?.id, {
       city: res.city,
       state: res.state,
     });
@@ -76,8 +76,8 @@ const IdentificationDoneFields = ({
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: true }));
     }
   }, [
-    errors.propertySchema?.pincode,
-    values.propertySchema?.pincode,
+    errors?.propertySchema?.pincode,
+    values?.propertySchema?.pincode,
     setFieldError,
     setFieldValue,
     requiredFieldsStatus,
@@ -86,7 +86,7 @@ const IdentificationDoneFields = ({
   useEffect(() => {
     if (
       parseInt(values?.lead?.applied_amount) >
-      parseInt(values.propertySchema.property_value_estimate)
+      parseInt(values?.propertySchema?.property_value_estimate)
     ) {
       setFieldError(
         'propertySchema.property_value_estimate',
@@ -94,9 +94,9 @@ const IdentificationDoneFields = ({
       );
     }
   }, [
-    values.propertySchema.property_value_estimate,
+    values?.propertySchema?.property_value_estimate,
     setFieldError,
-    errors.propertySchema?.property_value_estimate,
+    errors?.propertySchema?.property_value_estimate,
   ]);
 
   return (
@@ -107,8 +107,8 @@ const IdentificationDoneFields = ({
           label='My property value is estimated to be'
           required
           placeholder='1,00,000'
-          value={values.propertySchema.property_value_estimate}
-          error={errors.propertySchema?.property_value_estimate}
+          value={values?.propertySchema?.property_value_estimate}
+          error={errors?.propertySchema?.property_value_estimate}
           touched={touched.propertySchema?.property_value_estimate}
           onChange={(e) => {
             handleChange(e);
@@ -122,8 +122,8 @@ const IdentificationDoneFields = ({
           onBlur={(e) => {
             if (
               parseInt(values?.lead?.applied_amount) >
-                parseInt(values.propertySchema.property_value_estimate) &&
-              !errors.propertySchema.property_value_estimate
+                parseInt(values?.propertySchema?.property_value_estimate) &&
+              !errors?.propertySchema.property_value_estimate
             ) {
               setFieldError(
                 'propertySchema.property_value_estimate',
@@ -134,13 +134,13 @@ const IdentificationDoneFields = ({
             }
 
             if (
-              !errors.propertySchema?.property_value_estimate &&
-              values.propertySchema.property_value_estimate &&
+              !errors?.propertySchema?.property_value_estimate &&
+              values?.propertySchema?.property_value_estimate &&
               parseInt(values?.lead?.applied_amount) <
-                parseInt(values.propertySchema.property_value_estimate)
+                parseInt(values?.propertySchema?.property_value_estimate)
             ) {
-              editPropertyById(1, {
-                property_value_estimate: values.propertySchema.property_value_estimate,
+              editPropertyById(values?.propertySchema?.id, {
+                property_value_estimate: values?.propertySchema?.property_value_estimate,
               });
             }
           }}
@@ -152,16 +152,16 @@ const IdentificationDoneFields = ({
         label='Owner name'
         required
         placeholder='Eg: Sanjay'
-        value={values.propertySchema.owner_name}
-        error={errors.propertySchema?.owner_name}
+        value={values?.propertySchema?.owner_name}
+        error={errors?.propertySchema?.owner_name}
         touched={touched.propertySchema?.owner_name}
         onChange={handleTextInputChange}
         onBlur={(e) => {
           handleBlur(e);
 
-          if (!errors.propertySchema?.owner_name && values.propertySchema.owner_name) {
-            editPropertyById(1, {
-              owner_name: values.propertySchema.owner_name,
+          if (!errors?.propertySchema?.owner_name && values?.propertySchema?.owner_name) {
+            editPropertyById(values?.propertySchema?.id, {
+              owner_name: values?.propertySchema?.owner_name,
             });
           }
         }}
@@ -172,8 +172,8 @@ const IdentificationDoneFields = ({
         label='Plot/House/Flat No'
         required
         placeholder='Eg: 12/A'
-        value={values.propertySchema.plot_house_flat}
-        error={errors.propertySchema?.plot_house_flat}
+        value={values?.propertySchema?.plot_house_flat}
+        error={errors?.propertySchema?.plot_house_flat}
         touched={touched.propertySchema?.plot_house_flat}
         onChange={(e) => {
           const value = e.currentTarget.value;
@@ -191,9 +191,9 @@ const IdentificationDoneFields = ({
         onBlur={(e) => {
           handleBlur(e);
 
-          if (!errors.propertySchema?.plot_house_flat && values.propertySchema.plot_house_flat) {
-            editPropertyById(1, {
-              plot_house_flat: values.propertySchema.plot_house_flat,
+          if (!errors?.propertySchema?.plot_house_flat && values?.propertySchema?.plot_house_flat) {
+            editPropertyById(values?.propertySchema?.id, {
+              plot_house_flat: values?.propertySchema?.plot_house_flat,
             });
           }
         }}
@@ -204,8 +204,8 @@ const IdentificationDoneFields = ({
         label='Project/Society/Colony name'
         required
         placeholder='Eg: G Groups of Real Estate'
-        value={values.propertySchema.project_society_colony}
-        error={errors.propertySchema?.project_society_colony}
+        value={values?.propertySchema?.project_society_colony}
+        error={errors?.propertySchema?.project_society_colony}
         touched={touched.propertySchema?.project_society_colony}
         onChange={(e) => {
           const value = e.currentTarget.value;
@@ -225,11 +225,11 @@ const IdentificationDoneFields = ({
           handleBlur(e);
 
           if (
-            !errors.propertySchema?.project_society_colony &&
-            values.propertySchema.project_society_colony
+            !errors?.propertySchema?.project_society_colony &&
+            values?.propertySchema?.project_society_colony
           ) {
-            editPropertyById(1, {
-              project_society_colony: values.propertySchema.project_society_colony,
+            editPropertyById(values?.propertySchema?.id, {
+              project_society_colony: values?.propertySchema?.project_society_colony,
             });
           }
         }}
@@ -240,8 +240,8 @@ const IdentificationDoneFields = ({
         label='Project/Society/Colony name'
         required
         placeholder='Eg: G Groups of Real Estate'
-        value={values.propertySchema.project_society_colony}
-        error={errors.propertySchema?.project_society_colony}
+        value={values?.propertySchema?.project_society_colony}
+        error={errors?.propertySchema?.project_society_colony}
         touched={touched.propertySchema?.project_society_colony}
         onChange={(e) => {
           const value = e.currentTarget.value;
@@ -268,16 +268,16 @@ const IdentificationDoneFields = ({
         required
         hint='City and State fields will get filled based on Pincode'
         placeholder='Eg: 123456'
-        value={values.propertySchema.pincode}
-        error={errors.propertySchema?.pincode}
+        value={values?.propertySchema?.pincode}
+        error={errors?.propertySchema?.pincode}
         touched={touched.propertySchema?.pincode}
         onBlur={(e) => {
           handleBlur(e);
           handleOnPincodeChange();
 
-          if (!errors.propertySchema?.pincode && values.propertySchema.pincode) {
-            editPropertyById(1, {
-              pincode: parseInt(values.propertySchema.pincode),
+          if (!errors?.propertySchema?.pincode && values?.propertySchema?.pincode) {
+            editPropertyById(values?.propertySchema?.id, {
+              pincode: parseInt(values?.propertySchema?.pincode),
             });
           }
         }}
@@ -330,8 +330,8 @@ const IdentificationDoneFields = ({
         label='City'
         disabled
         placeholder='Eg: Nashik'
-        value={values.propertySchema.city}
-        error={errors.propertySchema?.city}
+        value={values?.propertySchema?.city}
+        error={errors?.propertySchema?.city}
         touched={touched.propertySchema?.city}
         onChange={handleChange}
         onBlur={handleBlur}
@@ -342,8 +342,8 @@ const IdentificationDoneFields = ({
         label='State'
         disabled
         placeholder='Eg: Maharashtra'
-        value={values.propertySchema.state}
-        error={errors.propertySchema?.state}
+        value={values?.propertySchema?.state}
+        error={errors?.propertySchema?.state}
         touched={touched.propertySchema?.state}
         onChange={handleChange}
         onBlur={handleBlur}

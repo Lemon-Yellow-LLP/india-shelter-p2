@@ -92,20 +92,15 @@ const ReferenceDetails = () => {
     setFieldValue,
     setFieldError,
     updateProgress,
+    updateProgressApplicantSteps,
   } = useContext(LeadContext);
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    reference_1_type: false,
-    reference_1_full_name: false,
-    reference_1_phone_number: false,
-    reference_1_address: false,
-    reference_1_pincode: false,
-
-    reference_2_type: false,
-    reference_2_full_name: false,
-    reference_2_phone_number: false,
-    reference_2_address: false,
-    reference_2_pincode: false,
+    ...values?.referenceSchema?.extra_params?.required_fields_status,
   });
+
+  useEffect(() => {
+    updateProgressApplicantSteps('referenceSchema', requiredFieldsStatus, 'reference');
+  }, [requiredFieldsStatus]);
 
   function disableOneOption(value) {
     setReferenceOneOptions((prev) => {

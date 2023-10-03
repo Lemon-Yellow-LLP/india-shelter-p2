@@ -31,6 +31,7 @@ import {
   loanPurposeDataLap,
 } from './ApplicantDropDownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import Topbar from '../../../../components/TopBar';
 
 const ApplicantDetails = () => {
   const {
@@ -446,10 +447,7 @@ const ApplicantDetails = () => {
     setRequiredFieldsStatus(
       values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
     );
-  }, [
-    activeIndex,
-    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
-  ]);
+  }, [activeIndex]);
 
   // console.log('values', values.applicants[activeIndex]?.applicant_details);
   // console.log('errors', errors?.applicants[activeIndex]);
@@ -457,6 +455,11 @@ const ApplicantDetails = () => {
 
   return (
     <>
+      {/* <Topbar
+        title='Lead Creation'
+        id={values?.lead?.id}
+        progress={values?.lead?.extra_params?.progress}
+      /> */}
       <div className='overflow-hidden flex flex-col h-[100vh]'>
         <div
           className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1`}

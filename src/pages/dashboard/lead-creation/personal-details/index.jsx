@@ -38,10 +38,7 @@ const PersonalDetails = () => {
     setRequiredFieldsStatus(
       values?.applicants?.[activeIndex]?.personal_details?.extra_params?.required_fields_status,
     );
-  }, [
-    activeIndex,
-    values?.applicants?.[activeIndex]?.personal_details?.extra_params?.required_fields_status,
-  ]);
+  }, [activeIndex]);
 
   const updateFields = async (name, value) => {
     let newData = {};

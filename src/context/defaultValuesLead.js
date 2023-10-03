@@ -16,13 +16,21 @@ export const defaultValuesLead = {
     owner_name: '',
     plot_house_flat: '',
     project_society_colony: '',
-    pincode: '',
+    pincode: null,
     city: '',
     state: '',
     geo_lat: '',
     geo_long: '',
     extra_params: {
       progress: 0,
+      required_fields_status: {
+        property_identification_is: false,
+        property_value_estimate: false,
+        owner_name: false,
+        plot_house_flat: false,
+        project_society_colony: false,
+        pincode: false,
+      },
     },
   },
 
@@ -45,6 +53,18 @@ export const defaultValuesLead = {
     reference_2_email: '',
     extra_params: {
       progress: 0,
+      required_fields_status: {
+        reference_1_type: false,
+        reference_1_full_name: false,
+        reference_1_phone_number: false,
+        reference_1_address: false,
+        reference_1_pincode: false,
+        reference_2_type: false,
+        reference_2_full_name: false,
+        reference_2_phone_number: false,
+        reference_2_address: false,
+        reference_2_pincode: false,
+      },
     },
   },
 

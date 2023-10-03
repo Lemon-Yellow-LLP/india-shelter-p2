@@ -3,8 +3,9 @@ import { IconPropertyIdentified, IconPropertyUnIdentified } from '../../../../as
 import { CardRadio } from '../../../../components';
 import IdentificationDoneFields from './IdentificationDoneFields';
 import { LeadContext } from '../../../../context/LeadContextProvider';
-import { editPropertyById } from '../../../../global';
+import { addApi, editPropertyById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
+import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 
 const propertyIdentificationOptions = [
   {
@@ -22,40 +23,59 @@ const propertyIdentificationOptions = [
 const selectedLoanType = 'LAP';
 
 const PropertyDetails = () => {
-  const { values, updateProgress, errors, touched, setFieldValue, handleSubmit, setValues } =
-    useContext(LeadContext);
+  const {
+    values,
+    updateProgress,
+    errors,
+    touched,
+    setFieldValue,
+    handleSubmit,
+    setValues,
+    updateProgressApplicantSteps,
+  } = useContext(LeadContext);
   const [propertyIdentification, setPropertyIdentification] = useState(null);
 
   useEffect(() => {
-    setPropertyIdentification(values.propertySchema.property_identification_is);
-  }, [values.propertySchema.property_identification_is]);
+    setPropertyIdentification(values?.propertySchema?.property_identification_is);
+  }, [values?.propertySchema?.property_identification_is]);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    property_identification_is: false,
-    property_value_estimate: false,
-    owner_name: false,
-    plot_house_flat: false,
-    project_society_colony: false,
-    pincode: false,
+    ...values?.propertySchema?.extra_params?.required_fields_status,
   });
 
+  useEffect(() => {
+    updateProgressApplicantSteps('propertySchema', requiredFieldsStatus, 'property');
+  }, [requiredFieldsStatus]);
+
   const handleRadioChange = useCallback(
-    (e) => {
+    async (e) => {
       setPropertyIdentification(e.value);
       setFieldValue('propertySchema.property_identification_is', e.value);
 
       const name = e.name.split('.')[0];
 
-      if (!requiredFieldsStatus[name]) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+
+      if (values?.propertySchema?.id) {
+        editPropertyById(values?.propertySchema?.id, {
+          property_identification_is: e.value,
+        });
+      } else {
+        let addData = { ...defaultValuesLead.propertySchema, [name]: e.value };
+        await addApi('property', {
+          ...addData,
+          lead_id: values?.lead?.id,
+        })
+          .then(async (res) => {
+            setFieldValue(`propertySchema.id`, res.id);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
 
-      editPropertyById(1, {
-        property_identification_is: e.value,
-      });
-
       if (e.value === 'not-yet') {
-        editPropertyById(1, {
+        editPropertyById(values?.propertySchema?.id, {
           property_value_estimate: '',
           owner_name: '',
           plot_house_flat: '',
@@ -68,6 +88,7 @@ const PropertyDetails = () => {
         setValues({
           ...values,
           propertySchema: {
+            ...values.propertySchema,
             property_value_estimate: '',
             owner_name: '',
             plot_house_flat: '',
@@ -81,10 +102,6 @@ const PropertyDetails = () => {
     },
     [requiredFieldsStatus, setFieldValue],
   );
-
-  useEffect(() => {
-    updateProgress(4, requiredFieldsStatus);
-  }, [requiredFieldsStatus]);
 
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>

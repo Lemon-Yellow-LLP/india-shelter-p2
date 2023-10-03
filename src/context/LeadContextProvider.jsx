@@ -54,23 +54,33 @@ const LeadContextProvider = ({ children }) => {
 
     let newData = formik.values;
 
-    if (
-      newData.applicants?.[activeIndex]?.[updateStep]?.extra_params &&
-      typeof newData.applicants[activeIndex][updateStep]?.extra_params === 'object'
-    ) {
-      newData.applicants[activeIndex][updateStep].extra_params.progress = finalProgress;
-      newData.applicants[activeIndex][updateStep].extra_params.required_fields_status =
-        requiredFieldsStatus;
-
-      await editFieldsById(
-        formik.values.applicants[activeIndex][updateStep].id,
-        page,
-        newData.applicants[activeIndex][updateStep],
-      );
+    if (page === 'reference' || page === 'property') {
+      console.log('hii');
+      if (newData?.[updateStep] && typeof newData[updateStep]?.extra_params === 'object') {
+        newData[updateStep].extra_params.progress = finalProgress;
+        newData[updateStep].extra_params.required_fields_status = requiredFieldsStatus;
+        await editFieldsById(formik.values[updateStep].id, page, newData[updateStep]);
+      } else {
+        console.error('Some properties are missing, cannot update progress');
+      }
     } else {
-      console.error('Some properties are missing, cannot update progress');
-    }
+      if (
+        newData.applicants?.[activeIndex]?.[updateStep]?.extra_params &&
+        typeof newData.applicants[activeIndex][updateStep]?.extra_params === 'object'
+      ) {
+        newData.applicants[activeIndex][updateStep].extra_params.progress = finalProgress;
+        newData.applicants[activeIndex][updateStep].extra_params.required_fields_status =
+          requiredFieldsStatus;
 
+        await editFieldsById(
+          formik.values.applicants[activeIndex][updateStep].id,
+          page,
+          newData.applicants[activeIndex][updateStep],
+        );
+      } else {
+        console.error('Some properties are missing, cannot update progress');
+      }
+    }
     formik.setValues(newData);
   };
 

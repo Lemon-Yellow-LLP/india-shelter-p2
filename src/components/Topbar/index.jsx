@@ -9,7 +9,7 @@ export default function Topbar({ title, id, progress, showBack = true, showClose
     <>
       <div
         id='titlebar'
-        className='sticky inset-0 bg-neutral-white h-fit flex items-start px-4 py-3 border border-[#ECECEC]'
+        className='sticky inset-0 bg-white h-fit flex items-start px-4 py-3 border border-[#ECECEC] z-[200]'
       >
         {showBack ? (
           <button onClick={() => navigate(-1)} className='mt-2 mr-3'>
@@ -35,7 +35,7 @@ export default function Topbar({ title, id, progress, showBack = true, showClose
           <h3 className='truncate'>{title}</h3>
           <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
             APP ID:
-            <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey'>
+            <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey pl-1'>
               {id}
             </span>
           </p>
