@@ -19,6 +19,7 @@ import {
 import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
 import LeadContextProvider from '../../../../context/LeadContextProvider';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const pan = true;
 const dl = false;
@@ -36,6 +37,7 @@ const gst = true;
 
 const BRE_ONE = () => {
   const addApplicant = useContext(LeadContextProvider);
+  const { setIsQaulifierActivated } = useContext(AuthContext);
   const SpeedoMeterAnimationRef = useRef(null);
   const [progress, setProgress] = useState(0);
   const [PAN, setPAN] = useState({
@@ -247,7 +249,9 @@ const BRE_ONE = () => {
       try {
         const bre_res = await checkBre101(89, {});
 
-        if (bre_res.bre_101_response.statusCode !== '200') return;
+        if (bre_res.bre_101_response.statusCode !== 200) return;
+
+        setIsQaulifierActivated(bre_res);
 
         setDL((prev) => ({
           ...prev,
