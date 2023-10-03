@@ -69,6 +69,10 @@ const ApplicantDetails = () => {
     values?.applicants[activeIndex]?.applicant_details.date_of_birth,
   );
 
+  const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
+    ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
+  });
+
   useEffect(() => {
     if (values?.applicants[activeIndex]?.applicant_details.date_of_birth?.length) {
       setDate(values?.applicants[activeIndex]?.applicant_details.date_of_birth);
@@ -78,10 +82,6 @@ const ApplicantDetails = () => {
   useEffect(() => {
     setDate(values?.applicants[activeIndex]?.applicant_details.date_of_birth);
   }, [activeIndex]);
-
-  const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
-  });
 
   const updateFieldsApplicant = async (name, value) => {
     let newData = {};
@@ -148,26 +148,10 @@ const ApplicantDetails = () => {
       const pattern = /^[A-Za-z][A-Za-z\s]*$/;
       if (pattern.exec(value)) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-        const name = e.currentTarget.name.split('.')[2];
-        if (
-          requiredFieldsStatus[name] !== undefined &&
-          !requiredFieldsStatus[name] &&
-          value.length > 1
-        ) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-        }
       }
 
       if (values?.applicants?.[activeIndex]?.applicant_details?.first_name.length > value) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-        const name = e.currentTarget.name.split('.')[2];
-        if (
-          requiredFieldsStatus[name] !== undefined &&
-          !requiredFieldsStatus[name] &&
-          value.length > 1
-        ) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-        }
       }
     },
     [requiredFieldsStatus, values],
@@ -458,6 +442,15 @@ const ApplicantDetails = () => {
     }
   };
 
+  useEffect(() => {
+    setRequiredFieldsStatus(
+      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
+    );
+  }, [
+    activeIndex,
+    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
+  ]);
+
   // console.log('values', values.applicants[activeIndex]?.applicant_details);
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
@@ -543,6 +536,13 @@ const ApplicantDetails = () => {
                   name,
                   values.applicants[activeIndex]?.applicant_details?.[name],
                 );
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             disabled={inputDisabled}

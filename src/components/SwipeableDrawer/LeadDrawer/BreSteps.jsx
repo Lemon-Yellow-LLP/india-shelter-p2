@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { LeadContext } from '../../../context/LeadContextProvider';
 import { LockIcon } from '../../../assets/icons';
 
-export default function DrawerSteps({ details, steps, index, stepIndex, noProgress, lock }) {
+export default function BreSteps({ details, steps, index, stepIndex, noProgress, lock }) {
   const { setCurrentStepIndex, setDrawerOpen, drawerOpen, setActiveIndex, values } =
     useContext(LeadContext);
   const navigate = useNavigate();
@@ -20,7 +20,9 @@ export default function DrawerSteps({ details, steps, index, stepIndex, noProgre
 
   return (
     <div
-      className='flex flex-col w-[100%] max-h-[77px] rounded-lg border p-2 justify-between'
+      className={`flex flex-col w-[100%] max-h-[77px] rounded-lg border p-2 justify-between ${
+        lock ? 'bg-[#FDECE8] border-[#E33439]' : null
+      } `}
       onClick={lock ? null : handleClick}
     >
       <div className='flex justify-between gap-1'>

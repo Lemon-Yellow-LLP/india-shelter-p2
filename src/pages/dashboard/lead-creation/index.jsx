@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import SwipeableDrawerComponent from '../../../components/SwipeableDrawer/LeadDrawer';
 import BRE_ONE from './bre-screen';
+import Topbar from '../../../components/TopBar';
 
 const AddressDetails = lazy(() => import('./address-details'));
 const ApplicantDetails = lazy(() => import('./applicant-details'));
@@ -16,6 +17,7 @@ const UploadDocuments = lazy(() => import('./upload-documents'));
 const LeadCreationRoutes = () => {
   return (
     <>
+      <Topbar />
       <SwipeableDrawerComponent />
       <Routes>
         <Route index element={<ApplicantDetails />} />

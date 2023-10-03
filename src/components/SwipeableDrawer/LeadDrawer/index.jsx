@@ -19,6 +19,7 @@ import ToggleSwitch from '../../ToggleSwitch';
 import { editFieldsById } from '../../../global';
 import DynamicDrawer from '../DynamicDrawer';
 import Button from '../../Button';
+import BreSteps from './BreSteps';
 
 const drawerBleeding = 0;
 
@@ -63,15 +64,12 @@ function a11yProps(index) {
 export default function SwipeableDrawerComponent() {
   const {
     applicantStepsProgress,
-
     addApplicant,
     drawerOpen,
     setDrawerOpen,
     values,
     setActiveIndex,
-    activeIndex,
     coApplicantStepsProgress,
-    setFieldValue,
     setValues,
   } = useContext(LeadContext);
 
@@ -286,16 +284,141 @@ export default function SwipeableDrawerComponent() {
                 dir={theme.direction}
               >
                 <div className='flex flex-col gap-[16px] w-[100%] pb-[80px] p-[15px]'>
-                  {applicantStepsProgress &&
-                    applicantStepsProgress.map((e, index) => (
-                      <DrawerSteps
-                        key={index}
-                        details={e}
-                        steps={true}
-                        index={primaryIndex}
-                        stepIndex={index}
-                      />
-                    ))}
+                  <DrawerSteps
+                    key={0}
+                    details={applicantStepsProgress[0]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={0}
+                  />
+                  <DrawerSteps
+                    key={1}
+                    details={applicantStepsProgress[1]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={1}
+                    lock={
+                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.progress !== 100
+                    }
+                  />
+                  <DrawerSteps
+                    key={2}
+                    details={applicantStepsProgress[2]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={2}
+                    lock={
+                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.progress !== 100
+                    }
+                  />
+                  <DrawerSteps
+                    key={3}
+                    details={applicantStepsProgress[3]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={3}
+                    lock={
+                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.progress !== 100
+                    }
+                  />
+                  <BreSteps
+                    key={4}
+                    details={applicantStepsProgress[4]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={4}
+                    noProgress={true}
+                    lock={
+                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.progress !== 100 ||
+                      values?.applicants?.[primaryIndex]?.personal_details?.extra_params
+                        ?.progress !== 100 ||
+                      values?.applicants?.[primaryIndex]?.address_detail?.extra_params?.progress !==
+                        100 ||
+                      values?.applicants?.[primaryIndex]?.work_income_detail?.extra_params
+                        ?.progress !== 100
+                    }
+                  />
+                  <DrawerSteps
+                    key={5}
+                    details={applicantStepsProgress[5]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={5}
+                    noProgress={true}
+                    lock={
+                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.progress !== 100
+                    }
+                  />
+                  <DrawerSteps
+                    key={6}
+                    details={applicantStepsProgress[6]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={6}
+                    lock={
+                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.progress !== 100
+                    }
+                  />
+                  <DrawerSteps
+                    key={7}
+                    details={applicantStepsProgress[7]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={7}
+                    lock={
+                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.progress !== 100
+                    }
+                  />
+                  <DrawerSteps
+                    key={8}
+                    details={applicantStepsProgress[8]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={8}
+                    lock={
+                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.progress !== 100
+                    }
+                  />
+                  <DrawerSteps
+                    key={9}
+                    details={applicantStepsProgress[9]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={9}
+                    lock={
+                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.progress !== 100
+                    }
+                  />
+                  <DrawerSteps
+                    key={10}
+                    details={applicantStepsProgress[10]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={10}
+                    noProgress={true}
+                    lock={
+                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.progress !== 100
+                    }
+                  />
+                  <BreSteps
+                    key={11}
+                    details={applicantStepsProgress[11]}
+                    steps={true}
+                    index={primaryIndex}
+                    stepIndex={11}
+                    noProgress={true}
+                    lock={true}
+                  />
                 </div>
               </TabPanel>
               <TabPanel
@@ -343,7 +466,10 @@ export default function SwipeableDrawerComponent() {
                           </div>
 
                           <button
-                            onClick={addApplicant}
+                            onClick={() => {
+                              setActiveCoApplicantIndex(values?.applicants?.length);
+                              addApplicant();
+                            }}
                             className={
                               values?.applicants.length >= 5
                                 ? 'text-[#96989A] font-medium text-[16px]'
@@ -364,6 +490,7 @@ export default function SwipeableDrawerComponent() {
                           <DropDown
                             options={coApplicants}
                             onChange={(e) => setActiveCoApplicantIndex(e)}
+                            value={coApplicants?.[activeCoApplicantIndex]?.value}
                             defaultSelected={coApplicants?.[0]?.value}
                             disabledError={true}
                           />
@@ -391,21 +518,85 @@ export default function SwipeableDrawerComponent() {
                             </div>
                           </div>
                           <div className='flex flex-col gap-[16px] w-[100%] pb-[80px]'>
-                            {coApplicantStepsProgress &&
-                              coApplicantStepsProgress.map((e, index) => (
-                                <DrawerSteps
-                                  key={index}
-                                  details={e}
-                                  steps={true}
-                                  index={activeCoApplicantIndex}
-                                  stepIndex={index}
-                                />
-                              ))}
+                            <DrawerSteps
+                              key={0}
+                              details={coApplicantStepsProgress[0]}
+                              steps={true}
+                              index={activeCoApplicantIndex}
+                              stepIndex={0}
+                            />
+                            <DrawerSteps
+                              key={1}
+                              details={coApplicantStepsProgress[1]}
+                              steps={true}
+                              index={activeCoApplicantIndex}
+                              stepIndex={1}
+                              lock={
+                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.extra_params?.progress !== 100
+                              }
+                            />
+                            <DrawerSteps
+                              key={2}
+                              details={coApplicantStepsProgress[2]}
+                              steps={true}
+                              index={activeCoApplicantIndex}
+                              stepIndex={2}
+                              lock={
+                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.extra_params?.progress !== 100
+                              }
+                            />
+                            <DrawerSteps
+                              key={3}
+                              details={coApplicantStepsProgress[3]}
+                              steps={true}
+                              index={activeCoApplicantIndex}
+                              stepIndex={3}
+                              lock={
+                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.extra_params?.progress !== 100
+                              }
+                            />
+                            <BreSteps
+                              key={4}
+                              details={coApplicantStepsProgress[4]}
+                              steps={true}
+                              index={activeCoApplicantIndex}
+                              stepIndex={4}
+                              noProgress={true}
+                              lock={true}
+                            />
+                            <DrawerSteps
+                              key={5}
+                              details={coApplicantStepsProgress[5]}
+                              steps={true}
+                              index={activeCoApplicantIndex}
+                              stepIndex={5}
+                              lock={
+                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.extra_params?.progress !== 100
+                              }
+                            />
+                            <DrawerSteps
+                              key={6}
+                              details={coApplicantStepsProgress[6]}
+                              steps={true}
+                              index={activeCoApplicantIndex}
+                              stepIndex={6}
+                              lock={
+                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.extra_params?.progress !== 100
+                              }
+                            />
                           </div>
                         </div>
                       ) : (
                         <button
-                          onClick={addApplicant}
+                          onClick={() => {
+                            setActiveCoApplicantIndex(values?.applicants?.length);
+                            addApplicant();
+                          }}
                           className='w-[100%] h-[48px] border bg-[#E33439] rounded-[4px] flex items-center justify-center text-[16px] text-[white] font-normal'
                         >
                           Add Co-applicant

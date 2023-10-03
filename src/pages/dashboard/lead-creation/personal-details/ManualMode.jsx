@@ -60,12 +60,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
       updateFields('id_type', e);
       updateFields('id_number', '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true, id_number: false }));
       if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
         updateFields('selected_address_proof', e);
         updateFields('address_proof_number', '');
-      }
-      if (!requiredFieldsStatus.id_type) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true }));
+        setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: false }));
       }
     },
     [requiredFieldsStatus],
@@ -77,9 +76,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
       updateFields('selected_address_proof', e);
       updateFields('address_proof_number', '');
-      if (!requiredFieldsStatus.selected_address_proof) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, selected_address_proof: true }));
-      }
+      setRequiredFieldsStatus((prev) => ({
+        ...prev,
+        selected_address_proof: true,
+        address_proof_number: false,
+      }));
     },
     [requiredFieldsStatus],
   );
@@ -143,15 +144,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }
       }
-
-      const name = e.target.name.split('.')[2];
-      if (
-        requiredFieldsStatus[name] !== undefined &&
-        !requiredFieldsStatus[name] &&
-        e.target.value.length > 1
-      ) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-      }
     },
     [requiredFieldsStatus, values],
   );
@@ -161,11 +153,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       setFieldValue(name, value);
       const fieldName = name.split('.')[2];
       updateFields(fieldName, value);
-      if (
-        requiredFieldsStatus[fieldName] !== undefined &&
-        !requiredFieldsStatus[fieldName] &&
-        value.length > 1
-      ) {
+      if (requiredFieldsStatus[fieldName] !== undefined) {
         setRequiredFieldsStatus((prev) => ({ ...prev, [fieldName]: true }));
       }
     },
@@ -315,12 +303,23 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.[name]
           ) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+            if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
+          } else {
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
           }
           if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
             updateFields(
               'address_proof_number',
               values?.applicants?.[activeIndex]?.personal_details?.[name],
             );
+            if (
+              requiredFieldsStatus.address_proof_number !== undefined &&
+              !requiredFieldsStatus.address_proof_number
+            ) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: true }));
+            }
           }
         }}
       />
@@ -342,6 +341,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                 '',
               );
               setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
+
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                selected_address_proof: false,
+                address_proof_number: false,
+              }));
             } else {
               setFieldValue(
                 `applicants[${activeIndex}].personal_details.selected_address_proof`,
@@ -359,6 +364,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                 `applicants[${activeIndex}].personal_details.address_proof_number`,
                 null,
               );
+
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                selected_address_proof: true,
+                address_proof_number: true,
+              }));
             }
             updateFields();
           }}
@@ -438,6 +449,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.[name]
           ) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+            if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
+          } else {
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
           }
         }}
       />
@@ -461,6 +477,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.[name]
           ) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+            if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
+          } else {
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
           }
         }}
       />
@@ -600,6 +621,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.[name]
           ) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+            if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
+          } else {
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
           }
         }}
       />
@@ -623,6 +649,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.[name]
           ) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+            if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
+          } else {
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
           }
         }}
       />

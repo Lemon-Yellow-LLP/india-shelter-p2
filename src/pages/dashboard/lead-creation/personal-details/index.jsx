@@ -7,6 +7,7 @@ import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { addApi, editFieldsById } from '../../../../global';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import { Button } from '../../../../components';
+import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 
 const PersonalDetails = () => {
   const {
@@ -23,28 +24,24 @@ const PersonalDetails = () => {
   } = useContext(LeadContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    how_would_you_like_to_proceed: false,
-    id_type: false,
-    id_number: false,
-    selected_address_proof: false,
-    address_proof_number: false,
-    first_name: false,
-    gender: false,
-    date_of_birth: true,
-    mobile_number: true,
-    father_husband_name: false,
-    mother_name: false,
-    marital_status: false,
-    religion: false,
-    preferred_language: false,
-    qualification: false,
+    ...values?.applicants?.[activeIndex]?.personal_details?.extra_params?.required_fields_status,
   });
 
   const [openExistingPopup, setOpenExistingPopup] = useState(
-    (values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-      values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done) ||
-      false,
+    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+      !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done
+      ? true
+      : false,
   );
+
+  useEffect(() => {
+    setRequiredFieldsStatus(
+      values?.applicants?.[activeIndex]?.personal_details?.extra_params?.required_fields_status,
+    );
+  }, [
+    activeIndex,
+    values?.applicants?.[activeIndex]?.personal_details?.extra_params?.required_fields_status,
+  ]);
 
   const updateFields = async (name, value) => {
     let newData = {};
@@ -64,8 +61,9 @@ const PersonalDetails = () => {
           newData,
         );
       } else {
+        let addData = { ...newCoApplicantValues.personal_details, [name]: value };
         await addApi('personal', {
-          ...newData,
+          ...addData,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
         })
           .then(async (res) => {
@@ -96,7 +94,7 @@ const PersonalDetails = () => {
   );
 
   useEffect(() => {
-    updateProgressApplicantSteps(1, requiredFieldsStatus);
+    updateProgressApplicantSteps('personal_details', requiredFieldsStatus, 'personal');
   }, [requiredFieldsStatus]);
 
   const handleNextClick = () => {

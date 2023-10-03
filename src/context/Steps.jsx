@@ -47,7 +47,7 @@ export const applicantSteps = [
   {
     title: 'Qualifier is not activated',
     description: 'Complete Applicant, Personal, Address and Work & Income details to activate',
-    url: '/lead/work-income-details',
+    url: '/lead/qualifier',
     hideProgress: true,
     Icon: QualifierIcon,
     name: 'qualifier',
@@ -77,7 +77,7 @@ export const applicantSteps = [
   },
   {
     title: 'Reference Details',
-    description: 'Reference person name, Mobile number',
+    description: 'Reference person name, Address',
     url: '/lead/reference-details',
     lock: true,
     Icon: ReferenceDetailsIcon,
@@ -97,6 +97,14 @@ export const applicantSteps = [
     hideProgress: true,
     Icon: PreviewIcon,
   },
+  {
+    title: 'Eligibility is not activated',
+    description: 'Complete all the steps to activate',
+    url: '/lead/eligibility',
+    hideProgress: true,
+    Icon: QualifierIcon,
+    name: 'eligibility',
+  },
 ];
 
 export const coApplicantSteps = [
@@ -111,7 +119,7 @@ export const coApplicantSteps = [
     title: 'Personal Details',
     description: 'OCR, e-KYC, Address',
     url: '/lead/personal-details',
-    lock: true,
+    lock: false,
     Icon: PersonalDetailsIcon,
     name: 'personal_details',
   },
@@ -134,7 +142,7 @@ export const coApplicantSteps = [
   {
     title: 'Qualifier is not activated',
     description: 'Complete Applicant, Personal, Address and Work & Income details to activate',
-    url: '/lead/work-income-details',
+    url: '/lead/qualifier',
     hideProgress: true,
     Icon: QualifierIcon,
   },

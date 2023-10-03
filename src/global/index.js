@@ -418,10 +418,11 @@ export async function getDashboardLeadList(
   toDate = moment(toDate).format('DD-MM-YYYY');
 
   try {
-    const { data } = await axios.get(
-      `${API_URL}/dashboard/lead-list/l?fromDate=${fromDate}&toDate=${toDate}`,
-      values,
-    );
+    // const { data } = await axios.get(
+    //   `${API_URL}/dashboard/lead-list/l?fromDate=${fromDate}&toDate=${toDate}`,
+    //   values,
+    // );
+    const { data } = await axios.get(`${API_URL}/dashboard/lead-list/l`, values);
     return data;
   } catch (err) {
     console.log(err);

@@ -11,8 +11,7 @@ import Retired from './Retired';
 import CurrencyInput from '../../../../components/CurrencyInput';
 import { addApi, checkIsValidStatePincode, editFieldsById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
-import { Button } from '../../../../components';
-import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
+import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -44,8 +43,9 @@ const WorkIncomeDetails = () => {
           [name]: e.value,
         });
       } else {
+        let addData = { ...newCoApplicantValues.work_income_detail, [name]: e.value };
         await addApi('work-income', {
-          [name]: e.value,
+          ...addData,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
         })
           .then(async (res) => {
