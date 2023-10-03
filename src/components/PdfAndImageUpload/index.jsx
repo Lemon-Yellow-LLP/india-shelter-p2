@@ -25,7 +25,7 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
         }
         setFile([...files, file[i]]);
       } else {
-        setMessage('only images accepted');
+        setMessage('File format not supported');
       }
     }
   };
@@ -56,11 +56,13 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
 
       {!files.length ? (
         <div className=''>
-          <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
-            {message}
-          </span>
           <div className='bg-white flex items-center justify-center w-full'>
-            <label className='flex cursor-pointer flex-col w-full h-[72px] border-2 rounded-md border-dashed border-stroke relative'>
+            <label
+              // style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
+              className={`flex cursor-pointer flex-col w-full h-[72px] border-2 rounded-md ${
+                message ? 'border-primary-red' : 'border-dashed border-stroke'
+              } relative`}
+            >
               <div className='flex flex-col items-center absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'>
                 <svg
                   width='20'
@@ -110,95 +112,65 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
               />
             </label>
           </div>
+          <span className='mt-1 text-[12px] text-red-500'>{message}</span>
         </div>
       ) : null}
 
       {imageUpload && files.length ? (
-        <div className='flex justify-start overflow-auto'>
-          <div className='flex gap-2 my-2'>
-            <div
-              style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
-              className='h-[85px] w-[68px] rounded border-x border-y border-dashed border-stroke flex justify-center items-center'
-            >
-              <button className='w-full h-full relative'>
-                <svg
-                  width='24'
-                  height='25'
-                  viewBox='0 0 24 25'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                  className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
-                >
-                  <g clipPath='url(#clip0_3036_39087)'>
-                    <rect y='0.5' width='24' height='24' rx='12' fill='#DDFFE7' />
-                    <path
-                      d='M12 7V19M18 13L6 13'
-                      stroke='#147257'
-                      strokeWidth='1.5'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id='clip0_3036_39087'>
-                      <rect y='0.5' width='24' height='24' rx='12' fill='white' />
-                    </clipPath>
-                  </defs>
-                </svg>
-                <input
-                  type='file'
-                  onChange={handleFile}
-                  className='opacity-0 w-full h-full'
-                  multiple={true}
-                  name='files[]'
-                />
-              </button>
-            </div>
+        <>
+          <div className='flex justify-start overflow-auto'>
+            <div className='flex gap-2 my-2'>
+              <div
+                style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
+                className={`h-[85px] w-[68px] rounded border-x border-y flex justify-center items-center`}
+              >
+                <button className='w-full h-full relative'>
+                  <svg
+                    width='24'
+                    height='25'
+                    viewBox='0 0 24 25'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
+                  >
+                    <g clipPath='url(#clip0_3036_39087)'>
+                      <rect y='0.5' width='24' height='24' rx='12' fill='#DDFFE7' />
+                      <path
+                        d='M12 7V19M18 13L6 13'
+                        stroke='#147257'
+                        strokeWidth='1.5'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                      />
+                    </g>
+                    <defs>
+                      <clipPath id='clip0_3036_39087'>
+                        <rect y='0.5' width='24' height='24' rx='12' fill='white' />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                  <input
+                    type='file'
+                    onChange={handleFile}
+                    className='opacity-0 w-full h-full'
+                    multiple={true}
+                    name='files[]'
+                  />
+                </button>
+              </div>
 
-            <div className='flex gap-2 h-[85px]'>
-              {files.map((file, key) => {
-                return (
-                  <div key={key} className='overflow-hidden relative w-[68px]'>
-                    <button
-                      onClick={() => {
-                        removeImage(file.name);
-                        if (files.length == 1) {
-                          setImageUpload(false);
-                        }
-                      }}
-                      className='absolute right-0 top-0 z-20'
-                    >
-                      <svg
-                        width='16'
-                        height='16'
-                        viewBox='0 0 16 16'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
-                      >
-                        <rect width='16' height='16' rx='8' fill='#FFE0E1' />
-                        <path
-                          d='M10.9193 5.0835L5.08594 10.9168'
-                          stroke='#E33439'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                        />
-                        <path
-                          d='M5.08594 5.0835L10.9193 10.9168'
-                          stroke='#E33439'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                        />
-                      </svg>
-                    </button>
-
-                    <div className='relative rounded-md h-full w-full'>
-                      <div className='absolute h-full w-full bg-black opacity-40'></div>
+              <div className='flex gap-2 h-[85px]'>
+                {files.map((file, key) => {
+                  return (
+                    <div key={key} className='overflow-hidden relative w-[68px]'>
                       <button
-                        className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
                         onClick={() => {
-                          setPreviewFile(file);
-                          setShow(true);
+                          removeImage(file.name);
+                          if (files.length == 1) {
+                            setImageUpload(false);
+                          }
                         }}
+                        className='absolute right-0 top-0 z-20'
                       >
                         <svg
                           width='16'
@@ -207,35 +179,71 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
                           fill='none'
                           xmlns='http://www.w3.org/2000/svg'
                         >
+                          <rect width='16' height='16' rx='8' fill='#FFE0E1' />
                           <path
-                            d='M14.0895 6.5689C14.8625 7.38228 14.8625 8.61805 14.0895 9.43143C12.7856 10.8033 10.5463 12.6668 8.0026 12.6668C5.45893 12.6668 3.2196 10.8033 1.91574 9.43143C1.14267 8.61805 1.14267 7.38228 1.91574 6.5689C3.2196 5.19705 5.45893 3.3335 8.0026 3.3335C10.5463 3.3335 12.7856 5.19705 14.0895 6.5689Z'
-                            stroke='#FEFEFE'
+                            d='M10.9193 5.0835L5.08594 10.9168'
+                            stroke='#E33439'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
                           />
                           <path
-                            d='M10.0026 8.00016C10.0026 9.10473 9.10717 10.0002 8.0026 10.0002C6.89803 10.0002 6.0026 9.10473 6.0026 8.00016C6.0026 6.89559 6.89803 6.00016 8.0026 6.00016C9.10717 6.00016 10.0026 6.89559 10.0026 8.00016Z'
-                            stroke='#FEFEFE'
+                            d='M5.08594 5.0835L10.9193 10.9168'
+                            stroke='#E33439'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
                           />
                         </svg>
                       </button>
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt='Gigs'
-                        className='object-cover object-center h-full w-full'
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
 
-            <DesktopPopUp
-              showpopup={show}
-              setShowPopUp={setShow}
-              img={previewFile}
-              callback={getImage}
-            />
+                      <div className='relative rounded-md h-full w-full'>
+                        <div className='absolute h-full w-full bg-black opacity-40'></div>
+                        <button
+                          className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
+                          onClick={() => {
+                            setPreviewFile(file);
+                            setShow(true);
+                          }}
+                        >
+                          <svg
+                            width='16'
+                            height='16'
+                            viewBox='0 0 16 16'
+                            fill='none'
+                            xmlns='http://www.w3.org/2000/svg'
+                          >
+                            <path
+                              d='M14.0895 6.5689C14.8625 7.38228 14.8625 8.61805 14.0895 9.43143C12.7856 10.8033 10.5463 12.6668 8.0026 12.6668C5.45893 12.6668 3.2196 10.8033 1.91574 9.43143C1.14267 8.61805 1.14267 7.38228 1.91574 6.5689C3.2196 5.19705 5.45893 3.3335 8.0026 3.3335C10.5463 3.3335 12.7856 5.19705 14.0895 6.5689Z'
+                              stroke='#FEFEFE'
+                            />
+                            <path
+                              d='M10.0026 8.00016C10.0026 9.10473 9.10717 10.0002 8.0026 10.0002C6.89803 10.0002 6.0026 9.10473 6.0026 8.00016C6.0026 6.89559 6.89803 6.00016 8.0026 6.00016C9.10717 6.00016 10.0026 6.89559 10.0026 8.00016Z'
+                              stroke='#FEFEFE'
+                            />
+                          </svg>
+                        </button>
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt='Gigs'
+                          className='object-cover object-center h-full w-full'
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <DesktopPopUp
+                showpopup={show}
+                setShowPopUp={setShow}
+                img={previewFile}
+                callback={getImage}
+              />
+            </div>
           </div>
-        </div>
+          <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
+            {message}
+          </span>
+        </>
       ) : null}
 
       {pdfUpload ? (
