@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import DesktopPopUp from '../DesktopPopUp';
+import DesktopPopUp from '../UploadDocsModal';
 
-function ImageUpload({ files, setFile, label, hint, ...props }) {
+function ImageUpload({ files, setFile, label, hint, noBorder, ...props }) {
   const [message, setMessage] = useState();
   const [imageUpload, setImageUpload] = useState(false);
   const [show, setShow] = useState(false);
@@ -59,7 +59,11 @@ function ImageUpload({ files, setFile, label, hint, ...props }) {
             {message}
           </span>
           <div className='bg-white flex items-center justify-center w-full'>
-            <label className='flex cursor-pointer flex-col w-full h-[72px] border-2 rounded-md border-dashed border-stroke relative'>
+            <label
+              className={`flex cursor-pointer flex-col w-full h-[72px] ${
+                noBorder ? 'border-0' : 'border-2'
+              }  border-dashed border-stroke rounded-md relative`}
+            >
               <div className='flex flex-col items-center absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'>
                 <svg
                   width='20'

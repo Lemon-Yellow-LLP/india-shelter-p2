@@ -3,7 +3,7 @@ import { IconClose } from '../../assets/icons';
 import PropTypes from 'prop-types';
 import Button from '../Button';
 
-const DesktopPopUp = ({ showpopup, setShowPopUp, img, callback }) => {
+const UploadDocsModal = ({ showpopup, setShowPopUp, img, callback }) => {
   if (showpopup)
     return createPortal(
       <div
@@ -32,9 +32,9 @@ const DesktopPopUp = ({ showpopup, setShowPopUp, img, callback }) => {
             <Button inputClasses='w-full' onClick={() => callback(img)}>
               Delete
             </Button>
-            <Button inputClasses='w-full' primary>
+            {/* <Button inputClasses='w-full' primary>
               Retake
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>,
@@ -43,9 +43,9 @@ const DesktopPopUp = ({ showpopup, setShowPopUp, img, callback }) => {
   return null;
 };
 
-export default DesktopPopUp;
+export default UploadDocsModal;
 
-DesktopPopUp.propTypes = {
+UploadDocsModal.propTypes = {
   showpopup: PropTypes.bool,
   setShowPopUp: PropTypes.func,
   img: PropTypes.object,

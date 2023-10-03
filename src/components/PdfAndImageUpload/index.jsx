@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import DesktopPopUp from '../DesktopPopUp';
+import DesktopPopUp from '../UploadDocsModal';
 
 function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
   const [message, setMessage] = useState();
