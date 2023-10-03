@@ -38,7 +38,22 @@ export default function Preview() {
 
   const [activeStep, setActiveStep] = useState(0);
   const [primaryApplicant, setPrimaryApplicant] = useState(null);
-  const [coApplicants, setCoApplicants] = useState([2, 2]);
+  const [coApplicants, setCoApplicants] = useState([]);
+
+  useEffect(() => {
+    const _primaryApplicant = values?.applicants?.find(
+      (applicant) => applicant?.applicant_details?.is_primary,
+    );
+    console.log('----------------');
+    console.log(_primaryApplicant);
+    setPrimaryApplicant(_primaryApplicant);
+    setCoApplicants(
+      values?.applicants?.filter(
+        (applicant) =>
+          applicant?.applicant_details?.id !== _primaryApplicant?.applicant_details?.id,
+      ),
+    );
+  }, []);
 
   const previousStep = () => {
     if (activeStep == 0) {
@@ -50,6 +65,367 @@ export default function Preview() {
   const nextStep = () => {
     if (activeStep === coApplicants.length) return;
     setActiveStep((prev) => prev + 1);
+  };
+
+  const CoApplicantDetails = ({ activeCoApplicantIndex }) => {
+    return (
+      <>
+        <PreviewCard
+          title={pages.applicant_details.title}
+          link={pages.applicant_details.url + '?preview=' + pages.applicant_details.url}
+          count={
+            errors && errors?.applicants?.[activeCoApplicantIndex]?.[pages.applicant_details.name]
+              ? Object.keys(
+                  errors?.applicants?.[activeCoApplicantIndex]?.[pages.applicant_details.name],
+                ).length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeCoApplicantIndex]?.[pages.applicant_details.name] &&
+            Object.keys(
+              errors?.applicants?.[activeCoApplicantIndex]?.[pages.applicant_details.name],
+            ).map((val, i) => (
+              <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                {fieldLabels[val] ?? '-'}
+                <span className='text-primary-red text-xs'>*</span>
+              </p>
+            ))}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.personal_details.title}
+          link={pages.personal_details.url + '?preview=' + pages.personal_details.url}
+          count={
+            errors && errors?.applicants?.[activeCoApplicantIndex]?.[pages.personal_details.name]
+              ? Object.keys(
+                  errors?.applicants?.[activeCoApplicantIndex]?.[pages.personal_details.name],
+                ).length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeCoApplicantIndex]?.[pages.personal_details.name] &&
+            Object.keys(
+              errors?.applicants?.[activeCoApplicantIndex]?.[pages.personal_details.name],
+            ).map((val, i) =>
+              fieldLabels[val] ? (
+                <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                  {fieldLabels[val]}
+                  <span className='text-primary-red text-xs'>*</span>
+                </p>
+              ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.address_detail.title}
+          link={pages.address_detail.url + '?preview=' + pages.address_detail.url}
+          count={
+            errors && errors?.applicants?.[activeCoApplicantIndex]?.[pages.address_detail.name]
+              ? Object.keys(
+                  errors?.applicants?.[activeCoApplicantIndex]?.[pages.address_detail.name],
+                ).length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeCoApplicantIndex]?.[pages.address_detail.name] &&
+            Object.keys(
+              errors?.applicants?.[activeCoApplicantIndex]?.[pages.address_detail.name],
+            ).map((val, i) =>
+              fieldLabels[val] ? (
+                <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                  {fieldLabels[val]}
+                  <span className='text-primary-red text-xs'>*</span>
+                </p>
+              ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.work_income_detail.title}
+          link={pages.work_income_detail.url + '?preview=' + pages.work_income_detail.url}
+          count={
+            errors && errors?.applicants?.[activeCoApplicantIndex]?.[pages.work_income_detail.name]
+              ? Object.keys(
+                  errors?.applicants?.[activeCoApplicantIndex]?.[pages.work_income_detail.name],
+                ).length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeCoApplicantIndex]?.[pages.work_income_detail.name] &&
+            Object.keys(
+              errors?.applicants?.[activeCoApplicantIndex]?.[pages.work_income_detail.name],
+            ).map((val, i) =>
+              fieldLabels[val] ? (
+                <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                  {fieldLabels[val]}
+                  <span className='text-primary-red text-xs'>*</span>
+                </p>
+              ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.property_details.title}
+          link={pages.property_details.url + '?preview=' + pages.property_details.url}
+          count={
+            errors && errors?.[pages.property_details.name]
+              ? Object.keys(errors?.[pages.property_details.name]).length
+              : 'ALL'
+          }
+        >
+          {errors?.[pages.property_details.name] &&
+            Object.keys(errors?.[pages.property_details.name]).map((val, i) =>
+              fieldLabels[val] ? (
+                <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                  {fieldLabels[val]}
+                  <span className='text-primary-red text-xs'>*</span>
+                </p>
+              ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.banking_details.title}
+          link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
+          count={
+            errors && errors?.applicants?.[activeCoApplicantIndex]?.[pages.banking_details.name]
+              ? Object.keys(
+                  errors?.applicants?.[activeCoApplicantIndex]?.[pages.banking_details.name],
+                ).length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeCoApplicantIndex]?.[pages.banking_details.name] &&
+            Object.keys(
+              errors?.applicants?.[activeCoApplicantIndex]?.[pages.banking_details.name],
+            ).map((val, i) =>
+              fieldLabels[val] ? (
+                <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                  {fieldLabels[val]}
+                  <span className='text-primary-red text-xs'>*</span>
+                </p>
+              ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.reference_details.title}
+          link={pages.reference_details.url + '?preview=' + pages.reference_details.url}
+          count={
+            errors && errors?.[pages.reference_details.name]
+              ? Object.keys(errors?.[pages.reference_details.name]).length
+              : 'ALL'
+          }
+        >
+          {errors?.[pages.reference_details.name] &&
+            Object.keys(errors?.[pages.reference_details.name]).map((val, i) =>
+              fieldLabels[val] ? (
+                <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                  {fieldLabels[val]}
+                  <span className='text-primary-red text-xs'>*</span>
+                </p>
+              ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.upload_documents.title}
+          link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
+          count={
+            errors && errors?.applicants?.[activeCoApplicantIndex]?.[pages.upload_documents.name]
+              ? Object.keys(
+                  errors?.applicants?.[activeCoApplicantIndex]?.[pages.upload_documents.name],
+                ).length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeCoApplicantIndex]?.[pages.upload_documents.name] &&
+            Object.keys(
+              errors?.applicants?.[activeCoApplicantIndex]?.[pages.upload_documents.name],
+            ).map((val, i) =>
+              fieldLabels[val] ? (
+                <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                  {fieldLabels[val]}
+                  <span className='text-primary-red text-xs'>*</span>
+                </p>
+              ) : null,
+            )}
+        </PreviewCard>
+      </>
+    );
+  };
+
+  const PrimaryApplicantDetails = () => {
+    return (
+      <>
+        <PreviewCard
+          title={pages.applicant_details.title}
+          link={pages.applicant_details.url + '?preview=' + pages.applicant_details.url}
+          count={
+            errors && errors?.applicants?.[activeIndex]?.[pages.applicant_details.name]
+              ? Object.keys(errors?.applicants?.[activeIndex]?.[pages.applicant_details.name])
+                  .length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeIndex]?.[pages.applicant_details.name] &&
+            Object.keys(errors?.applicants?.[activeIndex]?.[pages.applicant_details.name]).map(
+              (val, i) => (
+                <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                  {fieldLabels[val] ?? '-'}
+                  <span className='text-primary-red text-xs'>*</span>
+                </p>
+              ),
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.personal_details.title}
+          link={pages.personal_details.url + '?preview=' + pages.personal_details.url}
+          count={
+            errors && errors?.applicants?.[activeIndex]?.[pages.personal_details.name]
+              ? Object.keys(errors?.applicants?.[activeIndex]?.[pages.personal_details.name]).length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeIndex]?.[pages.personal_details.name] &&
+            Object.keys(errors?.applicants?.[activeIndex]?.[pages.personal_details.name]).map(
+              (val, i) =>
+                fieldLabels[val] ? (
+                  <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                    {fieldLabels[val]}
+                    <span className='text-primary-red text-xs'>*</span>
+                  </p>
+                ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.address_detail.title}
+          link={pages.address_detail.url + '?preview=' + pages.address_detail.url}
+          count={
+            errors && errors?.applicants?.[activeIndex]?.[pages.address_detail.name]
+              ? Object.keys(errors?.applicants?.[activeIndex]?.[pages.address_detail.name]).length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeIndex]?.[pages.address_detail.name] &&
+            Object.keys(errors?.applicants?.[activeIndex]?.[pages.address_detail.name]).map(
+              (val, i) =>
+                fieldLabels[val] ? (
+                  <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                    {fieldLabels[val]}
+                    <span className='text-primary-red text-xs'>*</span>
+                  </p>
+                ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.work_income_detail.title}
+          link={pages.work_income_detail.url + '?preview=' + pages.work_income_detail.url}
+          count={
+            errors && errors?.applicants?.[activeIndex]?.[pages.work_income_detail.name]
+              ? Object.keys(errors?.applicants?.[activeIndex]?.[pages.work_income_detail.name])
+                  .length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeIndex]?.[pages.work_income_detail.name] &&
+            Object.keys(errors?.applicants?.[activeIndex]?.[pages.work_income_detail.name]).map(
+              (val, i) =>
+                fieldLabels[val] ? (
+                  <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                    {fieldLabels[val]}
+                    <span className='text-primary-red text-xs'>*</span>
+                  </p>
+                ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.property_details.title}
+          link={pages.property_details.url + '?preview=' + pages.property_details.url}
+          count={
+            errors && errors?.[pages.property_details.name]
+              ? Object.keys(errors?.[pages.property_details.name]).length
+              : 'ALL'
+          }
+        >
+          {errors?.[pages.property_details.name] &&
+            Object.keys(errors?.[pages.property_details.name]).map((val, i) =>
+              fieldLabels[val] ? (
+                <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                  {fieldLabels[val]}
+                  <span className='text-primary-red text-xs'>*</span>
+                </p>
+              ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.banking_details.title}
+          link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
+          count={
+            errors && errors?.applicants?.[activeIndex]?.[pages.banking_details.name]
+              ? Object.keys(errors?.applicants?.[activeIndex]?.[pages.banking_details.name]).length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeIndex]?.[pages.banking_details.name] &&
+            Object.keys(errors?.applicants?.[activeIndex]?.[pages.banking_details.name]).map(
+              (val, i) =>
+                fieldLabels[val] ? (
+                  <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                    {fieldLabels[val]}
+                    <span className='text-primary-red text-xs'>*</span>
+                  </p>
+                ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.reference_details.title}
+          link={pages.reference_details.url + '?preview=' + pages.reference_details.url}
+          count={
+            errors && errors?.[pages.reference_details.name]
+              ? Object.keys(errors?.[pages.reference_details.name]).length
+              : 'ALL'
+          }
+        >
+          {errors?.[pages.reference_details.name] &&
+            Object.keys(errors?.[pages.reference_details.name]).map((val, i) =>
+              fieldLabels[val] ? (
+                <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                  {fieldLabels[val]}
+                  <span className='text-primary-red text-xs'>*</span>
+                </p>
+              ) : null,
+            )}
+        </PreviewCard>
+
+        <PreviewCard
+          title={pages.upload_documents.title}
+          link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
+          count={
+            errors && errors?.applicants?.[activeIndex]?.[pages.upload_documents.name]
+              ? Object.keys(errors?.applicants?.[activeIndex]?.[pages.upload_documents.name]).length
+              : 'ALL'
+          }
+        >
+          {errors?.applicants?.[activeIndex]?.[pages.upload_documents.name] &&
+            Object.keys(errors?.applicants?.[activeIndex]?.[pages.upload_documents.name]).map(
+              (val, i) =>
+                fieldLabels[val] ? (
+                  <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
+                    {fieldLabels[val]}
+                    <span className='text-primary-red text-xs'>*</span>
+                  </p>
+                ) : null,
+            )}
+        </PreviewCard>
+      </>
+    );
   };
 
   return (
@@ -149,29 +525,8 @@ export default function Preview() {
             </p>
           </div>
 
-          {pages &&
-            pages.map((p, i) =>
-              values[p.name]?.extra_params?.progress != '100' ? (
-                <PreviewCard
-                  key={i}
-                  title={p.title}
-                  link={p.url + '?preview=' + p.url}
-                  count={errors && errors[p.name] ? Object.keys(errors[p.name]).length : 'ALL'}
-                >
-                  {errors &&
-                    errors[p.name] &&
-                    Object.keys(errors[p.name]).map((val, i) => (
-                      <p
-                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                        key={i}
-                      >
-                        {val}
-                        <span className='text-primary-red text-xs'>*</span>
-                      </p>
-                    ))}
-                </PreviewCard>
-              ) : null,
-            )}
+          {/* Primary Applicant preview */}
+          <PrimaryApplicantDetails />
         </div>
 
         <div className='bottom-0 fixed'>
