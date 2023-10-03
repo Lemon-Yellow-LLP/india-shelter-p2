@@ -525,8 +525,13 @@ export default function Preview() {
             </p>
           </div>
 
-          {/* Primary Applicant preview */}
-          <PrimaryApplicantDetails />
+          {values?.lead?.extra_params?.progress == 100 ? (
+            <StepCompleted />
+          ) : activeStep == 0 ? (
+            <PrimaryApplicantDetails />
+          ) : (
+            <CoApplicantDetails activeCoApplicantIndex={activeIndex} />
+          )}
         </div>
 
         <div className='bottom-0 fixed'>
