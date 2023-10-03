@@ -4,15 +4,17 @@ import PdfAndImageUpload from '../../../../components/PdfAndImageUpload';
 import PhotoUpload from '../../../../components/PhotoUpload';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { manualModeDropdownOptions } from '../personal-details/manualModeDropdownOptions';
-import { DropDown, UploadDocsInput } from '../../../../components';
+import { DropDown, ToastMessage, UploadDocsInput } from '../../../../components';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import OtpInputNoEdit from '../../../../components/OtpInput/OtpInputNoEdit';
 
-const isQaulifierActivated = true;
+const isQaulifierActivated = false;
 
 const UploadDocuments = () => {
-  const { activeIndex, values, errors, touched, handleBlur, setFieldValue } =
+  const { activeIndex, values, errors, touched, handleBlur, setFieldValue, setFieldError } =
     useContext(LeadContext);
-  // const { isQaulifierActivated } = useContext(AuthContext);
+  const { toastMessage, setToastMessage } = useContext(AuthContext);
+  // isQaulifierActivated
   const [customerPhotos, setCustomerPhotos] = useState([]);
   const [idProofPhotos, setIdProofPhotos] = useState([]);
   const [addressProofPhotos, setAddressProofPhotos] = useState([]);
@@ -26,6 +28,10 @@ const UploadDocuments = () => {
   const [editAddressNumber, setEditAddressNumber] = useState(false);
   const [idStatus, setIdSatus] = useState(null);
   const [addressStatus, setAddressSatus] = useState(null);
+
+  const [showOTPInput, setShowOTPInput] = useState(false);
+  const [mobileVerified, setMobileVerified] = useState(values?.is_mobile_verified);
+  const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
 
   const idRef = useRef();
   const addressRef = useRef();
@@ -150,12 +156,63 @@ const UploadDocuments = () => {
     [values],
   );
 
+  const sendMobileOtp = async () => {
+    setHasSentOTPOnce(true);
+    setShowOTPInput(true);
+
+    // const res = await getLoginOtp(values.username);
+    // if (!res) return;
+
+    setToastMessage('OTP has been sent to the mobile number');
+  };
+
+  const verifyOTP = useCallback(
+    async (loginotp) => {
+      const otp = parseInt(loginotp);
+
+      try {
+        // const res = await verifyLoginOtp(values.username, {
+        //   otp,
+        // });
+        // if (!res) return;
+        // if (res.old_session_message === 'No old sessions') {
+        //   setToken(res.token);
+        //   setDisablePhoneNumber(false);
+        //   setMobileVerified(true);
+        //   setFieldError('username', undefined);
+        //   setShowOTPInput(false);
+        //   setIsAuthenticated(true);
+        //   return true;
+        // }
+        // setIsOpen(true);
+        // setToken(res.token);
+        // setDisablePhoneNumber(false);
+        // setMobileVerified(true);
+        // setFieldError('username', undefined);
+        // setShowOTPInput(false);
+        // setIsOpen(true);
+      } catch (err) {
+        console.log(err);
+
+        // setMobileVerified(false);
+        // setOtpFailCount(err.response.data.fail_count);
+        // setIsAuthenticated(false);
+        return false;
+      }
+    },
+    [values.username, setFieldError, setMobileVerified],
+  );
+
   console.log(errors?.applicants?.[activeIndex]?.personal_details?.id_number);
 
   console.log(isQaulifierActivated);
 
+  console.log(selfie.length !== 0);
+
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <ToastMessage message={toastMessage} setMessage={setToastMessage} />
+
       <div className='flex flex-col bg-medium-grey gap-9 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
         <PhotoUpload
           files={customerPhotos}
@@ -211,25 +268,14 @@ const UploadDocuments = () => {
                 <ImageUpload files={idProofPhotos} setFile={setIdProofPhotos} noBorder={true} />
 
                 <div
-                  className={`flex justify-between border-x border-y ${
+                  className={`flex gap-2 justify-between border-x border-y ${
                     editIdNumber ? '' : 'border-stroke'
                   }  p-2 rounded`}
                 >
-                  <div className='flex gap-1'>
-                    <p className='text-dark-grey text-xs font-normal'>
-                      {values?.applicants?.[activeIndex]?.personal_details?.id_type} :
+                  <div className='flex gap-2 w-full'>
+                    <p className='text-dark-grey text-xs font-normal self-center'>
+                      {values?.applicants?.[activeIndex]?.personal_details?.id_type}:
                     </p>
-                    {/* <input
-                      type='text'
-                      className='inline w-36 text-xs font-normal'
-                      name={`applicants[${activeIndex}].personal_details.id_number`}
-                      value={values?.applicants?.[activeIndex]?.personal_details?.id_number}
-                      onChange={(e) => {
-                        handleTextInputChange(e);
-                      }}
-                      ref={idRef}
-                      disabled={editIdNumber ? false : true}
-                    /> */}
                     <UploadDocsInput
                       name={`applicants[${activeIndex}].personal_details.id_number`}
                       value={values?.applicants?.[activeIndex]?.personal_details?.id_number}
@@ -249,7 +295,7 @@ const UploadDocuments = () => {
                     />
                   </div>
                   {!editIdNumber ? (
-                    <p className='flex gap-1'>
+                    <p className='flex gap-1 items-center'>
                       <svg
                         width='16'
                         height='16'
@@ -273,7 +319,7 @@ const UploadDocuments = () => {
                     </p>
                   ) : (
                     <span
-                      className='text-primary-red text-xs font-normal'
+                      className='text-primary-red text-xs font-normal flex items-center'
                       onClick={() => setEditIdNumber(!editIdNumber)}
                     >
                       Save
@@ -340,18 +386,23 @@ const UploadDocuments = () => {
                           </defs>
                         </svg>
                         <span className='text-primary-red leading-5 text-xs font-normal'>
-                          Not isQaulifierActivated
+                          Not Verified
                         </span>
                       </>
                     )}
                   </div>
-                  {!isQaulifierActivated && (
-                    <p className='text-light-grey leading-5 text-xs font-normal'>Photo mandatory</p>
-                  )}
+
+                  <p className='text-light-grey leading-5 text-xs font-normal'>Photo mandatory</p>
                 </div>
               </div>
             ) : (
               <ImageUpload files={idProofPhotos} setFile={setIdProofPhotos} />
+            )}
+
+            {isQaulifierActivated && (
+              <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
+                To be verified during the eligibility step
+              </p>
             )}
           </div>
         </div>
@@ -404,31 +455,38 @@ const UploadDocuments = () => {
                 />
 
                 <div
-                  className={`flex justify-between border-x border-y ${
-                    editAddressNumber ? 'border-secondary-blue' : 'border-stroke'
+                  className={`flex gap-2 justify-between border-x border-y ${
+                    editAddressNumber ? '' : 'border-stroke'
                   }  p-2 rounded`}
                 >
-                  <div className='flex gap-1'>
-                    <p className='text-dark-grey text-xs font-normal'>
-                      {values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}{' '}
-                      :
+                  <div className='flex gap-2 w-full'>
+                    <p className='text-dark-grey text-xs font-normal self-center'>
+                      {values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}:
                     </p>
-                    <input
-                      type='text'
-                      className='inline w-36 text-xs font-normal'
+                    <UploadDocsInput
                       name={`applicants[${activeIndex}].personal_details.address_proof_number`}
                       value={
                         values?.applicants?.[activeIndex]?.personal_details?.address_proof_number
                       }
                       onChange={(e) => {
+                        e.target.value = e.target.value.toUpperCase();
                         handleTextInputChange(e);
                       }}
+                      error={
+                        errors.applicants?.[activeIndex]?.personal_details?.address_proof_number
+                      }
+                      touched={
+                        touched?.applicants &&
+                        touched?.applicants?.[activeIndex]?.personal_details?.address_proof_number
+                      }
                       ref={addressRef}
                       disabled={editAddressNumber ? false : true}
+                      onBlur={handleBlur}
+                      inputClasses='text-xs capitalize h-3'
                     />
                   </div>
                   {!editAddressNumber ? (
-                    <p className='flex gap-1'>
+                    <p className='flex gap-1 items-center'>
                       <svg
                         width='16'
                         height='16'
@@ -452,7 +510,7 @@ const UploadDocuments = () => {
                     </p>
                   ) : (
                     <span
-                      className='text-primary-red text-xs font-normal'
+                      className='text-primary-red text-xs font-normal flex items-center'
                       onClick={() => setEditAddressNumber(!editAddressNumber)}
                     >
                       Save
@@ -519,18 +577,23 @@ const UploadDocuments = () => {
                           </defs>
                         </svg>
                         <span className='text-primary-red leading-5 text-xs font-normal'>
-                          Not isQaulifierActivated
+                          Not Verified
                         </span>
                       </>
                     )}
                   </div>
-                  {!isQaulifierActivated && (
-                    <p className='text-light-grey leading-5 text-xs font-normal'>Photo mandatory</p>
-                  )}
+
+                  <p className='text-light-grey leading-5 text-xs font-normal'>Photo mandatory</p>
                 </div>
               </div>
             ) : (
               <ImageUpload files={addressProofPhotos} setFile={setAddressProofPhotos} />
+            )}
+
+            {isQaulifierActivated && (
+              <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
+                To be verified during the eligibility step
+              </p>
             )}
           </div>
         </div>
@@ -567,7 +630,37 @@ const UploadDocuments = () => {
           hint='File size should be less than 5MB'
         />
 
-        <PhotoUpload files={selfie} setFile={setSelfie} label='Upload selfie' required />
+        <div className='flex justify-between gap-2'>
+          <div className='w-[65%]'>
+            <PhotoUpload files={selfie} setFile={setSelfie} label='Upload selfie' required />
+          </div>
+
+          <button
+            className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
+              mobileVerified || hasSentOTPOnce || selfie.length === 0
+                ? 'text-dark-grey bg-stroke pointer-events-none'
+                : 'bg-primary-red text-white'
+            }`}
+            disabled={mobileVerified || hasSentOTPOnce}
+            onClick={sendMobileOtp}
+          >
+            Send OTP
+          </button>
+        </div>
+
+        {showOTPInput && selfie.length >= 1 ? (
+          <OtpInputNoEdit
+            label='Enter OTP'
+            required
+            verified={mobileVerified}
+            setOTPVerified={setMobileVerified}
+            onSendOTPClick={sendMobileOtp}
+            defaultResendTime={30}
+            disableSendOTP={!mobileVerified}
+            verifyOTPCB={verifyOTP}
+            hasSentOTPOnce={hasSentOTPOnce}
+          />
+        ) : null}
 
         <ImageUpload
           files={docs}
