@@ -30,7 +30,7 @@ const DashboardRoutes = () => {
           path='/'
           element={
             <RequireAuth>
-              <DashboardTest />
+              <Dashboard />
             </RequireAuth>
           }
         />

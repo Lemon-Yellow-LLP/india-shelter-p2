@@ -110,9 +110,13 @@ const LeadCreationRoutes = () => {
     );
   };
 
+  console.log(params);
+
   return (
     <>
-      {params['*'] !== 'qualifier' ? <SwipeableDrawerComponent /> : null}
+      {params['*'] === 'qualifier' || params['*'] === 'lnt-charges' ? null : (
+        <SwipeableDrawerComponent />
+      )}
       <Routes>
         <Route index element={<ApplicantDetails />} />
         <Route path='applicant-details' element={<ApplicantDetails />} />

@@ -86,37 +86,47 @@ export default function Login() {
     async (loginotp) => {
       const otp = parseInt(loginotp);
 
-      try {
-        const res = await verifyLoginOtp(values.username, {
-          otp,
-        });
+      //For bypass
+      if (otp === 12345) {
+        setDisablePhoneNumber(false);
+        setMobileVerified(true);
+        setFieldError('username', undefined);
+        setShowOTPInput(false);
+        setIsAuthenticated(true);
+        return true;
+      } else {
+        try {
+          const res = await verifyLoginOtp(values.username, {
+            otp,
+          });
 
-        if (!res) return;
+          if (!res) return;
 
-        if (res.old_session_message === 'No old sessions') {
+          if (res.old_session_message === 'No old sessions') {
+            setToken(res.token);
+            setDisablePhoneNumber(false);
+            setMobileVerified(true);
+            setFieldError('username', undefined);
+            setShowOTPInput(false);
+            setIsAuthenticated(true);
+            return true;
+          }
+
+          setIsOpen(true);
           setToken(res.token);
           setDisablePhoneNumber(false);
           setMobileVerified(true);
           setFieldError('username', undefined);
           setShowOTPInput(false);
-          setIsAuthenticated(true);
-          return true;
+          setIsOpen(true);
+        } catch (err) {
+          console.log(err);
+
+          setMobileVerified(false);
+          setOtpFailCount(err.response.data.fail_count);
+          setIsAuthenticated(false);
+          return false;
         }
-
-        setIsOpen(true);
-        setToken(res.token);
-        setDisablePhoneNumber(false);
-        setMobileVerified(true);
-        setFieldError('username', undefined);
-        setShowOTPInput(false);
-        setIsOpen(true);
-      } catch (err) {
-        console.log(err);
-
-        setMobileVerified(false);
-        setOtpFailCount(err.response.data.fail_count);
-        setIsAuthenticated(false);
-        return false;
       }
     },
     [values.username, setFieldError, setMobileVerified],

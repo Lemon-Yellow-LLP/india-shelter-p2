@@ -98,12 +98,24 @@ const LnTCharges = ({ amount = 1500 }) => {
       setCheckingStatus(label);
       const resp = await checkPaymentStatus(LEAD_ID);
       if (resp?.airpay_response_json?.airpay_verify_transaction_status == '200') {
+        editLnTCharges(LEAD_ID, {
+          success: 'Completed',
+          method: activeItem,
+        });
         setPaymentStatus('success');
       } else if (resp?.airpay_response_json?.airpay_verify_transaction_status == '400') {
         setPaymentStatus('failure');
+        editLnTCharges(LEAD_ID, {
+          success: 'Rejected',
+          method: activeItem,
+        });
       }
     } catch (error) {
       setPaymentStatus('failure');
+      editLnTCharges(LEAD_ID, {
+        success: 'Rejected',
+        method: activeItem,
+      });
       console.log(error);
     } finally {
       setCheckingStatus('');
@@ -450,6 +462,7 @@ const LnTCharges = ({ amount = 1500 }) => {
 };
 
 const PaymentSuccess = ({ amount, method }) => {
+  const navigate = useNavigate();
   return (
     <div className='h-screen bg-[#EEF0DD] flex flex-col w-full'>
       <div className='flex-1 flex items-center z-0'>
@@ -471,7 +484,7 @@ const PaymentSuccess = ({ amount, method }) => {
         </div>
       </div>
       <div className='mt-auto w-full p-4'>
-        <Button primary={true} inputClasses='h-12'>
+        <Button primary={true} inputClasses='h-12' link='/lead/property-details'>
           Next
         </Button>
       </div>
