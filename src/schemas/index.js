@@ -266,7 +266,6 @@ const applicantSchema = Yup.object().shape({
       }),
     current_no_of_year_residing: Yup.string().required('This field is mandatory'),
 
-    permanent_type_of_residence: Yup.string().required('This field is mandatory'),
     permanent_flat_no_building_name: Yup.string()
       .trim()
       .required('This field is mandatory')
