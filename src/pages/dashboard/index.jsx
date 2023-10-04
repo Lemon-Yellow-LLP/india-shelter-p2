@@ -277,6 +277,14 @@ export const DashboardTest = () => {
       >
         go-to-Dashboard-page
       </Link>
+
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/preview'
+      >
+        go-to-Preview-page
+      </Link>
+
       <button
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
         onClick={handleActiveLogin}
