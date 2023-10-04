@@ -1065,7 +1065,6 @@ const Titlebar = ({ title, id }) => {
 
   const getLeadData = async () => {
     const data = await getDashboardLeadById(id);
-    console.log(data);
     setTotalProgress(data?.lead?.extra_params?.progress);
   };
 

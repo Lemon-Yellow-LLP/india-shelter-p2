@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useParams } from 'react-router-dom';
 import SwipeableDrawerComponent from '../../../components/SwipeableDrawer/LeadDrawer';
 import BRE_ONE from './bre-screen';
 
@@ -14,9 +14,11 @@ const PropertyDetails = lazy(() => import('./property-details'));
 const UploadDocuments = lazy(() => import('./upload-documents'));
 
 const LeadCreationRoutes = () => {
+  const params = useParams();
+
   return (
     <>
-      <SwipeableDrawerComponent />
+      {params['*'] !== 'qualifier' ? <SwipeableDrawerComponent /> : null}
       <Routes>
         <Route index element={<ApplicantDetails />} />
         <Route path='applicant-details' element={<ApplicantDetails />} />

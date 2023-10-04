@@ -38,6 +38,36 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
 
+  const [date, setDate] = useState(null);
+
+  useEffect(() => {
+    if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
+      var dateParts = values?.applicants[activeIndex]?.applicant_details?.date_of_birth.split('-');
+      var day = parseInt(dateParts[2], 10);
+      var month = parseInt(dateParts[1], 10);
+      var year = parseInt(dateParts[0], 10);
+      setDate(`${day}/${month}/${year}`);
+    }
+  }, [activeIndex, values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
+
+  const dobUpdate = useCallback(() => {
+    if (date && date.length) {
+      var dateParts = date?.split('/');
+      var day = parseInt(dateParts[0], 10);
+      var month = parseInt(dateParts[1], 10);
+      var year = parseInt(dateParts[2], 10);
+
+      const finalDate = `${year}-${month}-${day}`;
+
+      setFieldValue(`applicants[${activeIndex}].personal_details.date_of_birth`, finalDate);
+      updateFields('date_of_birth', finalDate);
+    }
+  }, [date]);
+
+  useEffect(() => {
+    dobUpdate();
+  }, [date]);
+
   useEffect(() => {
     updateProgressApplicantSteps(1, requiredFieldsStatus);
   }, [requiredFieldsStatus]);
@@ -221,21 +251,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         return false;
       });
   };
-
-  const dobUpdate = useCallback(() => {
-    setFieldValue(
-      `applicants[${activeIndex}].personal_details.date_of_birth`,
-      values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth,
-    );
-    updateFields(
-      'date_of_birth',
-      values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth,
-    );
-  }, [values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth]);
-
-  useEffect(() => {
-    dobUpdate();
-  }, [values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth]);
 
   const mobileNumberUpdate = useCallback(() => {
     setFieldValue(
@@ -556,7 +571,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       )}
 
       <DatePicker
-        value={values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth}
+        value={date}
         required
         name={`applicants[${activeIndex}].personal_details.date_of_birth`}
         label='Date of Birth'
@@ -759,6 +774,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.email}
         onOTPSendClick={sendEmailOTP}
         disabledOtpButton={
+          !values.applicants?.[activeIndex]?.personal_details?.email ||
           !!errors.applicants?.[activeIndex]?.personal_details?.email ||
           emailVerified ||
           hasSentOTPOnce

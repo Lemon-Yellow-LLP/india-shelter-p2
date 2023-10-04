@@ -33,17 +33,39 @@ export default function DrawerSteps({ details, steps, index, stepIndex, noProgre
         </div>
         {!details.hideProgress ? (
           !lock && steps ? (
-            <>
-              {values?.applicants?.[index]?.[details.name]?.extra_params?.progress === 100 ? (
-                <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
-                  Done
-                </span>
-              ) : (
-                <span className='text-[#065381] text-[10px] font-medium border border-[#065381] bg-[#E5F5FF] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
-                  In Progress
-                </span>
-              )}
-            </>
+            details.name === 'lt_charges' ? (
+              <>
+                {values?.[details.name]?.extra_params?.progress === 100 ? (
+                  <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
+                    Received
+                  </span>
+                ) : (
+                  <span className='text-[#E33439] text-[10px] font-medium border border-[#E33439] bg-[#FFD6D7] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
+                    Pending
+                  </span>
+                )}
+              </>
+            ) : details.name === 'property_details' || details.name === 'reference_details' ? (
+              <>
+                {values?.[details.name]?.extra_params?.progress === 100 ? (
+                  <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
+                    Done
+                  </span>
+                ) : (
+                  <span className='text-[#065381] text-[10px] font-medium border border-[#065381] bg-[#E5F5FF] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
+                    In Progress
+                  </span>
+                )}
+              </>
+            ) : values?.applicants?.[index]?.[details.name]?.extra_params?.progress === 100 ? (
+              <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
+                Done
+              </span>
+            ) : (
+              <span className='text-[#065381] text-[10px] font-medium border border-[#065381] bg-[#E5F5FF] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
+                In Progress
+              </span>
+            )
           ) : (
             <LockIcon />
           )
@@ -51,9 +73,15 @@ export default function DrawerSteps({ details, steps, index, stepIndex, noProgre
       </div>
 
       {!lock && !noProgress ? (
-        <ProgressBar
-          progress={values?.applicants?.[index]?.[details.name]?.extra_params?.progress || 0}
-        />
+        details.name === 'property_details' || details.name === 'reference_details' ? (
+          <>
+            <ProgressBar progress={values?.[details.name]?.extra_params?.progress || 0} />
+          </>
+        ) : (
+          <ProgressBar
+            progress={values?.applicants?.[index]?.[details.name]?.extra_params?.progress || 0}
+          />
+        )
       ) : null}
     </div>
   );

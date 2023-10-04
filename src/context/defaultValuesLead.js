@@ -10,7 +10,7 @@ export const defaultValuesLead = {
     },
   },
 
-  propertySchema: {
+  property_details: {
     property_identification_is: '',
     property_value_estimate: '',
     owner_name: '',
@@ -34,7 +34,7 @@ export const defaultValuesLead = {
     },
   },
 
-  referenceSchema: {
+  reference_details: {
     reference_1_type: '',
     reference_1_full_name: '',
     reference_1_phone_number: '',
@@ -188,7 +188,7 @@ export const defaultValuesLead = {
         company_name: '',
         total_income: '',
         pf_uan: '',
-        no_current_loan: '',
+        no_current_loan: null,
         ongoing_emi: '',
         working_since: '',
         mode_of_salary: '',

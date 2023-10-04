@@ -15,8 +15,11 @@ import DateRangePicker from '../../components/DateRangePicker';
 import ProgressBadge from '../../components/ProgressBadge';
 import moment from 'moment';
 import { parseISO } from 'date-fns';
+import { LeadContext } from '../../context/LeadContextProvider';
+import { defaultValuesLead } from '../../context/defaultValuesLead';
 
 export default function Dashboard() {
+  const { setValues } = useContext(LeadContext);
   const [leadList, setLeadList] = useState([]);
   const [primaryApplicantList, setPrimaryApplicantList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
@@ -136,7 +139,10 @@ export default function Dashboard() {
         )}
       </div>
       <button
-        onClick={() => navigate('/lead/applicant-details')}
+        onClick={() => {
+          setValues(defaultValuesLead);
+          navigate('/lead/applicant-details');
+        }}
         className='fixed bottom-4 right-4 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'
       >
         <AddLeadIcon />

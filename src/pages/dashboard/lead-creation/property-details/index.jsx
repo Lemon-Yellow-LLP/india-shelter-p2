@@ -36,38 +36,38 @@ const PropertyDetails = () => {
   const [propertyIdentification, setPropertyIdentification] = useState(null);
 
   useEffect(() => {
-    setPropertyIdentification(values?.propertySchema?.property_identification_is);
-  }, [values?.propertySchema?.property_identification_is]);
+    setPropertyIdentification(values?.property_details?.property_identification_is);
+  }, [values?.property_details?.property_identification_is]);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    ...values?.propertySchema?.extra_params?.required_fields_status,
+    ...values?.property_details?.extra_params?.required_fields_status,
   });
 
   useEffect(() => {
-    updateProgressApplicantSteps('propertySchema', requiredFieldsStatus, 'property');
+    updateProgressApplicantSteps('property_details', requiredFieldsStatus, 'property');
   }, [requiredFieldsStatus]);
 
   const handleRadioChange = useCallback(
     async (e) => {
       setPropertyIdentification(e.value);
-      setFieldValue('propertySchema.property_identification_is', e.value);
+      setFieldValue('property_details.property_identification_is', e.value);
 
-      const name = e.name.split('.')[0];
+      const name = e.name;
 
       setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
 
-      if (values?.propertySchema?.id) {
-        editPropertyById(values?.propertySchema?.id, {
+      if (values?.property_details?.id) {
+        editPropertyById(values?.property_details?.id, {
           property_identification_is: e.value,
         });
       } else {
-        let addData = { ...defaultValuesLead.propertySchema, [name]: e.value };
+        let addData = { ...defaultValuesLead.property_details, [name]: e.value };
         await addApi('property', {
           ...addData,
           lead_id: values?.lead?.id,
         })
           .then(async (res) => {
-            setFieldValue(`propertySchema.id`, res.id);
+            setFieldValue(`property_details.id`, res.id);
           })
           .catch((err) => {
             console.log(err);
@@ -75,25 +75,25 @@ const PropertyDetails = () => {
       }
 
       if (e.value === 'not-yet') {
-        editPropertyById(values?.propertySchema?.id, {
+        editPropertyById(values?.property_details?.id, {
           property_value_estimate: '',
           owner_name: '',
           plot_house_flat: '',
           project_society_colony: '',
-          pincode: '',
+          pincode: null,
           city: '',
           state: '',
         });
 
         setValues({
           ...values,
-          propertySchema: {
-            ...values.propertySchema,
+          property_details: {
+            ...values.property_details,
             property_value_estimate: '',
             owner_name: '',
             plot_house_flat: '',
             project_society_colony: '',
-            pincode: '',
+            pincode: null,
             city: '',
             state: '',
           },
@@ -131,12 +131,17 @@ const PropertyDetails = () => {
           ))}
         </div>
 
-        {errors.propertySchema?.property_identification_is &&
-          !values.property_identification_is && (
-            <span className='text-sm text-primary-red'>
-              {errors.propertySchema.property_identification_is}
-            </span>
-          )}
+        {errors?.property_details?.property_identification_is &&
+        touched?.property_details?.property_identification_is ? (
+          <span
+            className='text-xs text-primary-red'
+            dangerouslySetInnerHTML={{
+              __html: errors?.property_details?.property_identification_is,
+            }}
+          />
+        ) : (
+          ''
+        )}
 
         {propertyIdentification === 'done' ? (
           <IdentificationDoneFields
@@ -149,7 +154,7 @@ const PropertyDetails = () => {
 
       {/* <button onClick={handleSubmit}>submit</button> */}
 
-      {/* <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' /> */}
+      <PreviousNextButtons linkPrevious='/lead/lnt-charges' linkNext='/lead/banking-details' />
     </div>
   );
 };

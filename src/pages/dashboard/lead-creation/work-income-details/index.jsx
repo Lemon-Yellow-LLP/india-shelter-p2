@@ -131,11 +131,16 @@ const WorkIncomeDetails = () => {
             </div>
 
             {errors?.applicants?.[activeIndex]?.work_income_detail?.profession &&
-            !values?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
-              <span className='text-sm text-primary-red'>
-                {errors?.applicants?.[activeIndex]?.work_income_detail?.profession}
-              </span>
-            ) : null}
+            touched?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
+              <span
+                className='text-xs text-primary-red'
+                dangerouslySetInnerHTML={{
+                  __html: errors?.applicants?.[activeIndex]?.work_income_detail?.profession,
+                }}
+              />
+            ) : (
+              ''
+            )}
           </div>
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Salaried' && (
             <Salaried />
@@ -528,6 +533,13 @@ const WorkIncomeDetails = () => {
             linkNext='/lead/qualifier'
             onNextClick={handleNextClick}
             onPreviousClick={() => setCurrentStepIndex(2)}
+            disableNext={
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !==
+                100 ||
+              values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
+              values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
+              values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
+            }
           />
         </div>
       </div>

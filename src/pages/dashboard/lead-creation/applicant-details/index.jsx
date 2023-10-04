@@ -66,22 +66,32 @@ const ApplicantDetails = () => {
 
   const dateInputRef = useRef(null);
 
-  const [date, setDate] = useState(
-    values?.applicants[activeIndex]?.applicant_details.date_of_birth,
-  );
-
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
   });
 
+  const [date, setDate] = useState(null);
+
   useEffect(() => {
-    if (values?.applicants[activeIndex]?.applicant_details.date_of_birth?.length) {
-      setDate(values?.applicants[activeIndex]?.applicant_details.date_of_birth);
+    if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
+      var dateParts = values?.applicants[activeIndex]?.applicant_details?.date_of_birth.split('-');
+      var day = parseInt(dateParts[2], 10);
+      var month = parseInt(dateParts[1], 10);
+      var year = parseInt(dateParts[0], 10);
+      setDate(`${day}/${month}/${year}`);
     }
   }, [values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
 
   useEffect(() => {
-    setDate(values?.applicants[activeIndex]?.applicant_details.date_of_birth);
+    if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
+      var dateParts = values?.applicants[activeIndex]?.applicant_details?.date_of_birth.split('-');
+      var day = parseInt(dateParts[2], 10);
+      var month = parseInt(dateParts[1], 10);
+      var year = parseInt(dateParts[0], 10);
+      setDate(`${day}/${month}/${year}`);
+    } else {
+      setDate(null);
+    }
   }, [activeIndex]);
 
   const updateFieldsApplicant = async (name, value) => {
@@ -101,7 +111,6 @@ const ApplicantDetails = () => {
           return res;
         })
         .catch((err) => {
-          console.log(err);
           return err;
         });
     }
@@ -121,7 +130,6 @@ const ApplicantDetails = () => {
           return res;
         })
         .catch((err) => {
-          console.log(err);
           return err;
         });
     }
@@ -260,7 +268,15 @@ const ApplicantDetails = () => {
     if (!date) {
       return;
     }
-    if (!isEighteenOrAbove(date)) {
+
+    var dateParts = date.split('/');
+    var day = parseInt(dateParts[0], 10);
+    var month = parseInt(dateParts[1], 10);
+    var year = parseInt(dateParts[2], 10);
+
+    const finalDate = `${year}-${month}-${day}`;
+
+    if (!isEighteenOrAbove(finalDate)) {
       setFieldError(
         `applicants[${activeIndex}].applicant_details.date_of_birth`,
         'Date of Birth is Required. Minimum age must be 18 or 18+',
@@ -268,8 +284,8 @@ const ApplicantDetails = () => {
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
     } else {
-      setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, date);
-      updateFieldsApplicant('date_of_birth', date);
+      setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, finalDate);
+      updateFieldsApplicant('date_of_birth', finalDate);
       if (
         requiredFieldsStatus['date_of_birth'] !== undefined &&
         !requiredFieldsStatus['date_of_birth']
@@ -436,7 +452,6 @@ const ApplicantDetails = () => {
           setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
           setShowOTPInput(true);
           setVerifiedOnce(true);
-          console.log(err);
           setOtpFailCount(err.response.data.fail_count);
           return false;
         });

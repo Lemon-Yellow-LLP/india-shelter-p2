@@ -55,14 +55,14 @@ const LeadContextProvider = ({ children }) => {
     let newData = formik.values;
 
     if (page === 'reference' || page === 'property') {
-      console.log('hii');
       if (newData?.[updateStep] && typeof newData[updateStep]?.extra_params === 'object') {
         newData[updateStep].extra_params.progress = finalProgress;
         newData[updateStep].extra_params.required_fields_status = requiredFieldsStatus;
         await editFieldsById(formik.values[updateStep].id, page, newData[updateStep]);
-      } else {
-        console.error('Some properties are missing, cannot update progress');
       }
+      // else {
+      //   console.error('Some properties are missing, cannot update progress');
+      // }
     } else {
       if (
         newData.applicants?.[activeIndex]?.[updateStep]?.extra_params &&
@@ -77,16 +77,17 @@ const LeadContextProvider = ({ children }) => {
           page,
           newData.applicants[activeIndex][updateStep],
         );
-      } else {
-        console.error('Some properties are missing, cannot update progress');
       }
+      // else {
+      //   console.error('Some properties are missing, cannot update progress');
+      // }
     }
     formik.setValues(newData);
   };
 
   // console.log(formik.values.applicants[activeIndex]?.['applicant_details']?.extra_params?.progress);
 
-  console.log(formik.values);
+  // console.log(formik.values);
 
   const addApplicant = () => {
     formik.setValues((prev) => {

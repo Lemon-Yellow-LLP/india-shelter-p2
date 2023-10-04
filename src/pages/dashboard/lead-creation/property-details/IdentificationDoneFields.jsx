@@ -48,36 +48,34 @@ const IdentificationDoneFields = ({
 
   const handleOnPincodeChange = useCallback(async () => {
     if (
-      !values?.propertySchema?.pincode ||
-      values?.propertySchema?.pincode.toString().length < 5 ||
-      errors?.propertySchema?.pincode
+      !values?.property_details?.pincode ||
+      values?.property_details?.pincode.toString().length < 5 ||
+      errors?.property_details?.pincode
     ) {
-      setFieldValue('propertySchema.city', '');
-      setFieldValue('propertySchema.state', '');
+      setFieldValue('property_details.city', '');
+      setFieldValue('property_details.state', '');
       return;
     }
 
-    const res = await checkIsValidStatePincode(values?.propertySchema?.pincode);
+    const res = await checkIsValidStatePincode(values?.property_details?.pincode);
     if (!res) {
-      setFieldError('propertySchema.pincode', 'Invalid Pincode');
+      setFieldError('property_details.pincode', 'Invalid Pincode');
       return;
     }
 
-    editPropertyById(values?.propertySchema?.id, {
+    editPropertyById(values?.property_details?.id, {
       city: res.city,
       state: res.state,
+      pincode: parseInt(values?.property_details?.pincode),
     });
 
-    setFieldValue('propertySchema.city', res.city);
-    setFieldValue('propertySchema.state', res.state);
+    setFieldValue('property_details.city', res.city);
+    setFieldValue('property_details.state', res.state);
 
-    if (!requiredFieldsStatus['pincode']) {
-      updateProgress(4, requiredFieldsStatus);
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: true }));
-    }
+    setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: true }));
   }, [
-    errors?.propertySchema?.pincode,
-    values?.propertySchema?.pincode,
+    errors?.property_details?.pincode,
+    values?.property_details?.pincode,
     setFieldError,
     setFieldValue,
     requiredFieldsStatus,
@@ -86,30 +84,30 @@ const IdentificationDoneFields = ({
   useEffect(() => {
     if (
       parseInt(values?.lead?.applied_amount) >
-      parseInt(values?.propertySchema?.property_value_estimate)
+      parseInt(values?.property_details?.property_value_estimate)
     ) {
       setFieldError(
-        'propertySchema.property_value_estimate',
+        'property_details.property_value_estimate',
         'Property estimation value should be greater than Loan Amount',
       );
     }
   }, [
-    values?.propertySchema?.property_value_estimate,
+    values?.property_details?.property_value_estimate,
     setFieldError,
-    errors?.propertySchema?.property_value_estimate,
+    errors?.property_details?.property_value_estimate,
   ]);
 
   return (
     <>
       {selectedLoanType === 'LAP' ? (
         <CurrencyInput
-          name='propertySchema.property_value_estimate'
+          name='property_details.property_value_estimate'
           label='My property value is estimated to be'
           required
           placeholder='1,00,000'
-          value={values?.propertySchema?.property_value_estimate}
-          error={errors?.propertySchema?.property_value_estimate}
-          touched={touched.propertySchema?.property_value_estimate}
+          value={values?.property_details?.property_value_estimate}
+          error={errors?.property_details?.property_value_estimate}
+          touched={touched.property_details?.property_value_estimate}
           onChange={(e) => {
             handleChange(e);
 
@@ -122,11 +120,11 @@ const IdentificationDoneFields = ({
           onBlur={(e) => {
             if (
               parseInt(values?.lead?.applied_amount) >
-                parseInt(values?.propertySchema?.property_value_estimate) &&
-              !errors?.propertySchema.property_value_estimate
+                parseInt(values?.property_details?.property_value_estimate) &&
+              !errors?.property_details.property_value_estimate
             ) {
               setFieldError(
-                'propertySchema.property_value_estimate',
+                'property_details.property_value_estimate',
                 'Property estimation value should be greater than Loan Amount',
               );
             } else {
@@ -134,13 +132,13 @@ const IdentificationDoneFields = ({
             }
 
             if (
-              !errors?.propertySchema?.property_value_estimate &&
-              values?.propertySchema?.property_value_estimate &&
+              !errors?.property_details?.property_value_estimate &&
+              values?.property_details?.property_value_estimate &&
               parseInt(values?.lead?.applied_amount) <
-                parseInt(values?.propertySchema?.property_value_estimate)
+                parseInt(values?.property_details?.property_value_estimate)
             ) {
-              editPropertyById(values?.propertySchema?.id, {
-                property_value_estimate: values?.propertySchema?.property_value_estimate,
+              editPropertyById(values?.property_details?.id, {
+                property_value_estimate: values?.property_details?.property_value_estimate,
               });
             }
           }}
@@ -148,33 +146,33 @@ const IdentificationDoneFields = ({
       ) : null}
 
       <TextInput
-        name='propertySchema.owner_name'
+        name='property_details.owner_name'
         label='Owner name'
         required
         placeholder='Eg: Sanjay'
-        value={values?.propertySchema?.owner_name}
-        error={errors?.propertySchema?.owner_name}
-        touched={touched.propertySchema?.owner_name}
+        value={values?.property_details?.owner_name}
+        error={errors?.property_details?.owner_name}
+        touched={touched.property_details?.owner_name}
         onChange={handleTextInputChange}
         onBlur={(e) => {
           handleBlur(e);
 
-          if (!errors?.propertySchema?.owner_name && values?.propertySchema?.owner_name) {
-            editPropertyById(values?.propertySchema?.id, {
-              owner_name: values?.propertySchema?.owner_name,
+          if (!errors?.property_details?.owner_name && values?.property_details?.owner_name) {
+            editPropertyById(values?.property_details?.id, {
+              owner_name: values?.property_details?.owner_name,
             });
           }
         }}
       />
 
       <TextInput
-        name='propertySchema.plot_house_flat'
+        name='property_details.plot_house_flat'
         label='Plot/House/Flat No'
         required
         placeholder='Eg: 12/A'
-        value={values?.propertySchema?.plot_house_flat}
-        error={errors?.propertySchema?.plot_house_flat}
-        touched={touched.propertySchema?.plot_house_flat}
+        value={values?.property_details?.plot_house_flat}
+        error={errors?.property_details?.plot_house_flat}
+        touched={touched.property_details?.plot_house_flat}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
@@ -191,22 +189,25 @@ const IdentificationDoneFields = ({
         onBlur={(e) => {
           handleBlur(e);
 
-          if (!errors?.propertySchema?.plot_house_flat && values?.propertySchema?.plot_house_flat) {
-            editPropertyById(values?.propertySchema?.id, {
-              plot_house_flat: values?.propertySchema?.plot_house_flat,
+          if (
+            !errors?.property_details?.plot_house_flat &&
+            values?.property_details?.plot_house_flat
+          ) {
+            editPropertyById(values?.property_details?.id, {
+              plot_house_flat: values?.property_details?.plot_house_flat,
             });
           }
         }}
       />
 
       <TextInput
-        name='propertySchema.project_society_colony'
+        name='property_details.project_society_colony'
         label='Project/Society/Colony name'
         required
         placeholder='Eg: G Groups of Real Estate'
-        value={values?.propertySchema?.project_society_colony}
-        error={errors?.propertySchema?.project_society_colony}
-        touched={touched.propertySchema?.project_society_colony}
+        value={values?.property_details?.project_society_colony}
+        error={errors?.property_details?.project_society_colony}
+        touched={touched.property_details?.project_society_colony}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
@@ -225,24 +226,24 @@ const IdentificationDoneFields = ({
           handleBlur(e);
 
           if (
-            !errors?.propertySchema?.project_society_colony &&
-            values?.propertySchema?.project_society_colony
+            !errors?.property_details?.project_society_colony &&
+            values?.property_details?.project_society_colony
           ) {
-            editPropertyById(values?.propertySchema?.id, {
-              project_society_colony: values?.propertySchema?.project_society_colony,
+            editPropertyById(values?.property_details?.id, {
+              project_society_colony: values?.property_details?.project_society_colony,
             });
           }
         }}
       />
 
       {/* <MapInput
-        name='propertySchema.project_society_colony'
+        name='property_details.project_society_colony'
         label='Project/Society/Colony name'
         required
         placeholder='Eg: G Groups of Real Estate'
-        value={values?.propertySchema?.project_society_colony}
-        error={errors?.propertySchema?.project_society_colony}
-        touched={touched.propertySchema?.project_society_colony}
+        value={values?.property_details?.project_society_colony}
+        error={errors?.property_details?.project_society_colony}
+        touched={touched.property_details?.project_society_colony}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
@@ -263,23 +264,17 @@ const IdentificationDoneFields = ({
       /> */}
 
       <TextInput
-        name='propertySchema.pincode'
+        name='property_details.pincode'
         label='Pincode'
         required
         hint='City and State fields will get filled based on Pincode'
         placeholder='Eg: 123456'
-        value={values?.propertySchema?.pincode}
-        error={errors?.propertySchema?.pincode}
-        touched={touched.propertySchema?.pincode}
+        value={values?.property_details?.pincode}
+        error={errors?.property_details?.pincode}
+        touched={touched.property_details?.pincode}
         onBlur={(e) => {
           handleBlur(e);
           handleOnPincodeChange();
-
-          if (!errors?.propertySchema?.pincode && values?.propertySchema?.pincode) {
-            editPropertyById(values?.propertySchema?.id, {
-              pincode: parseInt(values?.propertySchema?.pincode),
-            });
-          }
         }}
         min='0'
         onInput={(e) => {
@@ -295,7 +290,7 @@ const IdentificationDoneFields = ({
             e.preventDefault();
             return;
           }
-          handleChange(e);
+          setFieldValue(e.currentTarget.name, parseInt(e.currentTarget.value));
         }}
         onKeyDown={(e) => {
           //capturing ctrl V and ctrl C
@@ -326,25 +321,25 @@ const IdentificationDoneFields = ({
       />
 
       <TextInput
-        name='propertySchema.city'
+        name='property_details.city'
         label='City'
         disabled
         placeholder='Eg: Nashik'
-        value={values?.propertySchema?.city}
-        error={errors?.propertySchema?.city}
-        touched={touched.propertySchema?.city}
+        value={values?.property_details?.city}
+        error={errors?.property_details?.city}
+        touched={touched.property_details?.city}
         onChange={handleChange}
         onBlur={handleBlur}
       />
 
       <TextInput
-        name='propertySchema.state'
+        name='property_details.state'
         label='State'
         disabled
         placeholder='Eg: Maharashtra'
-        value={values?.propertySchema?.state}
-        error={errors?.propertySchema?.state}
-        touched={touched.propertySchema?.state}
+        value={values?.property_details?.state}
+        error={errors?.property_details?.state}
+        touched={touched.property_details?.state}
         onChange={handleChange}
         onBlur={handleBlur}
       />
