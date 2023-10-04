@@ -24,7 +24,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 
-const LEAD_ID = 5;
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
 
@@ -70,7 +69,7 @@ const LnTCharges = ({ amount = 1500 }) => {
   const fetchQR = async () => {
     try {
       setLoadingQr(true);
-      const resp = await getLnTChargesQRCode(LEAD_ID);
+      const resp = await getLnTChargesQRCode(values?.lead?.id);
       setQrCode(resp.DecryptedData.QRCODE_STRING);
     } catch (err) {
       console.log(err);
@@ -81,7 +80,7 @@ const LnTCharges = ({ amount = 1500 }) => {
 
   useEffect(() => {
     (async () => {
-      const resp = await addLnTCharges(LEAD_ID);
+      const resp = await addLnTCharges(values?.lead?.id);
       setLntId(resp.id);
       await fetchQR();
     })();
@@ -96,23 +95,23 @@ const LnTCharges = ({ amount = 1500 }) => {
   const handleCheckingStatus = async (label = '') => {
     try {
       setCheckingStatus(label);
-      const resp = await checkPaymentStatus(LEAD_ID);
+      const resp = await checkPaymentStatus(values?.lead?.id);
       if (resp?.airpay_response_json?.airpay_verify_transaction_status == '200') {
-        editLnTCharges(LEAD_ID, {
+        editLnTCharges(values?.lead?.id, {
           success: 'Completed',
           method: activeItem,
         });
         setPaymentStatus('success');
       } else if (resp?.airpay_response_json?.airpay_verify_transaction_status == '400') {
         setPaymentStatus('failure');
-        editLnTCharges(LEAD_ID, {
+        editLnTCharges(values?.lead?.id, {
           success: 'Rejected',
           method: activeItem,
         });
       }
     } catch (error) {
       setPaymentStatus('failure');
-      editLnTCharges(LEAD_ID, {
+      editLnTCharges(values?.lead?.id, {
         success: 'Rejected',
         method: activeItem,
       });
@@ -183,7 +182,7 @@ const LnTCharges = ({ amount = 1500 }) => {
     setDisablePhoneNumber(true);
     setHasSentOTPOnce(true);
 
-    const resp = await makePaymentByLink(LEAD_ID, {
+    const resp = await makePaymentByLink(values?.lead?.id, {
       mobile_number: values?.lnt_charges?.mobile_number,
     });
     if (resp) {
@@ -320,7 +319,7 @@ const LnTCharges = ({ amount = 1500 }) => {
                           !errors?.lnt_charges?.mobile_number[name] &&
                           values?.lnt_charges?.mobile_number[name]
                         ) {
-                          editLnTCharges(LEAD_ID, { mobile_number: phoneNumber });
+                          editLnTCharges(values?.lead?.id, { mobile_number: phoneNumber });
                         }
                       }}
                       pattern='\d*'
