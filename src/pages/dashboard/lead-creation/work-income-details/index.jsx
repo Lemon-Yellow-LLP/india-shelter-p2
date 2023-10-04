@@ -11,8 +11,7 @@ import Retired from './Retired';
 import CurrencyInput from '../../../../components/CurrencyInput';
 import { addApi, checkIsValidStatePincode, editFieldsById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
-import { Button } from '../../../../components';
-import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
+import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -44,8 +43,9 @@ const WorkIncomeDetails = () => {
           [name]: e.value,
         });
       } else {
+        let addData = { ...newCoApplicantValues.work_income_detail, [name]: e.value };
         await addApi('work-income', {
-          [name]: e.value,
+          ...addData,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
         })
           .then(async (res) => {
@@ -131,11 +131,16 @@ const WorkIncomeDetails = () => {
             </div>
 
             {errors?.applicants?.[activeIndex]?.work_income_detail?.profession &&
-            !values?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
-              <span className='text-sm text-primary-red'>
-                {errors?.applicants?.[activeIndex]?.work_income_detail?.profession}
-              </span>
-            ) : null}
+            touched?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
+              <span
+                className='text-xs text-primary-red'
+                dangerouslySetInnerHTML={{
+                  __html: errors?.applicants?.[activeIndex]?.work_income_detail?.profession,
+                }}
+              />
+            ) : (
+              ''
+            )}
           </div>
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Salaried' && (
             <Salaried />
@@ -528,6 +533,13 @@ const WorkIncomeDetails = () => {
             linkNext='/lead/qualifier'
             onNextClick={handleNextClick}
             onPreviousClick={() => setCurrentStepIndex(2)}
+            disableNext={
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !==
+                100 ||
+              values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
+              values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
+              values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
+            }
           />
         </div>
       </div>

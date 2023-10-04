@@ -15,8 +15,11 @@ import DateRangePicker from '../../components/DateRangePicker';
 import ProgressBadge from '../../components/ProgressBadge';
 import moment from 'moment';
 import { parseISO } from 'date-fns';
+import { LeadContext } from '../../context/LeadContextProvider';
+import { defaultValuesLead } from '../../context/defaultValuesLead';
 
 export default function Dashboard() {
+  const { setValues } = useContext(LeadContext);
   const [leadList, setLeadList] = useState([]);
   const [primaryApplicantList, setPrimaryApplicantList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
@@ -57,12 +60,12 @@ export default function Dashboard() {
       });
 
       const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
-      setLeadList(formatted?.map((l) => l?.applicants));
+      setLeadList(formatted);
     })();
   }, [selectionRange]);
 
   useEffect(() => {
-    const data = leadList.map((lead) => lead?.find((applicant) => applicant?.is_primary));
+    const data = leadList;
     setPrimaryApplicantList(data);
     setFilteredList(data);
   }, [leadList]);
@@ -77,7 +80,7 @@ export default function Dashboard() {
           <div className='flex items-center'>
             <h4 className='text-[22px] not-italic font-medium text-primary-black'>My Leads </h4>
             <span className='text-xs not-italic font-normal text-primary-black ml-[6px]'>
-              {`(${filteredList.length})`}
+              {`(${filteredList?.applicants?.length || 0})`}
             </span>
           </div>
           <div>
@@ -100,30 +103,33 @@ export default function Dashboard() {
       <div className='px-4 h-full bg-[#FAFAFA] overflow-auto'>
         {/* List of leads */}
 
-        {leadList?.length === 0 ? (
+        {leadList?.applicants?.length === 0 ? (
           <div className='relative flex-1 flex h-full justify-center translate-y-20'>
             <NoLeadIllustration />
           </div>
-        ) : filteredList.length ? (
+        ) : filteredList?.length ? (
           <div className='relative flex-1 flex flex-col gap-2'>
-            {filteredList.map((applicant, i) => (
-              <LeadCard
-                key={i}
-                id={applicant?.lead_id ?? '-'}
-                title={`${
-                  applicant
-                    ? applicant.first_name +
-                      ' ' +
-                      applicant?.middle_name +
-                      ' ' +
-                      applicant?.last_name
-                    : '-'
-                }`}
-                progress={applicant?.extra_params?.progress ?? 0}
-                created={moment(applicant?.created_at).format('DD/MM/YYYY')}
-                mobile={applicant?.mobile_number ?? '-'}
-              />
-            ))}
+            {filteredList.map((lead, i) => {
+              const applicant = lead?.applicants?.find((applicant) => applicant?.is_primary);
+              return (
+                <LeadCard
+                  key={i}
+                  id={applicant?.lead_id ?? '-'}
+                  title={`${
+                    applicant
+                      ? applicant.first_name +
+                        ' ' +
+                        applicant?.middle_name +
+                        ' ' +
+                        applicant?.last_name
+                      : '-'
+                  }`}
+                  progress={lead?.extra_params?.progress ?? 0}
+                  created={moment(applicant?.created_at).format('DD/MM/YYYY')}
+                  mobile={applicant?.mobile_number ?? '-'}
+                />
+              );
+            })}
             <div className='h-[250px]'></div>
           </div>
         ) : (
@@ -133,7 +139,10 @@ export default function Dashboard() {
         )}
       </div>
       <button
-        onClick={() => navigate('/lead/applicant-details')}
+        onClick={() => {
+          setValues(defaultValuesLead);
+          navigate('/lead/applicant-details');
+        }}
         className='fixed bottom-4 right-4 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'
       >
         <AddLeadIcon />
@@ -268,6 +277,14 @@ export const DashboardTest = () => {
       >
         go-to-Dashboard-page
       </Link>
+
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/preview'
+      >
+        go-to-Preview-page
+      </Link>
+
       <button
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
         onClick={handleActiveLogin}

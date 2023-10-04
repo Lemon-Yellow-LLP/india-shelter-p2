@@ -24,7 +24,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 
-const LEAD_ID = 5;
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
 
@@ -70,7 +69,7 @@ const LnTCharges = ({ amount = 1500 }) => {
   const fetchQR = async () => {
     try {
       setLoadingQr(true);
-      const resp = await getLnTChargesQRCode(LEAD_ID);
+      const resp = await getLnTChargesQRCode(values?.lead?.id);
       setQrCode(resp.DecryptedData.QRCODE_STRING);
     } catch (err) {
       console.log(err);
@@ -81,7 +80,7 @@ const LnTCharges = ({ amount = 1500 }) => {
 
   useEffect(() => {
     (async () => {
-      const resp = await addLnTCharges(LEAD_ID);
+      const resp = await addLnTCharges(values?.lead?.id);
       setLntId(resp.id);
       await fetchQR();
     })();
@@ -96,14 +95,26 @@ const LnTCharges = ({ amount = 1500 }) => {
   const handleCheckingStatus = async (label = '') => {
     try {
       setCheckingStatus(label);
-      const resp = await checkPaymentStatus(LEAD_ID);
+      const resp = await checkPaymentStatus(values?.lead?.id);
       if (resp?.airpay_response_json?.airpay_verify_transaction_status == '200') {
+        editLnTCharges(values?.lead?.id, {
+          success: 'Completed',
+          method: activeItem,
+        });
         setPaymentStatus('success');
       } else if (resp?.airpay_response_json?.airpay_verify_transaction_status == '400') {
         setPaymentStatus('failure');
+        editLnTCharges(values?.lead?.id, {
+          success: 'Rejected',
+          method: activeItem,
+        });
       }
     } catch (error) {
       setPaymentStatus('failure');
+      editLnTCharges(values?.lead?.id, {
+        success: 'Rejected',
+        method: activeItem,
+      });
       console.log(error);
     } finally {
       setCheckingStatus('');
@@ -171,8 +182,8 @@ const LnTCharges = ({ amount = 1500 }) => {
     setDisablePhoneNumber(true);
     setHasSentOTPOnce(true);
 
-    const resp = await makePaymentByLink(LEAD_ID, {
-      mobile_number: values.lnt_charges?.mobile_number,
+    const resp = await makePaymentByLink(values?.lead?.id, {
+      mobile_number: values?.lnt_charges?.mobile_number,
     });
     if (resp) {
       setToastMessage('Link has been sent to the entered mobile number');
@@ -287,10 +298,10 @@ const LnTCharges = ({ amount = 1500 }) => {
                       placeholder='Eg: 1234567890'
                       required
                       name='lnt_charges.mobile_number'
-                      value={values.lnt_charges.mobile_number}
+                      value={values?.lnt_charges?.mobile_number}
                       onChange={handleOnPhoneNumberChange}
-                      error={errors.lnt_charges?.mobile_number}
-                      touched={touched.lnt_charges?.mobile_number}
+                      error={errors?.lnt_charges?.mobile_number}
+                      touched={touched?.lnt_charges?.mobile_number}
                       onOTPSendClick={sendPaymentLink}
                       disabledOtpButton={
                         !values.lnt_charges?.mobile_number ||
@@ -308,7 +319,7 @@ const LnTCharges = ({ amount = 1500 }) => {
                           !errors?.lnt_charges?.mobile_number[name] &&
                           values?.lnt_charges?.mobile_number[name]
                         ) {
-                          editLnTCharges(LEAD_ID, { mobile_number: phoneNumber });
+                          editLnTCharges(values?.lead?.id, { mobile_number: phoneNumber });
                         }
                       }}
                       pattern='\d*'
@@ -450,6 +461,7 @@ const LnTCharges = ({ amount = 1500 }) => {
 };
 
 const PaymentSuccess = ({ amount, method }) => {
+  const navigate = useNavigate();
   return (
     <div className='h-screen bg-[#EEF0DD] flex flex-col w-full'>
       <div className='flex-1 flex items-center z-0'>
@@ -471,7 +483,7 @@ const PaymentSuccess = ({ amount, method }) => {
         </div>
       </div>
       <div className='mt-auto w-full p-4'>
-        <Button primary={true} inputClasses='h-12'>
+        <Button primary={true} inputClasses='h-12' link='/lead/property-details'>
           Next
         </Button>
       </div>

@@ -331,6 +331,7 @@ body {
   line-height: 18px !important;
   font-family: 'Poppins', sans-serif !important;
 }
+
 .MuiTooltip-arrow {
   color: #373435 !important;
 }
@@ -374,4 +375,8 @@ body {
 
 .rdrDateDisplayWrapper {
   display: none;
+}
+
+.MuiSnackbar-root {
+  z-index: 30 !important;
 }

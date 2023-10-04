@@ -34,9 +34,9 @@ const applicantSchema = Yup.object().shape({
       .min(2, 'Last Name must be atleast 2 characters long')
       .max(10, 'Last Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
-    date_of_birth: Yup.string()
-      .min(10, 'Enter valid date')
-      .required('Date of Birth is Required. Minimum age must be 18 or 18+'),
+    date_of_birth: Yup.string().required(
+      'Date of Birth is Required. Minimum age must be 18 or 18+',
+    ),
     mobile_number: Yup.string()
       .matches(/^(?!.*(\d)\1{4})(?!.*(\d{5}).*\2)\d{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),
@@ -111,19 +111,16 @@ const applicantSchema = Yup.object().shape({
       }
     }),
     first_name: Yup.string()
-      .trim()
       .min(2, 'First Name must be atleast 2 characters long')
       .max(10, 'First Name can be max 10 characters long')
       .required('First Name is required')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     middle_name: Yup.string()
-      .trim()
       .nullable()
       .min(2, 'Middle Name must be atleast 2 characters long')
       .max(10, 'Middle Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
     last_name: Yup.string()
-      .trim()
       .nullable()
       .min(2, 'Last Name must be atleast 2 characters long')
       .max(10, 'Last Name can be max 10 characters long')
@@ -134,29 +131,32 @@ const applicantSchema = Yup.object().shape({
       .matches(/^(?!.*(\d{5}).*\1)\d{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),
     father_husband_name: Yup.string()
-      .trim()
       .min(2, 'Father/Husbands Name must be atleast 2 characters long')
-      .max(90, 'Father/Husbands Name can be max 90 characters long')
+      .max(10, 'Father/Husbands Name can be max 10 characters long')
       .required('Father/Husbands Name is required')
-      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     mother_name: Yup.string()
-      .trim()
       .min(2, 'Mother Name must be atleast 2 characters long')
-      .max(90, 'Mother Name can be max 90 characters long')
+      .max(10, 'Mother Name can be max 10 characters long')
       .required('Mother Name is required')
-      .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     marital_status: Yup.string().required('This field is mandatory.'),
     religion: Yup.string().required('Religion is required'),
     preferred_language: Yup.string().required('Preferred Language is required'),
     qualification: Yup.string().required('Qualification is required'),
-    email: Yup.string()
-      .required('Please enter your email')
-      .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
+    email: Yup.string().matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Enter a Valid Email'),
   }),
 
   work_income_detail: Yup.object().shape({
     profession: Yup.string().required('This field is mandatory'),
-    company_name: Yup.string().required('This field is mandatory'),
+    no_current_loan: Yup.number()
+      .required('This field is mandatory')
+      .min(0, 'No. of Current loan(s) can be min 0')
+      .max(99, 'No. of Current loan(s) can be max 99'),
+    ongoing_emi: Yup.string().required('This field is mandatory'),
+    total_family_number: Yup.string().required('This field is mandatory'),
+    total_household_income: Yup.string().required('This field is mandatory'),
+    no_of_dependents: Yup.string().required('This field is mandatory'),
     extra_params: Yup.object().shape({
       extra_company_name: Yup.string()
         .trim()
@@ -169,34 +169,8 @@ const applicantSchema = Yup.object().shape({
         .min(2, 'Industry name must be atleast 2 characters long')
         .max(90, 'Industry name can be max 90 characters long'),
     }),
-    business_name: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(2, 'Business name must be atleast 2 characters long')
-      .max(90, 'Business name can be max 90 characters long'),
-    industries: Yup.string().required('This field is mandatory'),
-    gst_number: Yup.string().required('This field is mandatory'),
-    total_income: Yup.number()
-      .required('This field is mandatory')
-      .required('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
-      .typeError('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
-      .min(10000, 'Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
-      .max(
-        500000000,
-        'Total loan amount should not be less than ₹ 10,000 and more than ₹ 50,00,00,000',
-      ),
-    pf_uan: Yup.string()
-      .trim()
-      .required('This field is mandatory')
-      .min(12, 'pf uan number must be atleast 12 characters')
-      .max(12, 'pf uan number must be atleast 12 characters'),
-    no_current_loan: Yup.number()
-      .required('This field is mandatory')
-      .min(0, 'No. of Current loan(s) can be min 0')
-      .max(99, 'No. of Current loan(s) can be max 99'),
-    ongoing_emi: Yup.string().required('This field is mandatory'),
-    working_since: Yup.string().required('This field is mandatory'),
-    mode_of_salary: Yup.string().required('This field is mandatory'),
+
+    //Salaried and Self Employed
     flat_no_building_name: Yup.string()
       .trim()
       .required('This field is mandatory')
@@ -209,7 +183,6 @@ const applicantSchema = Yup.object().shape({
       .max(90, 'Address can be max 90 characters long'),
     town: Yup.string()
       .trim()
-      .required('This field is mandatory')
       .min(2, 'Town must be atleast 2 characters long')
       .max(90, 'Town can be max 90 characters long'),
     landmark: Yup.string()
@@ -222,9 +195,35 @@ const applicantSchema = Yup.object().shape({
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
       .max(6, 'Enter a valid Pincode'),
-    total_family_number: Yup.string().required('This field is mandatory'),
-    total_household_income: Yup.string().required('This field is mandatory'),
-    no_of_dependents: Yup.string().required('This field is mandatory'),
+
+    //Salaried
+    company_name: Yup.string().required('This field is mandatory'),
+    total_income: Yup.number()
+      .required('This field is mandatory')
+      .required('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
+      .typeError('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
+      .min(10000, 'Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
+      .max(
+        500000000,
+        'Total loan amount should not be less than ₹ 10,000 and more than ₹ 50,00,00,000',
+      ),
+    pf_uan: Yup.string()
+      .trim()
+      .min(12, 'pf uan number must be atleast 12 characters')
+      .max(12, 'pf uan number must be atleast 12 characters'),
+    working_since: Yup.string().required('This field is mandatory'),
+    mode_of_salary: Yup.string().required('This field is mandatory'),
+
+    //Self Employed
+    business_name: Yup.string()
+      .trim()
+      .required('This field is mandatory')
+      .min(2, 'Business name must be atleast 2 characters long')
+      .max(90, 'Business name can be max 90 characters long'),
+    industries: Yup.string().required('This field is mandatory'),
+    gst_number: Yup.string().required('This field is mandatory'),
+
+    //Pentioner
     pention_amount: Yup.string().required('This field is mandatory'),
   }),
 
@@ -267,7 +266,6 @@ const applicantSchema = Yup.object().shape({
       }),
     current_no_of_year_residing: Yup.string().required('This field is mandatory'),
 
-    permanent_type_of_residence: Yup.string().required('This field is mandatory'),
     permanent_flat_no_building_name: Yup.string()
       .trim()
       .required('This field is mandatory')
@@ -308,7 +306,7 @@ const applicantSchema = Yup.object().shape({
 });
 
 export const validationSchemaLead = Yup.object().shape({
-  propertySchema: Yup.object().shape({
+  property_details: Yup.object().shape({
     property_identification_is: Yup.string().required('This field is mandatory'),
     property_value_estimate: Yup.string().trim().required('This field is mandatory'),
     owner_name: Yup.string()
@@ -341,7 +339,7 @@ export const validationSchemaLead = Yup.object().shape({
         return !!res;
       }),
   }),
-  referenceSchema: Yup.object().shape({
+  reference_details: Yup.object().shape({
     reference_1_type: Yup.string().trim().required('This field is mandatory'),
     reference_1_full_name: Yup.string()
       .trim()

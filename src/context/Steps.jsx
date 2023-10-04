@@ -16,7 +16,6 @@ export const applicantSteps = [
   {
     title: 'Applicant Details',
     description: 'Name, Mobile Number, Loan Type',
-    progress: 0,
     url: '/lead/applicant-details',
     Icon: ApplicantDetailsIcon,
     name: 'applicant_details',
@@ -24,7 +23,6 @@ export const applicantSteps = [
   {
     title: 'Personal Details',
     description: 'OCR, e-KYC, Address',
-    progress: 0,
     url: '/lead/personal-details',
     lock: false,
     Icon: PersonalDetailsIcon,
@@ -33,7 +31,6 @@ export const applicantSteps = [
   {
     title: 'Address Details',
     description: 'OCR, e-KYC, Address',
-    progress: 0,
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,
@@ -42,7 +39,6 @@ export const applicantSteps = [
   {
     title: 'Work/Income Details',
     description: 'Profession details, Family Income',
-    progress: 0,
     url: '/lead/work-income-details',
     lock: true,
     Icon: WorkIncomeIcon,
@@ -51,7 +47,7 @@ export const applicantSteps = [
   {
     title: 'Qualifier is not activated',
     description: 'Complete Applicant, Personal, Address and Work & Income details to activate',
-    url: '/lead/work-income-details',
+    url: '/lead/qualifier',
     hideProgress: true,
     Icon: QualifierIcon,
     name: 'qualifier',
@@ -59,7 +55,6 @@ export const applicantSteps = [
   {
     title: 'L&T Charges',
     description: 'Fee details',
-    progress: 0,
     url: '/lead/lnt-charges',
     lock: true,
     Icon: LnTIcon,
@@ -68,7 +63,6 @@ export const applicantSteps = [
   {
     title: 'Property Details',
     description: 'Profession details, Family Income',
-    progress: 0,
     url: '/lead/property-details',
     lock: true,
     Icon: PropertyDetailsIcon,
@@ -77,15 +71,13 @@ export const applicantSteps = [
   {
     title: 'Banking Details',
     description: 'IFSC Details, Bank Statement',
-    progress: 0,
     url: '/lead/banking-details',
     lock: true,
     Icon: BankingDetailsIcon,
   },
   {
     title: 'Reference Details',
-    description: 'Reference person name, Mobile number',
-    progress: 0,
+    description: 'Reference person name, Address',
     url: '/lead/reference-details',
     lock: true,
     Icon: ReferenceDetailsIcon,
@@ -94,7 +86,6 @@ export const applicantSteps = [
   {
     title: 'Upload Documents',
     description: 'Aadhar, PAN, Property document',
-    progress: 0,
     url: '/lead/upload-documents',
     lock: true,
     Icon: UploadIcon,
@@ -102,9 +93,17 @@ export const applicantSteps = [
   {
     title: 'Preview',
     description: '',
-    url: '/lead/upload-documents',
+    url: '/lead/preview',
     hideProgress: true,
     Icon: PreviewIcon,
+  },
+  {
+    title: 'Eligibility is not activated',
+    description: 'Complete all the steps to activate',
+    url: '/lead/eligibility',
+    hideProgress: true,
+    Icon: QualifierIcon,
+    name: 'eligibility',
   },
 ];
 
@@ -112,7 +111,6 @@ export const coApplicantSteps = [
   {
     title: 'Applicant Details',
     description: 'Name, Mobile Number, Loan Type',
-    progress: 0,
     url: '/lead/applicant-details',
     Icon: ApplicantDetailsIcon,
     name: 'applicant_details',
@@ -120,16 +118,14 @@ export const coApplicantSteps = [
   {
     title: 'Personal Details',
     description: 'OCR, e-KYC, Address',
-    progress: 0,
     url: '/lead/personal-details',
-    lock: true,
+    lock: false,
     Icon: PersonalDetailsIcon,
     name: 'personal_details',
   },
   {
     title: 'Address Details',
     description: 'OCR, e-KYC, Address',
-    progress: 0,
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,
@@ -138,7 +134,6 @@ export const coApplicantSteps = [
   {
     title: 'Work/Income Details',
     description: 'Profession details, Family Income',
-    progress: 0,
     url: '/lead/work-income-details',
     lock: true,
     Icon: WorkIncomeIcon,
@@ -147,14 +142,13 @@ export const coApplicantSteps = [
   {
     title: 'Qualifier is not activated',
     description: 'Complete Applicant, Personal, Address and Work & Income details to activate',
-    url: '/lead/work-income-details',
+    url: '/lead/qualifier',
     hideProgress: true,
     Icon: QualifierIcon,
   },
   {
     title: 'Banking Details',
     description: 'IFSC Details, Bank Statement',
-    progress: 0,
     url: '/lead/banking-details',
     lock: true,
     Icon: BankingDetailsIcon,
@@ -162,7 +156,6 @@ export const coApplicantSteps = [
   {
     title: 'Upload Documents',
     description: 'Aadhar, PAN, Property document',
-    progress: 0,
     url: '/lead/upload-documents',
     lock: true,
     Icon: UploadIcon,
