@@ -195,10 +195,7 @@ export default function Salaried() {
           }
           const address_pattern = /^[0-9]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(
-              `applicants[${activeIndex}].${e.currentTarget.name}`,
-              value.charAt(0).toUpperCase() + value.slice(1),
-            );
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
         }}
         onKeyDown={(e) => {
@@ -254,10 +251,7 @@ export default function Salaried() {
           const value = e.currentTarget.value;
           const address_pattern = /^[0-9]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(
-              `applicants[${activeIndex}].${e.currentTarget.name}`,
-              value.charAt(0).toUpperCase() + value.slice(1),
-            );
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
         }}
         onKeyDown={(e) => {
@@ -305,10 +299,7 @@ export default function Salaried() {
           const value = e.currentTarget.value;
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(
-              `applicants[${activeIndex}].${e.currentTarget.name}`,
-              value.charAt(0).toUpperCase() + value.slice(1),
-            );
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'

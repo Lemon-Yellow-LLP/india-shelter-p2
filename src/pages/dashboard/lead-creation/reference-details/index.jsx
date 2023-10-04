@@ -1,78 +1,15 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { DropDown, TextInput } from '../../../../components';
-import { checkIsValidStatePincode, editReferenceById } from '../../../../global';
+import {
+  addApi,
+  checkIsValidStatePincode,
+  editFieldsById,
+  editReferenceById,
+} from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
-
-const referenceDropdownOneOptions = [
-  {
-    label: 'Relative/Friend',
-    value: 'relative-friend',
-  },
-  {
-    label: 'Current Employer/Contractor',
-    value: 'current-employer-contractor',
-  },
-  {
-    label: 'Colleague',
-    value: 'colleague',
-  },
-  {
-    label: 'Business Neighbour',
-    value: 'business-neighbour',
-  },
-  {
-    label: 'Customer/Client',
-    value: 'customer-client',
-  },
-  {
-    label: 'Supplier',
-    value: 'supplier',
-  },
-  {
-    label: 'Business Place Landlord',
-    value: 'business-place-landlord',
-  },
-  {
-    label: 'Supervisor',
-    value: 'supervisor',
-  },
-];
-
-const referenceDropdownTwoOptions = [
-  {
-    label: 'Relative/Friend',
-    value: 'relative-friend',
-  },
-  {
-    label: 'Current Employer/Contractor',
-    value: 'current-employer-contractor',
-  },
-  {
-    label: 'Colleague',
-    value: 'colleague',
-  },
-  {
-    label: 'Business Neighbour',
-    value: 'business-neighbour',
-  },
-  {
-    label: 'Customer/Client',
-    value: 'customer-client',
-  },
-  {
-    label: 'Supplier',
-    value: 'supplier',
-  },
-  {
-    label: 'Business Place Landlord',
-    value: 'business-place-landlord',
-  },
-  {
-    label: 'Supervisor',
-    value: 'supervisor',
-  },
-];
+import { referenceDropdownOneOptions, referenceDropdownTwoOptions } from './ReferenceDropdowns';
+import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
@@ -92,20 +29,36 @@ const ReferenceDetails = () => {
     setFieldValue,
     setFieldError,
     updateProgress,
+    updateProgressApplicantSteps,
   } = useContext(LeadContext);
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    reference_1_type: false,
-    reference_1_full_name: false,
-    reference_1_phone_number: false,
-    reference_1_address: false,
-    reference_1_pincode: false,
-
-    reference_2_type: false,
-    reference_2_full_name: false,
-    reference_2_phone_number: false,
-    reference_2_address: false,
-    reference_2_pincode: false,
+    ...values?.reference_details?.extra_params?.required_fields_status,
   });
+
+  useEffect(() => {
+    updateProgressApplicantSteps('reference_details', requiredFieldsStatus, 'reference');
+  }, [requiredFieldsStatus]);
+
+  const updateFields = async (name, value) => {
+    let newData = {};
+    newData[name] = value;
+
+    if (values?.reference_details?.id) {
+      await editFieldsById(values?.reference_details?.id, 'reference', newData);
+    } else {
+      let addData = { ...defaultValuesLead.reference_details, [name]: value };
+      await addApi('reference', {
+        ...addData,
+        lead_id: values?.lead?.id,
+      })
+        .then(async (res) => {
+          setFieldValue(`reference_details.id`, res.id);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
 
   function disableOneOption(value) {
     setReferenceOneOptions((prev) => {
@@ -131,16 +84,13 @@ const ReferenceDetails = () => {
     (value) => {
       setSelectedReferenceTypeOne(value);
       disableTwoOption(value);
-      setFieldValue('referenceSchema.reference_1_type', value);
+      setFieldValue('reference_details.reference_1_type', value);
 
       if (!requiredFieldsStatus['reference_1_type']) {
-        updateProgress(6, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_type']: true }));
       }
 
-      editReferenceById(2, {
-        reference_1_type: value,
-      });
+      updateFields('reference_1_type', value);
     },
     [selectedReferenceTypeOne, requiredFieldsStatus],
   );
@@ -149,16 +99,13 @@ const ReferenceDetails = () => {
     (value) => {
       setSelectedReferenceTypeTwo(value);
       disableOneOption(value);
-      setFieldValue('referenceSchema.reference_2_type', value);
+      setFieldValue('reference_details.reference_2_type', value);
 
       if (!requiredFieldsStatus['reference_2_type']) {
-        updateProgress(6, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_type']: true }));
       }
 
-      editReferenceById(2, {
-        reference_2_type: value,
-      });
+      updateFields('reference_2_type', value);
     },
     [selectedReferenceTypeOne, requiredFieldsStatus],
   );
@@ -173,7 +120,6 @@ const ReferenceDetails = () => {
 
       const name = e.target.name.split('.')[1];
       if (!requiredFieldsStatus[name]) {
-        updateProgress(6, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
@@ -182,36 +128,35 @@ const ReferenceDetails = () => {
 
   const handleOnPincodeChangeOne = useCallback(async () => {
     if (
-      !values.referenceSchema.reference_1_pincode ||
-      values.referenceSchema.reference_1_pincode.toString().length < 5 ||
-      errors.referenceSchema?.reference_1_pincode
+      !values.reference_details.reference_1_pincode ||
+      values.reference_details.reference_1_pincode.toString().length < 5 ||
+      errors.reference_details?.reference_1_pincode
     ) {
-      setFieldValue('referenceSchema.reference_1_city', '');
-      setFieldValue('referenceSchema.reference_1_state', '');
+      setFieldValue('reference_details.reference_1_city', '');
+      setFieldValue('reference_details.reference_1_state', '');
       return;
     }
 
-    const res = await checkIsValidStatePincode(values.referenceSchema.reference_1_pincode);
+    const res = await checkIsValidStatePincode(values.reference_details.reference_1_pincode);
     if (!res) {
-      setFieldError('referenceSchema.reference_1_pincode', 'Invalid Pincode');
+      setFieldError('reference_details.reference_1_pincode', 'Invalid Pincode');
       return;
     }
 
-    editReferenceById(2, {
+    editReferenceById(values?.reference_details?.id, {
       reference_1_city: res.city,
       reference_1_state: res.state,
     });
 
-    setFieldValue('referenceSchema.reference_1_city', res.city);
-    setFieldValue('referenceSchema.reference_1_state', res.state);
+    setFieldValue('reference_details.reference_1_city', res.city);
+    setFieldValue('reference_details.reference_1_state', res.state);
 
     if (!requiredFieldsStatus['reference_1_pincode']) {
-      updateProgress(6, requiredFieldsStatus);
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_pincode']: true }));
     }
   }, [
-    errors.referenceSchema?.reference_1_pincode,
-    values.referenceSchema?.reference_1_pincode,
+    errors.reference_details?.reference_1_pincode,
+    values.reference_details?.reference_1_pincode,
     setFieldError,
     setFieldValue,
     requiredFieldsStatus,
@@ -219,36 +164,35 @@ const ReferenceDetails = () => {
 
   const handleOnPincodeChangeTwo = useCallback(async () => {
     if (
-      !values.referenceSchema.reference_2_pincode ||
-      values.referenceSchema.reference_2_pincode.toString().length < 5 ||
-      errors.referenceSchema?.reference_2_pincode
+      !values.reference_details.reference_2_pincode ||
+      values.reference_details.reference_2_pincode.toString().length < 5 ||
+      errors.reference_details?.reference_2_pincode
     ) {
-      setFieldValue('referenceSchema.reference_2_city', '');
-      setFieldValue('referenceSchema.reference_2_state', '');
+      setFieldValue('reference_details.reference_2_city', '');
+      setFieldValue('reference_details.reference_2_state', '');
       return;
     }
 
-    const res = await checkIsValidStatePincode(values.referenceSchema.reference_2_pincode);
+    const res = await checkIsValidStatePincode(values.reference_details.reference_2_pincode);
     if (!res) {
-      setFieldError('referenceSchema.reference_2_pincode', 'Invalid Pincode');
+      setFieldError('reference_details.reference_2_pincode', 'Invalid Pincode');
       return;
     }
 
-    editReferenceById(2, {
+    editReferenceById(values?.reference_details?.id, {
       reference_2_city: res.city,
       reference_2_state: res.state,
     });
 
-    setFieldValue('referenceSchema.reference_2_city', res.city);
-    setFieldValue('referenceSchema.reference_2_state', res.state);
+    setFieldValue('reference_details.reference_2_city', res.city);
+    setFieldValue('reference_details.reference_2_state', res.state);
 
     if (!requiredFieldsStatus['reference_2_pincode']) {
-      updateProgress(6, requiredFieldsStatus);
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_pincode']: true }));
     }
   }, [
-    errors.referenceSchema?.reference_2_pincode,
-    values.referenceSchema?.reference_2_pincode,
+    errors.reference_details?.reference_2_pincode,
+    values.reference_details?.reference_2_pincode,
     setFieldError,
     setFieldValue,
     requiredFieldsStatus,
@@ -256,36 +200,36 @@ const ReferenceDetails = () => {
 
   useEffect(() => {
     if (
-      values.referenceSchema.reference_1_phone_number ===
-        values.referenceSchema.reference_2_phone_number &&
-      values.referenceSchema.reference_2_phone_number
+      values.reference_details.reference_1_phone_number ===
+        values.reference_details.reference_2_phone_number &&
+      values.reference_details.reference_2_phone_number
     ) {
       setFieldError(
-        'referenceSchema.reference_1_phone_number',
+        'reference_details.reference_1_phone_number',
         'Reference phone number must be unique',
       );
     }
   }, [
-    values.referenceSchema.reference_1_phone_number,
+    values.reference_details.reference_1_phone_number,
     setFieldError,
-    errors.referenceSchema?.reference_1_phone_number,
+    errors.reference_details?.reference_1_phone_number,
   ]);
 
   useEffect(() => {
     if (
-      values.referenceSchema.reference_2_phone_number ===
-        values.referenceSchema.reference_1_phone_number &&
-      values.referenceSchema.reference_1_phone_number
+      values.reference_details.reference_2_phone_number ===
+        values.reference_details.reference_1_phone_number &&
+      values.reference_details.reference_1_phone_number
     ) {
       setFieldError(
-        'referenceSchema.reference_2_phone_number',
+        'reference_details.reference_2_phone_number',
         'Reference phone number must be unique',
       );
     }
   }, [
-    values.referenceSchema.reference_2_phone_number,
+    values.reference_details.reference_2_phone_number,
     setFieldError,
-    errors.referenceSchema?.reference_2_phone_number,
+    errors.reference_details?.reference_2_phone_number,
   ]);
 
   return (
@@ -310,9 +254,9 @@ const ReferenceDetails = () => {
             onChange={handleReferenceTypeChangeOne}
             defaultSelected={selectedReferenceTypeOne}
             inputClasses='mt-2'
-            name='referenceSchema.reference_1_type'
-            error={errors.referenceSchema?.reference_1_type}
-            touched={touched.referenceSchema?.reference_1_type}
+            name='reference_details.reference_1_type'
+            error={errors.reference_details?.reference_1_type}
+            touched={touched.reference_details?.reference_1_type}
             onBlur={(e) => {
               handleBlur(e);
             }}
@@ -322,19 +266,20 @@ const ReferenceDetails = () => {
             label='Full Name'
             placeholder='Eg: Pratik Akash Singh'
             required
-            name='referenceSchema.reference_1_full_name'
-            value={values.referenceSchema.reference_1_full_name}
-            error={errors.referenceSchema?.reference_1_full_name}
-            touched={touched.referenceSchema?.reference_1_full_name}
+            name='reference_details.reference_1_full_name'
+            value={values.reference_details.reference_1_full_name}
+            error={errors.reference_details?.reference_1_full_name}
+            touched={touched.reference_details?.reference_1_full_name}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.referenceSchema?.reference_1_full_name &&
-                values.referenceSchema.reference_1_full_name
+                !errors.reference_details?.reference_1_full_name &&
+                values?.reference_details?.reference_1_full_name
               ) {
-                editReferenceById(2, {
-                  reference_1_full_name: values.referenceSchema.reference_1_full_name,
-                });
+                updateFields(
+                  'reference_1_full_name',
+                  values.reference_details.reference_1_full_name,
+                );
               }
             }}
             disabled={inputDisabled}
@@ -346,21 +291,22 @@ const ReferenceDetails = () => {
             label='Mobile number'
             placeholder='Eg: 123456789'
             required
-            name='referenceSchema.reference_1_phone_number'
+            name='reference_details.reference_1_phone_number'
             type='tel'
-            value={values.referenceSchema.reference_1_phone_number}
-            error={errors.referenceSchema?.reference_1_phone_number}
-            touched={touched.referenceSchema?.reference_1_phone_number}
+            value={values.reference_details.reference_1_phone_number}
+            error={errors.reference_details?.reference_1_phone_number}
+            touched={touched.reference_details?.reference_1_phone_number}
             onBlur={(e) => {
               handleBlur(e);
 
               if (
-                !errors.referenceSchema?.reference_1_phone_number &&
-                values.referenceSchema.reference_1_phone_number
+                !errors.reference_details?.reference_1_phone_number &&
+                values.reference_details.reference_1_phone_number
               ) {
-                editReferenceById(2, {
-                  reference_1_phone_number: values.referenceSchema.reference_1_phone_number,
-                });
+                updateFields(
+                  'reference_1_phone_number',
+                  values.reference_details.reference_1_phone_number,
+                );
               }
             }}
             pattern='\d*'
@@ -394,7 +340,6 @@ const ReferenceDetails = () => {
 
               const name = e.target.name.split('.')[1];
               if (!requiredFieldsStatus[name]) {
-                updateProgress(6, requiredFieldsStatus);
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             }}
@@ -407,10 +352,10 @@ const ReferenceDetails = () => {
             onKeyDown={(e) => {
               if (e.key === 'Backspace') {
                 setFieldValue(
-                  'referenceSchema.reference_1_phone_number',
-                  values.referenceSchema.reference_1_phone_number.slice(
+                  'reference_details.reference_1_phone_number',
+                  values.reference_details.reference_1_phone_number.slice(
                     0,
-                    values.referenceSchema.reference_1_phone_number.length - 1,
+                    values.reference_details.reference_1_phone_number.length - 1,
                   ),
                 );
                 e.preventDefault();
@@ -429,19 +374,17 @@ const ReferenceDetails = () => {
             label='Address'
             placeholder='Eg: Near Sanjay hospital'
             required
-            name='referenceSchema.reference_1_address'
-            value={values.referenceSchema.reference_1_address}
-            error={errors.referenceSchema?.reference_1_address}
-            touched={touched.referenceSchema?.reference_1_address}
+            name='reference_details.reference_1_address'
+            value={values.reference_details.reference_1_address}
+            error={errors.reference_details?.reference_1_address}
+            touched={touched.reference_details?.reference_1_address}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.referenceSchema?.reference_1_address &&
-                values.referenceSchema.reference_1_address
+                !errors.reference_details?.reference_1_address &&
+                values.reference_details.reference_1_address
               ) {
-                editReferenceById(2, {
-                  reference_1_address: values.referenceSchema.reference_1_address,
-                });
+                updateFields('reference_1_address', values.reference_details.reference_1_address);
               }
             }}
             disabled={inputDisabled}
@@ -454,7 +397,6 @@ const ReferenceDetails = () => {
 
               const name = e.target.name.split('.')[1];
               if (!requiredFieldsStatus[name]) {
-                updateProgress(6, requiredFieldsStatus);
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             }}
@@ -465,23 +407,21 @@ const ReferenceDetails = () => {
             label='Pincode'
             placeholder='Eg: 123456'
             required
-            name='referenceSchema.reference_1_pincode'
+            name='reference_details.reference_1_pincode'
             type='tel'
             hint='City and State fields will get filled based on Pincode'
-            value={values.referenceSchema.reference_1_pincode}
-            error={errors.referenceSchema?.reference_1_pincode}
-            touched={touched.referenceSchema?.reference_1_pincode}
+            value={values.reference_details.reference_1_pincode}
+            error={errors.reference_details?.reference_1_pincode}
+            touched={touched.reference_details?.reference_1_pincode}
             disabled={inputDisabled}
             onBlur={(e) => {
               handleBlur(e);
               handleOnPincodeChangeOne();
               if (
-                !errors.referenceSchema?.reference_1_pincode &&
-                values.referenceSchema.reference_1_pincode
+                !errors.reference_details?.reference_1_pincode &&
+                values.reference_details.reference_1_pincode
               ) {
-                editReferenceById(2, {
-                  reference_1_pincode: values.referenceSchema.reference_1_pincode,
-                });
+                updateFields('reference_1_pincode', values.reference_details.reference_1_pincode);
               }
             }}
             min='0'
@@ -502,7 +442,6 @@ const ReferenceDetails = () => {
 
               const name = e.target.name.split('.')[1];
               if (!requiredFieldsStatus[name]) {
-                updateProgress(6, requiredFieldsStatus);
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             }}
@@ -538,10 +477,10 @@ const ReferenceDetails = () => {
             label='City'
             required
             placeholder='Eg: Nashik'
-            name='referenceSchema.reference_1_city'
-            value={values.referenceSchema.reference_1_city}
-            error={errors.referenceSchema?.reference_1_city}
-            touched={touched.referenceSchema?.reference_1_city}
+            name='reference_details.reference_1_city'
+            value={values.reference_details.reference_1_city}
+            error={errors.reference_details?.reference_1_city}
+            touched={touched.reference_details?.reference_1_city}
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
@@ -552,10 +491,10 @@ const ReferenceDetails = () => {
             label='State'
             required
             placeholder='Eg: Maharashtra'
-            name='referenceSchema.reference_1_state'
-            value={values.referenceSchema.reference_1_state}
-            error={errors.referenceSchema?.reference_1_state}
-            touched={touched.referenceSchema?.reference_1_state}
+            name='reference_details.reference_1_state'
+            value={values.reference_details.reference_1_state}
+            error={errors.reference_details?.reference_1_state}
+            touched={touched.reference_details?.reference_1_state}
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
@@ -566,20 +505,18 @@ const ReferenceDetails = () => {
             label='Email'
             type='email'
             placeholder='Eg: xyz@gmail.com'
-            name='referenceSchema.reference_1_email'
+            name='reference_details.reference_1_email'
             autoComplete='off'
-            value={values.referenceSchema.reference_1_email}
-            error={errors.referenceSchema?.reference_1_email}
-            touched={touched.referenceSchema?.reference_1_email}
+            value={values.reference_details.reference_1_email}
+            error={errors.reference_details?.reference_1_email}
+            touched={touched.reference_details?.reference_1_email}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.referenceSchema?.reference_1_email &&
-                values.referenceSchema.reference_1_email
+                !errors.reference_details?.reference_1_email &&
+                values.reference_details.reference_1_email
               ) {
-                editReferenceById(2, {
-                  reference_1_email: values.referenceSchema.reference_1_email,
-                });
+                updateFields('reference_1_email', values.reference_details.reference_1_email);
               }
             }}
             onChange={(e) => {
@@ -587,7 +524,6 @@ const ReferenceDetails = () => {
 
               const name = e.target.name.split('.')[1];
               if (!requiredFieldsStatus[name]) {
-                updateProgress(6, requiredFieldsStatus);
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             }}
@@ -610,9 +546,9 @@ const ReferenceDetails = () => {
             onChange={handleReferenceTypeChangeTwo}
             defaultSelected={selectedReferenceTypeTwo}
             inputClasses='mt-2'
-            name='referenceSchema.reference_2_type'
-            error={errors.referenceSchema?.reference_2_type}
-            touched={touched.referenceSchema?.reference_2_type}
+            name='reference_details.reference_2_type'
+            error={errors.reference_details?.reference_2_type}
+            touched={touched.reference_details?.reference_2_type}
             onBlur={(e) => {
               handleBlur(e);
             }}
@@ -622,19 +558,20 @@ const ReferenceDetails = () => {
             label='Full Name'
             placeholder='Eg: Pratik Akash Singh'
             required
-            name='referenceSchema.reference_2_full_name'
-            value={values.referenceSchema.reference_2_full_name}
-            error={errors.referenceSchema?.reference_2_full_name}
-            touched={touched.referenceSchema?.reference_2_full_name}
+            name='reference_details.reference_2_full_name'
+            value={values.reference_details.reference_2_full_name}
+            error={errors.reference_details?.reference_2_full_name}
+            touched={touched.reference_details?.reference_2_full_name}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.referenceSchema?.reference_2_full_name &&
-                values.referenceSchema.reference_2_full_name
+                !errors.reference_details?.reference_2_full_name &&
+                values.reference_details.reference_2_full_name
               ) {
-                editReferenceById(2, {
-                  reference_2_full_name: values.referenceSchema.reference_2_full_name,
-                });
+                updateFields(
+                  'reference_2_full_name',
+                  values.reference_details.reference_2_full_name,
+                );
               }
             }}
             disabled={inputDisabled}
@@ -646,21 +583,22 @@ const ReferenceDetails = () => {
             label='Mobile number'
             placeholder='Eg: 123456789'
             required
-            name='referenceSchema.reference_2_phone_number'
+            name='reference_details.reference_2_phone_number'
             type='tel'
-            value={values.referenceSchema.reference_2_phone_number}
-            error={errors.referenceSchema?.reference_2_phone_number}
-            touched={touched.referenceSchema?.reference_2_phone_number}
+            value={values.reference_details.reference_2_phone_number}
+            error={errors.reference_details?.reference_2_phone_number}
+            touched={touched.reference_details?.reference_2_phone_number}
             onBlur={(e) => {
               handleBlur(e);
 
               if (
-                !errors.referenceSchema?.reference_2_phone_number &&
-                values.referenceSchema.reference_2_phone_number
+                !errors.reference_details?.reference_2_phone_number &&
+                values.reference_details.reference_2_phone_number
               ) {
-                editReferenceById(2, {
-                  reference_2_phone_number: values.referenceSchema.reference_2_phone_number,
-                });
+                updateFields(
+                  'reference_2_phone_number',
+                  values.reference_details.reference_2_phone_number,
+                );
               }
             }}
             pattern='\d*'
@@ -694,7 +632,6 @@ const ReferenceDetails = () => {
 
               const name = e.target.name.split('.')[1];
               if (!requiredFieldsStatus[name]) {
-                updateProgress(6, requiredFieldsStatus);
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             }}
@@ -707,10 +644,10 @@ const ReferenceDetails = () => {
             onKeyDown={(e) => {
               if (e.key === 'Backspace') {
                 setFieldValue(
-                  'referenceSchema.reference_2_phone_number',
-                  values.referenceSchema.reference_2_phone_number.slice(
+                  'reference_details.reference_2_phone_number',
+                  values.reference_details.reference_2_phone_number.slice(
                     0,
-                    values.referenceSchema.reference_2_phone_number.length - 1,
+                    values.reference_details.reference_2_phone_number.length - 1,
                   ),
                 );
                 e.preventDefault();
@@ -729,19 +666,17 @@ const ReferenceDetails = () => {
             label='Address'
             placeholder='Eg: Near Sanjay hospital'
             required
-            name='referenceSchema.reference_2_address'
-            value={values.referenceSchema.reference_2_address}
-            error={errors.referenceSchema?.reference_2_address}
-            touched={touched.referenceSchema?.reference_2_address}
+            name='reference_details.reference_2_address'
+            value={values.reference_details.reference_2_address}
+            error={errors.reference_details?.reference_2_address}
+            touched={touched.reference_details?.reference_2_address}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.referenceSchema?.reference_2_address &&
-                values.referenceSchema.reference_2_address
+                !errors.reference_details?.reference_2_address &&
+                values.reference_details.reference_2_address
               ) {
-                editReferenceById(2, {
-                  reference_2_address: values.referenceSchema.reference_2_address,
-                });
+                updateFields('reference_2_address', values.reference_details.reference_2_address);
               }
             }}
             disabled={inputDisabled}
@@ -754,7 +689,6 @@ const ReferenceDetails = () => {
 
               const name = e.target.name.split('.')[1];
               if (!requiredFieldsStatus[name]) {
-                updateProgress(6, requiredFieldsStatus);
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             }}
@@ -765,23 +699,21 @@ const ReferenceDetails = () => {
             label='Pincode'
             placeholder='Eg: 123456'
             required
-            name='referenceSchema.reference_2_pincode'
+            name='reference_details.reference_2_pincode'
             type='tel'
             hint='City and State fields will get filled based on Pincode'
-            value={values.referenceSchema.reference_2_pincode}
-            error={errors.referenceSchema?.reference_2_pincode}
-            touched={touched.referenceSchema?.reference_2_pincode}
+            value={values.reference_details.reference_2_pincode}
+            error={errors.reference_details?.reference_2_pincode}
+            touched={touched.reference_details?.reference_2_pincode}
             disabled={inputDisabled}
             onBlur={(e) => {
               handleBlur(e);
               handleOnPincodeChangeTwo();
               if (
-                !errors.referenceSchema?.reference_2_pincode &&
-                values.referenceSchema.reference_2_pincode
+                !errors.reference_details?.reference_2_pincode &&
+                values.reference_details.reference_2_pincode
               ) {
-                editReferenceById(2, {
-                  reference_2_pincode: values.referenceSchema.reference_2_pincode,
-                });
+                updateFields('reference_2_pincode', values.reference_details.reference_2_pincode);
               }
             }}
             min='0'
@@ -802,7 +734,6 @@ const ReferenceDetails = () => {
 
               const name = e.target.name.split('.')[1];
               if (!requiredFieldsStatus[name]) {
-                updateProgress(6, requiredFieldsStatus);
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             }}
@@ -838,10 +769,10 @@ const ReferenceDetails = () => {
             label='City'
             required
             placeholder='Eg: Nashik'
-            name='referenceSchema.reference_2_city'
-            value={values.referenceSchema.reference_2_city}
-            error={errors.referenceSchema?.reference_2_city}
-            touched={touched.referenceSchema?.reference_2_city}
+            name='reference_details.reference_2_city'
+            value={values.reference_details.reference_2_city}
+            error={errors.reference_details?.reference_2_city}
+            touched={touched.reference_details?.reference_2_city}
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
@@ -852,10 +783,10 @@ const ReferenceDetails = () => {
             label='State'
             required
             placeholder='Eg: Maharashtra'
-            name='referenceSchema.reference_2_state'
-            value={values.referenceSchema.reference_2_state}
-            error={errors.referenceSchema?.reference_2_state}
-            touched={touched.referenceSchema?.reference_2_state}
+            name='reference_details.reference_2_state'
+            value={values.reference_details.reference_2_state}
+            error={errors.reference_details?.reference_2_state}
+            touched={touched.reference_details?.reference_2_state}
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
@@ -866,20 +797,18 @@ const ReferenceDetails = () => {
             label='Email'
             type='email'
             placeholder='Eg: xyz@gmail.com'
-            name='referenceSchema.reference_2_email'
+            name='reference_details.reference_2_email'
             autoComplete='off'
-            value={values.referenceSchema.reference_2_email}
-            error={errors.referenceSchema?.reference_2_email}
-            touched={touched.referenceSchema?.reference_2_email}
+            value={values.reference_details.reference_2_email}
+            error={errors.reference_details?.reference_2_email}
+            touched={touched.reference_details?.reference_2_email}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.referenceSchema?.reference_2_email &&
-                values.referenceSchema.reference_2_email
+                !errors.reference_details?.reference_2_email &&
+                values.reference_details.reference_2_email
               ) {
-                editReferenceById(2, {
-                  reference_2_email: values.referenceSchema.reference_2_email,
-                });
+                updateFields('reference_2_email', values.reference_details.reference_2_email);
               }
             }}
             onChange={(e) => {
@@ -887,7 +816,6 @@ const ReferenceDetails = () => {
 
               const name = e.target.name.split('.')[1];
               if (!requiredFieldsStatus[name]) {
-                updateProgress(6, requiredFieldsStatus);
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             }}
@@ -895,7 +823,7 @@ const ReferenceDetails = () => {
         </div>
       </div>
 
-      {/* <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' /> */}
+      <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' />
     </div>
   );
 };

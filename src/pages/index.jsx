@@ -13,7 +13,8 @@ const DashboardRoutes = () => {
   const RequireAuth = ({ children }) => {
     const { isAuthenticated } = useContext(AuthContext);
 
-    //Check authentication once and render accordingly
+    // Check authentication once and render accordingly
+
     if (isAuthenticated) {
       return children;
     } else {
@@ -29,7 +30,7 @@ const DashboardRoutes = () => {
           path='/'
           element={
             <RequireAuth>
-              <DashboardTest />
+              <Dashboard />
             </RequireAuth>
           }
         />

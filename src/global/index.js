@@ -368,19 +368,20 @@ export async function doesLnTChargesExist(leadId, values) {
   }
 }
 
-export async function editLnTCharges(id, values) {
-  const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, values);
-  return data;
-}
-
 export async function makePaymentByCash(id, values) {
   try {
     const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, {
-      extra_params: {
-        method: 'Cash',
-        status: 'success',
-      },
+      method: 'Cash',
+      status: 'Completed',
     });
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+}
+export async function editLnTCharges(id, values) {
+  try {
+    const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, values);
     return data;
   } catch (err) {
     console.error(err);
@@ -422,6 +423,7 @@ export async function getDashboardLeadList(
       `${API_URL}/dashboard/lead-list/l?fromDate=${fromDate}&toDate=${toDate}`,
       values,
     );
+    // const { data } = await axios.get(`${API_URL}/dashboard/lead-list/l`, values);
     return data;
   } catch (err) {
     console.log(err);

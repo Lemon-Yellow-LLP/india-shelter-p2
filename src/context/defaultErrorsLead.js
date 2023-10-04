@@ -6,7 +6,7 @@ export const defaultErrorsLead = {
     applied_amount: null,
   },
 
-  propertySchema: {
+  property_details: {
     property_identification_is: null,
     property_value_estimate: null,
     owner_name: null,
@@ -15,7 +15,7 @@ export const defaultErrorsLead = {
     pincode: null,
   },
 
-  referenceSchema: {
+  reference_details: {
     reference_1_type: null,
     reference_1_full_name: null,
     reference_1_phone_number: null,
