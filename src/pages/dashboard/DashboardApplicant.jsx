@@ -417,7 +417,7 @@ export default function DashboardApplicant() {
           <FormDetails
             title='WORK & INCOME DETAILS'
             ref={primarySelectedStep == 'work_income_details' ? primarySelectedStepRef : null}
-            progress={primaryApplicant?.work_income_details?.extra_params?.progress}
+            progress={primaryApplicant?.work_income_detail?.extra_params?.progress}
             data={[
               {
                 label: 'Profession',
@@ -843,7 +843,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={coApplicantSelectedStep == 'address_details' ? coApplicantSelectedStepRef : null}
             title='ADDRESS DETAILS'
-            progress={primaryApplicant?.address_details?.extra_params?.progress}
+            progress={activeCoApplicant?.address_detail?.extra_params?.progress}
             data={[
               {
                 label: 'Type of residence',
@@ -948,7 +948,7 @@ export default function DashboardApplicant() {
               coApplicantSelectedStep == 'work_income_details' ? coApplicantSelectedStepRef : null
             }
             title='WORK & INCOME DETAILS'
-            progress={primaryApplicant?.work_income_details?.extra_params?.progress}
+            progress={activeCoApplicant?.work_income_detail?.extra_params?.progress}
             data={[
               {
                 label: 'Profession',
