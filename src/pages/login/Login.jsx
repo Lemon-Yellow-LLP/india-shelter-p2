@@ -61,25 +61,32 @@ export default function Login() {
   }, []);
 
   const sendMobileOtp = async () => {
-    const officers = await getAllLoanOfficers();
+    //For bypass
+    if (values.username.toString() === '9876543210') {
+      setDisablePhoneNumber(true);
+      setHasSentOTPOnce(true);
+      setShowOTPInput(true);
+    } else {
+      const officers = await getAllLoanOfficers();
 
-    const user_exists = officers.find((user) => {
-      return user.username === values.username;
-    });
+      const user_exists = officers.find((user) => {
+        return user.username === values.username;
+      });
 
-    if (!user_exists) {
-      setFieldError('username', 'User with this number does not exists');
-      return;
+      if (!user_exists) {
+        setFieldError('username', 'User with this number does not exists');
+        return;
+      }
+
+      setDisablePhoneNumber(true);
+      setHasSentOTPOnce(true);
+      setShowOTPInput(true);
+
+      const res = await getLoginOtp(values.username);
+      if (!res) return;
+
+      setToastMessage('OTP has been sent to the mobile number');
     }
-
-    setDisablePhoneNumber(true);
-    setHasSentOTPOnce(true);
-    setShowOTPInput(true);
-
-    const res = await getLoginOtp(values.username);
-    if (!res) return;
-
-    setToastMessage('OTP has been sent to the mobile number');
   };
 
   const verifyOTP = useCallback(
@@ -87,7 +94,7 @@ export default function Login() {
       const otp = parseInt(loginotp);
 
       //For bypass
-      if (otp === 12345) {
+      if (values.username.toString() === '9876543210' && otp === 12345) {
         setDisablePhoneNumber(false);
         setMobileVerified(true);
         setFieldError('username', undefined);
@@ -120,8 +127,6 @@ export default function Login() {
           setShowOTPInput(false);
           setIsOpen(true);
         } catch (err) {
-          console.log(err);
-
           setMobileVerified(false);
           setOtpFailCount(err.response.data.fail_count);
           setIsAuthenticated(false);
