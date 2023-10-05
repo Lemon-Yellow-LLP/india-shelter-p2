@@ -3,7 +3,7 @@ import { IconHomeLoan, IconLoanAgainstProperty } from '../../../../assets/icons'
 export const loanTypeOptions = [
   {
     label: 'Home Loan',
-    value: 'HL',
+    value: 'Home Loan',
     icon: <IconHomeLoan />,
   },
   {
