@@ -5,6 +5,8 @@ import BRE_ONE from './bre-screen';
 import Preview from './preview';
 import { Snackbar } from '@mui/material';
 import { useSearchParams, useLocation } from 'react-router-dom';
+import BankingManual from './banking-details/BankingManual';
+import AccountAggregator from './banking-details/AccountAggregator';
 
 const AddressDetails = lazy(() => import('./address-details'));
 const ApplicantDetails = lazy(() => import('./applicant-details'));
@@ -110,11 +112,12 @@ const LeadCreationRoutes = () => {
     );
   };
 
-  console.log(params);
-
   return (
     <>
-      {params['*'] === 'qualifier' || params['*'] === 'lnt-charges' ? null : (
+      {params['*'] === 'qualifier' ||
+      params['*'] === 'lnt-charges' ||
+      params['*'] === 'banking-details/manual' ||
+      params['*'] === 'banking-details/account-aggregator' ? null : (
         <SwipeableDrawerComponent />
       )}
       <Routes>
@@ -122,6 +125,8 @@ const LeadCreationRoutes = () => {
         <Route path='applicant-details' element={<ApplicantDetails />} />
         <Route path='address-details' element={<AddressDetails />} />
         <Route path='banking-details' element={<BankingDetails />} />
+        <Route path='banking-details/manual' element={<BankingManual />} />
+        <Route path='banking-details/account-aggregator' element={<AccountAggregator />} />
         <Route path='lnt-charges' element={<LntCharges />} />
         <Route path='personal-details' element={<PersonalDetails />} />
         <Route path='reference-details' element={<ReferenceDetails />} />

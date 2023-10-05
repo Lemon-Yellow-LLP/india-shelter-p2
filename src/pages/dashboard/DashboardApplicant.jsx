@@ -64,7 +64,7 @@ export default function DashboardApplicant() {
 
         // Get completed lnt charges
         setLntCharges(
-          data?.lt_charges?.find((charge) => {
+          data?.lnt_charges?.find((charge) => {
             charge?.airpay_verify_transaction_status == '200' ||
               charge?.extra_params?.status == 'success';
           }),

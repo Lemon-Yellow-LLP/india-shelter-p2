@@ -25,7 +25,7 @@ import IconSelfEmployed from './self-employed.jsx';
 
 import ApplicantDetailsIcon from './ApplicantDetailsIcon';
 import AddressDetailsIcon from './AddressDetailsIcon';
-import BankingDetailsIcon from './BankingDetailsIcon';
+import BankingDetailsIcon from './bankingDetailsIcon';
 import LnTIcon from './lnTIcon';
 import PersonalDetailsIcon from './PersonalDetailsIcon';
 import PreviewIcon from './PreviewIcon';
@@ -38,8 +38,15 @@ import LockIcon from './LockIcon';
 import ToolTipIcon from './ToolTipIcon';
 import DustbinIcon from './DustbinIcon';
 import CommingSoon from './CommingSoon.svg';
+import BankingManual from './bankingManual.svg';
+import BankingAA from './bankingAA.svg';
+
+import IconBackBanking from './iconBackHeader';
 
 export {
+  IconBackBanking,
+  BankingAA,
+  BankingManual,
   CommingSoon,
   DustbinIcon,
   ToolTipIcon,

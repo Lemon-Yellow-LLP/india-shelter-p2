@@ -84,6 +84,7 @@ const LnTCharges = ({ amount = 1500 }) => {
       try {
         // check whether LnT exists
         const resp = await checkIfLntExists(values?.lead?.id);
+        setFieldValue('lnt_charges', resp);
         setPaymentStatus('success');
       } catch (err) {
         const resp = await addLnTCharges(values?.lead?.id);
@@ -93,7 +94,6 @@ const LnTCharges = ({ amount = 1500 }) => {
         // Reset
         setHasSentOTPOnce(false);
         setShowResendLink(false);
-        setFieldValue('lnt_charges.mobile_number', '');
         setActiveItem('');
       }
     })();
@@ -442,8 +442,8 @@ const LnTCharges = ({ amount = 1500 }) => {
             inputClasses=' w-full h-[46px]'
             onClick={() => {
               hideConfirmSkip();
-              // setPaymentStatus('failure');
             }}
+            link='/lead/property-details'
           >
             Yes, skip
           </Button>

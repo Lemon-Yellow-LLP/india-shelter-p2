@@ -7,6 +7,7 @@ import { LockIcon } from '../../../assets/icons';
 export default function DrawerSteps({ details, steps, index, stepIndex, noProgress, lock }) {
   const { setCurrentStepIndex, setDrawerOpen, drawerOpen, setActiveIndex, values } =
     useContext(LeadContext);
+
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -33,9 +34,9 @@ export default function DrawerSteps({ details, steps, index, stepIndex, noProgre
         </div>
         {!details.hideProgress ? (
           !lock && steps ? (
-            details.name === 'lt_charges' ? (
+            details.name === 'lnt_charges' ? (
               <>
-                {values?.[details.name]?.extra_params?.progress === 100 ? (
+                {values?.lnt_charges?.find((e) => e.status === 'Completed') ? (
                   <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
                     Received
                   </span>

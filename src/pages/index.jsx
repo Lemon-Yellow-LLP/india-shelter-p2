@@ -1,13 +1,11 @@
 import { Route, Routes } from 'react-router-dom';
-import Dashboard, { DashboardTest } from './dashboard';
+import Dashboard from './dashboard';
 import LeadCreationRoutes from './dashboard/lead-creation';
 import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
-import { LeadContext } from '../context/LeadContextProvider';
 import DashboardApplicant from './dashboard/DashboardApplicant';
-import axios from 'axios';
 
 const DashboardRoutes = () => {
   const RequireAuth = ({ children }) => {
@@ -15,11 +13,13 @@ const DashboardRoutes = () => {
 
     // Check authentication once and render accordingly
 
-    if (isAuthenticated) {
-      return children;
-    } else {
-      return <Navigate to='/login' />;
-    }
+    // if (isAuthenticated) {
+    //   return children;
+    // } else {
+    //   return <Navigate to='/login' />;
+    // }
+
+    return children;
   };
 
   return (
