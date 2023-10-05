@@ -31,7 +31,6 @@ import {
   loanPurposeDataLap,
 } from './ApplicantDropDownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
-import Topbar from '../../../../components/TopBar';
 
 const ApplicantDetails = () => {
   const {

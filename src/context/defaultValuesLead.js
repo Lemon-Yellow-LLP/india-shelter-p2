@@ -174,7 +174,6 @@ export const defaultValuesLead = {
             current_landmark: false,
             current_pincode: false,
             current_no_of_year_residing: false,
-            current_no_of_year_residing: false,
             permanent_flat_no_building_name: false,
             permanent_street_area_locality: false,
             permanent_town: false,
