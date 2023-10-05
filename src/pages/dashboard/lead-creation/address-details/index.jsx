@@ -172,6 +172,16 @@ export default function AddressDetails() {
       };
 
       setValues(newData);
+
+      setRequiredFieldsStatus((prev) => ({
+        ...prev,
+        permanent_flat_no_building_name: true,
+        permanent_street_area_locality: true,
+        permanent_town: true,
+        permanent_landmark: true,
+        permanent_pincode: true,
+        permanent_no_of_year_residing: true,
+      }));
     } else {
       let newData = JSON.parse(JSON.stringify(values));
 
@@ -188,6 +198,16 @@ export default function AddressDetails() {
       };
 
       setValues(newData);
+
+      setRequiredFieldsStatus((prev) => ({
+        ...prev,
+        permanent_flat_no_building_name: false,
+        permanent_street_area_locality: false,
+        permanent_town: false,
+        permanent_landmark: false,
+        permanent_pincode: false,
+        permanent_no_of_year_residing: false,
+      }));
     }
 
     if (values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence) {
