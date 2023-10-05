@@ -14,6 +14,7 @@ import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWith
 import QRCode from 'react-qr-code';
 import {
   addLnTCharges,
+  checkIfLntExists,
   checkPaymentStatus,
   doesLnTChargesExist,
   editLnTCharges,
@@ -80,41 +81,35 @@ const LnTCharges = ({ amount = 1500 }) => {
 
   useEffect(() => {
     (async () => {
-      const resp = await addLnTCharges(values?.lead?.id);
-      setLntId(resp.id);
-      await fetchQR();
-    })();
+      try {
+        // check whether LnT exists
+        const resp = await checkIfLntExists(values?.lead?.id);
+        setPaymentStatus('success');
+      } catch (err) {
+        const resp = await addLnTCharges(values?.lead?.id);
+        setLntId(resp.id);
+        await fetchQR();
 
-    // Reset
-    setHasSentOTPOnce(false);
-    setShowResendLink(false);
-    setFieldValue('lnt_charges.mobile_number', '');
-    setActiveItem('');
-  }, [paymentStatus]);
+        // Reset
+        setHasSentOTPOnce(false);
+        setShowResendLink(false);
+        setFieldValue('lnt_charges.mobile_number', '');
+        setActiveItem('');
+      }
+    })();
+  }, []);
 
   const handleCheckingStatus = async (label = '') => {
     try {
       setCheckingStatus(label);
       const resp = await checkPaymentStatus(values?.lead?.id);
       if (resp?.airpay_response_json?.airpay_verify_transaction_status == '200') {
-        editLnTCharges(values?.lead?.id, {
-          success: 'Completed',
-          method: activeItem,
-        });
         setPaymentStatus('success');
       } else if (resp?.airpay_response_json?.airpay_verify_transaction_status == '400') {
         setPaymentStatus('failure');
-        editLnTCharges(values?.lead?.id, {
-          success: 'Rejected',
-          method: activeItem,
-        });
       }
     } catch (error) {
       setPaymentStatus('failure');
-      editLnTCharges(values?.lead?.id, {
-        success: 'Rejected',
-        method: activeItem,
-      });
       console.log(error);
     } finally {
       setCheckingStatus('');
