@@ -34,17 +34,17 @@ export const personalDetailsModeOption = [
 export const personalDetailsGenderOption = [
   {
     label: 'Male',
-    value: 'MALE',
+    value: 'Male',
     icon: <IconMale />,
   },
   {
     label: 'Female',
-    value: 'FEMALE',
+    value: 'Female',
     icon: <IconFemale />,
   },
   {
     label: 'Transgender',
-    value: 'TRANSGENDER',
+    value: 'Transgender',
     icon: <IconTransGender />,
   },
 ];
