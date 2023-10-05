@@ -346,6 +346,11 @@ export async function checkPaymentStatus(leadId, values) {
   }
 }
 
+export async function checkIfLntExists(leadId) {
+  const { data } = await axios.get(`${API_URL}/lt-charges/check-lead-payment/${leadId}`);
+  return data;
+}
+
 export async function addLnTCharges(leadId, values) {
   const { data } = await axios.post(`${API_URL}/lt-charges/add/`, {
     lead_id: leadId,
@@ -379,6 +384,7 @@ export async function makePaymentByCash(id, values) {
     console.error(err);
   }
 }
+
 export async function editLnTCharges(id, values) {
   try {
     const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, values);
