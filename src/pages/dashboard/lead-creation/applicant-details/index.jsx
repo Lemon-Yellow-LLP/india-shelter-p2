@@ -721,7 +721,9 @@ const ApplicantDetails = () => {
             label='Purpose of loan'
             name='lead.purpose_of_loan'
             required
-            options={values?.lead.loan_type === 'HL' ? loanPurposeOptions : loanPurposeDataLap}
+            options={
+              values?.lead.loan_type === 'Home Loan' ? loanPurposeOptions : loanPurposeDataLap
+            }
             placeholder='Eg: Choose reference type'
             onChange={handleLoanPurposeChange}
             touched={touched && touched?.lead?.purpose_of_loan}
@@ -738,7 +740,7 @@ const ApplicantDetails = () => {
             required
             placeholder='Eg: Residential'
             options={
-              values?.lead.loan_type === 'HL'
+              values?.lead.loan_type === 'Home Loan'
                 ? loanFields[values.lead?.purpose_of_loan] || [
                     {
                       label: 'Residential House',
