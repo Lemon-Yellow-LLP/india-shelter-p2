@@ -3,7 +3,7 @@ import { IconClose } from '../../assets/icons';
 import PropTypes from 'prop-types';
 import Button from '../Button';
 
-const UploadDocsModal = ({ showpopup, setShowPopUp, img, callback }) => {
+const UploadDocsModal = ({ showpopup, setShowPopUp, img, callback, lat, long }) => {
   if (showpopup)
     return createPortal(
       <div
@@ -21,20 +21,20 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, img, callback }) => {
               <IconClose />
             </button>
           </div>
-          <div className='h-[437px] bg-white mt-3 rounded-t-lg'>
+          <div className='relative h-[437px] bg-white mt-3 rounded-t-lg'>
             <img
-              src={URL.createObjectURL(img)}
+              src={img}
               alt={img}
               className='h-full w-full object-cover object-center rounded-t-lg'
             />
+            <p className='absolute bottom-0 left-0 text-white p-3'>
+              Lat: {lat}, Long: {long}
+            </p>
           </div>
           <div className='p-4 flex gap-4 bg-white rounded-b-lg'>
             <Button inputClasses='w-full' onClick={() => callback(img)}>
               Delete
             </Button>
-            {/* <Button inputClasses='w-full' primary>
-              Retake
-            </Button> */}
           </div>
         </div>
       </div>,
@@ -48,5 +48,5 @@ export default UploadDocsModal;
 UploadDocsModal.propTypes = {
   showpopup: PropTypes.bool,
   setShowPopUp: PropTypes.func,
-  img: PropTypes.object,
+  img: PropTypes.string,
 };
