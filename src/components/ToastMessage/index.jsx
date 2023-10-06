@@ -57,9 +57,7 @@ const ToastMessage = ({ message, setMessage, timeout = DEFAULT_TIMEOUT }) => {
             />
           </svg>
 
-          <span className='flex-1 leading-5 text-sm font-semibold text-neutral-white'>
-            {message}
-          </span>
+          <span className='flex-1 leading-5 text-sm font-medium text-neutral-white'>{message}</span>
 
           <button type='button' onClick={handleOnCloseClick}>
             <IconClose color='#FEFEFE' />

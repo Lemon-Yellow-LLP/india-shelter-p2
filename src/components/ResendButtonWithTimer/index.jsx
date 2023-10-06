@@ -41,7 +41,7 @@ const ResendButtonWithTimer = ({ defaultResendTime, startTimer, handleResend, se
     if (resendCount === 0) return 'You have 3 attempt(s) left';
     if (resendCount === 1) return 'You have 2 attempt(s) left';
     if (resendCount === 2) return 'You have 1 attempt(s) left';
-    if (resendCount === 3) return 'You have 0 attempt(s) left';
+    if (resendCount === 3) return 'Too many attempts';
   });
 
   return (

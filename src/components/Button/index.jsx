@@ -28,6 +28,6 @@ export default Button;
 
 Button.propTypes = {
   primary: PropTypes.bool,
-  children: PropTypes.elementType,
+  children: PropTypes.any,
   inputClasses: PropTypes.string,
 };

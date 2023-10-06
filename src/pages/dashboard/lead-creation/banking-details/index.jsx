@@ -103,8 +103,30 @@ const BankingDetails = () => {
               })}
             </div>
           </div>
-
-          <Accounts />
+          {values?.applicants?.[activeIndex]?.banking_details?.length && (
+            <>
+              <div className='flex flex-col mt-4'>
+                <div>
+                  <span className='text-[#727376] font-normal text-[16px]'>Added Accounts</span>
+                  <span className='text-[#727376] font-normal text-[16px] ml-1'>
+                    ({values?.applicants?.[activeIndex]?.banking_details?.length || 0})
+                  </span>
+                </div>
+              </div>
+              <Accounts />
+            </>
+          )}
+          <>
+            <div className='flex flex-col mt-4'>
+              <div>
+                <span className='text-[#727376] font-normal text-[16px]'>Added Accounts</span>
+                <span className='text-[#727376] font-normal text-[16px] ml-1'>
+                  ({values?.applicants?.[activeIndex]?.banking_details?.length || 0})
+                </span>
+              </div>
+            </div>
+            <Accounts />
+          </>
         </div>
 
         <div className='bottom-0 fixed'>
