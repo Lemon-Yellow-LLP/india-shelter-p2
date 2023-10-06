@@ -7,6 +7,7 @@ import { manualModeDropdownOptions } from '../personal-details/manualModeDropdow
 import { DropDown, ToastMessage, UploadDocsInput } from '../../../../components';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import OtpInputNoEdit from '../../../../components/OtpInput/OtpInputNoEdit';
+import { editFieldsById, getApplicantById, uploadDoc } from '../../../../global';
 
 const isQaulifierActivated = false;
 
@@ -16,14 +17,42 @@ const UploadDocuments = () => {
   const { toastMessage, setToastMessage } = useContext(AuthContext);
   // isQaulifierActivated
   const [customerPhotos, setCustomerPhotos] = useState([]);
+  const [customerPhotosFile, setCustomerPhotosFile] = useState(null);
+  const [customerUploads, setCustomerUploads] = useState(null);
+
   const [idProofPhotos, setIdProofPhotos] = useState([]);
+  const [idProofPhotosFile, setIdProofPhotosFile] = useState(null);
+  const [idProofUploads, setIdProofUploads] = useState(null);
+
   const [addressProofPhotos, setAddressProofPhotos] = useState([]);
+  const [addressProofPhotosFile, setAddressProofPhotosFile] = useState(null);
+  const [addressProofUploads, setAddressProofUploads] = useState(null);
+
   const [propertyPapers, setPropertyPapers] = useState([]);
+  const [propertyPapersFile, setPropertyPapersFile] = useState(null);
+  const [propertyPaperUploads, setPropertyPaperUploads] = useState(null);
+  const [propertyPdf, setPropertyPdf] = useState(null);
+
   const [salarySlipPhotos, setSalarySlipPhotos] = useState([]);
+  const [salarySlipPhotosFile, setSalarySlipPhotosFile] = useState(null);
+  const [salarySlipUploads, setSalarySlipUploads] = useState(null);
+
   const [form60photos, setForm60photos] = useState([]);
+  const [form60photosFile, setForm60photosFile] = useState(null);
+  const [form60Uploads, setForm60Uploads] = useState(null);
+
   const [propertyPhotos, setPropertyPhotos] = useState([]);
+  const [propertyPhotosFile, setPropertyPhotosFile] = useState(null);
+  const [propertyUploads, setPropertyUploads] = useState(null);
+
   const [selfie, setSelfie] = useState([]);
+  const [selfieFile, setSelfieFile] = useState(null);
+  const [selfieUploads, setSelfieUploads] = useState(null);
+
   const [docs, setDocs] = useState([]);
+  const [docsFile, setDocsFile] = useState(null);
+  const [docUploads, setDocUploads] = useState(null);
+
   const [editIdNumber, setEditIdNumber] = useState(false);
   const [editAddressNumber, setEditAddressNumber] = useState(false);
   const [idStatus, setIdSatus] = useState(null);
@@ -86,18 +115,6 @@ const UploadDocuments = () => {
     //   setRequiredFieldsStatus((prev) => ({ ...prev, selected_address_proof: true }));
     // }
   }, []);
-
-  useEffect(() => {
-    console.log(idProofPhotos);
-
-    if (idProofPhotos) {
-      const galleryData = new FormData();
-      for (let i = 0; i < idProofPhotos.length; i++) {
-        galleryData.append('images[]', idProofPhotos[i]);
-      }
-      console.log(galleryData);
-    }
-  }, [idProofPhotos]);
 
   const handleTextInputChange = useCallback(
     (e) => {
@@ -203,11 +220,464 @@ const UploadDocuments = () => {
     [values.username, setFieldError, setMobileVerified],
   );
 
-  console.log(errors?.applicants?.[activeIndex]?.personal_details?.id_number);
+  // console.log(errors?.applicants?.[activeIndex]?.personal_details?.id_number);
 
-  console.log(isQaulifierActivated);
+  // console.log(isQaulifierActivated);
 
-  console.log(selfie.length !== 0);
+  // console.log(selfie.length !== 0);
+
+  useEffect(() => {
+    async function addPropertyPaperPhotos() {
+      const data = new FormData();
+      const filename = Date.now() + propertyPapersFile.name;
+      data.append('applicant_id', 1);
+      data.append('document_type', 'property_paper_photos');
+      data.append('document_name', filename);
+      data.append('file', propertyPapersFile);
+
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res) {
+        const applicant = await getApplicantById(1);
+        const document_meta = applicant.document_meta;
+        if ('property_paper_photos' in document_meta == false) {
+          document_meta['property_paper_photos'] = [];
+        }
+        document_meta['property_paper_photos'].push(res.document);
+
+        const edited_applicant = await editFieldsById(1, 'applicant', {
+          document_meta: document_meta,
+        });
+
+        const pdf = edited_applicant.document_meta.property_paper_photos.find((data) => {
+          if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+            return data;
+          }
+        });
+
+        if (pdf) {
+          setPropertyPdf(pdf);
+        } else {
+          const active_uploads = edited_applicant.document_meta.property_paper_photos.filter(
+            (data) => {
+              return data.active === true;
+            },
+          );
+
+          setPropertyPaperUploads(active_uploads);
+        }
+      }
+    }
+    propertyPapers.length > 0 && addPropertyPaperPhotos();
+  }, [propertyPapersFile]);
+
+  useEffect(() => {
+    async function addCustomerPhotos() {
+      const data = new FormData();
+      const filename = Date.now() + customerPhotosFile.name;
+      data.append('applicant_id', 1);
+      data.append('document_type', 'customer_photos');
+      data.append('document_name', filename);
+      data.append('file', customerPhotosFile);
+
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res) {
+        const applicant = await getApplicantById(1);
+        const document_meta = applicant.document_meta;
+        if ('customer_photos' in document_meta == false) {
+          console.log(true);
+          document_meta['customer_photos'] = [];
+        }
+
+        document_meta['customer_photos'].push(res.document);
+
+        const edited_applicant = await editFieldsById(1, 'applicant', {
+          document_meta: document_meta,
+        });
+
+        const active_upload = edited_applicant.document_meta.customer_photos.find((data) => {
+          return data.active === true;
+        });
+
+        setCustomerUploads({ type: 'customer_photos', data: active_upload });
+      }
+    }
+    customerPhotos.length > 0 && addCustomerPhotos();
+  }, [customerPhotosFile]);
+
+  useEffect(() => {
+    async function addIdProofPhotos() {
+      const data = new FormData();
+      const filename = Date.now() + idProofPhotosFile.name;
+      data.append('applicant_id', 1);
+      data.append('document_type', 'id_proof_photos');
+      data.append('document_name', filename);
+      data.append('file', idProofPhotosFile);
+
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res) {
+        const applicant = await getApplicantById(1);
+        const document_meta = applicant.document_meta;
+        if ('id_proof_photos' in document_meta == false) {
+          document_meta['id_proof_photos'] = [];
+        }
+
+        document_meta['id_proof_photos'].push(res.document);
+
+        const edited_applicant = await editFieldsById(1, 'applicant', {
+          document_meta: document_meta,
+        });
+
+        const active_uploads = edited_applicant.document_meta.id_proof_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+      }
+    }
+    idProofPhotos.length > 0 && addIdProofPhotos();
+  }, [idProofPhotosFile]);
+
+  useEffect(() => {
+    async function addAddressProofPhotos() {
+      const data = new FormData();
+      const filename = Date.now() + addressProofPhotosFile.name;
+      data.append('applicant_id', 1);
+      data.append('document_type', 'address_proof_photos');
+      data.append('document_name', filename);
+      data.append('file', addressProofPhotosFile);
+
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res) {
+        const applicant = await getApplicantById(1);
+        const document_meta = applicant.document_meta;
+        if ('address_proof_photos' in document_meta == false) {
+          document_meta['address_proof_photos'] = [];
+        }
+
+        document_meta['address_proof_photos'].push(res.document);
+
+        const edited_applicant = await editFieldsById(1, 'applicant', {
+          document_meta: document_meta,
+        });
+
+        const active_uploads = edited_applicant.document_meta.address_proof_photos.filter(
+          (data) => {
+            return data.active === true;
+          },
+        );
+
+        setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+      }
+    }
+    addressProofPhotos.length > 0 && addAddressProofPhotos();
+  }, [addressProofPhotosFile]);
+
+  useEffect(() => {
+    async function addSalarySlipPhotos() {
+      const data = new FormData();
+      const filename = Date.now() + salarySlipPhotosFile.name;
+      data.append('applicant_id', 1);
+      data.append('document_type', 'salary_slip_photos');
+      data.append('document_name', filename);
+      data.append('file', salarySlipPhotosFile);
+
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res) {
+        const applicant = await getApplicantById(1);
+        const document_meta = applicant.document_meta;
+        if ('salary_slip_photos' in document_meta == false) {
+          document_meta['salary_slip_photos'] = [];
+        }
+
+        document_meta['salary_slip_photos'].push(res.document);
+
+        const edited_applicant = await editFieldsById(1, 'applicant', {
+          document_meta: document_meta,
+        });
+
+        const active_uploads = edited_applicant.document_meta.salary_slip_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
+      }
+    }
+    salarySlipPhotos.length > 0 && addSalarySlipPhotos();
+  }, [salarySlipPhotosFile]);
+
+  useEffect(() => {
+    async function addForm60Photos() {
+      const data = new FormData();
+      const filename = Date.now() + form60photosFile.name;
+      data.append('applicant_id', 1);
+      data.append('document_type', 'form_60_photos');
+      data.append('document_name', filename);
+      data.append('file', form60photosFile);
+
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res) {
+        const applicant = await getApplicantById(1);
+        const document_meta = applicant.document_meta;
+        if ('form_60_photos' in document_meta == false) {
+          document_meta['form_60_photos'] = [];
+        }
+        document_meta['form_60_photos'].push(res.document);
+
+        const edited_applicant = await editFieldsById(1, 'applicant', {
+          document_meta: document_meta,
+        });
+
+        const active_uploads = edited_applicant.document_meta.form_60_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
+      }
+    }
+    form60photos.length > 0 && addForm60Photos();
+  }, [form60photosFile]);
+
+  useEffect(() => {
+    async function addPropertyPhotos() {
+      const data = new FormData();
+      const filename = Date.now() + propertyPhotosFile.name;
+      data.append('applicant_id', 1);
+      data.append('document_type', 'property_photos');
+      data.append('document_name', filename);
+      data.append('file', propertyPhotosFile);
+
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res) {
+        const applicant = await getApplicantById(1);
+        const document_meta = applicant.document_meta;
+        if ('property_photos' in document_meta == false) {
+          document_meta['property_photos'] = [];
+        }
+        document_meta['property_photos'].push(res.document);
+
+        const edited_applicant = await editFieldsById(1, 'applicant', {
+          document_meta: document_meta,
+        });
+
+        const active_uploads = edited_applicant.document_meta.property_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setPropertyUploads({ type: 'property_photos', data: active_uploads });
+      }
+    }
+    propertyPhotos.length > 0 && addPropertyPhotos();
+  }, [propertyPhotosFile]);
+
+  useEffect(() => {
+    async function addSelfiePhoto() {
+      const data = new FormData();
+      const filename = Date.now() + selfieFile.name;
+      data.append('applicant_id', 1);
+      data.append('document_type', 'lo_selfie');
+      data.append('document_name', filename);
+      data.append('file', selfieFile);
+
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res) {
+        const applicant = await getApplicantById(1);
+        const document_meta = applicant.document_meta;
+        if ('lo_selfie' in document_meta == false) {
+          document_meta['lo_selfie'] = [];
+        }
+        document_meta['lo_selfie'].push(res.document);
+
+        const edited_applicant = await editFieldsById(1, 'applicant', {
+          document_meta: document_meta,
+        });
+
+        const active_upload = edited_applicant.document_meta.lo_selfie.find((data) => {
+          return data.active === true;
+        });
+
+        setSelfieUploads({ type: 'lo_selfie', data: active_upload });
+      }
+    }
+    selfie.length > 0 && addSelfiePhoto();
+  }, [selfieFile]);
+
+  useEffect(() => {
+    async function addOtherDocPhotos() {
+      const data = new FormData();
+      const filename = Date.now() + docsFile.name;
+      data.append('applicant_id', 1);
+      data.append('document_type', 'other_docs');
+      data.append('document_name', filename);
+      data.append('file', docsFile);
+
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res) {
+        const applicant = await getApplicantById(1);
+        const document_meta = applicant.document_meta;
+        if ('other_docs' in document_meta == false) {
+          document_meta['other_docs'] = [];
+        }
+        document_meta['other_docs'].push(res.document);
+
+        const edited_applicant = await editFieldsById(1, 'applicant', {
+          document_meta: document_meta,
+        });
+
+        const active_uploads = edited_applicant.document_meta.other_docs.filter((data) => {
+          return data.active === true;
+        });
+
+        setDocUploads({ type: 'other_docs', data: active_uploads });
+      }
+    }
+    docs.length > 0 && addOtherDocPhotos();
+  }, [docsFile]);
+
+  useEffect(() => {
+    async function getPreviousUploads() {
+      const res = await getApplicantById(1);
+
+      if (!res) return;
+
+      if (res.document_meta.customer_photos) {
+        const active_upload = res.document_meta.customer_photos.find((data) => {
+          return data.active === true;
+        });
+
+        setCustomerUploads({ type: 'customer_photos', data: active_upload });
+        setCustomerPhotos([1]);
+      }
+
+      if (res.document_meta.id_proof_photos) {
+        const active_uploads = res.document_meta.id_proof_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+        setIdProofPhotos(active_uploads);
+      }
+
+      if (res.document_meta.property_paper_photos) {
+        const pdf = res.document_meta.property_paper_photos.find((data) => {
+          if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+            return data;
+          }
+        });
+
+        if (pdf) {
+          setPropertyPdf(pdf);
+          setPropertyPapers([1]);
+        } else {
+          const active_uploads = res.document_meta.property_paper_photos.filter((data) => {
+            return data.active === true;
+          });
+
+          setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
+          setPropertyPapers(active_uploads);
+        }
+      }
+
+      if (res.document_meta.address_proof_photos) {
+        const active_uploads = res.document_meta.address_proof_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+        setAddressProofPhotos(active_uploads);
+      }
+
+      if (res.document_meta.salary_slip_photos) {
+        const active_uploads = res.document_meta.salary_slip_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
+        setSalarySlipPhotos(active_uploads);
+      }
+
+      if (res.document_meta.form_60_photos) {
+        const active_uploads = res.document_meta.form_60_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
+        setForm60photos(active_uploads);
+      }
+
+      if (res.document_meta.property_photos) {
+        const active_uploads = res.document_meta.property_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setPropertyUploads({ type: 'property_photos', data: active_uploads });
+        setPropertyPhotos(active_uploads);
+      }
+
+      if (res.document_meta.lo_selfie) {
+        const active_upload = res.document_meta.lo_selfie.find((data) => {
+          return data.active === true;
+        });
+
+        setSelfieUploads({ type: 'lo_selfie', data: active_upload });
+        setSelfie([1]);
+      }
+
+      if (res.document_meta.other_docs) {
+        const active_uploads = res.document_meta.other_docs.filter((data) => {
+          return data.active === true;
+        });
+
+        setDocUploads({ type: 'other_docs', data: active_uploads });
+        setDocs(active_uploads);
+      }
+    }
+    getPreviousUploads();
+  }, []);
 
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
@@ -217,6 +687,9 @@ const UploadDocuments = () => {
         <PhotoUpload
           files={customerPhotos}
           setFile={setCustomerPhotos}
+          setSingleFile={setCustomerPhotosFile}
+          uploads={customerUploads}
+          setUploads={setCustomerUploads}
           label='Customer photo'
           required
         />
@@ -265,7 +738,13 @@ const UploadDocuments = () => {
 
             {isQaulifierActivated ? (
               <div className='bg-white mt-1 border-x border-y border-stroke rounded-lg px-2 pb-2'>
-                <ImageUpload files={idProofPhotos} setFile={setIdProofPhotos} noBorder={true} />
+                <ImageUpload
+                  files={idProofPhotos}
+                  setFile={setIdProofPhotos}
+                  uploads={idProofUploads}
+                  setUploads={setIdProofUploads}
+                  noBorder={true}
+                />
 
                 <div
                   className={`flex gap-2 justify-between border-x border-y ${
@@ -396,7 +875,13 @@ const UploadDocuments = () => {
                 </div>
               </div>
             ) : (
-              <ImageUpload files={idProofPhotos} setFile={setIdProofPhotos} />
+              <ImageUpload
+                files={idProofPhotos}
+                setFile={setIdProofPhotos}
+                setSingleFile={setIdProofPhotosFile}
+                uploads={idProofUploads}
+                setUploads={setIdProofUploads}
+              />
             )}
 
             {isQaulifierActivated && (
@@ -451,6 +936,9 @@ const UploadDocuments = () => {
                 <ImageUpload
                   files={addressProofPhotos}
                   setFile={setAddressProofPhotos}
+                  setSingleFile={setAddressProofPhotosFile}
+                  uploads={addressProofUploads}
+                  setUploads={setAddressProofUploads}
                   noBorder={true}
                 />
 
@@ -587,7 +1075,13 @@ const UploadDocuments = () => {
                 </div>
               </div>
             ) : (
-              <ImageUpload files={addressProofPhotos} setFile={setAddressProofPhotos} />
+              <ImageUpload
+                files={addressProofPhotos}
+                setFile={setAddressProofPhotos}
+                setSingleFile={setAddressProofPhotosFile}
+                uploads={addressProofUploads}
+                setUploads={setAddressProofUploads}
+              />
             )}
 
             {isQaulifierActivated && (
@@ -601,38 +1095,59 @@ const UploadDocuments = () => {
         <PdfAndImageUpload
           files={propertyPapers}
           setFile={setPropertyPapers}
+          uploads={propertyPaperUploads}
+          setUploads={setPropertyPaperUploads}
+          pdf={propertyPdf}
+          setPdf={setPropertyPdf}
           label='Property papers'
           required
           hint='File size should be less than 5MB'
+          setSingleFile={setPropertyPapersFile}
         />
 
         <ImageUpload
           files={salarySlipPhotos}
           setFile={setSalarySlipPhotos}
+          uploads={salarySlipUploads}
+          setUploads={setSalarySlipUploads}
           label='Salary slip'
           required
           hint='File size should be less than 5MB'
+          setSingleFile={setSalarySlipPhotosFile}
         />
 
         <ImageUpload
           files={form60photos}
           setFile={setForm60photos}
+          uploads={form60Uploads}
+          setUploads={setForm60Uploads}
           label='Form 60'
           required
           hint='File size should be less than 5MB'
+          setSingleFile={setForm60photosFile}
         />
 
         <ImageUpload
           files={propertyPhotos}
           setFile={setPropertyPhotos}
+          uploads={propertyUploads}
+          setUploads={setPropertyUploads}
           label='Property image'
           required
           hint='File size should be less than 5MB'
+          setSingleFile={setPropertyPhotosFile}
         />
 
         <div className='flex justify-between gap-2'>
           <div className='w-[65%]'>
-            <PhotoUpload files={selfie} setFile={setSelfie} label='Upload selfie' required />
+            <PhotoUpload
+              files={selfie}
+              setFile={setSelfie}
+              setSingleFile={setSelfieFile}
+              uploads={selfieUploads}
+              label='Upload selfie'
+              required
+            />
           </div>
 
           <button
@@ -665,9 +1180,12 @@ const UploadDocuments = () => {
         <ImageUpload
           files={docs}
           setFile={setDocs}
+          uploads={docUploads}
+          setUploads={setDocUploads}
           label='Other documents'
           required
           hint='File size should be less than 5MB'
+          setSingleFile={setDocsFile}
         />
       </div>
     </div>
