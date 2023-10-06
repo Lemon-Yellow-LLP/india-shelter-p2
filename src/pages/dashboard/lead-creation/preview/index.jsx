@@ -82,7 +82,7 @@ export default function Preview() {
   }
 
   useEffect(() => {
-    removePropertiesByKeys(errors, nonRequiredFields);
+    // removePropertiesByKeys(errors, nonRequiredFields);
     console.log('-------------');
     console.log(flattenExtraParams(errors));
     setFlattedErrors(flattenExtraParams(errors));
@@ -793,7 +793,7 @@ export default function Preview() {
           },
         }}
         className='-translate-y-32 m-[10px]'
-        open={!values?.lt_charges?.find((e) => e.status !== 'Completed')}
+        open={!values?.lt_charges?.find((e) => e.status === 'Completed')}
         onClose={() => {}}
         message='L&T charges is pending'
         action={

@@ -522,7 +522,7 @@ export default function DashboardApplicant() {
 
           <FormDetails
             title='L&T CHARGES'
-            ref={primarySelectedStep == 'lnt_charges' ? primarySelectedStepRef : null}
+            ref={primarySelectedStep == 'lt_charges' ? primarySelectedStepRef : null}
             progress={null}
             data={[
               {
