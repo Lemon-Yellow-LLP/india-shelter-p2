@@ -181,26 +181,39 @@ const applicantSchema = Yup.object().shape({
       .trim()
       .required('This field is mandatory')
       .min(2, 'Address must be atleast 2 characters long')
-      .max(90, 'Address can be max 90 characters long'),
+      .max(90, 'Address can be max 90 characters long')
+      .when('profession', {
+        is: 'Self-employed' || 'Salaried',
+        then: Yup.string().required('This field is mandatory'),
+      }),
     street_area_locality: Yup.string()
       .trim()
-      .required('This field is mandatory')
       .min(2, 'Address must be atleast 2 characters long')
-      .max(90, 'Address can be max 90 characters long'),
+      .max(90, 'Address can be max 90 characters long')
+      .when('profession', {
+        is: 'Self-employed' || 'Salaried',
+        then: Yup.string().required('This field is mandatory'),
+      }),
     town: Yup.string()
       .trim()
       .min(2, 'Town must be atleast 2 characters long')
       .max(90, 'Town can be max 90 characters long'),
     landmark: Yup.string()
       .trim()
-      .required('This field is mandatory')
       .min(2, 'Landmark must be atleast 2 characters long')
-      .max(90, 'Landmark can be max 90 characters long'),
+      .max(90, 'Landmark can be max 90 characters long')
+      .when('profession', {
+        is: 'Self-employed' || 'Salaried',
+        then: Yup.string().required('This field is mandatory'),
+      }),
     pincode: Yup.string()
-      .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode'),
+      .max(6, 'Enter a valid Pincode')
+      .when('profession', {
+        is: 'Self-employed' || 'Salaried',
+        then: Yup.string().required('This field is mandatory'),
+      }),
 
     //Salaried
     company_name: Yup.string().required('This field is mandatory'),

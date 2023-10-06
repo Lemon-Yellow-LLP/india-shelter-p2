@@ -7,20 +7,30 @@ import CurrencyInput from '../../../../components/CurrencyInput';
 import { editFieldsById, getCompanyNamesList } from '../../../../global';
 import { workingSinceOptions, modeOfSalary } from './WorkIncomeDropdownData';
 
-export default function Salaried() {
+export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, errors, touched, handleBlur, setFieldValue, setFieldError, activeIndex } =
     useContext(LeadContext);
 
   const [companyNameOptions, setCompanyNameOptions] = useState([]);
 
-  const searchableTextInputChange = useCallback((name, value) => {
-    setFieldValue(name, value?.value);
-    const new_name = name.split('.')[2];
+  const searchableTextInputChange = useCallback(
+    (name, value) => {
+      setFieldValue(name, value?.value);
+      const new_name = name.split('.')[2];
 
-    editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-      [new_name]: value?.label,
-    });
-  }, []);
+      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
+        [new_name]: value?.label,
+      });
+
+      if (!requiredFieldsStatus[new_name]) {
+        setRequiredFieldsStatus((prev) => ({
+          ...prev,
+          [new_name]: true,
+        }));
+      }
+    },
+    [requiredFieldsStatus, setRequiredFieldsStatus],
+  );
 
   useEffect(() => {
     const getCompanies = async () => {
@@ -47,12 +57,22 @@ export default function Salaried() {
     getCompanies();
   }, []);
 
-  const handleDropdownChange = useCallback((value) => {
-    setFieldValue(`applicants[${activeIndex}].work_income_detail.mode_of_salary`, value);
-    editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-      mode_of_salary: value,
-    });
-  }, []);
+  const handleDropdownChange = useCallback(
+    (value) => {
+      setFieldValue(`applicants[${activeIndex}].work_income_detail.mode_of_salary`, value);
+      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
+        mode_of_salary: value,
+      });
+
+      if (!requiredFieldsStatus['mode_of_salary']) {
+        setRequiredFieldsStatus((prev) => ({
+          ...prev,
+          ['mode_of_salary']: true,
+        }));
+      }
+    },
+    [requiredFieldsStatus, setRequiredFieldsStatus],
+  );
 
   return (
     <>
@@ -78,6 +98,11 @@ export default function Salaried() {
                 company_name: values?.applicants?.[activeIndex]?.work_income_detail?.company_name,
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['company_name']: false,
+            }));
           }
         }}
         onChange={searchableTextInputChange}
@@ -120,6 +145,11 @@ export default function Salaried() {
                   },
                 },
               );
+            } else {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ['company_name']: false,
+              }));
             }
           }}
           onChange={(e) => {
@@ -127,6 +157,13 @@ export default function Salaried() {
             const pattern = /^[a-zA-Z\s]+$/;
             if (pattern.exec(value[value.length - 1])) {
               setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+              if (!requiredFieldsStatus['company_name']) {
+                setRequiredFieldsStatus((prev) => ({
+                  ...prev,
+                  ['company_name']: true,
+                }));
+              }
             }
           }}
         />
@@ -154,6 +191,11 @@ export default function Salaried() {
                 total_income: values?.applicants?.[activeIndex]?.work_income_detail?.total_income,
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['total_income']: false,
+            }));
           }
         }}
         onChange={(e) => {
@@ -161,6 +203,13 @@ export default function Salaried() {
           const pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+            if (!requiredFieldsStatus['total_income']) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ['total_income']: true,
+              }));
+            }
           }
         }}
       />
@@ -245,6 +294,11 @@ export default function Salaried() {
                 ),
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['no_current_loan']: false,
+            }));
           }
         }}
         onChange={(e) => {
@@ -252,13 +306,20 @@ export default function Salaried() {
           const address_pattern = /^[0-9]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+            if (!requiredFieldsStatus['no_current_loan']) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ['no_current_loan']: true,
+              }));
+            }
           }
         }}
         onKeyDown={(e) => {
           if (e.key === 'Backspace') {
             setFieldValue(
               `applicants[${activeIndex}].work_income_detail.no_current_loan`,
-              values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.slice(
+              values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan?.slice(
                 0,
                 values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.length - 1,
               ),
@@ -293,6 +354,11 @@ export default function Salaried() {
                 ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['ongoing_emi']: false,
+            }));
           }
         }}
         onChange={(e) => {
@@ -300,6 +366,13 @@ export default function Salaried() {
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+            if (!requiredFieldsStatus['ongoing_emi']) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ['ongoing_emi']: true,
+              }));
+            }
           }
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'

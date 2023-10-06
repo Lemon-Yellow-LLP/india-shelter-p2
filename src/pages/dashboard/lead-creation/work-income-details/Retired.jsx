@@ -4,7 +4,7 @@ import TextInput from '../../../../components/TextInput';
 import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
 
-export default function Retired() {
+export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, errors, handleBlur, touched, setFieldValue, activeIndex } =
     useContext(LeadContext);
 
@@ -33,6 +33,11 @@ export default function Retired() {
                   values?.applicants?.[activeIndex]?.work_income_detail?.pention_amount,
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['pention_amount']: false,
+            }));
           }
         }}
         onChange={(e) => {
@@ -40,6 +45,10 @@ export default function Retired() {
           const pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
           if (pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+            if (!requiredFieldsStatus['pention_amount']) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, ['pention_amount']: true }));
+            }
           }
         }}
       />
@@ -77,6 +86,11 @@ export default function Retired() {
                 ),
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['no_current_loan']: false,
+            }));
           }
         }}
         onChange={(e) => {
@@ -84,6 +98,10 @@ export default function Retired() {
           const address_pattern = /^[0-9]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+            if (!requiredFieldsStatus['no_current_loan']) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, ['no_current_loan']: true }));
+            }
           }
         }}
         onKeyDown={(e) => {
@@ -125,6 +143,11 @@ export default function Retired() {
                 ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['ongoing_emi']: false,
+            }));
           }
         }}
         onChange={(e) => {
@@ -132,6 +155,10 @@ export default function Retired() {
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+            if (!requiredFieldsStatus['ongoing_emi']) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, ['ongoing_emi']: true }));
+            }
           }
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
