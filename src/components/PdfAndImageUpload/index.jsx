@@ -1,15 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
+import loading from '../../assets/icons/loading.svg';
+import { editFieldsById, getApplicantById } from '../../global';
 
-function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
+function PdfAndImageUpload({
+  files,
+  setFile,
+  uploads,
+  setUploads,
+  pdf,
+  setPdf,
+  setSingleFile,
+  label,
+  hint,
+  ...props
+}) {
   const [message, setMessage] = useState();
-  const [pdfUpload, setPdfUpload] = useState(false);
-  const [imageUpload, setImageUpload] = useState(false);
+  const [loader, setLoader] = useState(false);
+
   const [show, setShow] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
+  const [lat, setLat] = useState('');
+  const [long, setLong] = useState('');
 
-  const handleFile = (e) => {
+  const handleFile = async (e) => {
     setMessage('');
+
+    setLoader(true);
+
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      ('The geolocation API is not supported by your browser.');
+    }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+
+      setLat(lat);
+      setLong(long);
+    }
+
     let file = e.target.files;
 
     for (let i = 0; i < file.length; i++) {
@@ -18,25 +52,101 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
       const validImageTypes = ['image/jpeg', 'application/pdf'];
 
       if (validImageTypes.includes(fileType)) {
-        if (fileType === 'application/pdf') {
-          setPdfUpload(true);
-        } else {
-          setImageUpload(true);
-        }
+        setSingleFile(file[i]);
         setFile([...files, file[i]]);
       } else {
+        setLoader(false);
         setMessage('File format not supported');
       }
     }
   };
 
-  const removeImage = (i) => {
-    setFile(files.filter((x) => x.name !== i));
-  };
+  useEffect(() => {
+    uploads && setLoader(false);
+  }, [uploads]);
+
+  useEffect(() => {
+    pdf && setLoader(false);
+  }, [pdf]);
+
+  async function removeImage(id) {
+    setFile(files.filter((x) => x.name !== id));
+
+    const applicant = await getApplicantById(1);
+    const document_meta = applicant.document_meta;
+
+    const property_papers = applicant.document_meta.property_paper_photos;
+
+    const edited_property_papers = property_papers.filter((paper) => {
+      return paper.id !== id;
+    });
+
+    const property_pdf = property_papers.find((paper) => {
+      return paper.id === id;
+    });
+
+    const edited_property_pdf = { ...property_pdf, active: false };
+
+    const edited_applicant = [...edited_property_papers, edited_property_pdf];
+
+    const new_edited_applicant = await editFieldsById(1, 'applicant', {
+      document_meta: { ...document_meta, property_paper_photos: edited_applicant },
+    });
+
+    const active_uploads = new_edited_applicant.document_meta.property_paper_photos.filter(
+      (data) => {
+        return data.active === true;
+      },
+    );
+
+    if (active_uploads.length === 0) {
+      setUploads(null);
+      setFile([]);
+    } else {
+      setUploads(active_uploads);
+    }
+  }
 
   const getImage = (value) => {
     setFile(files.filter((img) => img.name !== value.name));
   };
+
+  async function deletePDF(id) {
+    const applicant = await getApplicantById(1);
+    const document_meta = applicant.document_meta;
+
+    const property_papers = applicant.document_meta.property_paper_photos;
+
+    const edited_property_papers = property_papers.filter((paper) => {
+      return paper.id !== id;
+    });
+
+    const property_pdf = property_papers.find((paper) => {
+      return paper.id === id;
+    });
+
+    const edited_property_pdf = { ...property_pdf, active: false };
+
+    const edited_applicant = [...edited_property_papers, edited_property_pdf];
+
+    const new_edited_applicant = await editFieldsById(1, 'applicant', {
+      document_meta: { ...document_meta, property_paper_photos: edited_applicant },
+    });
+
+    const active_uploads = new_edited_applicant.document_meta.property_paper_photos.filter(
+      (data) => {
+        return data.active === true;
+      },
+    );
+
+    if (active_uploads.length === 0) {
+      setUploads(null);
+    } else {
+      setUploads(active_uploads);
+      setUploads(null);
+    }
+    setPdf(null);
+  }
 
   return (
     <div className='w-full'>
@@ -116,7 +226,13 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
         </div>
       ) : null}
 
-      {imageUpload && files.length ? (
+      {loader ? (
+        <div className='flex justify-center items-center h-14'>
+          <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+        </div>
+      ) : null}
+
+      {uploads && !pdf && !loader ? (
         <>
           <div className='flex justify-start overflow-auto'>
             <div className='flex gap-2 my-2'>
@@ -160,15 +276,12 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
               </div>
 
               <div className='flex gap-2 h-[85px]'>
-                {files.map((file, key) => {
+                {uploads.map((upload, key) => {
                   return (
                     <div key={key} className='overflow-hidden relative w-[68px]'>
                       <button
                         onClick={() => {
-                          removeImage(file.name);
-                          if (files.length == 1) {
-                            setImageUpload(false);
-                          }
+                          removeImage(upload.id);
                         }}
                         className='absolute right-0 top-0 z-20'
                       >
@@ -200,7 +313,7 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
                         <button
                           className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
                           onClick={() => {
-                            setPreviewFile(file);
+                            setPreviewFile(upload.document_url);
                             setShow(true);
                           }}
                         >
@@ -222,7 +335,7 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
                           </svg>
                         </button>
                         <img
-                          src={URL.createObjectURL(file)}
+                          src={upload.document_url}
                           alt='Gigs'
                           className='object-cover object-center h-full w-full'
                         />
@@ -237,6 +350,8 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
                 setShowPopUp={setShow}
                 img={previewFile}
                 callback={getImage}
+                lat={lat}
+                long={long}
               />
             </div>
           </div>
@@ -246,7 +361,7 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
         </>
       ) : null}
 
-      {pdfUpload ? (
+      {pdf ? (
         <div className='bg-white border-x border-y border-stroke rounded-lg p-2 mt-1'>
           <div className='flex justify-between'>
             <div className='flex gap-2'>
@@ -279,16 +394,16 @@ function PdfAndImageUpload({ files, setFile, label, hint, ...props }) {
                 </svg>
               </button>
               <div>
-                <p className='text-xs text-primary-black font-normal'>{files[0]?.name}</p>
+                <p className='text-xs text-primary-black font-normal'>{pdf.document_name}</p>
                 <p className='text-xs text-light-grey font-normal'>
-                  {(files[0]?.size / 1048576).toFixed(2) + ' MB'}
+                  {(pdf.document_meta.size / 1048576).toFixed(2) + ' MB'}
                 </p>
               </div>
             </div>
 
             <button
               onClick={() => {
-                setPdfUpload(false);
+                deletePDF(pdf.id);
                 files.length = 0;
               }}
             >

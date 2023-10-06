@@ -1,14 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
+import loading from '../../assets/icons/loading.svg';
+import { editFieldsById, getApplicantById } from '../../global';
 
-function ImageUpload({ files, setFile, label, hint, noBorder, ...props }) {
+function ImageUpload({
+  files,
+  setFile,
+  setSingleFile,
+  uploads,
+  setUploads,
+  label,
+  hint,
+  noBorder,
+  ...props
+}) {
   const [message, setMessage] = useState();
-  const [imageUpload, setImageUpload] = useState(false);
+  const [loader, setLoader] = useState(false);
+
   const [show, setShow] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
+  const [lat, setLat] = useState('');
+  const [long, setLong] = useState('');
 
   const handleFile = (e) => {
     setMessage('');
+
+    setLoader(true);
+
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      ('The geolocation API is not supported by your browser.');
+    }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+
+      setLat(lat);
+      setLong(long);
+    }
+
     let file = e.target.files;
 
     for (let i = 0; i < file.length; i++) {
@@ -17,25 +51,63 @@ function ImageUpload({ files, setFile, label, hint, noBorder, ...props }) {
       const validImageTypes = ['image/jpeg'];
 
       if (validImageTypes.includes(fileType)) {
-        setImageUpload(true);
-
+        setSingleFile(file[i]);
         setFile([...files, file[i]]);
       } else {
+        setLoader(false);
         setMessage('File format not supported');
       }
     }
   };
 
-  const removeImage = (i) => {
-    setFile(files.filter((x) => x.name !== i));
-  };
+  async function removeImage(id) {
+    const type = uploads.type;
+    setFile(files.filter((x) => x.name !== id));
+
+    const applicant = await getApplicantById(1);
+    const document_meta = applicant.document_meta;
+
+    const photos = applicant.document_meta[type];
+
+    const edited_photos = photos.filter((paper) => {
+      return paper.id !== id;
+    });
+
+    const photo = photos.find((paper) => {
+      return paper.id === id;
+    });
+
+    const edited_photo = { ...photo, active: false };
+
+    const edited_applicant = [...edited_photos, edited_photo];
+
+    const new_edited_applicant = await editFieldsById(1, 'applicant', {
+      document_meta: { ...document_meta, [type]: edited_applicant },
+    });
+
+    const edited_type = new_edited_applicant.document_meta[type];
+
+    const active_uploads = edited_type.filter((data) => {
+      return data.active === true;
+    });
+
+    if (active_uploads.length === 0) {
+      setUploads(null);
+      setFile([]);
+    } else {
+      setUploads({ type: [type], data: active_uploads });
+    }
+  }
 
   const getImage = (value) => {
     setFile(files.filter((img) => img.name !== value.name));
   };
 
-  //   console.log(files);
-  //   console.log(imageUpload);
+  useEffect(() => {
+    uploads && setLoader(false);
+  }, [uploads]);
+
+  console.log(uploads);
 
   return (
     <div className='w-full'>
@@ -118,7 +190,13 @@ function ImageUpload({ files, setFile, label, hint, noBorder, ...props }) {
         </div>
       ) : null}
 
-      {imageUpload && files.length ? (
+      {loader ? (
+        <div className='flex justify-center items-center h-14'>
+          <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+        </div>
+      ) : null}
+
+      {uploads && !loader ? (
         <>
           <div className='flex justify-start overflow-auto'>
             <div className='flex gap-2 my-2'>
@@ -165,15 +243,12 @@ function ImageUpload({ files, setFile, label, hint, noBorder, ...props }) {
               </div>
 
               <div className='flex gap-2 h-[85px]'>
-                {files.map((file, key) => {
+                {uploads.data.map((upload, key) => {
                   return (
                     <div key={key} className='overflow-hidden relative w-[68px]'>
                       <button
                         onClick={() => {
-                          removeImage(file.name);
-                          if (files.length == 1) {
-                            setImageUpload(false);
-                          }
+                          removeImage(upload.id);
                         }}
                         className='absolute right-0 top-0 z-20'
                       >
@@ -205,7 +280,7 @@ function ImageUpload({ files, setFile, label, hint, noBorder, ...props }) {
                         <button
                           className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
                           onClick={() => {
-                            setPreviewFile(file);
+                            setPreviewFile(upload.document_url);
                             setShow(true);
                           }}
                         >
@@ -227,7 +302,7 @@ function ImageUpload({ files, setFile, label, hint, noBorder, ...props }) {
                           </svg>
                         </button>
                         <img
-                          src={URL.createObjectURL(file)}
+                          src={upload.document_url}
                           alt='Gigs'
                           className='object-cover object-center h-full w-full'
                         />
@@ -244,6 +319,8 @@ function ImageUpload({ files, setFile, label, hint, noBorder, ...props }) {
             setShowPopUp={setShow}
             img={previewFile}
             callback={getImage}
+            lat={lat}
+            long={long}
           />
 
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>

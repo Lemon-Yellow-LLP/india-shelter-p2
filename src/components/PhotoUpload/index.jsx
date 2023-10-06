@@ -1,15 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
+import loading from '../../assets/icons/loading.svg';
+import { editFieldsById, getApplicantById } from '../../global';
 
-function PhotoUpload({ files, setFile, label, hint, ...props }) {
+function PhotoUpload({
+  files,
+  setFile,
+  setSingleFile,
+  uploads,
+  setUploads,
+  label,
+  hint,
+  ...props
+}) {
   const [message, setMessage] = useState();
-  const [photoUpload, setPhotoUpload] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
-  const [lat, setLat] = useState(null);
-  const [long, setLong] = useState(null);
+  const [lat, setLat] = useState('');
+  const [long, setLong] = useState('');
 
-  const handleFile = (e) => {
+  const handleFile = async (e) => {
     setMessage('');
+
+    setLoader(true);
 
     let userLocation = navigator.geolocation;
 
@@ -19,28 +32,13 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
       ('The geolocation API is not supported by your browser.');
     }
 
-    // function myGeolocator() {
-    //   if (userLocation) {
-    //     userLocation.getCurrentPosition(success);
-    //   } else {
-    //     ('The geolocation API is not supported by your browser.');
-    //   }
-    // }
-
     function success(data) {
       let lat = data.coords.latitude;
       let long = data.coords.longitude;
 
-      console.log(lat);
-      console.log(long);
-
       setLat(lat);
       setLong(long);
-      // result.innerHTML = 'Latitude: ' + lat + '<br>Longitude: ' + long;
     }
-
-    console.log(lat);
-    console.log(long);
 
     let file = e.target.files;
 
@@ -50,8 +48,7 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
       const validImageTypes = ['image/jpeg'];
 
       if (validImageTypes.includes(fileType)) {
-        setPhotoUpload(true);
-
+        setSingleFile(file[0]);
         setFile([...files, file[i]]);
       } else {
         setMessage('File format not supported');
@@ -59,13 +56,69 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
     }
   };
 
+  // useEffect(() => {
+  //   async function getLocation() {
+  //     const res = await fetch('https://ipinfo.io/json');
+
+  //     console.log(res);
+  //     if (res.ok) {
+  //       const data = await res.json();
+  //       let state = data.region;
+
+  //       console.log(state);
+  //     }
+  //   }
+
+  //   getLocation();
+  // }, []);
+
   const getImage = (value) => {
     setFile(files.filter((img) => img.name !== value.name));
   };
 
-  const removeImage = (i) => {
-    setFile(files.filter((x) => x.name !== i));
-  };
+  async function removeImage(id) {
+    const type = uploads.type;
+
+    setFile(files.filter((x) => x.name !== id));
+
+    const applicant = await getApplicantById(1);
+    const document_meta = applicant.document_meta;
+
+    const photos = applicant.document_meta[type];
+
+    const edited_photos = photos.filter((paper) => {
+      return paper.id !== id;
+    });
+
+    const photo = photos.find((paper) => {
+      return paper.id === id;
+    });
+
+    const edited_photo = { ...photo, active: false };
+
+    const edited_applicant = [...edited_photos, edited_photo];
+
+    const new_edited_applicant = await editFieldsById(1, 'applicant', {
+      document_meta: { ...document_meta, [type]: edited_applicant },
+    });
+
+    const edited_type = new_edited_applicant.document_meta[type];
+
+    const active_uploads = edited_type.filter((data) => {
+      return data.active === true;
+    });
+
+    if (active_uploads.length === 0) {
+      setUploads(null);
+      setFile([]);
+    } else {
+      setUploads({ type: [type], data: active_uploads });
+    }
+  }
+
+  useEffect(() => {
+    uploads && setLoader(false);
+  }, [uploads]);
 
   return (
     <div className='w-full'>
@@ -126,7 +179,13 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
         </div>
       ) : null}
 
-      {photoUpload && files.length ? (
+      {loader ? (
+        <div className='flex justify-center items-center h-14'>
+          <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+        </div>
+      ) : null}
+
+      {uploads && files.length && !loader ? (
         <div>
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
             {message}
@@ -158,7 +217,7 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
                 </button>
 
                 <img
-                  src={URL.createObjectURL(files[0])}
+                  src={uploads.data.document_url}
                   alt=''
                   className='w-10 h-10 object-cover object-center'
                 />
@@ -167,21 +226,22 @@ function PhotoUpload({ files, setFile, label, hint, ...props }) {
               <DesktopPopUp
                 showpopup={show}
                 setShowPopUp={setShow}
-                img={files[0]}
+                img={uploads.data.document_url}
                 callback={getImage}
+                lat={lat}
+                long={long}
               />
 
               <div>
-                <p className='text-base text-primary-black font-normal truncate'>
-                  {files[0]?.name}
+                <p className='text-base text-primary-black font-normal truncate w-20'>
+                  {uploads.data.document_name}
                 </p>
               </div>
             </div>
 
             <button
               onClick={() => {
-                setPhotoUpload(false);
-                removeImage(files[0]?.name);
+                removeImage(uploads.data.id);
               }}
             >
               <svg
