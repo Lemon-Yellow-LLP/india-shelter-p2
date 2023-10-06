@@ -58,7 +58,7 @@ export const applicantSteps = [
     url: '/lead/lnt-charges',
     lock: true,
     Icon: LnTIcon,
-    name: 'lnt_charges',
+    name: 'lt_charges',
   },
   {
     title: 'Property Details',

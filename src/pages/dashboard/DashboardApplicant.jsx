@@ -64,7 +64,7 @@ export default function DashboardApplicant() {
 
         // Get completed lnt charges
         setLntCharges(
-          data?.lnt_charges?.find((charge) => {
+          data?.lt_charges?.find((charge) => {
             charge?.airpay_verify_transaction_status == '200' ||
               charge?.extra_params?.status == 'success';
           }),
@@ -522,7 +522,7 @@ export default function DashboardApplicant() {
 
           <FormDetails
             title='L&T CHARGES'
-            ref={primarySelectedStep == 'lnt_charges' ? primarySelectedStepRef : null}
+            ref={primarySelectedStep == 'lt_charges' ? primarySelectedStepRef : null}
             progress={null}
             data={[
               {

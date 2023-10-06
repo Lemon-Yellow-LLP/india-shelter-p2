@@ -422,7 +422,7 @@ export const validationSchemaLead = Yup.object().shape({
       .required('This field is mandatory.'),
   }),
 
-  lnt_charges: Yup.object().shape({
+  lt_charges: Yup.object().shape({
     mobile_number: Yup.string()
       .matches(/^(?!.*(\d)\1{4})(?!.*(\d{5}).*\2)\d{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),

@@ -21,7 +21,7 @@ export const PrimaryDropdownOptions = [
   },
   {
     label: 'L&T Charges',
-    value: 'lnt_charges',
+    value: 'lt_charges',
   },
   {
     label: 'Property Details',

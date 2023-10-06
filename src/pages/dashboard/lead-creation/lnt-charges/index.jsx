@@ -84,7 +84,7 @@ const LnTCharges = ({ amount = 1500 }) => {
       try {
         // check whether LnT exists
         const resp = await checkIfLntExists(values?.lead?.id);
-        setFieldValue('lnt_charges', resp);
+        setFieldValue('lt_charges', resp);
         setPaymentStatus('success');
       } catch (err) {
         const resp = await addLnTCharges(values?.lead?.id);
@@ -161,7 +161,7 @@ const LnTCharges = ({ amount = 1500 }) => {
       e.preventDefault();
       return;
     }
-    setFieldValue('lnt_charges.mobile_number', phoneNumber);
+    setFieldValue('lt_charges.mobile_number', phoneNumber);
 
     if (phoneNumber.length === 10) {
       setHasSentOTPOnce(false);
@@ -178,7 +178,7 @@ const LnTCharges = ({ amount = 1500 }) => {
     setHasSentOTPOnce(true);
 
     const resp = await makePaymentByLink(values?.lead?.id, {
-      mobile_number: values?.lnt_charges?.mobile_number,
+      mobile_number: values?.lt_charges?.mobile_number,
     });
     if (resp) {
       setToastMessage('Link has been sent to the entered mobile number');
@@ -292,15 +292,15 @@ const LnTCharges = ({ amount = 1500 }) => {
                       label='Mobile Number'
                       placeholder='Eg: 1234567890'
                       required
-                      name='lnt_charges.mobile_number'
-                      value={values?.lnt_charges?.mobile_number}
+                      name='lt_charges.mobile_number'
+                      value={values?.lt_charges?.mobile_number}
                       onChange={handleOnPhoneNumberChange}
-                      error={errors?.lnt_charges?.mobile_number}
-                      touched={touched?.lnt_charges?.mobile_number}
+                      error={errors?.lt_charges?.mobile_number}
+                      touched={touched?.lt_charges?.mobile_number}
                       onOTPSendClick={sendPaymentLink}
                       disabledOtpButton={
-                        !values.lnt_charges?.mobile_number ||
-                        !!errors.lnt_charges?.mobile_number ||
+                        !values.lt_charges?.mobile_number ||
+                        !!errors.lt_charges?.mobile_number ||
                         hasSentOTPOnce
                       }
                       hideOTPButton={hasSentOTPOnce}
@@ -310,9 +310,9 @@ const LnTCharges = ({ amount = 1500 }) => {
                         handleBlur(e);
                         const name = e.target.name.split('.')[1];
                         if (
-                          errors?.lnt_charges?.mobile_number &&
-                          !errors?.lnt_charges?.mobile_number[name] &&
-                          values?.lnt_charges?.mobile_number[name]
+                          errors?.lt_charges?.mobile_number &&
+                          !errors?.lt_charges?.mobile_number[name] &&
+                          values?.lt_charges?.mobile_number[name]
                         ) {
                           editLnTCharges(values?.lead?.id, { mobile_number: phoneNumber });
                         }
@@ -352,7 +352,7 @@ const LnTCharges = ({ amount = 1500 }) => {
 
                     <StatusButton
                       disabled={
-                        !values.lnt_charges?.mobile_number || !!errors.lnt_charges?.mobile_number
+                        !values.lt_charges?.mobile_number || !!errors.lt_charges?.mobile_number
                       }
                       onClick={() => handleCheckingStatus('Pay via Link')}
                       isLoading={checkingStatus === 'Pay via Link'}
