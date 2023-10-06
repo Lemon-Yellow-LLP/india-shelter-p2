@@ -243,6 +243,16 @@ async function checkBre101(id, options) {
   return res.data;
 }
 
+async function uploadDoc(data, options) {
+  const res = await axios.post(`${API_URL}/doc/upload/document`, data, options);
+  return res.data;
+}
+
+async function getApplicantById(id) {
+  const res = await axios.get(`${API_URL}/applicant/${id}`);
+  return res.data;
+}
+
 async function updateLeadDataOnBlur(leadId, fieldName, value) {
   if (!leadId) return;
   const inputName = fieldName;
@@ -461,4 +471,6 @@ export {
   checkCibil,
   checkCrif,
   checkBre101,
+  uploadDoc,
+  getApplicantById,
 };
