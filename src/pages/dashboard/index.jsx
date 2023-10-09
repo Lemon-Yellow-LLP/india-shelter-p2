@@ -143,7 +143,7 @@ export default function Dashboard() {
           setValues(defaultValuesLead);
           navigate('/lead/applicant-details');
         }}
-        className='fixed bottom-4 right-4 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'
+        className='fixed bottom-4 right-6 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'
       >
         <AddLeadIcon />
         <span className='text-sm not-italic font-medium text-white'>Add new lead</span>
