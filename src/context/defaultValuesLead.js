@@ -68,9 +68,15 @@ export const defaultValuesLead = {
     },
   },
 
-  lnt_charges: {
+  lt_charges: [
+    {
+      mobile_number: '',
+      status: null,
+    },
+  ],
+
+  lnt_mobile_number: {
     mobile_number: '',
-    status: null,
   },
 
   applicants: [

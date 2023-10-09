@@ -35,7 +35,7 @@ export default function DrawerSteps({ details, steps, index, stepIndex, noProgre
           !lock && steps ? (
             details.name === 'lt_charges' ? (
               <>
-                {values?.[details.name]?.extra_params?.progress === 100 ? (
+                {values?.lt_charges?.find((e) => e.status === 'Completed') ? (
                   <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
                     Received
                   </span>

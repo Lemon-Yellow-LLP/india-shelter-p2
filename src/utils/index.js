@@ -83,8 +83,8 @@ export const fieldLabels = {
   pention_amount: 'Pention Amount',
   geo_lat: '',
   geo_long: '',
-  extra_company_name: 'Extra Company Name',
-  extra_industries: 'Extra Industries',
+  extra_company_name: 'Other Company Name',
+  extra_industries: 'Other Industries',
   progress: 0,
 
   // reference
@@ -105,6 +105,13 @@ export const fieldLabels = {
   reference_2_state: 'Reference 2 state',
   reference_2_type: 'Reference 2 type',
 };
+
+export const nonRequiredFields = [
+  'middle_name',
+  'last_name',
+  'extra_company_name',
+  'extra_industries',
+];
 
 export const pages = {
   applicant_details: {

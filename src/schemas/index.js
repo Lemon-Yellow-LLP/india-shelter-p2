@@ -160,14 +160,20 @@ const applicantSchema = Yup.object().shape({
     extra_params: Yup.object().shape({
       extra_company_name: Yup.string()
         .trim()
-        .required('This field is mandatory')
         .min(2, 'Company name must be atleast 2 characters long')
-        .max(90, 'Company name can be max 90 characters long'),
+        .max(90, 'Company name can be max 90 characters long')
+        .when('company_name', {
+          is: 'Others',
+          then: Yup.string().required('This field is mandatory'),
+        }),
       extra_industries: Yup.string()
         .trim()
-        .required('This field is mandatory')
         .min(2, 'Industry name must be atleast 2 characters long')
-        .max(90, 'Industry name can be max 90 characters long'),
+        .max(90, 'Industry name can be max 90 characters long')
+        .when('industries', {
+          is: 'Others',
+          then: Yup.string().required('This field is mandatory'),
+        }),
     }),
 
     //Salaried and Self Employed
@@ -175,26 +181,39 @@ const applicantSchema = Yup.object().shape({
       .trim()
       .required('This field is mandatory')
       .min(2, 'Address must be atleast 2 characters long')
-      .max(90, 'Address can be max 90 characters long'),
+      .max(90, 'Address can be max 90 characters long')
+      .when('profession', {
+        is: 'Self-employed' || 'Salaried',
+        then: Yup.string().required('This field is mandatory'),
+      }),
     street_area_locality: Yup.string()
       .trim()
-      .required('This field is mandatory')
       .min(2, 'Address must be atleast 2 characters long')
-      .max(90, 'Address can be max 90 characters long'),
+      .max(90, 'Address can be max 90 characters long')
+      .when('profession', {
+        is: 'Self-employed' || 'Salaried',
+        then: Yup.string().required('This field is mandatory'),
+      }),
     town: Yup.string()
       .trim()
       .min(2, 'Town must be atleast 2 characters long')
       .max(90, 'Town can be max 90 characters long'),
     landmark: Yup.string()
       .trim()
-      .required('This field is mandatory')
       .min(2, 'Landmark must be atleast 2 characters long')
-      .max(90, 'Landmark can be max 90 characters long'),
+      .max(90, 'Landmark can be max 90 characters long')
+      .when('profession', {
+        is: 'Self-employed' || 'Salaried',
+        then: Yup.string().required('This field is mandatory'),
+      }),
     pincode: Yup.string()
-      .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode'),
+      .max(6, 'Enter a valid Pincode')
+      .when('profession', {
+        is: 'Self-employed' || 'Salaried',
+        then: Yup.string().required('This field is mandatory'),
+      }),
 
     //Salaried
     company_name: Yup.string().required('This field is mandatory'),
@@ -217,14 +236,27 @@ const applicantSchema = Yup.object().shape({
     //Self Employed
     business_name: Yup.string()
       .trim()
-      .required('This field is mandatory')
       .min(2, 'Business name must be atleast 2 characters long')
-      .max(90, 'Business name can be max 90 characters long'),
-    industries: Yup.string().required('This field is mandatory'),
-    gst_number: Yup.string().required('This field is mandatory'),
+      .max(90, 'Business name can be max 90 characters long')
+      .when('profession', {
+        is: 'Self-employed',
+        then: Yup.string().required('This field is mandatory'),
+      }),
+    industries: Yup.string().when('profession', {
+      is: 'Self-employed',
+      then: Yup.string().required('This field is mandatory'),
+    }),
+
+    gst_number: Yup.string().when('profession', {
+      is: 'Self-employed',
+      then: Yup.string().required('This field is mandatory'),
+    }),
 
     //Pentioner
-    pention_amount: Yup.string().required('This field is mandatory'),
+    pention_amount: Yup.string().when('profession', {
+      is: 'Retired',
+      then: Yup.string().required('This field is mandatory'),
+    }),
   }),
 
   address_detail: Yup.object().shape({
@@ -422,7 +454,7 @@ export const validationSchemaLead = Yup.object().shape({
       .required('This field is mandatory.'),
   }),
 
-  lnt_charges: Yup.object().shape({
+  lnt_mobile_number: Yup.object().shape({
     mobile_number: Yup.string()
       .matches(/^(?!.*(\d)\1{4})(?!.*(\d{5}).*\2)\d{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),
