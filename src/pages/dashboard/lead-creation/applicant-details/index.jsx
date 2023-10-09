@@ -31,6 +31,7 @@ import {
   loanPurposeDataLap,
 } from './ApplicantDropDownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import Topbar from '../../../../components/Topbar';
 
 const ApplicantDetails = () => {
   const {
@@ -469,11 +470,7 @@ const ApplicantDetails = () => {
 
   return (
     <>
-      {/* <Topbar
-        title='Lead Creation'
-        id={values?.lead?.id}
-        progress={values?.lead?.extra_params?.progress}
-      /> */}
+      <Topbar title='Lead Creation' id={values?.lead?.id} progress={8} />
       <div className='overflow-hidden flex flex-col h-[100vh]'>
         <div
           className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1`}

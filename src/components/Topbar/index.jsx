@@ -1,10 +1,26 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import BackIcon2 from '../../assets/icons/back-2';
 import { IconBack, IconClose } from '../../assets/icons';
 import { Button } from '@mui/material';
 
-export default function Topbar({ title, id, progress, showBack = true, showClose = true }) {
+export const pages = [
+  '/lead/applicant-details',
+  '/lead/personal-details',
+  '/lead/address-details',
+  '/lead/work-income-details',
+  '/lead/qualifier',
+  '/lead/property-details',
+  '/lead/reference-details',
+  '/lead/upload-documents',
+  '/lead/preview',
+  '/lead/eligibility',
+];
+
+export default function Topbar({ title, id, progress, showBack = false, showClose = true }) {
   const navigate = useNavigate();
+
+  const location = useLocation();
+
   return (
     <>
       <div
@@ -41,14 +57,14 @@ export default function Topbar({ title, id, progress, showBack = true, showClose
           </p>
         </div>
         {showClose ? (
-          <button onClick={() => {}} className=''>
+          <button onClick={() => navigate('/dashboard/' + id)} className=''>
             <IconClose />
           </button>
         ) : null}
         {/* Progressbar */}
         <div
           style={{
-            width: `${progress}%`,
+            width: `${((pages.indexOf(location.pathname) + 1) / pages.length) * 100}%`,
           }}
           className='absolute left-0 bottom-0 h-[2px] bg-red-500'
         ></div>
