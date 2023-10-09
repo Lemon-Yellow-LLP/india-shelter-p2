@@ -7,7 +7,14 @@ import { manualModeDropdownOptions } from '../personal-details/manualModeDropdow
 import { DropDown, ToastMessage, UploadDocsInput } from '../../../../components';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import OtpInputNoEdit from '../../../../components/OtpInput/OtpInputNoEdit';
-import { editFieldsById, getApplicantById, uploadDoc } from '../../../../global';
+import {
+  editFieldsById,
+  getApplicantById,
+  getUploadOtp,
+  reUploadDoc,
+  uploadDoc,
+  verifyUploadOtp,
+} from '../../../../global';
 
 const isQaulifierActivated = false;
 
@@ -15,7 +22,9 @@ const UploadDocuments = () => {
   const { activeIndex, values, errors, touched, handleBlur, setFieldValue, setFieldError } =
     useContext(LeadContext);
   const { toastMessage, setToastMessage } = useContext(AuthContext);
+  const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
   // isQaulifierActivated
+
   const [customerPhotos, setCustomerPhotos] = useState([]);
   const [customerPhotosFile, setCustomerPhotosFile] = useState(null);
   const [customerUploads, setCustomerUploads] = useState(null);
@@ -23,27 +32,51 @@ const UploadDocuments = () => {
   const [idProofPhotos, setIdProofPhotos] = useState([]);
   const [idProofPhotosFile, setIdProofPhotosFile] = useState(null);
   const [idProofUploads, setIdProofUploads] = useState(null);
+  const [editIdProof, setEditIdProof] = useState({
+    file: {},
+    id: null,
+  });
 
   const [addressProofPhotos, setAddressProofPhotos] = useState([]);
   const [addressProofPhotosFile, setAddressProofPhotosFile] = useState(null);
   const [addressProofUploads, setAddressProofUploads] = useState(null);
+  const [editAddressProof, setEditAddressProof] = useState({
+    file: {},
+    id: null,
+  });
 
   const [propertyPapers, setPropertyPapers] = useState([]);
   const [propertyPapersFile, setPropertyPapersFile] = useState(null);
   const [propertyPaperUploads, setPropertyPaperUploads] = useState(null);
   const [propertyPdf, setPropertyPdf] = useState(null);
+  const [editPropertyPaper, setEditPropertyPaper] = useState({
+    file: {},
+    id: null,
+  });
 
   const [salarySlipPhotos, setSalarySlipPhotos] = useState([]);
   const [salarySlipPhotosFile, setSalarySlipPhotosFile] = useState(null);
   const [salarySlipUploads, setSalarySlipUploads] = useState(null);
+  const [editSalarySlip, setEditSalarySlip] = useState({
+    file: {},
+    id: null,
+  });
 
   const [form60photos, setForm60photos] = useState([]);
   const [form60photosFile, setForm60photosFile] = useState(null);
   const [form60Uploads, setForm60Uploads] = useState(null);
+  const [editForm60, setEditForm60] = useState({
+    file: {},
+    id: null,
+  });
 
   const [propertyPhotos, setPropertyPhotos] = useState([]);
   const [propertyPhotosFile, setPropertyPhotosFile] = useState(null);
   const [propertyUploads, setPropertyUploads] = useState(null);
+  const [editProperty, setEditProperty] = useState({
+    file: {},
+    id: null,
+  });
 
   const [selfie, setSelfie] = useState([]);
   const [selfieFile, setSelfieFile] = useState(null);
@@ -52,6 +85,10 @@ const UploadDocuments = () => {
   const [docs, setDocs] = useState([]);
   const [docsFile, setDocsFile] = useState(null);
   const [docUploads, setDocUploads] = useState(null);
+  const [editDoc, setEditDoc] = useState({
+    file: {},
+    id: null,
+  });
 
   const [editIdNumber, setEditIdNumber] = useState(false);
   const [editAddressNumber, setEditAddressNumber] = useState(false);
@@ -177,8 +214,11 @@ const UploadDocuments = () => {
     setHasSentOTPOnce(true);
     setShowOTPInput(true);
 
-    // const res = await getLoginOtp(values.username);
+    // const res = await getUploadOtp(login_res.session.user_id);
     // if (!res) return;
+
+    const res = await getUploadOtp(1);
+    if (!res) return;
 
     setToastMessage('OTP has been sent to the mobile number');
   };
@@ -188,10 +228,19 @@ const UploadDocuments = () => {
       const otp = parseInt(loginotp);
 
       try {
-        // const res = await verifyLoginOtp(values.username, {
+        // const res = await verifyUploadOtp(login_res.session.user_id, {
         //   otp,
         // });
+
         // if (!res) return;
+
+        const res = await verifyUploadOtp(1, otp);
+
+        if (!res) return;
+
+        setDisablePhoneNumber(false);
+        setMobileVerified(true);
+
         // if (res.old_session_message === 'No old sessions') {
         //   setToken(res.token);
         //   setDisablePhoneNumber(false);
@@ -211,13 +260,15 @@ const UploadDocuments = () => {
       } catch (err) {
         console.log(err);
 
-        // setMobileVerified(false);
+        setMobileVerified(false);
         // setOtpFailCount(err.response.data.fail_count);
         // setIsAuthenticated(false);
         return false;
       }
     },
-    [values.username, setFieldError, setMobileVerified],
+    //values.mobile_number
+
+    [setFieldError, setMobileVerified],
   );
 
   // console.log(errors?.applicants?.[activeIndex]?.personal_details?.id_number);
@@ -276,6 +327,34 @@ const UploadDocuments = () => {
   }, [propertyPapersFile]);
 
   useEffect(() => {
+    async function editPropertyPaperPhotos() {
+      const data = new FormData();
+      const filename = editPropertyPaper.file.name;
+      data.append('document_type', 'property_paper_photos');
+      data.append('document_name', filename);
+      data.append('file', editPropertyPaper.file);
+
+      const res = await reUploadDoc(editPropertyPaper.id, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (!res) return;
+
+      const applicant = await getApplicantById(1);
+
+      const active_uploads = applicant.document_meta.property_paper_photos.filter((data) => {
+        return data.active === true;
+      });
+
+      setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
+      setPropertyPapers(active_uploads);
+    }
+    editPropertyPaper.id && editPropertyPaperPhotos();
+  }, [editPropertyPaper]);
+
+  useEffect(() => {
     async function addCustomerPhotos() {
       const data = new FormData();
       const filename = Date.now() + customerPhotosFile.name;
@@ -294,7 +373,6 @@ const UploadDocuments = () => {
         const applicant = await getApplicantById(1);
         const document_meta = applicant.document_meta;
         if ('customer_photos' in document_meta == false) {
-          console.log(true);
           document_meta['customer_photos'] = [];
         }
 
@@ -322,6 +400,8 @@ const UploadDocuments = () => {
       data.append('document_type', 'id_proof_photos');
       data.append('document_name', filename);
       data.append('file', idProofPhotosFile);
+
+      console.log(idProofPhotosFile);
 
       const res = await uploadDoc(data, {
         headers: {
@@ -351,6 +431,33 @@ const UploadDocuments = () => {
     }
     idProofPhotos.length > 0 && addIdProofPhotos();
   }, [idProofPhotosFile]);
+
+  useEffect(() => {
+    async function editIdProofPhotos() {
+      const data = new FormData();
+      const filename = editIdProof.file.name;
+      data.append('document_type', 'id_proof_photos');
+      data.append('document_name', filename);
+      data.append('file', editIdProof.file);
+
+      const res = await reUploadDoc(editIdProof.id, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (!res) return;
+
+      const applicant = await getApplicantById(1);
+
+      const active_uploads = applicant.document_meta.id_proof_photos.filter((data) => {
+        return data.active === true;
+      });
+
+      setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+    }
+    editIdProof.id && editIdProofPhotos();
+  }, [editIdProof]);
 
   useEffect(() => {
     async function addAddressProofPhotos() {
@@ -393,6 +500,33 @@ const UploadDocuments = () => {
   }, [addressProofPhotosFile]);
 
   useEffect(() => {
+    async function editAddressProofPhotos() {
+      const data = new FormData();
+      const filename = editAddressProof.file.name;
+      data.append('document_type', 'address_proof_photos');
+      data.append('document_name', filename);
+      data.append('file', editAddressProof.file);
+
+      const res = await reUploadDoc(editAddressProof.id, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (!res) return;
+
+      const applicant = await getApplicantById(1);
+
+      const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
+        return data.active === true;
+      });
+
+      setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+    }
+    editAddressProof.id && editAddressProofPhotos();
+  }, [editAddressProof]);
+
+  useEffect(() => {
     async function addSalarySlipPhotos() {
       const data = new FormData();
       const filename = Date.now() + salarySlipPhotosFile.name;
@@ -429,6 +563,33 @@ const UploadDocuments = () => {
     }
     salarySlipPhotos.length > 0 && addSalarySlipPhotos();
   }, [salarySlipPhotosFile]);
+
+  useEffect(() => {
+    async function editSalarySlipPhotos() {
+      const data = new FormData();
+      const filename = editSalarySlip.file.name;
+      data.append('document_type', 'salary_slip_photos');
+      data.append('document_name', filename);
+      data.append('file', editSalarySlip.file);
+
+      const res = await reUploadDoc(editSalarySlip.id, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (!res) return;
+
+      const applicant = await getApplicantById(1);
+
+      const active_uploads = applicant.document_meta.salary_slip_photos.filter((data) => {
+        return data.active === true;
+      });
+
+      setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
+    }
+    editSalarySlip.id && editSalarySlipPhotos();
+  }, [editSalarySlip]);
 
   useEffect(() => {
     async function addForm60Photos() {
@@ -468,6 +629,33 @@ const UploadDocuments = () => {
   }, [form60photosFile]);
 
   useEffect(() => {
+    async function editForm60Photos() {
+      const data = new FormData();
+      const filename = editForm60.file.name;
+      data.append('document_type', 'form_60_photos');
+      data.append('document_name', filename);
+      data.append('file', editForm60.file);
+
+      const res = await reUploadDoc(editForm60.id, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (!res) return;
+
+      const applicant = await getApplicantById(1);
+
+      const active_uploads = applicant.document_meta.form_60_photos.filter((data) => {
+        return data.active === true;
+      });
+
+      setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
+    }
+    form60photos.id && editForm60Photos();
+  }, [form60photos]);
+
+  useEffect(() => {
     async function addPropertyPhotos() {
       const data = new FormData();
       const filename = Date.now() + propertyPhotosFile.name;
@@ -503,6 +691,33 @@ const UploadDocuments = () => {
     }
     propertyPhotos.length > 0 && addPropertyPhotos();
   }, [propertyPhotosFile]);
+
+  useEffect(() => {
+    async function editPropertyPhotos() {
+      const data = new FormData();
+      const filename = editProperty.file.name;
+      data.append('document_type', 'property_photos');
+      data.append('document_name', filename);
+      data.append('file', editProperty.file);
+
+      const res = await reUploadDoc(editProperty.id, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (!res) return;
+
+      const applicant = await getApplicantById(1);
+
+      const active_uploads = applicant.document_meta.property_photos.filter((data) => {
+        return data.active === true;
+      });
+
+      setPropertyUploads({ type: 'property_photos', data: active_uploads });
+    }
+    editProperty.id && editPropertyPhotos();
+  }, [editProperty]);
 
   useEffect(() => {
     async function addSelfiePhoto() {
@@ -579,6 +794,33 @@ const UploadDocuments = () => {
   }, [docsFile]);
 
   useEffect(() => {
+    async function editOtherDocPhotos() {
+      const data = new FormData();
+      const filename = editDoc.file.name;
+      data.append('document_type', 'other_docs');
+      data.append('document_name', filename);
+      data.append('file', editDoc.file);
+
+      const res = await reUploadDoc(editDoc.id, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (!res) return;
+
+      const applicant = await getApplicantById(1);
+
+      const active_uploads = applicant.document_meta.other_docs.filter((data) => {
+        return data.active === true;
+      });
+
+      setDocUploads({ type: 'other_docs', data: active_uploads });
+    }
+    editDoc.id && editOtherDocPhotos();
+  }, [editDoc]);
+
+  useEffect(() => {
     async function getPreviousUploads() {
       const res = await getApplicantById(1);
 
@@ -588,6 +830,8 @@ const UploadDocuments = () => {
         const active_upload = res.document_meta.customer_photos.find((data) => {
           return data.active === true;
         });
+
+        if (!active_upload) return;
 
         setCustomerUploads({ type: 'customer_photos', data: active_upload });
         setCustomerPhotos([1]);
@@ -662,6 +906,8 @@ const UploadDocuments = () => {
         const active_upload = res.document_meta.lo_selfie.find((data) => {
           return data.active === true;
         });
+
+        if (!active_upload) return;
 
         setSelfieUploads({ type: 'lo_selfie', data: active_upload });
         setSelfie([1]);
@@ -744,6 +990,7 @@ const UploadDocuments = () => {
                   uploads={idProofUploads}
                   setUploads={setIdProofUploads}
                   noBorder={true}
+                  setEdit={setEditIdProof}
                 />
 
                 <div
@@ -881,6 +1128,7 @@ const UploadDocuments = () => {
                 setSingleFile={setIdProofPhotosFile}
                 uploads={idProofUploads}
                 setUploads={setIdProofUploads}
+                setEdit={setEditIdProof}
               />
             )}
 
@@ -937,6 +1185,7 @@ const UploadDocuments = () => {
                   files={addressProofPhotos}
                   setFile={setAddressProofPhotos}
                   setSingleFile={setAddressProofPhotosFile}
+                  setEdit={setEditAddressProof}
                   uploads={addressProofUploads}
                   setUploads={setAddressProofUploads}
                   noBorder={true}
@@ -1079,6 +1328,7 @@ const UploadDocuments = () => {
                 files={addressProofPhotos}
                 setFile={setAddressProofPhotos}
                 setSingleFile={setAddressProofPhotosFile}
+                setEdit={setEditAddressProof}
                 uploads={addressProofUploads}
                 setUploads={setAddressProofUploads}
               />
@@ -1097,6 +1347,7 @@ const UploadDocuments = () => {
           setFile={setPropertyPapers}
           uploads={propertyPaperUploads}
           setUploads={setPropertyPaperUploads}
+          setEdit={setEditPropertyPaper}
           pdf={propertyPdf}
           setPdf={setPropertyPdf}
           label='Property papers'
@@ -1110,6 +1361,7 @@ const UploadDocuments = () => {
           setFile={setSalarySlipPhotos}
           uploads={salarySlipUploads}
           setUploads={setSalarySlipUploads}
+          setEdit={setEditSalarySlip}
           label='Salary slip'
           required
           hint='File size should be less than 5MB'
@@ -1121,6 +1373,7 @@ const UploadDocuments = () => {
           setFile={setForm60photos}
           uploads={form60Uploads}
           setUploads={setForm60Uploads}
+          setEdit={setEditForm60}
           label='Form 60'
           required
           hint='File size should be less than 5MB'
@@ -1132,6 +1385,7 @@ const UploadDocuments = () => {
           setFile={setPropertyPhotos}
           uploads={propertyUploads}
           setUploads={setPropertyUploads}
+          setEdit={setEditProperty}
           label='Property image'
           required
           hint='File size should be less than 5MB'
@@ -1145,6 +1399,7 @@ const UploadDocuments = () => {
               setFile={setSelfie}
               setSingleFile={setSelfieFile}
               uploads={selfieUploads}
+              setUploads={setSelfieUploads}
               label='Upload selfie'
               required
             />
@@ -1156,7 +1411,7 @@ const UploadDocuments = () => {
                 ? 'text-dark-grey bg-stroke pointer-events-none'
                 : 'bg-primary-red text-white'
             }`}
-            disabled={mobileVerified || hasSentOTPOnce}
+            disabled={disablePhoneNumber || mobileVerified}
             onClick={sendMobileOtp}
           >
             Send OTP
@@ -1182,6 +1437,7 @@ const UploadDocuments = () => {
           setFile={setDocs}
           uploads={docUploads}
           setUploads={setDocUploads}
+          setEdit={setEditDoc}
           label='Other documents'
           required
           hint='File size should be less than 5MB'
