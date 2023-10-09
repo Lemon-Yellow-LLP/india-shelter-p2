@@ -6,10 +6,12 @@ import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { useContext, useEffect, useState } from 'react';
 import ArrowRightIcon2 from '../../../../assets/icons/arrow-right-2';
-import { fieldLabels, pages } from '../../../../utils';
+import { fieldLabels, nonRequiredFields, pages } from '../../../../utils';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../../../components';
 import StepCompletedIllustration from '../../../../assets/step-completed';
+import { validationSchemaLead } from '../../../../schemas';
+import { Snackbar } from '@mui/material';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -29,7 +31,7 @@ export default function Preview() {
     updateProgress,
     activeIndex,
     setValues,
-    setCurrentStepIndex,
+    setActiveIndex,
     handleSubmit,
   } = useContext(LeadContext);
 
@@ -62,10 +64,28 @@ export default function Preview() {
     return flattenExtraParamsHelper(obj);
   }
 
+  function removePropertiesByKeys(obj, keysToRemove) {
+    if (Array.isArray(obj)) {
+      // If it's an array, recursively call the function for each element
+      obj.forEach((item, index) => {
+        removePropertiesByKeys(item, keysToRemove);
+      });
+    } else if (typeof obj === 'object') {
+      for (const key in obj) {
+        if (keysToRemove.includes(key)) {
+          delete obj[key];
+        } else {
+          removePropertiesByKeys(obj[key], keysToRemove);
+        }
+      }
+    }
+  }
+
   useEffect(() => {
-    setFlattedErrors(flattenExtraParams(errors));
+    // removePropertiesByKeys(errors, nonRequiredFields);
     console.log('-------------');
     console.log(flattenExtraParams(errors));
+    setFlattedErrors(flattenExtraParams(errors));
   }, []);
 
   useEffect(() => {
@@ -85,11 +105,11 @@ export default function Preview() {
 
     // To show errors
     handleSubmit();
-  }, [activeIndex]);
+  }, []);
 
   useEffect(() => {
-    setCoApplicantIndex(0);
-  }, [coApplicantIndex, primaryIndex]);
+    setCoApplicantIndex(activeStep ? activeStep - 1 : 0);
+  }, [activeStep]);
 
   const previousStep = () => {
     setActiveStep((prev) => {
@@ -101,12 +121,15 @@ export default function Preview() {
     });
   };
 
+  const gotoLntCharges = () => navigate('/lead/lnt-charges');
+
   const nextStep = () => {
-    if (activeStep === coApplicantIndexes.length) return;
+    if (activeStep === coApplicantIndexes.length) {
+      return;
+    }
     setActiveStep((prev) => {
       if (prev === 0) {
-        setCurrentStepIndex(coApplicantIndexes[coApplicantIndex]);
-        setCoApplicantIndex((i) => i + 1);
+        setActiveIndex(coApplicantIndexes[coApplicantIndex]);
       }
       return prev + 1;
     });
@@ -310,29 +333,6 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
-              title={pages.property_details.title}
-              link={pages.property_details.url + '?preview=' + pages.property_details.url}
-              count={
-                flattedErrors && flattedErrors?.[pages.property_details.name]
-                  ? Object.keys(flattedErrors?.[pages.property_details.name]).length
-                  : 'ALL'
-              }
-            >
-              {flattedErrors?.[pages.property_details.name] &&
-                Object.keys(flattedErrors?.[pages.property_details.name]).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
-            </PreviewCard>
-
-            <PreviewCard
               hide={
                 !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.banking_details.name
@@ -361,34 +361,6 @@ export default function Preview() {
                     pages.banking_details.name
                   ],
                 ).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
-            </PreviewCard>
-
-            <PreviewCard
-              hide={
-                !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.reference_details.name
-                ]
-              }
-              title={pages.reference_details.title}
-              link={pages.reference_details.url + '?preview=' + pages.reference_details.url}
-              count={
-                flattedErrors && flattedErrors?.[pages.reference_details.name]
-                  ? Object.keys(flattedErrors?.[pages.reference_details.name]).length
-                  : 'ALL'
-              }
-            >
-              {flattedErrors?.[pages.reference_details.name] &&
-                Object.keys(flattedErrors?.[pages.reference_details.name]).map((val, i) =>
                   fieldLabels[val] ? (
                     <p
                       key={i}
@@ -716,8 +688,9 @@ export default function Preview() {
           <div className='px-6 mb-3 flex justify-between'>
             <span className='text-xs not-italic font-medium text-dark-grey'>APPLICANTS</span>
             <span className='text-right text-xs not-italic font-normal text-primary-black'>{`${
-              values?.applicants?.[activeStep == 0 ? primaryIndex : coApplicantIndex]
-                ?.applicant_details?.first_name || '-'
+              values?.applicants?.[
+                activeStep == 0 ? primaryIndex : coApplicantIndexes[coApplicantIndex]
+              ]?.applicant_details?.first_name || '-'
             } (${activeStep == 0 ? 'Primary' : 'Co-app'}) `}</span>
           </div>
           <Stepper activeStep={activeStep} alternativeLabel>
@@ -774,13 +747,7 @@ export default function Preview() {
           </Stepper>
         </div>
 
-        {activeStep == 0 ? (
-          <PrimaryApplicantDetails />
-        ) : (
-          coApplicantIndexes.map((value) =>
-            coApplicantIndex === value ? <CoApplicantDetails key={value} /> : null,
-          )
-        )}
+        {activeStep == 0 ? <PrimaryApplicantDetails /> : <CoApplicantDetails />}
 
         <div className='bottom-0 fixed'>
           <div
@@ -791,14 +758,14 @@ export default function Preview() {
               Previous
             </Button>
             <Button
+              link={activeStep === coApplicantIndexes.length ? '/lead/eligibility' : null}
               primary={true}
               disabled={
                 activeStep === 0
                   ? errors?.applicants?.[primaryIndex] ||
                     errors?.propertySchema ||
                     errors?.referenceSchema
-                  : errors?.applicants?.[coApplicantIndexes[coApplicantIndex]] ||
-                    coApplicantIndexes.length
+                  : errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]
               }
               inputClasses='w-1/2 h-[46px]'
               onClick={nextStep}
@@ -808,6 +775,35 @@ export default function Preview() {
           </div>
         </div>
       </div>
+
+      {/* Lnt Charges */}
+      <Snackbar
+        sx={{
+          '& .MuiPaper-root': {
+            backgroundColor: '#000000F2',
+            fontFamily: 'Poppins',
+          },
+
+          '& .MuiPaper-root .MuiSnackbarContent-message': {
+            color: '#FEFEFE',
+
+            fontSize: '14px',
+            fontStyle: 'normal',
+            fontWeight: 400,
+          },
+        }}
+        className='-translate-y-32 m-[10px]'
+        open={!values?.lt_charges?.find((e) => e.status === 'Completed')}
+        onClose={() => {}}
+        message='L&T charges is pending'
+        action={
+          <button onClick={gotoLntCharges} className='mr-3'>
+            <span className='text-right text-sm not-italic font-semibold text-primary-red'>
+              Pay now
+            </span>
+          </button>
+        }
+      />
     </>
   );
 }
@@ -815,7 +811,7 @@ export default function Preview() {
 function PreviewCard({ title, count, link, hide, children }) {
   return (
     <>
-      {hide ? null : (
+      {hide || count == 0 ? null : (
         <Link
           to={link}
           className='rounded-lg border border-[#EBEBEB] bg-white p-3 flex flex-col gap-2 active:opacity-90'
@@ -832,7 +828,9 @@ function PreviewCard({ title, count, link, hide, children }) {
             <p className='not-italic font-medium text-[10px] text-light-grey'>
               INCOMPLETE FIELDS:{' '}
             </p>
-            <span className='not-italic font-medium text-[10px] text-dark-grey'>{count}</span>
+            <span className='not-italic font-medium text-[10px] text-dark-grey leading-loose'>
+              {count}
+            </span>
           </div>
           {children}
         </Link>

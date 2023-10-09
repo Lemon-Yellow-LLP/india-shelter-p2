@@ -28,22 +28,161 @@ const WorkIncomeDetails = () => {
     handleSubmit,
     activeIndex,
     setCurrentStepIndex,
+    updateProgressApplicantSteps,
   } = useContext(LeadContext);
+
+  const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
+    ...values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.required_fields_status,
+  });
 
   const [openExistingPopup, setOpenExistingPopup] = useState(
     values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing || false,
   );
 
+  useEffect(() => {
+    setRequiredFieldsStatus(
+      values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.required_fields_status,
+    );
+  }, [activeIndex]);
+
+  useEffect(() => {
+    updateProgressApplicantSteps('work_income_detail', requiredFieldsStatus, 'work-income');
+  }, [requiredFieldsStatus]);
+
   const handleRadioChange = useCallback(
     async (e) => {
       setFieldValue(e.name, e.value);
       const name = e.name.split('.')[2];
+
       if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
+        if (name === 'profession') {
+          let _requiredFieldStatus = {};
+
+          if (values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Salaried') {
+            _requiredFieldStatus = {
+              profession: true,
+              flat_no_building_name: false,
+              street_area_locality: false,
+              town: false,
+              landmark: false,
+              pincode: false,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: false,
+              total_household_income: false,
+              no_of_dependents: false,
+            };
+            setRequiredFieldsStatus(_requiredFieldStatus);
+          }
+
+          if (
+            values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Self-employed'
+          ) {
+            _requiredFieldStatus = {
+              profession: true,
+              flat_no_building_name: false,
+              street_area_locality: false,
+              town: false,
+              landmark: false,
+              pincode: false,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: false,
+              total_household_income: false,
+              no_of_dependents: false,
+              business_name: false,
+              industries: false,
+              gst_number: false,
+            };
+            setRequiredFieldsStatus(_requiredFieldStatus);
+          }
+
+          if (
+            values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Self-employed'
+          ) {
+            _requiredFieldStatus = {
+              profession: true,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: false,
+              total_household_income: false,
+              no_of_dependents: false,
+            };
+            setRequiredFieldsStatus(_requiredFieldStatus);
+          }
+
+          if (values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Retired') {
+            _requiredFieldStatus = {
+              profession: true,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: false,
+              total_household_income: false,
+              no_of_dependents: false,
+              pention_amount: false,
+            };
+            setRequiredFieldsStatus(_requiredFieldStatus);
+          }
+
+          const newData = JSON.parse(JSON.stringify(values));
+
+          newData.applicants[activeIndex].work_income_detail = {
+            id: newData.applicants[activeIndex].work_income_detail.id,
+            applicant_id: newData.applicants[activeIndex].work_income_detail.applicant_id,
+            profession: e.value,
+            company_name: '',
+            total_income: '',
+            pf_uan: '',
+            no_current_loan: null,
+            ongoing_emi: '',
+            working_since: '',
+            mode_of_salary: '',
+            flat_no_building_name: '',
+            street_area_locality: '',
+            town: '',
+            landmark: '',
+            pincode: '',
+            city: '',
+            state: '',
+            total_family_number: '',
+            total_household_income: '',
+            no_of_dependents: '',
+            business_name: '',
+            industries: '',
+            gst_number: '',
+            pention_amount: '',
+            extra_params: {
+              extra_company_name: '',
+              extra_industries: '',
+              progress: 0,
+              required_fields_status: _requiredFieldStatus,
+            },
+          };
+
+          setValues(newData);
+
+          editFieldsById(
+            newData.applicants[activeIndex].work_income_detail.id,
+            'work-income',
+            newData,
+          );
+
+          return;
+        }
+
         editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
           [name]: e.value,
         });
+        if (!requiredFieldsStatus[name]) {
+          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+        }
       } else {
         let addData = { ...newCoApplicantValues.work_income_detail, [name]: e.value };
+
+        if (!requiredFieldsStatus[name]) {
+          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+        }
+
         await addApi('work-income', {
           ...addData,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
@@ -63,7 +202,7 @@ const WorkIncomeDetails = () => {
           });
       }
     },
-    [values],
+    [values, requiredFieldsStatus, setRequiredFieldsStatus],
   );
 
   const handleOnPincodeChange = async () => {
@@ -93,6 +232,10 @@ const WorkIncomeDetails = () => {
 
     setFieldValue(`applicants[${activeIndex}].work_income_detail.city`, res.city);
     setFieldValue(`applicants[${activeIndex}].work_income_detail.state`, res.state);
+
+    if (!requiredFieldsStatus['pincode']) {
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: true }));
+    }
   };
 
   const handleNextClick = () => {
@@ -143,15 +286,29 @@ const WorkIncomeDetails = () => {
             )}
           </div>
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Salaried' && (
-            <Salaried />
+            <Salaried
+              requiredFieldsStatus={requiredFieldsStatus}
+              setRequiredFieldsStatus={setRequiredFieldsStatus}
+            />
           )}
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession ===
-            'Self-employed' && <SelfEmployed />}
+            'Self-employed' && (
+            <SelfEmployed
+              requiredFieldsStatus={requiredFieldsStatus}
+              setRequiredFieldsStatus={setRequiredFieldsStatus}
+            />
+          )}
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Unemployed' && (
-            <UnEmployed />
+            <UnEmployed
+              requiredFieldsStatus={requiredFieldsStatus}
+              setRequiredFieldsStatus={setRequiredFieldsStatus}
+            />
           )}
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Retired' && (
-            <Retired />
+            <Retired
+              requiredFieldsStatus={requiredFieldsStatus}
+              setRequiredFieldsStatus={setRequiredFieldsStatus}
+            />
           )}
 
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Salaried' ||
@@ -182,6 +339,11 @@ const WorkIncomeDetails = () => {
                             ?.flat_no_building_name,
                       },
                     );
+                  } else {
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      ['flat_no_building_name']: false,
+                    }));
                   }
                 }}
                 onChange={(e) => {
@@ -192,6 +354,13 @@ const WorkIncomeDetails = () => {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
+
+                    if (!requiredFieldsStatus['flat_no_building_name']) {
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        ['flat_no_building_name']: true,
+                      }));
+                    }
                   }
                 }}
               />
@@ -222,6 +391,11 @@ const WorkIncomeDetails = () => {
                             ?.street_area_locality,
                       },
                     );
+                  } else {
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      ['street_area_locality']: false,
+                    }));
                   }
                 }}
                 onChange={(e) => {
@@ -232,6 +406,13 @@ const WorkIncomeDetails = () => {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
+
+                    if (!requiredFieldsStatus['street_area_locality']) {
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        ['street_area_locality']: true,
+                      }));
+                    }
                   }
                 }}
               />
@@ -257,6 +438,11 @@ const WorkIncomeDetails = () => {
                         town: values?.applicants?.[activeIndex]?.work_income_detail?.town,
                       },
                     );
+                  } else {
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      ['town']: false,
+                    }));
                   }
                 }}
                 onChange={(e) => {
@@ -267,6 +453,13 @@ const WorkIncomeDetails = () => {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
+
+                    if (!requiredFieldsStatus['town']) {
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        ['town']: true,
+                      }));
+                    }
                   }
                 }}
               />
@@ -293,6 +486,11 @@ const WorkIncomeDetails = () => {
                         landmark: values?.applicants?.[activeIndex]?.work_income_detail?.landmark,
                       },
                     );
+                  } else {
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      ['landmark']: false,
+                    }));
                   }
                 }}
                 onChange={(e) => {
@@ -303,6 +501,13 @@ const WorkIncomeDetails = () => {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
+
+                    if (!requiredFieldsStatus['landmark']) {
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        ['landmark']: true,
+                      }));
+                    }
                   }
                 }}
               />
@@ -487,6 +692,11 @@ const WorkIncomeDetails = () => {
                             ?.total_household_income,
                       },
                     );
+                  } else {
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      ['total_household_income']: false,
+                    }));
                   }
                 }}
                 onChange={(e) => {
@@ -497,6 +707,13 @@ const WorkIncomeDetails = () => {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
+
+                    if (!requiredFieldsStatus['total_household_income']) {
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        ['total_household_income']: true,
+                      }));
+                    }
                   }
                 }}
               />

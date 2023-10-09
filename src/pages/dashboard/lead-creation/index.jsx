@@ -46,7 +46,6 @@ const LeadCreationRoutes = () => {
   };
 
   const gotoPreview = () => navigate('/lead/preview');
-  const gotoLntCharges = () => navigate('/lead/lnt-charges');
 
   const PreviewSnackbar = () => {
     return (
@@ -137,35 +136,6 @@ const LeadCreationRoutes = () => {
         <Route path='preview' element={<Preview />} />
         <Route path='*' element={<h1>404, Page not found!</h1>} />
       </Routes>
-
-      {/* Lnt Charges */}
-      {/* <Snackbar
-        sx={{
-          '& .MuiPaper-root': {
-            backgroundColor: '#000000F2',
-            fontFamily: 'Poppins',
-          },
-
-          '& .MuiPaper-root .MuiSnackbarContent-message': {
-            color: '#FEFEFE',
-
-            fontSize: '14px',
-            fontStyle: 'normal',
-            fontWeight: 400,
-          },
-        }}
-        className='-translate-y-32 m-[10px]'
-        open={open}
-        onClose={handleClose}
-        message='L&T charges is pending'
-        action={
-          <button onClick={gotoLntCharges} className='mr-3'>
-            <span className='text-right text-sm not-italic font-semibold text-primary-red'>
-              Pay now
-            </span>
-          </button>
-        }
-      /> */}
 
       {/* Preview snackbar */}
       <Snackbar
