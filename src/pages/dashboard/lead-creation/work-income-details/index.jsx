@@ -12,6 +12,7 @@ import CurrencyInput from '../../../../components/CurrencyInput';
 import { addApi, checkIsValidStatePincode, editFieldsById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
+import { tr } from 'date-fns/locale';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -750,13 +751,14 @@ const WorkIncomeDetails = () => {
             linkNext='/lead/qualifier'
             onNextClick={handleNextClick}
             onPreviousClick={() => setCurrentStepIndex(2)}
-            disableNext={
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !==
-                100 ||
-              values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
-              values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
-              values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
-            }
+            // disableNext={
+            //   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !==
+            //     100 ||
+            //   values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
+            //   values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
+            //   values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
+            // }
+            disableNext={true}
           />
         </div>
       </div>
