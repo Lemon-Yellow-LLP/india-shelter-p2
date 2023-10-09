@@ -222,7 +222,21 @@ export default function Login() {
             disabled={disablePhoneNumber || mobileVerified}
             message={
               mobileVerified
-                ? `<img src="${otpVerified}" alt='Otp Verified' role='presentation' /> OTP Verfied`
+                ? `<svg
+                width='18'
+                height='18'
+                viewBox='0 0 18 18'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+            >
+                <path
+                    d='M15 4.5L6.75 12.75L3 9'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                />
+            </svg> OTP Verfied`
                 : null
             }
             onBlur={(e) => {
