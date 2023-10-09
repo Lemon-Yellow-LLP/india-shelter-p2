@@ -9,6 +9,7 @@ function ImageUpload({
   setSingleFile,
   uploads,
   setUploads,
+  setEdit,
   label,
   hint,
   noBorder,
@@ -60,11 +61,54 @@ function ImageUpload({
     }
   };
 
+  const editImage = (e, id) => {
+    setMessage('');
+
+    setLoader(true);
+
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      ('The geolocation API is not supported by your browser.');
+    }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+
+      setLat(lat);
+      setLong(long);
+    }
+
+    let file = e.target.files;
+
+    for (let i = 0; i < file.length; i++) {
+      const fileType = file[i]['type'];
+
+      const validImageTypes = ['image/jpeg'];
+
+      if (validImageTypes.includes(fileType)) {
+        setEdit({
+          file: file[i],
+          id: id,
+        });
+        setFile([...files, file[i]]);
+      } else {
+        setLoader(false);
+        setMessage('File format not supported');
+      }
+    }
+  };
+
   async function removeImage(id) {
     const type = uploads.type;
+
     setFile(files.filter((x) => x.name !== id));
 
     const applicant = await getApplicantById(1);
+
     const document_meta = applicant.document_meta;
 
     const photos = applicant.document_meta[type];
@@ -106,8 +150,6 @@ function ImageUpload({
   useEffect(() => {
     uploads && setLoader(false);
   }, [uploads]);
-
-  console.log(uploads);
 
   return (
     <div className='w-full'>
@@ -246,33 +288,33 @@ function ImageUpload({
                 {uploads.data.map((upload, key) => {
                   return (
                     <div key={key} className='overflow-hidden relative w-[68px]'>
-                      <button
-                        onClick={() => {
-                          removeImage(upload.id);
-                        }}
-                        className='absolute right-0 top-0 z-20'
-                      >
-                        <svg
-                          width='16'
-                          height='16'
-                          viewBox='0 0 16 16'
-                          fill='none'
-                          xmlns='http://www.w3.org/2000/svg'
-                        >
-                          <rect width='16' height='16' rx='8' fill='#FFE0E1' />
-                          <path
-                            d='M10.9193 5.0835L5.08594 10.9168'
-                            stroke='#E33439'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
+                      <button className='absolute right-0 top-0 z-20 w-4 h-4'>
+                        <div className='w-full h-full relative'>
+                          <svg
+                            width='16'
+                            height='16'
+                            viewBox='0 0 16 16'
+                            fill='none'
+                            xmlns='http://www.w3.org/2000/svg'
+                          >
+                            <rect width='16' height='16' rx='8' fill='#DDFFE7' />
+                            <path
+                              d='M4 12H12M8.79307 5.02743C8.79307 5.02743 8.79307 5.75393 9.51957 6.48043C10.2461 7.20693 10.9726 7.20693 10.9726 7.20693M5.91983 10.6614L7.44548 10.4434C7.66555 10.412 7.86949 10.31 8.02668 10.1528L11.6991 6.48043C12.1003 6.07919 12.1003 5.42866 11.6991 5.02743L10.9726 4.30093C10.5713 3.89969 9.92081 3.89969 9.51957 4.30093L5.84718 7.97332C5.68999 8.13051 5.58802 8.33445 5.55658 8.55452L5.33863 10.0802C5.2902 10.4192 5.5808 10.7098 5.91983 10.6614Z'
+                              stroke='#147257'
+                              strokeLinecap='round'
+                            />
+                          </svg>
+
+                          <input
+                            type='file'
+                            onChange={(e) => editImage(e, upload.id)}
+                            className='absolute bottom-0 right-0 opacity-0 w-full h-full'
+                            multiple={true}
+                            name='files[]'
+                            capture='user'
+                            accept='image/*'
                           />
-                          <path
-                            d='M5.08594 5.0835L10.9193 10.9168'
-                            stroke='#E33439'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                          />
-                        </svg>
+                        </div>
                       </button>
 
                       <div className='relative rounded-md h-full w-full'>
@@ -321,6 +363,7 @@ function ImageUpload({
             callback={getImage}
             lat={lat}
             long={long}
+            photos={uploads.data}
           />
 
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
