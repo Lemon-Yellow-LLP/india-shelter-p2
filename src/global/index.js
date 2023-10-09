@@ -1,4 +1,3 @@
-import { reference } from '@popperjs/core';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
@@ -243,14 +242,6 @@ async function checkBre101(id, options) {
   return res.data;
 }
 
-async function updateLeadDataOnBlur(leadId, fieldName, value) {
-  if (!leadId) return;
-  const inputName = fieldName;
-  const updatedFieldValue = {};
-  updatedFieldValue[inputName] = value;
-  return editLeadById(leadId, updatedFieldValue);
-}
-
 function NaNorNull(value, toReturn = null) {
   return isNaN(value) ? toReturn : value;
 }
@@ -332,18 +323,14 @@ async function checkExistingCustomer(body) {
 }
 
 // L&T
-export async function getLnTChargesQRCode(leadId, values) {
+export async function getLnTChargesQRCode(leadId) {
   const { data } = await axios.post(`${API_URL}/lt-charges/payment-qr/${leadId}`);
   return data;
 }
 
-export async function checkPaymentStatus(leadId, values) {
-  try {
-    const { data } = await axios.post(`${API_URL}/lt-charges/payment-verify/${leadId}`);
-    return data;
-  } catch (err) {
-    throw err;
-  }
+export async function checkPaymentStatus(leadId) {
+  const { data } = await axios.post(`${API_URL}/lt-charges/payment-verify/${leadId}`);
+  return data;
 }
 
 export async function checkIfLntExists(leadId) {
@@ -351,14 +338,14 @@ export async function checkIfLntExists(leadId) {
   return data;
 }
 
-export async function addLnTCharges(leadId, values) {
+export async function addLnTCharges(leadId) {
   const { data } = await axios.post(`${API_URL}/lt-charges/add/`, {
     lead_id: leadId,
   });
   return data;
 }
 
-export async function doesLnTChargesExist(leadId, values) {
+export async function doesLnTChargesExist(leadId) {
   try {
     const { data } = await axios.get(`${API_URL}/lt-charges/by-lead/${leadId}`);
     return {
@@ -373,7 +360,7 @@ export async function doesLnTChargesExist(leadId, values) {
   }
 }
 
-export async function makePaymentByCash(id, values) {
+export async function makePaymentByCash(id) {
   try {
     const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, {
       method: 'Cash',
@@ -408,7 +395,6 @@ export async function getDashboardLeadById(id, values) {
     const { data } = await axios.get(`${API_URL}/dashboard/lead/${id}`, values);
     return data;
   } catch (err) {
-    cer;
     return err;
   }
 }
@@ -439,7 +425,6 @@ export async function getDashboardLeadList(
 export {
   API_URL,
   pingAPI,
-  updateLeadDataOnBlur,
   NaNorNull,
   isEighteenOrAbove,
   checkIsValidStatePincode,
