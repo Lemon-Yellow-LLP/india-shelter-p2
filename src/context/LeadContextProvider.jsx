@@ -87,7 +87,7 @@ const LeadContextProvider = ({ children }) => {
 
   // console.log(formik.values.applicants[activeIndex]?.['applicant_details']?.extra_params?.progress);
 
-  // console.log(formik.values);
+  console.log(formik.values);
 
   const addApplicant = () => {
     formik.setValues((prev) => {

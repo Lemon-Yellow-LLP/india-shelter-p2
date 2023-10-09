@@ -301,15 +301,14 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
-          const name = e.currentTarget.name;
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
 
-            if (!requiredFieldsStatus[name]) {
+            if (!requiredFieldsStatus.ongoing_emi) {
               setRequiredFieldsStatus((prev) => ({
                 ...prev,
-                [name]: true,
+                ongoing_emi: true,
               }));
             }
           }

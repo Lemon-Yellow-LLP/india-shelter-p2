@@ -59,12 +59,11 @@ const WorkIncomeDetails = () => {
         if (name === 'profession') {
           let _requiredFieldStatus = {};
 
-          if (values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Salaried') {
+          if (e.value === 'Salaried') {
             _requiredFieldStatus = {
               profession: true,
               flat_no_building_name: false,
               street_area_locality: false,
-              town: false,
               landmark: false,
               pincode: false,
               no_current_loan: false,
@@ -76,14 +75,11 @@ const WorkIncomeDetails = () => {
             setRequiredFieldsStatus(_requiredFieldStatus);
           }
 
-          if (
-            values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Self-employed'
-          ) {
+          if (e.value === 'Self-employed') {
             _requiredFieldStatus = {
               profession: true,
               flat_no_building_name: false,
               street_area_locality: false,
-              town: false,
               landmark: false,
               pincode: false,
               no_current_loan: false,
@@ -98,9 +94,7 @@ const WorkIncomeDetails = () => {
             setRequiredFieldsStatus(_requiredFieldStatus);
           }
 
-          if (
-            values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Self-employed'
-          ) {
+          if (e.value === 'Self-employed') {
             _requiredFieldStatus = {
               profession: true,
               no_current_loan: false,
@@ -112,7 +106,7 @@ const WorkIncomeDetails = () => {
             setRequiredFieldsStatus(_requiredFieldStatus);
           }
 
-          if (values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Retired') {
+          if (e.value === 'Retired') {
             _requiredFieldStatus = {
               profession: true,
               no_current_loan: false,
