@@ -724,7 +724,7 @@ const ApplicantDetails = () => {
             options={
               values?.lead.loan_type === 'Home Loan' ? loanPurposeOptions : loanPurposeDataLap
             }
-            placeholder='Eg: Choose reference type'
+            placeholder='Choose purpose of loan'
             onChange={handleLoanPurposeChange}
             touched={touched && touched?.lead?.purpose_of_loan}
             error={errors && errors?.lead?.purpose_of_loan}
@@ -738,7 +738,7 @@ const ApplicantDetails = () => {
             label='Property Type'
             name='lead.property_type'
             required
-            placeholder='Eg: Residential'
+            placeholder='Choose property type'
             options={
               values?.lead.loan_type === 'Home Loan'
                 ? loanFields[values.lead?.purpose_of_loan] || [
