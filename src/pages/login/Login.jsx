@@ -191,7 +191,12 @@ export default function Login() {
           <img src='./IS-Login-Logo.png' alt='login-logo' />
         </div>
 
-        <div className='flex flex-col gap-5 px-4 pb-4 pt-3 rounded-t-2xl h-full bg-white'>
+        <div
+          style={{
+            height: 'calc(100vh - 290px)',
+          }}
+          className='flex flex-col gap-5 px-4 pb-4 pt-3 rounded-t-2xl bg-white'
+        >
           <div>
             <h2 className='text-primary-black font-semibold'>Welcome!</h2>
             <p className='text-dark-grey font-normal'>Login to continue</p>
@@ -262,7 +267,7 @@ export default function Login() {
             Login
           </Button>
 
-          <p className='absolute w-[328px] text-xs text-light-grey font-normal text-center bottom-4 flex flex-col justify-center left-2/4 -translate-x-2/4'>
+          <p className='mt-auto text-xs text-light-grey font-normal text-center  flex flex-col justify-center '>
             In case of any queries, write a mail to
             <span className='text-primary-black text-xs'>abc@xyz.com</span>
           </p>
