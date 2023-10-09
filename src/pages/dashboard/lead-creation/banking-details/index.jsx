@@ -1,7 +1,7 @@
 const BankingDetails = () => {
   return (
     <>
-      <div className='overflow-hidden flex flex-col h-[100vh]'></div>
+      <div className='overflow-hidden flex flex-col h-[100vh]'>Banking Details</div>
     </>
   );
 };
