@@ -128,16 +128,16 @@ const ReferenceDetails = () => {
 
   const handleOnPincodeChangeOne = useCallback(async () => {
     if (
-      !values.reference_details.reference_1_pincode ||
-      values.reference_details.reference_1_pincode.toString().length < 5 ||
-      errors.reference_details?.reference_1_pincode
+      !values?.reference_details?.reference_1_pincode ||
+      values?.reference_details?.reference_1_pincode.toString().length < 5 ||
+      errors?.reference_details?.reference_1_pincode
     ) {
       setFieldValue('reference_details.reference_1_city', '');
       setFieldValue('reference_details.reference_1_state', '');
       return;
     }
 
-    const res = await checkIsValidStatePincode(values.reference_details.reference_1_pincode);
+    const res = await checkIsValidStatePincode(values?.reference_details?.reference_1_pincode);
     if (!res) {
       setFieldError('reference_details.reference_1_pincode', 'Invalid Pincode');
       return;
@@ -155,8 +155,8 @@ const ReferenceDetails = () => {
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_pincode']: true }));
     }
   }, [
-    errors.reference_details?.reference_1_pincode,
-    values.reference_details?.reference_1_pincode,
+    errors?.reference_details?.reference_1_pincode,
+    values?.reference_details?.reference_1_pincode,
     setFieldError,
     setFieldValue,
     requiredFieldsStatus,
@@ -164,16 +164,16 @@ const ReferenceDetails = () => {
 
   const handleOnPincodeChangeTwo = useCallback(async () => {
     if (
-      !values.reference_details.reference_2_pincode ||
-      values.reference_details.reference_2_pincode.toString().length < 5 ||
-      errors.reference_details?.reference_2_pincode
+      !values?.reference_details?.reference_2_pincode ||
+      values?.reference_details?.reference_2_pincode.toString().length < 5 ||
+      errors?.reference_details?.reference_2_pincode
     ) {
       setFieldValue('reference_details.reference_2_city', '');
       setFieldValue('reference_details.reference_2_state', '');
       return;
     }
 
-    const res = await checkIsValidStatePincode(values.reference_details.reference_2_pincode);
+    const res = await checkIsValidStatePincode(values?.reference_details?.reference_2_pincode);
     if (!res) {
       setFieldError('reference_details.reference_2_pincode', 'Invalid Pincode');
       return;
@@ -200,9 +200,9 @@ const ReferenceDetails = () => {
 
   useEffect(() => {
     if (
-      values.reference_details.reference_1_phone_number ===
-        values.reference_details.reference_2_phone_number &&
-      values.reference_details.reference_2_phone_number
+      values?.reference_details?.reference_1_phone_number ===
+        values?.reference_details?.reference_2_phone_number &&
+      values?.reference_details?.reference_2_phone_number
     ) {
       setFieldError(
         'reference_details.reference_1_phone_number',
@@ -210,16 +210,16 @@ const ReferenceDetails = () => {
       );
     }
   }, [
-    values.reference_details.reference_1_phone_number,
+    values?.reference_details?.reference_1_phone_number,
     setFieldError,
-    errors.reference_details?.reference_1_phone_number,
+    errors?.reference_details?.reference_1_phone_number,
   ]);
 
   useEffect(() => {
     if (
-      values.reference_details.reference_2_phone_number ===
-        values.reference_details.reference_1_phone_number &&
-      values.reference_details.reference_1_phone_number
+      values?.reference_details?.reference_2_phone_number ===
+        values?.reference_details?.reference_1_phone_number &&
+      values?.reference_details?.reference_1_phone_number
     ) {
       setFieldError(
         'reference_details.reference_2_phone_number',
@@ -227,9 +227,9 @@ const ReferenceDetails = () => {
       );
     }
   }, [
-    values.reference_details.reference_2_phone_number,
+    values?.reference_details?.reference_2_phone_number,
     setFieldError,
-    errors.reference_details?.reference_2_phone_number,
+    errors?.reference_details?.reference_2_phone_number,
   ]);
 
   return (
@@ -255,8 +255,8 @@ const ReferenceDetails = () => {
             defaultSelected={selectedReferenceTypeOne}
             inputClasses='mt-2'
             name='reference_details.reference_1_type'
-            error={errors.reference_details?.reference_1_type}
-            touched={touched.reference_details?.reference_1_type}
+            error={errors?.reference_details?.reference_1_type}
+            touched={touched?.reference_details?.reference_1_type}
             onBlur={(e) => {
               handleBlur(e);
             }}
@@ -267,18 +267,18 @@ const ReferenceDetails = () => {
             placeholder='Eg: Pratik Akash Singh'
             required
             name='reference_details.reference_1_full_name'
-            value={values.reference_details.reference_1_full_name}
-            error={errors.reference_details?.reference_1_full_name}
-            touched={touched.reference_details?.reference_1_full_name}
+            value={values?.reference_details?.reference_1_full_name}
+            error={errors?.reference_details?.reference_1_full_name}
+            touched={touched?.reference_details?.reference_1_full_name}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.reference_details?.reference_1_full_name &&
+                !errors?.reference_details?.reference_1_full_name &&
                 values?.reference_details?.reference_1_full_name
               ) {
                 updateFields(
                   'reference_1_full_name',
-                  values.reference_details.reference_1_full_name,
+                  values?.reference_details?.reference_1_full_name,
                 );
               }
             }}
@@ -293,19 +293,19 @@ const ReferenceDetails = () => {
             required
             name='reference_details.reference_1_phone_number'
             type='tel'
-            value={values.reference_details.reference_1_phone_number}
-            error={errors.reference_details?.reference_1_phone_number}
-            touched={touched.reference_details?.reference_1_phone_number}
+            value={values?.reference_details?.reference_1_phone_number}
+            error={errors?.reference_details?.reference_1_phone_number}
+            touched={touched?.reference_details?.reference_1_phone_number}
             onBlur={(e) => {
               handleBlur(e);
 
               if (
-                !errors.reference_details?.reference_1_phone_number &&
-                values.reference_details.reference_1_phone_number
+                !errors?.reference_details?.reference_1_phone_number &&
+                values?.reference_details?.reference_1_phone_number
               ) {
                 updateFields(
                   'reference_1_phone_number',
-                  values.reference_details.reference_1_phone_number,
+                  values?.reference_details?.reference_1_phone_number,
                 );
               }
             }}
@@ -353,9 +353,9 @@ const ReferenceDetails = () => {
               if (e.key === 'Backspace') {
                 setFieldValue(
                   'reference_details.reference_1_phone_number',
-                  values.reference_details.reference_1_phone_number.slice(
+                  values?.reference_details?.reference_1_phone_number.slice(
                     0,
-                    values.reference_details.reference_1_phone_number.length - 1,
+                    values?.reference_details?.reference_1_phone_number.length - 1,
                   ),
                 );
                 e.preventDefault();
@@ -375,16 +375,16 @@ const ReferenceDetails = () => {
             placeholder='Eg: Near Sanjay hospital'
             required
             name='reference_details.reference_1_address'
-            value={values.reference_details.reference_1_address}
-            error={errors.reference_details?.reference_1_address}
-            touched={touched.reference_details?.reference_1_address}
+            value={values?.reference_details?.reference_1_address}
+            error={errors?.reference_details?.reference_1_address}
+            touched={touched?.reference_details?.reference_1_address}
             onBlur={(e) => {
               handleBlur(e);
               if (
                 !errors.reference_details?.reference_1_address &&
-                values.reference_details.reference_1_address
+                values?.reference_details?.reference_1_address
               ) {
-                updateFields('reference_1_address', values.reference_details.reference_1_address);
+                updateFields('reference_1_address', values?.reference_details?.reference_1_address);
               }
             }}
             disabled={inputDisabled}
@@ -410,18 +410,18 @@ const ReferenceDetails = () => {
             name='reference_details.reference_1_pincode'
             type='tel'
             hint='City and State fields will get filled based on Pincode'
-            value={values.reference_details.reference_1_pincode}
-            error={errors.reference_details?.reference_1_pincode}
-            touched={touched.reference_details?.reference_1_pincode}
+            value={values?.reference_details?.reference_1_pincode}
+            error={errors?.reference_details?.reference_1_pincode}
+            touched={touched?.reference_details?.reference_1_pincode}
             disabled={inputDisabled}
             onBlur={(e) => {
               handleBlur(e);
               handleOnPincodeChangeOne();
               if (
-                !errors.reference_details?.reference_1_pincode &&
-                values.reference_details.reference_1_pincode
+                !errors?.reference_details?.reference_1_pincode &&
+                values?.reference_details?.reference_1_pincode
               ) {
-                updateFields('reference_1_pincode', values.reference_details.reference_1_pincode);
+                updateFields('reference_1_pincode', values?.reference_details?.reference_1_pincode);
               }
             }}
             min='0'
@@ -478,9 +478,9 @@ const ReferenceDetails = () => {
             required
             placeholder='Eg: Nashik'
             name='reference_details.reference_1_city'
-            value={values.reference_details.reference_1_city}
-            error={errors.reference_details?.reference_1_city}
-            touched={touched.reference_details?.reference_1_city}
+            value={values?.reference_details?.reference_1_city}
+            error={errors?.reference_details?.reference_1_city}
+            touched={touched?.reference_details?.reference_1_city}
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
@@ -492,9 +492,9 @@ const ReferenceDetails = () => {
             required
             placeholder='Eg: Maharashtra'
             name='reference_details.reference_1_state'
-            value={values.reference_details.reference_1_state}
-            error={errors.reference_details?.reference_1_state}
-            touched={touched.reference_details?.reference_1_state}
+            value={values?.reference_details?.reference_1_state}
+            error={errors?.reference_details?.reference_1_state}
+            touched={touched?.reference_details?.reference_1_state}
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
@@ -507,16 +507,16 @@ const ReferenceDetails = () => {
             placeholder='Eg: xyz@gmail.com'
             name='reference_details.reference_1_email'
             autoComplete='off'
-            value={values.reference_details.reference_1_email}
-            error={errors.reference_details?.reference_1_email}
+            value={values?.reference_details?.reference_1_email}
+            error={errors?.reference_details?.reference_1_email}
             touched={touched.reference_details?.reference_1_email}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.reference_details?.reference_1_email &&
-                values.reference_details.reference_1_email
+                !errors?.reference_details?.reference_1_email &&
+                values?.reference_details?.reference_1_email
               ) {
-                updateFields('reference_1_email', values.reference_details.reference_1_email);
+                updateFields('reference_1_email', values?.reference_details?.reference_1_email);
               }
             }}
             onChange={(e) => {
@@ -547,8 +547,8 @@ const ReferenceDetails = () => {
             defaultSelected={selectedReferenceTypeTwo}
             inputClasses='mt-2'
             name='reference_details.reference_2_type'
-            error={errors.reference_details?.reference_2_type}
-            touched={touched.reference_details?.reference_2_type}
+            error={errors?.reference_details?.reference_2_type}
+            touched={touched?.reference_details?.reference_2_type}
             onBlur={(e) => {
               handleBlur(e);
             }}
@@ -559,18 +559,18 @@ const ReferenceDetails = () => {
             placeholder='Eg: Pratik Akash Singh'
             required
             name='reference_details.reference_2_full_name'
-            value={values.reference_details.reference_2_full_name}
-            error={errors.reference_details?.reference_2_full_name}
-            touched={touched.reference_details?.reference_2_full_name}
+            value={values?.reference_details?.reference_2_full_name}
+            error={errors?.reference_details?.reference_2_full_name}
+            touched={touched?.reference_details?.reference_2_full_name}
             onBlur={(e) => {
               handleBlur(e);
               if (
-                !errors.reference_details?.reference_2_full_name &&
-                values.reference_details.reference_2_full_name
+                !errors?.reference_details?.reference_2_full_name &&
+                values?.reference_details?.reference_2_full_name
               ) {
                 updateFields(
                   'reference_2_full_name',
-                  values.reference_details.reference_2_full_name,
+                  values?.reference_details?.reference_2_full_name,
                 );
               }
             }}
@@ -585,19 +585,19 @@ const ReferenceDetails = () => {
             required
             name='reference_details.reference_2_phone_number'
             type='tel'
-            value={values.reference_details.reference_2_phone_number}
-            error={errors.reference_details?.reference_2_phone_number}
-            touched={touched.reference_details?.reference_2_phone_number}
+            value={values?.reference_details?.reference_2_phone_number}
+            error={errors?.reference_details?.reference_2_phone_number}
+            touched={touched?.reference_details?.reference_2_phone_number}
             onBlur={(e) => {
               handleBlur(e);
 
               if (
                 !errors.reference_details?.reference_2_phone_number &&
-                values.reference_details.reference_2_phone_number
+                values?.reference_details?.reference_2_phone_number
               ) {
                 updateFields(
                   'reference_2_phone_number',
-                  values.reference_details.reference_2_phone_number,
+                  values?.reference_details?.reference_2_phone_number,
                 );
               }
             }}
@@ -645,9 +645,9 @@ const ReferenceDetails = () => {
               if (e.key === 'Backspace') {
                 setFieldValue(
                   'reference_details.reference_2_phone_number',
-                  values.reference_details.reference_2_phone_number.slice(
+                  values?.reference_details?.reference_2_phone_number.slice(
                     0,
-                    values.reference_details.reference_2_phone_number.length - 1,
+                    values?.reference_details?.reference_2_phone_number.length - 1,
                   ),
                 );
                 e.preventDefault();
@@ -667,16 +667,16 @@ const ReferenceDetails = () => {
             placeholder='Eg: Near Sanjay hospital'
             required
             name='reference_details.reference_2_address'
-            value={values.reference_details.reference_2_address}
-            error={errors.reference_details?.reference_2_address}
-            touched={touched.reference_details?.reference_2_address}
+            value={values?.reference_details?.reference_2_address}
+            error={errors?.reference_details?.reference_2_address}
+            touched={touched?.reference_details?.reference_2_address}
             onBlur={(e) => {
               handleBlur(e);
               if (
                 !errors.reference_details?.reference_2_address &&
-                values.reference_details.reference_2_address
+                values?.reference_details?.reference_2_address
               ) {
-                updateFields('reference_2_address', values.reference_details.reference_2_address);
+                updateFields('reference_2_address', values?.reference_details?.reference_2_address);
               }
             }}
             disabled={inputDisabled}
@@ -702,7 +702,7 @@ const ReferenceDetails = () => {
             name='reference_details.reference_2_pincode'
             type='tel'
             hint='City and State fields will get filled based on Pincode'
-            value={values.reference_details.reference_2_pincode}
+            value={values?.reference_details?.reference_2_pincode}
             error={errors.reference_details?.reference_2_pincode}
             touched={touched.reference_details?.reference_2_pincode}
             disabled={inputDisabled}
@@ -711,9 +711,9 @@ const ReferenceDetails = () => {
               handleOnPincodeChangeTwo();
               if (
                 !errors.reference_details?.reference_2_pincode &&
-                values.reference_details.reference_2_pincode
+                values?.reference_details?.reference_2_pincode
               ) {
-                updateFields('reference_2_pincode', values.reference_details.reference_2_pincode);
+                updateFields('reference_2_pincode', values?.reference_details?.reference_2_pincode);
               }
             }}
             min='0'
@@ -770,9 +770,9 @@ const ReferenceDetails = () => {
             required
             placeholder='Eg: Nashik'
             name='reference_details.reference_2_city'
-            value={values.reference_details.reference_2_city}
-            error={errors.reference_details?.reference_2_city}
-            touched={touched.reference_details?.reference_2_city}
+            value={values?.reference_details?.reference_2_city}
+            error={errors?.reference_details?.reference_2_city}
+            touched={touched?.reference_details?.reference_2_city}
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
@@ -784,9 +784,9 @@ const ReferenceDetails = () => {
             required
             placeholder='Eg: Maharashtra'
             name='reference_details.reference_2_state'
-            value={values.reference_details.reference_2_state}
-            error={errors.reference_details?.reference_2_state}
-            touched={touched.reference_details?.reference_2_state}
+            value={values?.reference_details?.reference_2_state}
+            error={errors?.reference_details?.reference_2_state}
+            touched={touched?.reference_details?.reference_2_state}
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
@@ -799,16 +799,16 @@ const ReferenceDetails = () => {
             placeholder='Eg: xyz@gmail.com'
             name='reference_details.reference_2_email'
             autoComplete='off'
-            value={values.reference_details.reference_2_email}
-            error={errors.reference_details?.reference_2_email}
-            touched={touched.reference_details?.reference_2_email}
+            value={values?.reference_details?.reference_2_email}
+            error={errors?.reference_details?.reference_2_email}
+            touched={touched?.reference_details?.reference_2_email}
             onBlur={(e) => {
               handleBlur(e);
               if (
                 !errors.reference_details?.reference_2_email &&
-                values.reference_details.reference_2_email
+                values?.reference_details?.reference_2_email
               ) {
-                updateFields('reference_2_email', values.reference_details.reference_2_email);
+                updateFields('reference_2_email', values?.reference_details?.reference_2_email);
               }
             }}
             onChange={(e) => {
