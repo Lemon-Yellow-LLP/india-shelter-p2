@@ -143,10 +143,6 @@ function ImageUpload({
     }
   }
 
-  const getImage = (value) => {
-    setFile(files.filter((img) => img.name !== value.name));
-  };
-
   useEffect(() => {
     uploads && setLoader(false);
   }, [uploads]);
@@ -285,9 +281,9 @@ function ImageUpload({
               </div>
 
               <div className='flex gap-2 h-[85px]'>
-                {uploads.data.map((upload, key) => {
+                {uploads.data.map((upload, index) => {
                   return (
-                    <div key={key} className='overflow-hidden relative w-[68px]'>
+                    <div key={index} className='overflow-hidden relative w-[68px]'>
                       <button className='absolute right-0 top-0 z-20 w-4 h-4'>
                         <div className='w-full h-full relative'>
                           <svg
@@ -322,7 +318,7 @@ function ImageUpload({
                         <button
                           className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
                           onClick={() => {
-                            setPreviewFile(upload.document_url);
+                            setPreviewFile(index);
                             setShow(true);
                           }}
                         >
@@ -359,8 +355,8 @@ function ImageUpload({
           <DesktopPopUp
             showpopup={show}
             setShowPopUp={setShow}
-            img={previewFile}
-            callback={getImage}
+            index={previewFile}
+            callback={removeImage}
             lat={lat}
             long={long}
             photos={uploads.data}
