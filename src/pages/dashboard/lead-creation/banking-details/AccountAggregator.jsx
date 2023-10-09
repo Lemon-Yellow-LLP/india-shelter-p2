@@ -178,7 +178,7 @@ export default function AccountAggregator() {
                   primary={false}
                   inputClasses='w-full h-[46px]'
                   disabled={aaRunning}
-                  onClick={() => setConfirmation(true)}
+                  onClick={() => (aaRunning ? null : setConfirmation(true))}
                 >
                   Skip
                 </Button>

@@ -1,7 +1,5 @@
-import { forwardRef, memo, useEffect, useRef } from 'react';
+import { forwardRef, memo, useRef } from 'react';
 import PropTypes from 'prop-types';
-import SearchIcon from '../../assets/icons/searchIcon.svg';
-import { Autocomplete, TextField } from '@mui/material';
 
 /**
  * @param label - String
@@ -10,8 +8,8 @@ import { Autocomplete, TextField } from '@mui/material';
  * @param error - String
  * @param Icon React JSX Element
  */
-const SearchableTextInput = memo(
-  forwardRef(function TextInput(
+const ClickableEndIcon = memo(
+  forwardRef(function ClickableEndIcon(
     {
       label,
       name,
@@ -23,70 +21,61 @@ const SearchableTextInput = memo(
       displayError = true,
       message,
       onChange,
-      options,
+      labelDisabled,
+      EndIcon,
+      onEndButtonClick,
       ...props
     },
     ref,
   ) {
     const inputRef = useRef();
 
-    const removeLable = () => {
-      const labelElement = document.getElementsByClassName('MuiFormLabel-root');
-      if (labelElement.length > 0) {
-        labelElement[0].remove();
-      }
-    };
-
-    useEffect(() => {
-      removeLable();
-    }, [inputRef.current]);
-
     return (
-      <div className='flex flex-col gap-1 w-full'>
-        <label htmlFor={name} className='flex gap-0.5 items-center text-primary-black'>
+      <div className='flex flex-col gap-1'>
+        <label
+          htmlFor={name}
+          className={`'flex gap-0.5 items-center' ${labelDisabled ? 'opacity-60' : 'opacity-100'}`}
+        >
           {label}
           {props.required && <span className='text-primary-red text-sm'>*</span>}
         </label>
         {hint && (
           <span
-            className='mb-1.5 text-light-grey text-sm font-normal'
+            className='mb-1.5 text-light-grey text-xs font-normal'
             dangerouslySetInnerHTML={{
               __html: hint,
             }}
           />
         )}
         <div
-          role='button'
           tabIndex={-1}
-          onClick={() => (ref ? ref.current.focus() : inputRef.current.focus())}
-          onKeyDown={() => (ref ? ref.current?.focus() : inputRef.current.focus())}
-          className={`input-container bg-white px-4 py-3 border rounded-lg 
-        flex justify-between gap-1
+          className={`input-container px-4 py-3 border rounded-lg
+        flex gap-1
         transition-all ease-out duration-150
         focus-within:border-secondary-blue focus-within:shadow-secondary-blue focus-within:shadow-primary
         ${!props.value && !touched ? 'border-stroke' : 'border-light-grey'}
         ${error && touched && 'border-primary-red shadow-primary shadow-primary-red'}
         ${props.disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
+        ${labelDisabled ? 'bg-white opacity-60' : 'opacity-100'}
+
         `}
         >
           {Icon && <Icon />}
-
-          <Autocomplete
-            ref={ref || inputRef}
-            disablePortal
+          <input
             className={`w-full focus:outline-none ${inputClasses}`}
+            ref={ref || inputRef}
             id={name}
             name={name}
-            value={props.value}
-            isOptionEqualToValue={(option, value) => option.value === value}
-            onBlur={props.onBlur}
-            onChange={(e, value) => onChange(name, value)}
-            options={options}
-            sx={{ width: 300, border: 'none' }}
-            renderInput={(params) => <TextField {...params} label='Movie' placeholder='Eg: Idea' />}
+            onChange={(e) => onChange(e)}
+            {...props}
           />
-          <img src={SearchIcon} />
+          {EndIcon && (
+            <div onClick={onEndButtonClick}>
+              <EndIcon />
+            </div>
+          )}
         </div>
+
         {displayError && !message ? (
           <span
             className='text-xs text-primary-red'
@@ -99,7 +88,7 @@ const SearchableTextInput = memo(
         )}
         {message ? (
           <span
-            className='flex text-primary-black text-xs leading-[18px]'
+            className='flex text-[#727376] text-xs leading-[18px]'
             dangerouslySetInnerHTML={{
               __html: message,
             }}
@@ -112,9 +101,9 @@ const SearchableTextInput = memo(
   }),
 );
 
-export default SearchableTextInput;
+export default ClickableEndIcon;
 
-SearchableTextInput.propTypes = {
+ClickableEndIcon.propTypes = {
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   hint: PropTypes.string,

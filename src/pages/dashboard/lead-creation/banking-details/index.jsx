@@ -1,15 +1,25 @@
 import { useContext } from 'react';
 import { useState } from 'react';
-import { useCallback } from 'react';
 import { addApi, editFieldsById } from '../../../../global';
 import { LeadContext } from '../../../../context/LeadContextProvider';
-import { bankingMode } from './bankingDropdownOptions';
 import { CardRadio } from '../../../../components';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { useNavigate } from 'react-router-dom';
-import BankingManual from './BankingManual';
-import AccountAggregator from './AccountAggregator';
 import Accounts from './Accounts';
+import { BankingAA, BankingManual } from '../../../../assets/icons';
+
+export const bankingMode = [
+  {
+    label: 'Account Aggregator',
+    value: 'Account Aggregator',
+    icon: <BankingAA />,
+  },
+  {
+    label: 'Manual',
+    value: 'Manual',
+    icon: <BankingManual />,
+  },
+];
 
 const BankingDetails = () => {
   const {
@@ -97,7 +107,7 @@ const BankingDetails = () => {
                     onChange={handleRadioChange}
                     containerClasses='flex-1'
                   >
-                    <img src={option.icon} />
+                    {option.icon}
                   </CardRadio>
                 );
               })}

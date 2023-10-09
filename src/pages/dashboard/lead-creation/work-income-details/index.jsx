@@ -1,7 +1,7 @@
 import { professionOptions, noOfDependentsOptions, totalFamilyMembersOptions } from '../utils';
 import CardRadio from '../../../../components/CardRadio';
 import CardRadioWithoutIcon from '../../../../components/CardRadio/CardRadioWithoutIcon';
-import { memo, useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import Salaried from './Salaried';
 import SelfEmployed from './SelfEmployed';
@@ -12,7 +12,6 @@ import CurrencyInput from '../../../../components/CurrencyInput';
 import { addApi, checkIsValidStatePincode, editFieldsById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
-import { tr } from 'date-fns/locale';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 

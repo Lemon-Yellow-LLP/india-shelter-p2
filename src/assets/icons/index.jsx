@@ -38,12 +38,21 @@ import LockIcon from './LockIcon';
 import ToolTipIcon from './ToolTipIcon';
 import DustbinIcon from './DustbinIcon';
 import CommingSoon from './CommingSoon.svg';
-import BankingManual from './bankingManual.svg';
-import BankingAA from './bankingAA.svg';
 
+import BankingManual from './bankingManual.jsx';
+import BankingAA from './bankingAA.jsx';
 import IconBackBanking from './iconBackHeader';
 
+import SavingIcon from './savingsIcon';
+import CurrentIcon from './currentIcon';
+import CashCreditIcon from './cashCreditIcon';
+import OverDraftIcon from './overDraftIcon';
+
 export {
+  OverDraftIcon,
+  CashCreditIcon,
+  CurrentIcon,
+  SavingIcon,
   IconBackBanking,
   BankingAA,
   BankingManual,
