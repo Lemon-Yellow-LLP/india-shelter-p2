@@ -319,7 +319,7 @@ const UploadDocuments = () => {
             },
           );
 
-          setPropertyPaperUploads(active_uploads);
+          setPropertyPaperUploads({ data: active_uploads });
         }
       }
     }
@@ -842,8 +842,10 @@ const UploadDocuments = () => {
           return data.active === true;
         });
 
-        setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
-        setIdProofPhotos(active_uploads);
+        if (active_uploads.length) {
+          setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+          setIdProofPhotos(active_uploads);
+        }
       }
 
       if (res.document_meta.property_paper_photos) {
@@ -861,8 +863,10 @@ const UploadDocuments = () => {
             return data.active === true;
           });
 
-          setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
-          setPropertyPapers(active_uploads);
+          if (active_uploads.length) {
+            setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
+            setPropertyPapers(active_uploads);
+          }
         }
       }
 
@@ -871,8 +875,10 @@ const UploadDocuments = () => {
           return data.active === true;
         });
 
-        setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
-        setAddressProofPhotos(active_uploads);
+        if (active_uploads.length) {
+          setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+          setAddressProofPhotos(active_uploads);
+        }
       }
 
       if (res.document_meta.salary_slip_photos) {
@@ -880,8 +886,10 @@ const UploadDocuments = () => {
           return data.active === true;
         });
 
-        setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
-        setSalarySlipPhotos(active_uploads);
+        if (active_uploads.length) {
+          setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
+          setSalarySlipPhotos(active_uploads);
+        }
       }
 
       if (res.document_meta.form_60_photos) {
@@ -889,8 +897,10 @@ const UploadDocuments = () => {
           return data.active === true;
         });
 
-        setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
-        setForm60photos(active_uploads);
+        if (active_uploads.length) {
+          setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
+          setForm60photos(active_uploads);
+        }
       }
 
       if (res.document_meta.property_photos) {
@@ -898,8 +908,10 @@ const UploadDocuments = () => {
           return data.active === true;
         });
 
-        setPropertyUploads({ type: 'property_photos', data: active_uploads });
-        setPropertyPhotos(active_uploads);
+        if (active_uploads.length) {
+          setPropertyUploads({ type: 'property_photos', data: active_uploads });
+          setPropertyPhotos(active_uploads);
+        }
       }
 
       if (res.document_meta.lo_selfie) {
@@ -918,8 +930,10 @@ const UploadDocuments = () => {
           return data.active === true;
         });
 
-        setDocUploads({ type: 'other_docs', data: active_uploads });
-        setDocs(active_uploads);
+        if (active_uploads.length) {
+          setDocUploads({ type: 'other_docs', data: active_uploads });
+          setDocs(active_uploads);
+        }
       }
     }
     getPreviousUploads();
