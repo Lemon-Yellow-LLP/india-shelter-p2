@@ -75,10 +75,6 @@ export const defaultValuesLead = {
     },
   ],
 
-  lnt_mobile_number: {
-    mobile_number: '',
-  },
-
   applicants: [
     {
       applicant_details: {
