@@ -145,13 +145,9 @@ function PdfAndImageUpload({
       setUploads(null);
       setFile([]);
     } else {
-      setUploads(active_uploads);
+      setUploads({ data: active_uploads });
     }
   }
-
-  const getImage = (value) => {
-    setFile(files.filter((img) => img.name !== value.name));
-  };
 
   async function deletePDF(id) {
     const applicant = await getApplicantById(1);
@@ -189,8 +185,6 @@ function PdfAndImageUpload({
     }
     setPdf(null);
   }
-
-  console.log(uploads);
 
   return (
     <div className='w-full'>
@@ -320,9 +314,9 @@ function PdfAndImageUpload({
               </div>
 
               <div className='flex gap-2 h-[85px]'>
-                {uploads.data.map((upload, key) => {
+                {uploads.data.map((upload, index) => {
                   return (
-                    <div key={key} className='overflow-hidden relative w-[68px]'>
+                    <div key={index} className='overflow-hidden relative w-[68px]'>
                       <button className='absolute right-0 top-0 z-20 w-4 h-4'>
                         <div className='w-full h-full relative'>
                           <svg
@@ -357,7 +351,7 @@ function PdfAndImageUpload({
                         <button
                           className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
                           onClick={() => {
-                            setPreviewFile(upload.document_url);
+                            setPreviewFile(index);
                             setShow(true);
                           }}
                         >
@@ -392,8 +386,8 @@ function PdfAndImageUpload({
               <DesktopPopUp
                 showpopup={show}
                 setShowPopUp={setShow}
-                img={previewFile}
-                callback={getImage}
+                index={previewFile}
+                callback={removeImage}
                 lat={lat}
                 long={long}
                 photos={uploads.data}
