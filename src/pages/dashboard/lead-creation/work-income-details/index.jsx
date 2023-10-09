@@ -12,6 +12,7 @@ import CurrencyInput from '../../../../components/CurrencyInput';
 import { addApi, checkIsValidStatePincode, editFieldsById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
+import { tr } from 'date-fns/locale';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -58,12 +59,11 @@ const WorkIncomeDetails = () => {
         if (name === 'profession') {
           let _requiredFieldStatus = {};
 
-          if (values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Salaried') {
+          if (e.value === 'Salaried') {
             _requiredFieldStatus = {
               profession: true,
               flat_no_building_name: false,
               street_area_locality: false,
-              town: false,
               landmark: false,
               pincode: false,
               no_current_loan: false,
@@ -75,14 +75,11 @@ const WorkIncomeDetails = () => {
             setRequiredFieldsStatus(_requiredFieldStatus);
           }
 
-          if (
-            values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Self-employed'
-          ) {
+          if (e.value === 'Self-employed') {
             _requiredFieldStatus = {
               profession: true,
               flat_no_building_name: false,
               street_area_locality: false,
-              town: false,
               landmark: false,
               pincode: false,
               no_current_loan: false,
@@ -97,9 +94,7 @@ const WorkIncomeDetails = () => {
             setRequiredFieldsStatus(_requiredFieldStatus);
           }
 
-          if (
-            values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Self-employed'
-          ) {
+          if (e.value === 'Self-employed') {
             _requiredFieldStatus = {
               profession: true,
               no_current_loan: false,
@@ -111,7 +106,7 @@ const WorkIncomeDetails = () => {
             setRequiredFieldsStatus(_requiredFieldStatus);
           }
 
-          if (values?.applicants?.[activeIndex]?.work_income_detail?.profession == 'Retired') {
+          if (e.value === 'Retired') {
             _requiredFieldStatus = {
               profession: true,
               no_current_loan: false,
@@ -750,13 +745,14 @@ const WorkIncomeDetails = () => {
             linkNext='/lead/qualifier'
             onNextClick={handleNextClick}
             onPreviousClick={() => setCurrentStepIndex(2)}
-            disableNext={
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !==
-                100 ||
-              values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
-              values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
-              values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
-            }
+            // disableNext={
+            //   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !==
+            //     100 ||
+            //   values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
+            //   values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
+            //   values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
+            // }
+            disableNext={true}
           />
         </div>
       </div>
