@@ -116,7 +116,7 @@ const ApplicantDetails = () => {
     }
   };
 
-  const updateFieldsLead = async (name, value) => {
+  const updateFieldsLead = useCallback(async (name, value) => {
     let newData = {};
     newData[name] = value;
     newData.lo_id = lo_id;
@@ -133,11 +133,11 @@ const ApplicantDetails = () => {
           return err;
         });
     }
-  };
+  });
 
   useEffect(() => {
     updateProgressApplicantSteps('applicant_details', requiredFieldsStatus, 'applicant');
-  }, [requiredFieldsStatus, updateProgressApplicantSteps]);
+  }, [requiredFieldsStatus]);
 
   const onLoanTypeChange = useCallback(
     (e) => {
@@ -148,7 +148,7 @@ const ApplicantDetails = () => {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus, setFieldValue, updateFieldsLead],
+    [requiredFieldsStatus, values],
   );
 
   const handleFirstNameChange = useCallback(
@@ -181,7 +181,7 @@ const ApplicantDetails = () => {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus, setFieldValue],
+    [requiredFieldsStatus],
   );
 
   const handleLoanPurposeChange = useCallback(
