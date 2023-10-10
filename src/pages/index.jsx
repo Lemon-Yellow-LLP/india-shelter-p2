@@ -15,12 +15,11 @@ const DashboardRoutes = () => {
 
     // Check authentication once and render accordingly
 
-    // if (isAuthenticated) {
-    //   return children;
-    // } else {
-    //   return <Navigate to='/login' />;
-    // }
-    return children;
+    if (isAuthenticated) {
+      return children;
+    } else {
+      return <Navigate to='/login' />;
+    }
   };
 
   return (
