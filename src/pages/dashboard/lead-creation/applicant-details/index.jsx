@@ -31,6 +31,7 @@ import {
   loanPurposeDataLap,
 } from './ApplicantDropDownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import Topbar from '../../../../components/Topbar';
 
 const ApplicantDetails = () => {
   const {
@@ -136,7 +137,7 @@ const ApplicantDetails = () => {
 
   useEffect(() => {
     updateProgressApplicantSteps('applicant_details', requiredFieldsStatus, 'applicant');
-  }, [requiredFieldsStatus]);
+  }, [requiredFieldsStatus, updateProgressApplicantSteps]);
 
   const onLoanTypeChange = useCallback(
     (e) => {
@@ -147,7 +148,7 @@ const ApplicantDetails = () => {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus, values],
+    [requiredFieldsStatus, setFieldValue, updateFieldsLead],
   );
 
   const handleFirstNameChange = useCallback(
@@ -162,26 +163,25 @@ const ApplicantDetails = () => {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
     },
-    [requiredFieldsStatus, values],
+    [activeIndex, setFieldValue, values?.applicants],
   );
 
   const handleTextInputChange = useCallback(
     (e) => {
       const value = e.currentTarget.value;
-      const pattern = /^[A-Za-z]+$/;
-      if (pattern.exec(value[value.length - 1])) {
-        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-        const name = e.currentTarget.name.split('.')[2];
-        if (
-          requiredFieldsStatus[name] !== undefined &&
-          !requiredFieldsStatus[name] &&
-          value.length > 1
-        ) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-        }
+      const pattern = /[^a-zA-Z]+/;
+      if (pattern.test(value)) return;
+      setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+      const name = e.currentTarget.name.split('.')[2];
+      if (
+        requiredFieldsStatus[name] !== undefined &&
+        !requiredFieldsStatus[name] &&
+        value.length > 1
+      ) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus, values],
+    [requiredFieldsStatus, setFieldValue],
   );
 
   const handleLoanPurposeChange = useCallback(
@@ -469,11 +469,7 @@ const ApplicantDetails = () => {
 
   return (
     <>
-      {/* <Topbar
-        title='Lead Creation'
-        id={values?.lead?.id}
-        progress={values?.lead?.extra_params?.progress}
-      /> */}
+      <Topbar title='Lead Creation' id={values?.lead?.id} progress={8} />
       <div className='overflow-hidden flex flex-col h-[100vh]'>
         <div
           className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1`}
