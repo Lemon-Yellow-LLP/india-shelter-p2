@@ -153,7 +153,7 @@ export default function Login() {
 
       if (!res) return;
 
-      window.location.reload();
+      navigate('/');
     } catch (err) {
       console.log(err);
     }
