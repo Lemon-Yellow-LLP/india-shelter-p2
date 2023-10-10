@@ -15,6 +15,7 @@ import {
   uploadDoc,
   verifyUploadOtp,
 } from '../../../../global';
+import imageCompression from 'browser-image-compression';
 
 const isQaulifierActivated = false;
 
@@ -280,11 +281,32 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function addPropertyPaperPhotos() {
       const data = new FormData();
-      const filename = Date.now() + propertyPapersFile.name;
+      const filename = propertyPapersFile.name;
       data.append('applicant_id', 1);
       data.append('document_type', 'property_paper_photos');
       data.append('document_name', filename);
-      data.append('file', propertyPapersFile);
+
+      if (propertyPapersFile.type === 'image/jpeg') {
+        const options = {
+          maxSizeMB: 0.02,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+
+        try {
+          const compressedFile = await imageCompression(propertyPapersFile, options);
+
+          const compressedImageFile = new File([compressedFile], filename, {
+            type: compressedFile.type,
+          });
+
+          data.append('file', compressedImageFile);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        data.append('file', propertyPapersFile);
+      }
 
       const res = await uploadDoc(data, {
         headers: {
@@ -332,7 +354,28 @@ const UploadDocuments = () => {
       const filename = editPropertyPaper.file.name;
       data.append('document_type', 'property_paper_photos');
       data.append('document_name', filename);
-      data.append('file', editPropertyPaper.file);
+
+      if (editPropertyPaper.file.type === 'image/jpeg') {
+        const options = {
+          maxSizeMB: 0.02,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+
+        try {
+          const compressedFile = await imageCompression(editPropertyPaper.file, options);
+
+          const compressedImageFile = new File([compressedFile], filename, {
+            type: compressedFile.type,
+          });
+
+          data.append('file', compressedImageFile);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        data.append('file', editPropertyPaper.file);
+      }
 
       const res = await reUploadDoc(editPropertyPaper.id, data, {
         headers: {
@@ -357,11 +400,28 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function addCustomerPhotos() {
       const data = new FormData();
-      const filename = Date.now() + customerPhotosFile.name;
+      const filename = customerPhotosFile.name;
       data.append('applicant_id', 1);
       data.append('document_type', 'customer_photos');
       data.append('document_name', filename);
-      data.append('file', customerPhotosFile);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(customerPhotosFile, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await uploadDoc(data, {
         headers: {
@@ -395,13 +455,28 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function addIdProofPhotos() {
       const data = new FormData();
-      const filename = Date.now() + idProofPhotosFile.name;
+      const filename = idProofPhotosFile.name;
       data.append('applicant_id', 1);
-      data.append('document_type', 'id_proof_photos');
+      data.append('document_type', values?.applicants?.[activeIndex]?.personal_details?.id_type);
       data.append('document_name', filename);
-      data.append('file', idProofPhotosFile);
 
-      console.log(idProofPhotosFile);
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(idProofPhotosFile, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await uploadDoc(data, {
         headers: {
@@ -423,7 +498,10 @@ const UploadDocuments = () => {
         });
 
         const active_uploads = edited_applicant.document_meta.id_proof_photos.filter((data) => {
-          return data.active === true;
+          return (
+            data.active === true &&
+            data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+          );
         });
 
         setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
@@ -436,9 +514,26 @@ const UploadDocuments = () => {
     async function editIdProofPhotos() {
       const data = new FormData();
       const filename = editIdProof.file.name;
-      data.append('document_type', 'id_proof_photos');
+      data.append('document_type', values?.applicants?.[activeIndex]?.personal_details?.id_type);
       data.append('document_name', filename);
-      data.append('file', editIdProof.file);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(editIdProof.file, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await reUploadDoc(editIdProof.id, data, {
         headers: {
@@ -451,7 +546,10 @@ const UploadDocuments = () => {
       const applicant = await getApplicantById(1);
 
       const active_uploads = applicant.document_meta.id_proof_photos.filter((data) => {
-        return data.active === true;
+        return (
+          data.active === true &&
+          data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+        );
       });
 
       setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
@@ -462,11 +560,31 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function addAddressProofPhotos() {
       const data = new FormData();
-      const filename = Date.now() + addressProofPhotosFile.name;
+      const filename = addressProofPhotosFile.name;
       data.append('applicant_id', 1);
-      data.append('document_type', 'address_proof_photos');
+      data.append(
+        'document_type',
+        values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof,
+      );
       data.append('document_name', filename);
-      data.append('file', addressProofPhotosFile);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(addressProofPhotosFile, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await uploadDoc(data, {
         headers: {
@@ -489,7 +607,11 @@ const UploadDocuments = () => {
 
         const active_uploads = edited_applicant.document_meta.address_proof_photos.filter(
           (data) => {
-            return data.active === true;
+            return (
+              data.active === true &&
+              data.document_type ==
+                values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+            );
           },
         );
 
@@ -503,9 +625,31 @@ const UploadDocuments = () => {
     async function editAddressProofPhotos() {
       const data = new FormData();
       const filename = editAddressProof.file.name;
-      data.append('document_type', 'address_proof_photos');
+      data.append(
+        'document_type',
+        values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof,
+      );
       data.append('document_name', filename);
-      data.append('file', editAddressProof.file);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      console.log(values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof);
+
+      try {
+        const compressedFile = await imageCompression(editAddressProof.file, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await reUploadDoc(editAddressProof.id, data, {
         headers: {
@@ -518,7 +662,11 @@ const UploadDocuments = () => {
       const applicant = await getApplicantById(1);
 
       const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
-        return data.active === true;
+        return (
+          data.active === true &&
+          data.document_type ==
+            values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+        );
       });
 
       setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
@@ -529,11 +677,28 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function addSalarySlipPhotos() {
       const data = new FormData();
-      const filename = Date.now() + salarySlipPhotosFile.name;
+      const filename = salarySlipPhotosFile.name;
       data.append('applicant_id', 1);
       data.append('document_type', 'salary_slip_photos');
       data.append('document_name', filename);
-      data.append('file', salarySlipPhotosFile);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(salarySlipPhotosFile, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await uploadDoc(data, {
         headers: {
@@ -570,7 +735,24 @@ const UploadDocuments = () => {
       const filename = editSalarySlip.file.name;
       data.append('document_type', 'salary_slip_photos');
       data.append('document_name', filename);
-      data.append('file', editSalarySlip.file);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(editSalarySlip.file, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await reUploadDoc(editSalarySlip.id, data, {
         headers: {
@@ -594,11 +776,28 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function addForm60Photos() {
       const data = new FormData();
-      const filename = Date.now() + form60photosFile.name;
+      const filename = form60photosFile.name;
       data.append('applicant_id', 1);
       data.append('document_type', 'form_60_photos');
       data.append('document_name', filename);
-      data.append('file', form60photosFile);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(form60photosFile, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await uploadDoc(data, {
         headers: {
@@ -634,7 +833,24 @@ const UploadDocuments = () => {
       const filename = editForm60.file.name;
       data.append('document_type', 'form_60_photos');
       data.append('document_name', filename);
-      data.append('file', editForm60.file);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(editForm60.file, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await reUploadDoc(editForm60.id, data, {
         headers: {
@@ -658,11 +874,28 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function addPropertyPhotos() {
       const data = new FormData();
-      const filename = Date.now() + propertyPhotosFile.name;
+      const filename = propertyPhotosFile.name;
       data.append('applicant_id', 1);
       data.append('document_type', 'property_photos');
       data.append('document_name', filename);
-      data.append('file', propertyPhotosFile);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(propertyPhotosFile, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await uploadDoc(data, {
         headers: {
@@ -698,7 +931,24 @@ const UploadDocuments = () => {
       const filename = editProperty.file.name;
       data.append('document_type', 'property_photos');
       data.append('document_name', filename);
-      data.append('file', editProperty.file);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(editProperty.file, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await reUploadDoc(editProperty.id, data, {
         headers: {
@@ -722,11 +972,28 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function addSelfiePhoto() {
       const data = new FormData();
-      const filename = Date.now() + selfieFile.name;
+      const filename = selfieFile.name;
       data.append('applicant_id', 1);
       data.append('document_type', 'lo_selfie');
       data.append('document_name', filename);
-      data.append('file', selfieFile);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(selfieFile, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await uploadDoc(data, {
         headers: {
@@ -759,11 +1026,28 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function addOtherDocPhotos() {
       const data = new FormData();
-      const filename = Date.now() + docsFile.name;
+      const filename = docsFile.name;
       data.append('applicant_id', 1);
       data.append('document_type', 'other_docs');
       data.append('document_name', filename);
-      data.append('file', docsFile);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(docsFile, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await uploadDoc(data, {
         headers: {
@@ -799,7 +1083,24 @@ const UploadDocuments = () => {
       const filename = editDoc.file.name;
       data.append('document_type', 'other_docs');
       data.append('document_name', filename);
-      data.append('file', editDoc.file);
+
+      const options = {
+        maxSizeMB: 0.02,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(editDoc.file, options);
+
+        const compressedImageFile = new File([compressedFile], filename, {
+          type: compressedFile.type,
+        });
+
+        data.append('file', compressedImageFile);
+      } catch (error) {
+        console.log(error);
+      }
 
       const res = await reUploadDoc(editDoc.id, data, {
         headers: {
@@ -831,15 +1132,18 @@ const UploadDocuments = () => {
           return data.active === true;
         });
 
-        if (!active_upload) return;
-
-        setCustomerUploads({ type: 'customer_photos', data: active_upload });
-        setCustomerPhotos([1]);
+        if (active_upload) {
+          setCustomerUploads({ type: 'customer_photos', data: active_upload });
+          setCustomerPhotos([1]);
+        }
       }
 
       if (res.document_meta.id_proof_photos) {
         const active_uploads = res.document_meta.id_proof_photos.filter((data) => {
-          return data.active === true;
+          return (
+            data.active === true &&
+            data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+          );
         });
 
         if (active_uploads.length) {
@@ -872,7 +1176,11 @@ const UploadDocuments = () => {
 
       if (res.document_meta.address_proof_photos) {
         const active_uploads = res.document_meta.address_proof_photos.filter((data) => {
-          return data.active === true;
+          return (
+            data.active === true &&
+            data.document_type ==
+              values?.applicants[activeIndex]?.personal_details?.selected_address_proof
+          );
         });
 
         if (active_uploads.length) {
@@ -919,10 +1227,10 @@ const UploadDocuments = () => {
           return data.active === true;
         });
 
-        if (!active_upload) return;
-
-        setSelfieUploads({ type: 'lo_selfie', data: active_upload });
-        setSelfie([1]);
+        if (active_upload) {
+          setSelfieUploads({ type: 'lo_selfie', data: active_upload });
+          setSelfie([1]);
+        }
       }
 
       if (res.document_meta.other_docs) {
@@ -937,7 +1245,10 @@ const UploadDocuments = () => {
       }
     }
     getPreviousUploads();
-  }, []);
+  }, [
+    values?.applicants?.[activeIndex]?.personal_details?.id_type,
+    values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
+  ]);
 
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
