@@ -72,9 +72,9 @@ function PhotoUpload({
   //   getLocation();
   // }, []);
 
-  const getImage = (value) => {
-    setFile(files.filter((img) => img.name !== value.name));
-  };
+  // const getImage = (value) => {
+  //   setFile(files.filter((img) => img.name !== value.name));
+  // };
 
   async function removeImage(id) {
     const type = uploads.type;
@@ -119,6 +119,8 @@ function PhotoUpload({
   useEffect(() => {
     uploads && setLoader(false);
   }, [uploads]);
+
+  // console.log(uploads);
 
   return (
     <div className='w-full'>
@@ -217,7 +219,7 @@ function PhotoUpload({
                 </button>
 
                 <img
-                  src={uploads.data.document_url}
+                  src={uploads.data.document_fetch_url}
                   alt=''
                   className='w-10 h-10 object-cover object-center'
                 />
@@ -226,8 +228,9 @@ function PhotoUpload({
               <DesktopPopUp
                 showpopup={show}
                 setShowPopUp={setShow}
-                img={uploads.data.document_url}
-                callback={getImage}
+                index={0}
+                singlePhoto={uploads.data}
+                callback={removeImage}
                 lat={lat}
                 long={long}
               />

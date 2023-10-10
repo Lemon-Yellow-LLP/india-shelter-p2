@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
 import { editFieldsById, getApplicantById } from '../../global';
+import { LeadContext } from '../../context/LeadContextProvider';
 
 function PdfAndImageUpload({
   files,
@@ -16,6 +17,7 @@ function PdfAndImageUpload({
   hint,
   ...props
 }) {
+  const { values } = useContext(LeadContext);
   const [message, setMessage] = useState();
   const [loader, setLoader] = useState(false);
 
@@ -373,7 +375,7 @@ function PdfAndImageUpload({
                           </svg>
                         </button>
                         <img
-                          src={upload.document_url}
+                          src={upload.document_fetch_url}
                           alt='Gigs'
                           className='object-cover object-center h-full w-full'
                         />
