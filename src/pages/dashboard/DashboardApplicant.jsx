@@ -63,12 +63,7 @@ export default function DashboardApplicant() {
         );
 
         // Get completed lnt charges
-        setLntCharges(
-          data?.lt_charges?.find((charge) => {
-            charge?.airpay_verify_transaction_status == '200' ||
-              charge?.extra_params?.status == 'success';
-          }),
-        );
+        setLntCharges(data?.lt_charges?.find((charge) => charge?.status === 'Completed'));
       } catch (err) {
         console.error(err?.response?.status);
         navigate('/');
@@ -527,7 +522,7 @@ export default function DashboardApplicant() {
             data={[
               {
                 label: 'Payment method',
-                value: lntCharges?.airpay_verify_chmod ?? lntCharges?.extra_params?.method ?? '-',
+                value: lntCharges?.airpay_verify_chmod ?? lntCharges?.method ?? '-',
               },
             ]}
             message={!lntCharges ? 'L&T charges is pending' : null}
