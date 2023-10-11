@@ -36,9 +36,13 @@ export default function DateRangePicker({ selectionRange, setSelectionRange }) {
 
       {open ? (
         <DateRange
-          onRangeFocusChange={() => console.log('range')}
           ranges={[selectionRange]}
-          onChange={({ selection }) => setSelectionRange(selection)}
+          onChange={({ selection }) => {
+            setSelectionRange(selection);
+            if (selection.endDate > selection.startDate) {
+              setOpen(false);
+            }
+          }}
           rangeColors={['#E33439', '#147257']}
           maxDate={new Date()}
           className='absolute left-0 -translate-x-48 z-[99] bg-white border border-light-grey border-opacity-20 px-5 shadow-calendar rounded-lg'

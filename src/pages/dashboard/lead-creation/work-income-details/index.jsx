@@ -93,7 +93,7 @@ const WorkIncomeDetails = () => {
             setRequiredFieldsStatus(_requiredFieldStatus);
           }
 
-          if (e.value === 'Self-employed') {
+          if (e.value === 'Unemployed') {
             _requiredFieldStatus = {
               profession: true,
               no_current_loan: false,
@@ -118,11 +118,11 @@ const WorkIncomeDetails = () => {
             setRequiredFieldsStatus(_requiredFieldStatus);
           }
 
-          const newData = JSON.parse(JSON.stringify(values));
+          const newData = { ...values };
 
           newData.applicants[activeIndex].work_income_detail = {
-            id: newData.applicants[activeIndex].work_income_detail.id,
-            applicant_id: newData.applicants[activeIndex].work_income_detail.applicant_id,
+            id: values?.applicants[activeIndex].work_income_detail.id,
+            applicant_id: values?.applicants[activeIndex].work_income_detail.applicant_id,
             profession: e.value,
             company_name: '',
             total_income: '',
@@ -158,7 +158,7 @@ const WorkIncomeDetails = () => {
           editFieldsById(
             newData.applicants[activeIndex].work_income_detail.id,
             'work-income',
-            newData,
+            newData.applicants[activeIndex].work_income_detail,
           );
 
           return;
