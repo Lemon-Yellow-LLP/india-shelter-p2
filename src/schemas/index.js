@@ -257,13 +257,13 @@ const applicantSchema = Yup.object().shape({
       .required('This field is mandatory')
       .min(2, 'Flat no/Building name must be atleast 2 characters long')
       .max(90, 'Flat no/Building name can be max 90 characters long')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
     current_street_area_locality: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Street/Area/Locality must be atleast 2 characters long')
       .max(90, 'Street/Area/Locality can be max 90 characters long')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
     current_town: Yup.string()
       .trim()
       .required('This field is mandatory')
@@ -294,13 +294,13 @@ const applicantSchema = Yup.object().shape({
       .required('This field is mandatory')
       .min(2, 'Flat no/Building name must be atleast 2 characters long')
       .max(90, 'Flat no/Building name can be max 90 characters long')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
     permanent_street_area_locality: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Street/Area/Locality must be atleast 2 characters long')
       .max(90, 'Street/Area/Locality can be max 90 characters long')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
     permanent_town: Yup.string()
       .trim()
       .required('This field is mandatory')
@@ -343,13 +343,13 @@ export const validationSchemaLead = Yup.object().shape({
       .required('This field is mandatory')
       .min(2, 'Address must be atleast 2 characters long')
       .max(90, 'Address can be max 90 characters long')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
     project_society_colony: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(10, 'Address must be atleast 10 characters long')
       .max(90, 'Address can be max 90 characters long')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
     pincode: Yup.string()
       .trim()
       .required('This field is mandatory')
@@ -375,7 +375,7 @@ export const validationSchemaLead = Yup.object().shape({
       .min(10, 'Address must be atleast 10 characters long')
       .max(90, 'Address can be max 90 characters long')
       .required('This field is mandatory')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
     reference_1_phone_number: Yup.string()
       .trim()
       .min(10, 'Enter a valid 10 digit mobile number')
@@ -409,7 +409,7 @@ export const validationSchemaLead = Yup.object().shape({
       .min(10, 'Address must be atleast 10 characters long')
       .max(90, 'Address can be max 90 characters long')
       .required('This field is mandatory')
-      .matches(/^[a-zA-Z0-9.,\/ -]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
     reference_2_phone_number: Yup.string()
       .trim()
       .min(10, 'Enter a valid 10 digit mobile number')
