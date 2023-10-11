@@ -26,8 +26,8 @@ export default function Dashboard() {
 
   const [query, setQuery] = useState('');
   const [selectionRange, setSelectionRange] = useState({
-    startDate: parseISO(moment().format()),
-    endDate: parseISO(moment().subtract(30, 'days').format()),
+    startDate: parseISO(moment().subtract(30, 'days').format()),
+    endDate: parseISO(moment().format()),
     key: 'selection',
   });
   const navigate = useNavigate();
