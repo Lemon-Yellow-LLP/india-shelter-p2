@@ -58,7 +58,7 @@ export default function Dashboard() {
     (async () => {
       const data = await getDashboardLeadList({
         fromDate: selectionRange.startDate,
-        toDate: selectionRange.endDate,
+        toDate: moment(selectionRange.endDate).add(1, 'day'),
       });
 
       const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
