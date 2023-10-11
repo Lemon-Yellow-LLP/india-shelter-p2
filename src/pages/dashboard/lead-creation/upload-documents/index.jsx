@@ -17,7 +17,7 @@ import {
 } from '../../../../global';
 import imageCompression from 'browser-image-compression';
 
-const isQaulifierActivated = false;
+const isQaulifierActivated = true;
 
 const UploadDocuments = () => {
   const { activeIndex, values, errors, touched, handleBlur, setFieldValue, setFieldError } =
@@ -1312,6 +1312,7 @@ const UploadDocuments = () => {
                 <ImageUpload
                   files={idProofPhotos}
                   setFile={setIdProofPhotos}
+                  setSingleFile={setIdProofPhotosFile}
                   uploads={idProofUploads}
                   setUploads={setIdProofUploads}
                   noBorder={true}
