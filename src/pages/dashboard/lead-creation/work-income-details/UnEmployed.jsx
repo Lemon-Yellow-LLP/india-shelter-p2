@@ -4,13 +4,14 @@ import TextInput from '../../../../components/TextInput';
 import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
 
-export default function UnEmployed() {
+export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, errors, touched, handleBlur, setFieldValue, activeIndex } =
     useContext(LeadContext);
 
   return (
     <>
       <TextInput
+        type='number'
         label='No. of current loan(s)'
         placeholder='Choose no. of current loan(s)'
         required
@@ -21,7 +22,7 @@ export default function UnEmployed() {
         onBlur={(e) => {
           handleBlur(e);
           if (values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0) {
-            setFieldValue(`applicants[${activeIndex}].work_income_detail.ongoing_emi`, '');
+            setFieldValue(`applicants[${activeIndex}].work_income_detail.ongoing_emi`, null);
             editFieldsById(
               values?.applicants?.[activeIndex]?.work_income_detail?.id,
               'work-income',
@@ -44,27 +45,27 @@ export default function UnEmployed() {
                 ),
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['no_current_loan']: false,
+            }));
           }
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
-          const address_pattern = /^[0-9]+$/;
-          if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(
-              `applicants[${activeIndex}].${e.currentTarget.name}`,
-              value.charAt(0).toUpperCase() + value.slice(1),
-            );
+          const address_pattern = /[^\d]/g;
+          if (address_pattern.test(value)) {
+            return;
           }
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Backspace') {
-            setFieldValue(
-              `applicants[${activeIndex}].work_income_detail.no_current_loan`,
-              values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.slice(
-                0,
-                values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.length - 1,
-              ),
-            );
+
+          setFieldValue(e.currentTarget.name, value && parseInt(value));
+
+          if (!requiredFieldsStatus['no_current_loan']) {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['no_current_loan']: true,
+            }));
           }
         }}
       />
@@ -95,16 +96,25 @@ export default function UnEmployed() {
                 ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['ongoing_emi']: false,
+            }));
           }
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(
-              `applicants[${activeIndex}].${e.currentTarget.name}`,
-              value.charAt(0).toUpperCase() + value.slice(1),
-            );
+            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+            if (!requiredFieldsStatus['ongoing_emi']) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ['ongoing_emi']: true,
+              }));
+            }
           }
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'

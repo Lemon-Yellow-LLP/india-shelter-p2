@@ -31,6 +31,7 @@ import {
   loanPurposeDataLap,
 } from './ApplicantDropDownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import Topbar from '../../../../components/Topbar';
 
 const ApplicantDetails = () => {
   const {
@@ -41,7 +42,7 @@ const ApplicantDetails = () => {
     touched,
     setFieldValue,
     setFieldError,
-    updateProgress,
+    updateProgressApplicantSteps,
     setToastMessage,
     setFieldTouched,
     activeIndex,
@@ -65,29 +66,33 @@ const ApplicantDetails = () => {
 
   const dateInputRef = useRef(null);
 
-  const [date, setDate] = useState(
-    values?.applicants[activeIndex]?.applicant_details.date_of_birth,
-  );
+  const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
+    ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
+  });
+
+  const [date, setDate] = useState(null);
 
   useEffect(() => {
-    if (values?.applicants[activeIndex]?.applicant_details.date_of_birth?.length) {
-      setDate(values?.applicants[activeIndex]?.applicant_details.date_of_birth);
+    if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
+      var dateParts = values?.applicants[activeIndex]?.applicant_details?.date_of_birth.split('-');
+      var day = parseInt(dateParts[2], 10);
+      var month = parseInt(dateParts[1], 10);
+      var year = parseInt(dateParts[0], 10);
+      setDate(`${day}/${month}/${year}`);
     }
   }, [values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
 
   useEffect(() => {
-    setDate(values?.applicants[activeIndex]?.applicant_details.date_of_birth);
+    if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
+      var dateParts = values?.applicants[activeIndex]?.applicant_details?.date_of_birth.split('-');
+      var day = parseInt(dateParts[2], 10);
+      var month = parseInt(dateParts[1], 10);
+      var year = parseInt(dateParts[0], 10);
+      setDate(`${day}/${month}/${year}`);
+    } else {
+      setDate(null);
+    }
   }, [activeIndex]);
-
-  const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    loan_type: false,
-    applied_amount: true,
-    first_name: false,
-    date_of_birth: false,
-    purpose_of_loan: false,
-    property_type: false,
-    mobile_number: false,
-  });
 
   const updateFieldsApplicant = async (name, value) => {
     let newData = {};
@@ -106,13 +111,12 @@ const ApplicantDetails = () => {
           return res;
         })
         .catch((err) => {
-          console.log(err);
           return err;
         });
     }
   };
 
-  const updateFieldsLead = async (name, value) => {
+  const updateFieldsLead = useCallback(async (name, value) => {
     let newData = {};
     newData[name] = value;
     newData.lo_id = lo_id;
@@ -126,14 +130,13 @@ const ApplicantDetails = () => {
           return res;
         })
         .catch((err) => {
-          console.log(err);
           return err;
         });
     }
-  };
+  });
 
   useEffect(() => {
-    updateProgress(0, requiredFieldsStatus);
+    updateProgressApplicantSteps('applicant_details', requiredFieldsStatus, 'applicant');
   }, [requiredFieldsStatus]);
 
   const onLoanTypeChange = useCallback(
@@ -154,48 +157,31 @@ const ApplicantDetails = () => {
       const pattern = /^[A-Za-z][A-Za-z\s]*$/;
       if (pattern.exec(value)) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-        const name = e.currentTarget.name.split('.')[2];
-        if (
-          requiredFieldsStatus[name] !== undefined &&
-          !requiredFieldsStatus[name] &&
-          value.length > 1
-        ) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-        }
       }
 
       if (values?.applicants?.[activeIndex]?.applicant_details?.first_name.length > value) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-        const name = e.currentTarget.name.split('.')[2];
-        if (
-          requiredFieldsStatus[name] !== undefined &&
-          !requiredFieldsStatus[name] &&
-          value.length > 1
-        ) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-        }
       }
     },
-    [requiredFieldsStatus, values],
+    [activeIndex, setFieldValue, values?.applicants],
   );
 
   const handleTextInputChange = useCallback(
     (e) => {
       const value = e.currentTarget.value;
-      const pattern = /^[A-Za-z]+$/;
-      if (pattern.exec(value[value.length - 1])) {
-        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-        const name = e.currentTarget.name.split('.')[2];
-        if (
-          requiredFieldsStatus[name] !== undefined &&
-          !requiredFieldsStatus[name] &&
-          value.length > 1
-        ) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-        }
+      const pattern = /[^a-zA-Z]+/;
+      if (pattern.test(value)) return;
+      setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+      const name = e.currentTarget.name.split('.')[2];
+      if (
+        requiredFieldsStatus[name] !== undefined &&
+        !requiredFieldsStatus[name] &&
+        value.length > 1
+      ) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus, values],
+    [requiredFieldsStatus],
   );
 
   const handleLoanPurposeChange = useCallback(
@@ -281,7 +267,15 @@ const ApplicantDetails = () => {
     if (!date) {
       return;
     }
-    if (!isEighteenOrAbove(date)) {
+
+    var dateParts = date.split('/');
+    var day = parseInt(dateParts[0], 10);
+    var month = parseInt(dateParts[1], 10);
+    var year = parseInt(dateParts[2], 10);
+
+    const finalDate = `${year}-${month}-${day}`;
+
+    if (!isEighteenOrAbove(finalDate)) {
       setFieldError(
         `applicants[${activeIndex}].applicant_details.date_of_birth`,
         'Date of Birth is Required. Minimum age must be 18 or 18+',
@@ -289,8 +283,8 @@ const ApplicantDetails = () => {
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
     } else {
-      setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, date);
-      updateFieldsApplicant('date_of_birth', date);
+      setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, finalDate);
+      updateFieldsApplicant('date_of_birth', finalDate);
       if (
         requiredFieldsStatus['date_of_birth'] !== undefined &&
         !requiredFieldsStatus['date_of_birth']
@@ -314,99 +308,100 @@ const ApplicantDetails = () => {
     if (values.applicants[activeIndex]?.applicant_details.date_of_birth) {
       await updateFieldsApplicant().then(async () => {
         // setDisablePhoneNumber((prev) => !prev);
-        setShowOTPInput(true);
-        setHasSentOTPOnce(true);
-        getMobileOtp(values.applicants[activeIndex]?.applicant_details?.id);
-        setToastMessage('OTP has been sent to your mail id');
 
-        const bodyForExistingCustomer = JSON.stringify({
-          resource: '/customer_check',
-          path: '/customer_check',
-          httpMethod: 'POST',
-          auth: 'exi$t_Sys@85',
-          'source flag': '1',
-          body: {
-            DOB: values.applicants[activeIndex]?.applicant_details.date_of_birth,
-            'Mobile Number': values.applicants[activeIndex]?.applicant_details.mobile_number,
-            Product: values.lead.loan_type,
-          },
-        });
-
-        const responce = await checkExistingCustomer(bodyForExistingCustomer);
-
-        const { body } = {
-          ErrorCode: 200,
-          body: [
-            {
-              is_existing_customer: 'TRUE',
-              pre_approved_amount: '1000000',
-
-              id_type: 'PAN',
-              id_number: 'AAAPB2117A',
-
-              selected_address_proof: 'AADHAR',
-              address_proof_number: '654987321659',
-
-              first_name: 'SANTOSH YADAV',
-              middle_name: '',
-              last_name: '',
-
-              gender: 'MALE',
-              father_husband_name: 'XYZ',
-              mother_name: 'XYZ',
-
-              current_flat_no_building_name: '12',
-              current_street_area_locality: 'Thane',
-              current_town: 'Delhi',
-              current_landmark: 'ABC',
-              current_pincode: '421202',
-              current_city: 'Dombivli',
-              current_state: 'Maharashtra',
-              current_no_of_year_residing: '20',
-              permanent_flat_no_building_name: '12',
-              permanent_street_area_locality: 'Thane',
-              permanent_town: 'Delhi',
-              permanent_landmark: 'ABC',
-              permanent_pincode: '421202',
-              permanent_city: 'Dombivli',
-              permanent_state: 'Maharashtra',
-              permanent_no_of_year_residing: '20',
+        getMobileOtp(values.applicants[activeIndex]?.applicant_details?.id).then(async (res) => {
+          setShowOTPInput(true);
+          setHasSentOTPOnce(true);
+          setToastMessage('OTP has been sent to your mail id');
+          const bodyForExistingCustomer = JSON.stringify({
+            resource: '/customer_check',
+            path: '/customer_check',
+            httpMethod: 'POST',
+            auth: 'exi$t_Sys@85',
+            'source flag': '1',
+            body: {
+              DOB: values.applicants[activeIndex]?.applicant_details.date_of_birth,
+              'Mobile Number': values.applicants[activeIndex]?.applicant_details.mobile_number,
+              Product: values.lead.loan_type,
             },
-          ],
-        };
+          });
 
-        let {
-          id_type,
-          id_number,
-          selected_address_proof,
-          address_proof_number,
-          first_name,
-          middle_name,
-          last_name,
-          gender,
-          father_husband_name,
-          mother_name,
-        } = body[0];
+          const responce = await checkExistingCustomer(bodyForExistingCustomer);
 
-        let newData = { ...values };
+          const { body } = {
+            ErrorCode: 200,
+            body: [
+              {
+                is_existing_customer: 'TRUE',
+                pre_approved_amount: '1000000',
 
-        newData.personal_details = {
-          id_type,
-          id_number,
-          selected_address_proof,
-          address_proof_number,
-          first_name,
-          middle_name,
-          last_name,
-          gender,
-          father_husband_name,
-          mother_name,
-        };
-        setValues(newData);
-        setFieldValue(
-          `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
-          true,
-        );
+                id_type: 'PAN',
+                id_number: 'AAAPB2117A',
+
+                selected_address_proof: 'AADHAR',
+                address_proof_number: '654987321659',
+
+                first_name: 'SANTOSH YADAV',
+                middle_name: '',
+                last_name: '',
+
+                gender: 'MALE',
+                father_husband_name: 'XYZ',
+                mother_name: 'XYZ',
+
+                current_flat_no_building_name: '12',
+                current_street_area_locality: 'Thane',
+                current_town: 'Delhi',
+                current_landmark: 'ABC',
+                current_pincode: '421202',
+                current_city: 'Dombivli',
+                current_state: 'Maharashtra',
+                current_no_of_year_residing: '20',
+                permanent_flat_no_building_name: '12',
+                permanent_street_area_locality: 'Thane',
+                permanent_town: 'Delhi',
+                permanent_landmark: 'ABC',
+                permanent_pincode: '421202',
+                permanent_city: 'Dombivli',
+                permanent_state: 'Maharashtra',
+                permanent_no_of_year_residing: '20',
+              },
+            ],
+          };
+
+          let {
+            id_type,
+            id_number,
+            selected_address_proof,
+            address_proof_number,
+            first_name,
+            middle_name,
+            last_name,
+            gender,
+            father_husband_name,
+            mother_name,
+          } = body[0];
+
+          let newData = { ...values };
+
+          newData.personal_details = {
+            id_type,
+            id_number,
+            selected_address_proof,
+            address_proof_number,
+            first_name,
+            middle_name,
+            last_name,
+            gender,
+            father_husband_name,
+            mother_name,
+          };
+          // setValues(newData);
+          // setFieldValue(
+          //   `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+          //   true,
+          // );
+        });
       });
     } else {
       setFieldError(
@@ -418,7 +413,7 @@ const ApplicantDetails = () => {
     }
   };
 
-  const verifyOTP = (otp) => {
+  const verifyOTP = async (otp) => {
     verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp)
       .then(async () => {
         await updateFieldsLead().then((res) => {
@@ -440,11 +435,16 @@ const ApplicantDetails = () => {
         setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
         setShowOTPInput(true);
         setVerifiedOnce(true);
-        console.log(err);
         setOtpFailCount(err.response.data.fail_count);
         return false;
       });
   };
+
+  useEffect(() => {
+    setRequiredFieldsStatus(
+      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
+    );
+  }, [activeIndex]);
 
   // console.log('values', values.applicants[activeIndex]?.applicant_details);
   // console.log('errors', errors?.applicants[activeIndex]);
@@ -452,6 +452,7 @@ const ApplicantDetails = () => {
 
   return (
     <>
+      <Topbar title='Lead Creation' id={values?.lead?.id} progress={8} />
       <div className='overflow-hidden flex flex-col h-[100vh]'>
         <div
           className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1`}
@@ -531,6 +532,13 @@ const ApplicantDetails = () => {
                   name,
                   values.applicants[activeIndex]?.applicant_details?.[name],
                 );
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             disabled={inputDisabled}
@@ -595,7 +603,6 @@ const ApplicantDetails = () => {
           </div>
 
           <DatePicker
-            // value={values?.applicants[activeIndex]?.applicant_details?.date_of_birth}
             value={date}
             setDate={(e) => {
               setDate(e, checkDate(e));
@@ -693,8 +700,10 @@ const ApplicantDetails = () => {
             label='Purpose of loan'
             name='lead.purpose_of_loan'
             required
-            options={values?.lead.loan_type === 'HL' ? loanPurposeOptions : loanPurposeDataLap}
-            placeholder='Eg: Choose reference type'
+            options={
+              values?.lead.loan_type === 'Home Loan' ? loanPurposeOptions : loanPurposeDataLap
+            }
+            placeholder='Choose purpose of loan'
             onChange={handleLoanPurposeChange}
             touched={touched && touched?.lead?.purpose_of_loan}
             error={errors && errors?.lead?.purpose_of_loan}
@@ -708,9 +717,9 @@ const ApplicantDetails = () => {
             label='Property Type'
             name='lead.property_type'
             required
-            placeholder='Eg: Residential'
+            placeholder='Choose property type'
             options={
-              values?.lead.loan_type === 'HL'
+              values?.lead.loan_type === 'Home Loan'
                 ? loanFields[values.lead?.purpose_of_loan] || [
                     {
                       label: 'Residential House',

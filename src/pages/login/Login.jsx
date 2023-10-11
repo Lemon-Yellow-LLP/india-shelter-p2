@@ -61,62 +61,77 @@ export default function Login() {
   }, []);
 
   const sendMobileOtp = async () => {
-    const officers = await getAllLoanOfficers();
+    //For bypass
+    if (values.username.toString() === '9876543210') {
+      setDisablePhoneNumber(true);
+      setHasSentOTPOnce(true);
+      setShowOTPInput(true);
+    } else {
+      const officers = await getAllLoanOfficers();
 
-    const user_exists = officers.find((user) => {
-      return user.username === values.username;
-    });
+      const user_exists = officers.find((user) => {
+        return user.username === values.username;
+      });
 
-    if (!user_exists) {
-      setFieldError('username', 'User with this number does not exists');
-      return;
+      if (!user_exists) {
+        setFieldError('username', 'User with this number does not exists');
+        return;
+      }
+
+      setDisablePhoneNumber(true);
+      setHasSentOTPOnce(true);
+      setShowOTPInput(true);
+
+      const res = await getLoginOtp(values.username);
+      if (!res) return;
+
+      setToastMessage('OTP has been sent to the mobile number');
     }
-
-    setDisablePhoneNumber(true);
-    setHasSentOTPOnce(true);
-    setShowOTPInput(true);
-
-    const res = await getLoginOtp(values.username);
-    if (!res) return;
-
-    setToastMessage('OTP has been sent to the mobile number');
   };
 
   const verifyOTP = useCallback(
     async (loginotp) => {
       const otp = parseInt(loginotp);
 
-      try {
-        const res = await verifyLoginOtp(values.username, {
-          otp,
-        });
+      //For bypass
+      if (values.username.toString() === '9876543210' && otp === 12345) {
+        setDisablePhoneNumber(false);
+        setMobileVerified(true);
+        setFieldError('username', undefined);
+        setShowOTPInput(false);
+        setIsAuthenticated(true);
+        return true;
+      } else {
+        try {
+          const res = await verifyLoginOtp(values.username, {
+            otp,
+          });
 
-        if (!res) return;
+          if (!res) return;
 
-        if (res.old_session_message === 'No old sessions') {
+          if (res.old_session_message === 'No old sessions') {
+            setToken(res.token);
+            setDisablePhoneNumber(false);
+            setMobileVerified(true);
+            setFieldError('username', undefined);
+            setShowOTPInput(false);
+            setIsAuthenticated(true);
+            return true;
+          }
+
+          setIsOpen(true);
           setToken(res.token);
           setDisablePhoneNumber(false);
           setMobileVerified(true);
           setFieldError('username', undefined);
           setShowOTPInput(false);
-          setIsAuthenticated(true);
-          return true;
+          setIsOpen(true);
+        } catch (err) {
+          setMobileVerified(false);
+          setOtpFailCount(err.response.data.fail_count);
+          setIsAuthenticated(false);
+          return false;
         }
-
-        setIsOpen(true);
-        setToken(res.token);
-        setDisablePhoneNumber(false);
-        setMobileVerified(true);
-        setFieldError('username', undefined);
-        setShowOTPInput(false);
-        setIsOpen(true);
-      } catch (err) {
-        console.log(err);
-
-        setMobileVerified(false);
-        setOtpFailCount(err.response.data.fail_count);
-        setIsAuthenticated(false);
-        return false;
       }
     },
     [values.username, setFieldError, setMobileVerified],
@@ -176,7 +191,12 @@ export default function Login() {
           <img src='./IS-Login-Logo.png' alt='login-logo' />
         </div>
 
-        <div className='flex flex-col gap-5 px-4 pb-4 pt-3 rounded-t-2xl h-full bg-white'>
+        <div
+          style={{
+            height: 'calc(100vh - 290px)',
+          }}
+          className='flex flex-col gap-5 px-4 pb-4 pt-3 rounded-t-2xl bg-white'
+        >
           <div>
             <h2 className='text-primary-black font-semibold'>Welcome!</h2>
             <p className='text-dark-grey font-normal'>Login to continue</p>
@@ -202,7 +222,21 @@ export default function Login() {
             disabled={disablePhoneNumber || mobileVerified}
             message={
               mobileVerified
-                ? `<img src="${otpVerified}" alt='Otp Verified' role='presentation' /> OTP Verfied`
+                ? `<svg
+                width='18'
+                height='18'
+                viewBox='0 0 18 18'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+            >
+                <path
+                    d='M15 4.5L6.75 12.75L3 9'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                />
+            </svg> OTP Verfied`
                 : null
             }
             onBlur={(e) => {
@@ -247,7 +281,7 @@ export default function Login() {
             Login
           </Button>
 
-          <p className='absolute w-[328px] text-xs text-light-grey font-normal text-center bottom-4 flex flex-col justify-center left-2/4 -translate-x-2/4'>
+          <p className='mt-auto text-xs text-light-grey font-normal text-center  flex flex-col justify-center '>
             In case of any queries, write a mail to
             <span className='text-primary-black text-xs'>abc@xyz.com</span>
           </p>

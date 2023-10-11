@@ -15,16 +15,19 @@ import DateRangePicker from '../../components/DateRangePicker';
 import ProgressBadge from '../../components/ProgressBadge';
 import moment from 'moment';
 import { parseISO } from 'date-fns';
+import { LeadContext } from '../../context/LeadContextProvider';
+import { defaultValuesLead } from '../../context/defaultValuesLead';
 
 export default function Dashboard() {
+  const { setValues } = useContext(LeadContext);
   const [leadList, setLeadList] = useState([]);
   const [primaryApplicantList, setPrimaryApplicantList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
 
   const [query, setQuery] = useState('');
   const [selectionRange, setSelectionRange] = useState({
-    startDate: parseISO(moment().startOf('month').format()),
-    endDate: parseISO(moment().endOf('month').format()),
+    startDate: parseISO(moment().subtract(30, 'days').format()),
+    endDate: parseISO(moment().format()),
     key: 'selection',
   });
   const navigate = useNavigate();
@@ -33,14 +36,16 @@ export default function Dashboard() {
     e.preventDefault();
     let value = query.trim().toLowerCase();
     setFilteredList(
-      primaryApplicantList.filter(
-        (applicant) =>
+      primaryApplicantList.filter((lead) => {
+        const applicant = lead?.applicants?.find((applicant) => applicant?.is_primary);
+        return (
           String(applicant.lead_id).includes(value) ||
           String(applicant.first_name).toLowerCase().includes(value) ||
           String(applicant.middle_name).toLowerCase().includes(value) ||
           String(applicant.last_name).toLowerCase().includes(value) ||
-          String(applicant.mobile_number).toLowerCase().includes(value),
-      ),
+          String(applicant.mobile_number).toLowerCase().includes(value)
+        );
+      }),
     );
   };
 
@@ -53,16 +58,16 @@ export default function Dashboard() {
     (async () => {
       const data = await getDashboardLeadList({
         fromDate: selectionRange.startDate,
-        toDate: selectionRange.endDate,
+        toDate: moment(selectionRange.endDate).add(1, 'day'),
       });
 
       const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
-      setLeadList(formatted?.map((l) => l?.applicants));
+      setLeadList(formatted);
     })();
   }, [selectionRange]);
 
   useEffect(() => {
-    const data = leadList.map((lead) => lead?.find((applicant) => applicant?.is_primary));
+    const data = leadList;
     setPrimaryApplicantList(data);
     setFilteredList(data);
   }, [leadList]);
@@ -77,7 +82,7 @@ export default function Dashboard() {
           <div className='flex items-center'>
             <h4 className='text-[22px] not-italic font-medium text-primary-black'>My Leads </h4>
             <span className='text-xs not-italic font-normal text-primary-black ml-[6px]'>
-              {`(${filteredList.length})`}
+              {`(${filteredList?.filter((l) => l.applicants?.length > 0).length || 0})`}
             </span>
           </div>
           <div>
@@ -100,30 +105,33 @@ export default function Dashboard() {
       <div className='px-4 h-full bg-[#FAFAFA] overflow-auto'>
         {/* List of leads */}
 
-        {leadList?.length === 0 ? (
+        {leadList?.applicants?.length === 0 ? (
           <div className='relative flex-1 flex h-full justify-center translate-y-20'>
             <NoLeadIllustration />
           </div>
-        ) : filteredList.length ? (
+        ) : filteredList?.length ? (
           <div className='relative flex-1 flex flex-col gap-2'>
-            {filteredList.map((applicant, i) => (
-              <LeadCard
-                key={i}
-                id={applicant?.lead_id ?? '-'}
-                title={`${
-                  applicant
-                    ? applicant.first_name +
-                      ' ' +
-                      applicant?.middle_name +
-                      ' ' +
-                      applicant?.last_name
-                    : '-'
-                }`}
-                progress={applicant?.extra_params?.progress ?? 0}
-                created={moment(applicant?.created_at).format('DD/MM/YYYY')}
-                mobile={applicant?.mobile_number ?? '-'}
-              />
-            ))}
+            {filteredList.map((lead, i) => {
+              const applicant = lead?.applicants?.find((applicant) => applicant?.is_primary);
+              return (
+                <LeadCard
+                  key={i}
+                  id={applicant?.lead_id ?? '-'}
+                  title={`${
+                    applicant
+                      ? applicant.first_name +
+                        ' ' +
+                        applicant?.middle_name +
+                        ' ' +
+                        applicant?.last_name
+                      : '-'
+                  }`}
+                  progress={lead?.extra_params?.progress ?? 0}
+                  created={moment(applicant?.created_at).format('DD/MM/YYYY')}
+                  mobile={applicant?.mobile_number ?? '-'}
+                />
+              );
+            })}
             <div className='h-[250px]'></div>
           </div>
         ) : (
@@ -133,8 +141,11 @@ export default function Dashboard() {
         )}
       </div>
       <button
-        onClick={() => navigate('/lead/applicant-details')}
-        className='fixed bottom-4 right-4 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'
+        onClick={() => {
+          setValues(defaultValuesLead);
+          navigate('/lead/applicant-details');
+        }}
+        className='fixed bottom-4 right-6 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'
       >
         <AddLeadIcon />
         <span className='text-sm not-italic font-medium text-white'>Add new lead</span>
@@ -268,6 +279,14 @@ export const DashboardTest = () => {
       >
         go-to-Dashboard-page
       </Link>
+
+      <Link
+        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
+        to='/lead/preview'
+      >
+        go-to-Preview-page
+      </Link>
+
       <button
         style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
         onClick={handleActiveLogin}

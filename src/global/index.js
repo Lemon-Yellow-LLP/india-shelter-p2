@@ -1,4 +1,3 @@
-import { reference } from '@popperjs/core';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
@@ -359,28 +358,29 @@ async function checkExistingCustomer(body) {
 }
 
 // L&T
-export async function getLnTChargesQRCode(leadId, values) {
+export async function getLnTChargesQRCode(leadId) {
   const { data } = await axios.post(`${API_URL}/lt-charges/payment-qr/${leadId}`);
   return data;
 }
 
-export async function checkPaymentStatus(leadId, values) {
-  try {
-    const { data } = await axios.post(`${API_URL}/lt-charges/payment-verify/${leadId}`);
-    return data;
-  } catch (err) {
-    throw err;
-  }
+export async function checkPaymentStatus(leadId) {
+  const { data } = await axios.post(`${API_URL}/lt-charges/payment-verify/${leadId}`);
+  return data;
 }
 
-export async function addLnTCharges(leadId, values) {
+export async function checkIfLntExists(leadId) {
+  const { data } = await axios.get(`${API_URL}/lt-charges/check-lead-payment/${leadId}`);
+  return data;
+}
+
+export async function addLnTCharges(leadId) {
   const { data } = await axios.post(`${API_URL}/lt-charges/add/`, {
     lead_id: leadId,
   });
   return data;
 }
 
-export async function doesLnTChargesExist(leadId, values) {
+export async function doesLnTChargesExist(leadId) {
   try {
     const { data } = await axios.get(`${API_URL}/lt-charges/by-lead/${leadId}`);
     return {
@@ -395,19 +395,21 @@ export async function doesLnTChargesExist(leadId, values) {
   }
 }
 
-export async function editLnTCharges(id, values) {
-  const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, values);
-  return data;
-}
-
-export async function makePaymentByCash(id, values) {
+export async function makePaymentByCash(id) {
   try {
     const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, {
-      extra_params: {
-        method: 'Cash',
-        status: 'success',
-      },
+      method: 'Cash',
+      status: 'Completed',
     });
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+export async function editLnTCharges(id, values) {
+  try {
+    const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, values);
     return data;
   } catch (err) {
     console.error(err);
@@ -428,7 +430,6 @@ export async function getDashboardLeadById(id, values) {
     const { data } = await axios.get(`${API_URL}/dashboard/lead/${id}`, values);
     return data;
   } catch (err) {
-    cer;
     return err;
   }
 }
@@ -449,6 +450,7 @@ export async function getDashboardLeadList(
       `${API_URL}/dashboard/lead-list/l?fromDate=${fromDate}&toDate=${toDate}`,
       values,
     );
+    // const { data } = await axios.get(`${API_URL}/dashboard/lead-list/l`, values);
     return data;
   } catch (err) {
     console.log(err);
@@ -458,7 +460,6 @@ export async function getDashboardLeadList(
 export {
   API_URL,
   pingAPI,
-  updateLeadDataOnBlur,
   NaNorNull,
   isEighteenOrAbove,
   checkIsValidStatePincode,

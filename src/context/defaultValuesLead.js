@@ -10,23 +10,31 @@ export const defaultValuesLead = {
     },
   },
 
-  propertySchema: {
+  property_details: {
     property_identification_is: '',
     property_value_estimate: '',
     owner_name: '',
     plot_house_flat: '',
     project_society_colony: '',
-    pincode: '',
+    pincode: null,
     city: '',
     state: '',
     geo_lat: '',
     geo_long: '',
     extra_params: {
       progress: 0,
+      required_fields_status: {
+        property_identification_is: false,
+        property_value_estimate: false,
+        owner_name: false,
+        plot_house_flat: false,
+        project_society_colony: false,
+        pincode: false,
+      },
     },
   },
 
-  referenceSchema: {
+  reference_details: {
     reference_1_type: '',
     reference_1_full_name: '',
     reference_1_phone_number: '',
@@ -45,12 +53,27 @@ export const defaultValuesLead = {
     reference_2_email: '',
     extra_params: {
       progress: 0,
+      required_fields_status: {
+        reference_1_type: false,
+        reference_1_full_name: false,
+        reference_1_phone_number: false,
+        reference_1_address: false,
+        reference_1_pincode: false,
+        reference_2_type: false,
+        reference_2_full_name: false,
+        reference_2_phone_number: false,
+        reference_2_address: false,
+        reference_2_pincode: false,
+      },
     },
   },
 
-  lnt_charges: {
-    mobile_number: '',
-  },
+  lt_charges: [
+    {
+      mobile_number: '',
+      status: null,
+    },
+  ],
 
   applicants: [
     {
@@ -68,6 +91,15 @@ export const defaultValuesLead = {
           progress: 0,
           is_existing: false,
           is_existing_done: false,
+          required_fields_status: {
+            loan_type: false,
+            applied_amount: true,
+            first_name: false,
+            date_of_birth: false,
+            purpose_of_loan: false,
+            property_type: false,
+            mobile_number: false,
+          },
         },
       },
       personal_details: {
@@ -92,8 +124,25 @@ export const defaultValuesLead = {
         is_email_verified: false,
         extra_params: {
           same_as_id_type: false,
-          progress: 0,
+          progress: 13,
           is_existing_done: false,
+          required_fields_status: {
+            how_would_you_like_to_proceed: false,
+            id_type: false,
+            id_number: false,
+            selected_address_proof: false,
+            address_proof_number: false,
+            first_name: false,
+            gender: false,
+            date_of_birth: true,
+            mobile_number: true,
+            father_husband_name: false,
+            mother_name: false,
+            marital_status: false,
+            religion: false,
+            preferred_language: false,
+            qualification: false,
+          },
         },
       },
       address_detail: {
@@ -119,6 +168,21 @@ export const defaultValuesLead = {
           permanent_address_same_as_current: false,
           progress: 0,
           is_existing_done: false,
+          required_fields_status: {
+            current_type_of_residence: false,
+            current_flat_no_building_name: false,
+            current_street_area_locality: false,
+            current_town: false,
+            current_landmark: false,
+            current_pincode: false,
+            current_no_of_year_residing: false,
+            permanent_flat_no_building_name: false,
+            permanent_street_area_locality: false,
+            permanent_town: false,
+            permanent_landmark: false,
+            permanent_pincode: false,
+            permanent_no_of_year_residing: false,
+          },
         },
       },
       work_income_detail: {
@@ -126,7 +190,7 @@ export const defaultValuesLead = {
         company_name: '',
         total_income: '',
         pf_uan: '',
-        no_current_loan: '',
+        no_current_loan: null,
         ongoing_emi: '',
         working_since: '',
         mode_of_salary: '',
@@ -150,6 +214,18 @@ export const defaultValuesLead = {
           extra_company_name: '',
           extra_industries: '',
           progress: 0,
+          required_fields_status: {
+            profession: false,
+            flat_no_building_name: false,
+            street_area_locality: false,
+            landmark: false,
+            pincode: false,
+            no_current_loan: false,
+            ongoing_emi: false,
+            total_family_number: false,
+            total_household_income: false,
+            no_of_dependents: false,
+          },
         },
       },
     },

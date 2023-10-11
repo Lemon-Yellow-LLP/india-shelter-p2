@@ -8,89 +8,9 @@ import ProgressBadge from '../../components/ProgressBadge';
 import { getDashboardLeadById } from '../../global';
 import { CheckBox, DropDown } from '../../components';
 import moment from 'moment';
-
-const PrimaryDropdownOptions = [
-  {
-    label: 'Applicant Details',
-    value: 'applicant_details',
-  },
-  {
-    label: 'Personal Details',
-    value: 'personal_details',
-  },
-  {
-    label: 'Address Details',
-    value: 'address_details',
-  },
-  {
-    label: 'Work & Income Details',
-    value: 'work_income_details',
-  },
-  {
-    label: 'Qualifier',
-    value: 'qualifier',
-  },
-  {
-    label: 'L&T Charges',
-    value: 'lnt_charges',
-  },
-  {
-    label: 'Property Details',
-    value: 'property_details',
-  },
-  {
-    label: 'Banking Details',
-    value: 'banking_details',
-  },
-  {
-    label: 'Reference Details',
-    value: 'reference_details',
-  },
-  {
-    label: 'Upload Documents',
-    value: 'upload_documents',
-  },
-  {
-    label: 'Preview',
-    value: 'preview',
-  },
-  {
-    label: 'Eligibility',
-    value: 'eligibility',
-  },
-];
-
-const CoApplicantDropdownOptions = [
-  {
-    label: 'Applicant Details',
-    value: 'applicant_details',
-  },
-  {
-    label: 'Personal Details',
-    value: 'personal_details',
-  },
-  {
-    label: 'Address Details',
-    value: 'address_details',
-  },
-  {
-    label: 'Work & Income Details',
-    value: 'work_income_details',
-  },
-
-  {
-    label: 'Banking Details',
-    value: 'banking_details',
-  },
-  {
-    label: 'Upload Documents',
-    value: 'upload_documents',
-  },
-  {
-    label: 'Qualifier',
-    value: 'qualifier',
-  },
-];
+import { PrimaryDropdownOptions, CoApplicantDropdownOptions } from './DashboardDropdowns';
+import { LeadContext } from '../../context/LeadContextProvider';
+import EditLeadEnabled from '../../assets/icons/EditFormEnabled';
 
 export default function DashboardApplicant() {
   const { id } = useParams();
@@ -143,12 +63,7 @@ export default function DashboardApplicant() {
         );
 
         // Get completed lnt charges
-        setLntCharges(
-          data?.lt_charges?.find((charge) => {
-            charge?.airpay_verify_transaction_status == '200' ||
-              charge?.extra_params?.status == 'success';
-          }),
-        );
+        setLntCharges(data?.lt_charges?.find((charge) => charge?.status === 'Completed'));
       } catch (err) {
         console.error(err?.response?.status);
         navigate('/');
@@ -497,7 +412,7 @@ export default function DashboardApplicant() {
           <FormDetails
             title='WORK & INCOME DETAILS'
             ref={primarySelectedStep == 'work_income_details' ? primarySelectedStepRef : null}
-            progress={primaryApplicant?.work_income_details?.extra_params?.progress}
+            progress={primaryApplicant?.work_income_detail?.extra_params?.progress}
             data={[
               {
                 label: 'Profession',
@@ -602,12 +517,12 @@ export default function DashboardApplicant() {
 
           <FormDetails
             title='L&T CHARGES'
-            ref={primarySelectedStep == 'lnt_charges' ? primarySelectedStepRef : null}
+            ref={primarySelectedStep == 'lt_charges' ? primarySelectedStepRef : null}
             progress={null}
             data={[
               {
                 label: 'Payment method',
-                value: lntCharges?.airpay_verify_chmod ?? lntCharges?.extra_params?.method ?? '-',
+                value: lntCharges?.airpay_verify_chmod ?? lntCharges?.method ?? '-',
               },
             ]}
             message={!lntCharges ? 'L&T charges is pending' : null}
@@ -923,7 +838,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={coApplicantSelectedStep == 'address_details' ? coApplicantSelectedStepRef : null}
             title='ADDRESS DETAILS'
-            progress={primaryApplicant?.address_details?.extra_params?.progress}
+            progress={activeCoApplicant?.address_detail?.extra_params?.progress}
             data={[
               {
                 label: 'Type of residence',
@@ -1028,7 +943,7 @@ export default function DashboardApplicant() {
               coApplicantSelectedStep == 'work_income_details' ? coApplicantSelectedStepRef : null
             }
             title='WORK & INCOME DETAILS'
-            progress={primaryApplicant?.work_income_details?.extra_params?.progress}
+            progress={activeCoApplicant?.work_income_detail?.extra_params?.progress}
             data={[
               {
                 label: 'Profession',
@@ -1139,7 +1054,25 @@ export default function DashboardApplicant() {
 }
 
 const Titlebar = ({ title, id }) => {
+  const { values, setValues } = useContext(LeadContext);
+  const [totalProgress, setTotalProgress] = useState(0);
   const navigate = useNavigate();
+
+  const getLeadData = async () => {
+    const data = await getDashboardLeadById(id);
+    setTotalProgress(data?.lead?.extra_params?.progress);
+  };
+
+  useEffect(() => {
+    getLeadData();
+  }, []);
+
+  const handleOpenForm = async (id) => {
+    const data = await getDashboardLeadById(id);
+    setValues(data);
+    navigate('/lead/applicant-details');
+  };
+
   return (
     <div
       id='titlebar'
@@ -1149,16 +1082,16 @@ const Titlebar = ({ title, id }) => {
         <BackIcon2 />
       </button>
       <div className='flex-1'>
-        <h3 className='truncate'>{title}</h3>
+        <h3 className='w-[200px] truncate'>{title}</h3>
         <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
-          LEAD ID:{' '}
+          LEAD ID:
           <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey'>
             {id}
           </span>
         </p>
       </div>
-      <button className='ml-4 '>
-        <EditIcon />
+      <button className='ml-4 ' onClick={() => handleOpenForm(id)} disabled={totalProgress === 100}>
+        {totalProgress === 100 ? <EditIcon /> : <EditLeadEnabled />}
       </button>
     </div>
   );

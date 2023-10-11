@@ -14,6 +14,7 @@ import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWith
 import QRCode from 'react-qr-code';
 import {
   addLnTCharges,
+  checkIfLntExists,
   checkPaymentStatus,
   doesLnTChargesExist,
   editLnTCharges,
@@ -24,7 +25,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 
-const LEAD_ID = 5;
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
 
@@ -43,6 +43,8 @@ const LnTCharges = ({ amount = 1500 }) => {
   } = useContext(LeadContext);
 
   const [toastMessage, setToastMessage] = useState('');
+
+  const [mobile_number, setMobileNumber] = useState('');
 
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState('');
@@ -70,7 +72,7 @@ const LnTCharges = ({ amount = 1500 }) => {
   const fetchQR = async () => {
     try {
       setLoadingQr(true);
-      const resp = await getLnTChargesQRCode(LEAD_ID);
+      const resp = await getLnTChargesQRCode(values?.lead?.id);
       setQrCode(resp.DecryptedData.QRCODE_STRING);
     } catch (err) {
       console.log(err);
@@ -81,22 +83,45 @@ const LnTCharges = ({ amount = 1500 }) => {
 
   useEffect(() => {
     (async () => {
-      const resp = await addLnTCharges(LEAD_ID);
-      setLntId(resp.id);
-      await fetchQR();
-    })();
+      try {
+        // check whether LnT exists
+        if (values?.lead?.id) {
+          const resp = await checkIfLntExists(values?.lead?.id);
+          console.log('----- ', resp);
+          setFieldValue('lt_charges', resp);
+          setPaymentStatus('success');
+        }
+      } catch (err) {
+        const resp = await addLnTCharges(values?.lead?.id);
+        setLntId(resp.id);
+        await fetchQR();
 
-    // Reset
-    setHasSentOTPOnce(false);
-    setShowResendLink(false);
-    setFieldValue('lnt_charges.mobile_number', '');
-    setActiveItem('');
+        // Reset
+        setHasSentOTPOnce(false);
+        setShowResendLink(false);
+        setActiveItem('');
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        // check whether LnT exists
+        if (values?.lead?.id) {
+          const resp = await checkIfLntExists(values?.lead?.id);
+          setFieldValue('lt_charges', resp);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    })();
   }, [paymentStatus]);
 
   const handleCheckingStatus = async (label = '') => {
     try {
       setCheckingStatus(label);
-      const resp = await checkPaymentStatus(LEAD_ID);
+      const resp = await checkPaymentStatus(values?.lead?.id);
       if (resp?.airpay_response_json?.airpay_verify_transaction_status == '200') {
         setPaymentStatus('success');
       } else if (resp?.airpay_response_json?.airpay_verify_transaction_status == '400') {
@@ -134,7 +159,7 @@ const LnTCharges = ({ amount = 1500 }) => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
-  const handleOnPhoneNumberChange = useCallback(async (e) => {
+  const handleOnPhoneNumberChange = async (e) => {
     const phoneNumber = e.currentTarget.value;
 
     if (phoneNumber < 0) {
@@ -155,12 +180,14 @@ const LnTCharges = ({ amount = 1500 }) => {
       e.preventDefault();
       return;
     }
-    setFieldValue('lnt_charges.mobile_number', phoneNumber);
+
+    setMobileNumber(phoneNumber);
+    setFieldValue('lnt_mobile_number.mobile_number', phoneNumber);
 
     if (phoneNumber.length === 10) {
       setHasSentOTPOnce(false);
     }
-  }, []);
+  };
 
   const handlePaymentByCash = async () => {
     const resp = await makePaymentByCash(lntId);
@@ -171,8 +198,8 @@ const LnTCharges = ({ amount = 1500 }) => {
     setDisablePhoneNumber(true);
     setHasSentOTPOnce(true);
 
-    const resp = await makePaymentByLink(LEAD_ID, {
-      mobile_number: values.lnt_charges?.mobile_number,
+    const resp = await makePaymentByLink(values?.lead?.id, {
+      mobile_number: values?.lnt_mobile_number?.mobile_number,
     });
     if (resp) {
       setToastMessage('Link has been sent to the entered mobile number');
@@ -204,7 +231,7 @@ const LnTCharges = ({ amount = 1500 }) => {
 
   return (
     <>
-      {paymentStatus === '' ? (
+      {!paymentStatus ? (
         <>
           <div className='h-screen bg-medium-grey flex flex-col w-full p-4'>
             <div className='flex-1'>
@@ -286,15 +313,15 @@ const LnTCharges = ({ amount = 1500 }) => {
                       label='Mobile Number'
                       placeholder='Eg: 1234567890'
                       required
-                      name='lnt_charges.mobile_number'
-                      value={values.lnt_charges.mobile_number}
+                      name='lnt_mobile_number.mobile_number'
+                      value={mobile_number}
                       onChange={handleOnPhoneNumberChange}
-                      error={errors.lnt_charges?.mobile_number}
-                      touched={touched.lnt_charges?.mobile_number}
+                      error={errors?.lnt_mobile_number?.mobile_number}
+                      touched={touched?.lnt_mobile_number?.mobile_number}
                       onOTPSendClick={sendPaymentLink}
                       disabledOtpButton={
-                        !values.lnt_charges?.mobile_number ||
-                        !!errors.lnt_charges?.mobile_number ||
+                        !mobile_number ||
+                        !!errors?.lnt_mobile_number?.mobile_number ||
                         hasSentOTPOnce
                       }
                       hideOTPButton={hasSentOTPOnce}
@@ -302,14 +329,6 @@ const LnTCharges = ({ amount = 1500 }) => {
                       buttonLabel='Send Link'
                       onBlur={(e) => {
                         handleBlur(e);
-                        const name = e.target.name.split('.')[1];
-                        if (
-                          errors?.lnt_charges?.mobile_number &&
-                          !errors?.lnt_charges?.mobile_number[name] &&
-                          values?.lnt_charges?.mobile_number[name]
-                        ) {
-                          editLnTCharges(LEAD_ID, { mobile_number: phoneNumber });
-                        }
                       }}
                       pattern='\d*'
                       onFocus={(e) =>
@@ -322,9 +341,9 @@ const LnTCharges = ({ amount = 1500 }) => {
                         )
                       }
                       min='0'
-                      onInput={(e) => {
-                        if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
-                      }}
+                      // onInput={(e) => {
+                      //   if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
+                      // }}
                     />
                     <div className='flex items-center'>
                       {sendLinkTime && sendLinkTime > 0 ? (
@@ -345,9 +364,7 @@ const LnTCharges = ({ amount = 1500 }) => {
                     </div>
 
                     <StatusButton
-                      disabled={
-                        !values.lnt_charges?.mobile_number || !!errors.lnt_charges?.mobile_number
-                      }
+                      disabled={!mobile_number || !!errors.lnt_mobile_number?.mobile_number}
                       onClick={() => handleCheckingStatus('Pay via Link')}
                       isLoading={checkingStatus === 'Pay via Link'}
                     />
@@ -438,6 +455,7 @@ const LnTCharges = ({ amount = 1500 }) => {
               hideConfirmSkip();
               // setPaymentStatus('failure');
             }}
+            link='/lead/property-details'
           >
             Yes, skip
           </Button>
@@ -450,6 +468,7 @@ const LnTCharges = ({ amount = 1500 }) => {
 };
 
 const PaymentSuccess = ({ amount, method }) => {
+  const navigate = useNavigate();
   return (
     <div className='h-screen bg-[#EEF0DD] flex flex-col w-full'>
       <div className='flex-1 flex items-center z-0'>
@@ -471,7 +490,7 @@ const PaymentSuccess = ({ amount, method }) => {
         </div>
       </div>
       <div className='mt-auto w-full p-4'>
-        <Button primary={true} inputClasses='h-12'>
+        <Button primary={true} inputClasses='h-12' link='/lead/property-details'>
           Next
         </Button>
       </div>

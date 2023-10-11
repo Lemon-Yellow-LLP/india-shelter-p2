@@ -90,9 +90,7 @@ const OtpInputNoEdit = ({
   const otpCount = useMemo(() => {
     if (otpFailCount === 1) return 'Invalid OTP. You have 2 attempt(s) left';
     if (otpFailCount === 2) return 'Invalid OTP. You have 1 attempt(s) left';
-    if (otpFailCount === 3)
-      return 'You have entered invalid OTP 3 times. Your lead is temporarily suspended';
-    else return 'Multiple attempts to verify OTP failed, try again tomorrow';
+    return 'You have entered invalid OTP 3 times. You can try after 30 minutes.';
   });
 
   return (

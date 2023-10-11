@@ -6,17 +6,27 @@ import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
 import { industriesOptions } from './WorkIncomeDropdownData';
 
-export default function SelfEmployed() {
+export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, errors, handleBlur, touched, setFieldValue, setFieldError, activeIndex } =
     useContext(LeadContext);
 
-  const handleDropdownChange = useCallback((value) => {
-    setFieldValue('work_income_detail.industries', value);
+  const handleDropdownChange = useCallback(
+    (value) => {
+      setFieldValue('work_income_detail.industries', value);
 
-    editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-      industries: value,
-    });
-  }, []);
+      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
+        industries: value,
+      });
+
+      if (!requiredFieldsStatus['industries']) {
+        setRequiredFieldsStatus((prev) => ({
+          ...prev,
+          ['industries']: true,
+        }));
+      }
+    },
+    [requiredFieldsStatus, setRequiredFieldsStatus],
+  );
 
   useEffect(() => {
     const gstPattern =
@@ -60,13 +70,26 @@ export default function SelfEmployed() {
                 business_name: values?.applicants?.[activeIndex]?.work_income_detail?.business_name,
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['business_name']: false,
+            }));
           }
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
+          const name = e.currentTarget.name;
           const address_pattern = /^[a-zA-Z]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+            if (!requiredFieldsStatus['business_name']) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ['business_name']: true,
+              }));
+            }
           }
         }}
       />
@@ -177,6 +200,7 @@ export default function SelfEmployed() {
       />
 
       <TextInput
+        type='number'
         label='No. of current loan(s)'
         placeholder='Choose no. of current loan(s)'
         required
@@ -210,24 +234,27 @@ export default function SelfEmployed() {
                 ),
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['no_current_loan']: false,
+            }));
           }
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
-          const address_pattern = /^[0-9]+$/;
-          if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+          const address_pattern = /[^\d]/g;
+          if (address_pattern.test(value)) {
+            return;
           }
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Backspace') {
-            setFieldValue(
-              e.currentTarget.name,
-              values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.slice(
-                0,
-                values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.length - 1,
-              ),
-            );
+
+          setFieldValue(e.currentTarget.name, value && parseInt(value));
+
+          if (!requiredFieldsStatus['no_current_loan']) {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['no_current_loan']: true,
+            }));
           }
         }}
       />
@@ -258,6 +285,11 @@ export default function SelfEmployed() {
                 ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
               },
             );
+          } else {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['ongoing_emi']: false,
+            }));
           }
         }}
         onChange={(e) => {
@@ -265,6 +297,13 @@ export default function SelfEmployed() {
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+            if (!requiredFieldsStatus.ongoing_emi) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ongoing_emi: true,
+              }));
+            }
           }
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'

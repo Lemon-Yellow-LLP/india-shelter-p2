@@ -11,6 +11,7 @@ import Checkbox from '../../../../components/Checkbox';
 import { residenceData, yearsResidingData } from './AddressDropdownData';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
+import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -25,7 +26,7 @@ export default function AddressDetails() {
     handleChange,
     setFieldError,
     setFieldValue,
-    updateProgress,
+    updateProgressApplicantSteps,
     activeIndex,
     setValues,
     setCurrentStepIndex,
@@ -36,21 +37,18 @@ export default function AddressDetails() {
   );
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    current_type_of_residence: false,
-    current_flat_no_building_name: false,
-    current_street_area_locality: false,
-    current_town: false,
-    current_landmark: false,
-    current_pincode: false,
-    current_no_of_year_residing: false,
-    current_no_of_year_residing: false,
-    permanent_flat_no_building_name: false,
-    permanent_street_area_locality: false,
-    permanent_town: false,
-    permanent_landmark: false,
-    permanent_pincode: false,
-    permanent_no_of_year_residing: false,
+    ...values?.applicants?.[activeIndex]?.address_detail?.extra_params?.required_fields_status,
   });
+
+  useEffect(() => {
+    setRequiredFieldsStatus(
+      values?.applicants?.[activeIndex]?.address_detail?.extra_params?.required_fields_status,
+    );
+  }, [activeIndex]);
+
+  useEffect(() => {
+    updateProgressApplicantSteps('address_detail', requiredFieldsStatus, 'address');
+  }, [requiredFieldsStatus]);
 
   const handleRadioChange = useCallback(
     async (e) => {
@@ -61,8 +59,9 @@ export default function AddressDetails() {
           [name]: e.value,
         });
       } else {
+        let addData = { ...newCoApplicantValues.address_detail, [name]: e.value };
         await addApi('address', {
-          [name]: e.value,
+          ...addData,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
         })
           .then(async (res) => {
@@ -71,8 +70,9 @@ export default function AddressDetails() {
               values?.applicants[activeIndex]?.applicant_details?.id,
               'applicant',
               { address_detail: res.id },
-            );
-            return res;
+            ).then(() => {
+              return res;
+            });
           })
           .catch((err) => {
             console.log(err);
@@ -96,11 +96,10 @@ export default function AddressDetails() {
       }
 
       if (!requiredFieldsStatus[name]) {
-        updateProgress(2, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus, setFieldValue, values],
+    [setFieldValue, values],
   );
 
   const handleCurrentPincodeChange = useCallback(async () => {
@@ -141,7 +140,6 @@ export default function AddressDetails() {
     }
 
     if (!requiredFieldsStatus['current_pincode']) {
-      updateProgress(2, requiredFieldsStatus);
       setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: true }));
     }
   }, [
@@ -149,7 +147,6 @@ export default function AddressDetails() {
     values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
     setFieldError,
     setFieldValue,
-    requiredFieldsStatus,
   ]);
 
   useEffect(() => {
@@ -175,6 +172,16 @@ export default function AddressDetails() {
       };
 
       setValues(newData);
+
+      setRequiredFieldsStatus((prev) => ({
+        ...prev,
+        permanent_flat_no_building_name: true,
+        permanent_street_area_locality: true,
+        permanent_town: true,
+        permanent_landmark: true,
+        permanent_pincode: true,
+        permanent_no_of_year_residing: true,
+      }));
     } else {
       let newData = JSON.parse(JSON.stringify(values));
 
@@ -191,6 +198,16 @@ export default function AddressDetails() {
       };
 
       setValues(newData);
+
+      setRequiredFieldsStatus((prev) => ({
+        ...prev,
+        permanent_flat_no_building_name: false,
+        permanent_street_area_locality: false,
+        permanent_town: false,
+        permanent_landmark: false,
+        permanent_pincode: false,
+        permanent_no_of_year_residing: false,
+      }));
     }
 
     if (values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence) {
@@ -249,7 +266,6 @@ export default function AddressDetails() {
     setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, res.state);
 
     if (!requiredFieldsStatus['permanent_pincode']) {
-      updateProgress(2, requiredFieldsStatus);
       setRequiredFieldsStatus((prev) => ({ ...prev, ['permanent_pincode']: true }));
     }
   }, [
@@ -257,7 +273,6 @@ export default function AddressDetails() {
     values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode,
     setFieldError,
     setFieldValue,
-    requiredFieldsStatus,
   ]);
 
   const handleNextClick = () => {
@@ -445,16 +460,18 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-                  if (address_pattern.exec(value[value.length - 1])) {
+                  if (address_pattern.test(value)) {
                     setFieldValue(
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-                  }
-                  const name = e.target.name.split('.')[2];
-                  if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    }
+                  } else if (value == '') {
+                    setFieldValue(e.currentTarget.name, value);
                   }
                 }}
                 inputClasses='capitalize'
@@ -511,17 +528,18 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-                  if (address_pattern.exec(value[value.length - 1])) {
+                  if (address_pattern.test(value)) {
                     setFieldValue(
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-                  }
 
-                  const name = e.target.name.split('.')[2];
-                  if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    }
+                  } else if (value == '') {
+                    setFieldValue(e.currentTarget.name, value);
                   }
                 }}
                 inputClasses='capitalize'
@@ -576,7 +594,6 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -632,7 +649,6 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -860,7 +876,6 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -913,7 +928,6 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -957,7 +971,6 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -1001,7 +1014,6 @@ export default function AddressDetails() {
 
                   const name = e.target.name.split('.')[2];
                   if (!requiredFieldsStatus[name]) {
-                    updateProgress(2, requiredFieldsStatus);
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
@@ -1042,7 +1054,7 @@ export default function AddressDetails() {
                     return;
                   }
                   setFieldValue(
-                    `applicants[${activeIndex}].address_detail.current_pincode`,
+                    `applicants[${activeIndex}].address_detail.permanent_pincode`,
                     e.target.value,
                   );
                 }}
@@ -1072,7 +1084,7 @@ export default function AddressDetails() {
                     .replace('');
                   e.target.value = text;
                   setFieldValue(
-                    `applicants[${activeIndex}].address_detail.current_pincode`,
+                    `applicants[${activeIndex}].address_detail.permanent_pincode`,
                     e.target.value,
                   );
                 }}
