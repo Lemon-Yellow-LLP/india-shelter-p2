@@ -109,8 +109,6 @@ const LeadCreationRoutes = () => {
     );
   };
 
-  console.log(params);
-
   return (
     <>
       {params['*'] === 'qualifier' || params['*'] === 'lnt-charges' ? null : (
