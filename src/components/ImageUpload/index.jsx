@@ -16,7 +16,7 @@ function ImageUpload({
   noBorder,
   ...props
 }) {
-  const { values } = useContext(LeadContext);
+  const { values, activeIndex } = useContext(LeadContext);
   const [message, setMessage] = useState();
   const [loader, setLoader] = useState(false);
 
@@ -133,24 +133,46 @@ function ImageUpload({
 
     const edited_type = new_edited_applicant.document_meta[type];
 
-    const active_uploads = edited_type.filter((data) => {
-      return data.active === true;
+    const active_id_proofs = edited_type.filter((data) => {
+      return (
+        data.active === true &&
+        data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+      );
     });
 
-    // const selected_uploads = active_uploads.filter((data) => {
-    //   return (
-    //     data.document_type ==
-    //       values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
-    //     (data.document_type == data.document_type) ==
-    //       values?.applicants?.[activeIndex]?.personal_details?.id_type
-    //   );
-    // });
+    const active_address_proofs = edited_type.filter((data) => {
+      return (
+        data.active === true &&
+        data.document_type ==
+          values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+      );
+    });
 
-    if (active_uploads.length === 0) {
-      setUploads(null);
-      setFile([]);
+    if (active_id_proofs.length !== 0) {
+      if (active_id_proofs.length === 0) {
+        setUploads(null);
+        setFile([]);
+      } else {
+        setUploads({ type: [type], data: active_id_proofs });
+      }
+    } else if (active_address_proofs.length !== 0) {
+      if (active_address_proofs.length === 0) {
+        setUploads(null);
+        setFile([]);
+      } else {
+        setUploads({ type: [type], data: active_address_proofs });
+      }
     } else {
-      setUploads({ type: [type], data: active_uploads });
+      const active_uploads = edited_type.filter((data) => {
+        return data.active === true;
+      });
+
+      if (active_uploads.length === 0) {
+        setUploads(null);
+        setFile([]);
+      } else {
+        setUploads({ type: [type], data: active_uploads });
+      }
     }
   }
 
@@ -251,7 +273,7 @@ function ImageUpload({
             <div className='flex gap-2 my-2'>
               <div
                 style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
-                className='h-[85px] w-[68px] rounded border-x border-y border-dashed border-stroke flex justify-center items-center'
+                className='h-[85px] w-[68px] rounded-lg border-x border-y border-dashed border-stroke flex justify-center items-center'
               >
                 <button className='w-full h-full relative'>
                   <svg
@@ -294,7 +316,7 @@ function ImageUpload({
               <div className='flex gap-2 h-[85px]'>
                 {uploads.data.map((upload, index) => {
                   return (
-                    <div key={index} className='overflow-hidden relative w-[68px]'>
+                    <div key={index} className='overflow-hidden rounded-lg relative w-[68px]'>
                       <button className='absolute right-0 top-0 z-20 w-4 h-4'>
                         <svg
                           width='16'
