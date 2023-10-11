@@ -414,47 +414,30 @@ const ApplicantDetails = () => {
   };
 
   const verifyOTP = async (otp) => {
-    if (otp.toString() === '12345') {
-      await updateFieldsLead().then((res) => {
-        setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
-        updateFieldsApplicant('lead_id', res.id);
-        setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
-        updateFieldsApplicant('is_mobile_verified', true);
-        setShowOTPInput(false);
-        if (
-          requiredFieldsStatus['mobile_number'] !== undefined &&
-          !requiredFieldsStatus['mobile_number']
-        ) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
-        }
-        return true;
-      });
-    } else {
-      verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp)
-        .then(async () => {
-          await updateFieldsLead().then((res) => {
-            setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
-            updateFieldsApplicant('lead_id', res.id);
-            setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
-            updateFieldsApplicant('is_mobile_verified', true);
-            setShowOTPInput(false);
-            if (
-              requiredFieldsStatus['mobile_number'] !== undefined &&
-              !requiredFieldsStatus['mobile_number']
-            ) {
-              setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
-            }
-            return true;
-          });
-        })
-        .catch((err) => {
-          setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
-          setShowOTPInput(true);
-          setVerifiedOnce(true);
-          setOtpFailCount(err.response.data.fail_count);
-          return false;
+    verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp)
+      .then(async () => {
+        await updateFieldsLead().then((res) => {
+          setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
+          updateFieldsApplicant('lead_id', res.id);
+          setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
+          updateFieldsApplicant('is_mobile_verified', true);
+          setShowOTPInput(false);
+          if (
+            requiredFieldsStatus['mobile_number'] !== undefined &&
+            !requiredFieldsStatus['mobile_number']
+          ) {
+            setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
+          }
+          return true;
         });
-    }
+      })
+      .catch((err) => {
+        setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
+        setShowOTPInput(true);
+        setVerifiedOnce(true);
+        setOtpFailCount(err.response.data.fail_count);
+        return false;
+      });
   };
 
   useEffect(() => {
