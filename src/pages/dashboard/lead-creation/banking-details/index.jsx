@@ -89,6 +89,30 @@ const BankingDetails = () => {
     }
   };
 
+  const handlePrimaryChange = (id, checked) => {
+    let newData = values;
+    let currentPrimaryId = newData.applicants[activeIndex].banking_details.find(
+      (account) => account.is_primary === true,
+    );
+
+    currentPrimaryId = currentPrimaryId?.id;
+
+    newData.applicants[activeIndex].banking_details.map((account) => {
+      if (account.id === id) {
+        account.is_primary = checked;
+      } else {
+        account.is_primary = false;
+      }
+    });
+    setValues(newData);
+
+    editFieldsById(id, 'banking', { is_primary: checked });
+
+    if (currentPrimaryId) {
+      editFieldsById(currentPrimaryId, 'banking', { is_primary: false });
+    }
+  };
+
   return (
     <>
       <div className='overflow-hidden flex flex-col h-[100vh]'>
@@ -113,7 +137,7 @@ const BankingDetails = () => {
               })}
             </div>
           </div>
-          {values?.applicants?.[activeIndex]?.banking_details?.length && (
+          {values?.applicants?.[activeIndex]?.banking_details?.length ? (
             <>
               <div className='flex flex-col mt-4'>
                 <div>
@@ -123,20 +147,13 @@ const BankingDetails = () => {
                   </span>
                 </div>
               </div>
-              <Accounts />
+              {values?.applicants?.[activeIndex]?.banking_details
+                ?.sort((a, b) => (a.is_primary === b.is_primary ? 0 : a.is_primary ? -1 : 1))
+                .map((account, index) => (
+                  <Accounts key={index} data={account} handlePrimaryChange={handlePrimaryChange} />
+                ))}
             </>
-          )}
-          <>
-            <div className='flex flex-col mt-4'>
-              <div>
-                <span className='text-[#727376] font-normal text-[16px]'>Added Accounts</span>
-                <span className='text-[#727376] font-normal text-[16px] ml-1'>
-                  ({values?.applicants?.[activeIndex]?.banking_details?.length || 0})
-                </span>
-              </div>
-            </div>
-            <Accounts />
-          </>
+          ) : null}
         </div>
 
         <div className='bottom-0 fixed'>

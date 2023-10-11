@@ -8,12 +8,27 @@ import { AuthContext } from '../context/AuthContextProvider';
 import DashboardApplicant from './dashboard/DashboardApplicant';
 import axios from 'axios';
 import { logout } from '../global';
+import { LeadContext } from '../context/LeadContextProvider';
 
 const TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
 const DashboardRoutes = () => {
   const RequireAuth = ({ children }) => {
     const { isAuthenticated, token } = useContext(AuthContext);
+
+    //for testing
+    const { setValues, setActiveIndex } = useContext(LeadContext);
+    const getLead = async () => {
+      await axios.get(`https://lo.scotttiger.in/api/dashboard/lead/377`).then(({ data }) => {
+        setValues(data);
+        setActiveIndex(0);
+      });
+    };
+    useEffect(() => {
+      getLead();
+    }, []);
+
+    //for testing end
 
     useEffect(() => {
       const resetSessionTimer = () => {
@@ -56,13 +71,11 @@ const DashboardRoutes = () => {
 
     // Check authentication once and render accordingly
 
-    // if (isAuthenticated) {
-    //   return children;
-    // } else {
-    //   return <Navigate to='/login' />;
-    // }
-
-    return children;
+    if (isAuthenticated) {
+      return children;
+    } else {
+      return <Navigate to='/login' />;
+    }
   };
 
   return (

@@ -11,7 +11,7 @@ import { LeadContext } from '../../../../context/LeadContextProvider';
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
 export default function AccountAggregator() {
-  const { values } = useContext(LeadContext);
+  const { values, activeIndex } = useContext(LeadContext);
   const navigate = useNavigate();
   const [mobileNo, setMobileNo] = useState('');
   const [aaInitiated, setAAInitiated] = useState(false);
@@ -24,13 +24,10 @@ export default function AccountAggregator() {
   const [loadingState, setLoadingState] = useState(false);
 
   const handleInitiateAA = async () => {
-    // await axios.post(
-    //   `https://lo.scotttiger.in/api/applicant/account-aggregator/initiate-by-phone-number/${values?.lead?.id}`,
-    // );
     setLoadingState(true);
     await axios
       .post(
-        `https://lo.scotttiger.in/api/applicant/account-aggregator/initiate-by-phone-number/299`,
+        `https://lo.scotttiger.in/api/applicant/account-aggregator/initiate-by-phone-number/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         { phone_number: mobileNo },
       )
       .then(({ data }) => {
@@ -48,7 +45,7 @@ export default function AccountAggregator() {
   const handleResend = async () => {
     await axios
       .post(
-        `https://lo.scotttiger.in/api/applicant/account-aggregator/regenerate-redirection-url/299`,
+        `https://lo.scotttiger.in/api/applicant/account-aggregator/regenerate-redirection-url/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         { referenceId: referenceId },
       )
       .then((res) => {
@@ -63,9 +60,12 @@ export default function AccountAggregator() {
   const checkStatus = async () => {
     setChecking(true);
     await axios
-      .post(`https://lo.scotttiger.in/api/applicant/account-aggregator/tracking-status/299`, {
-        referenceId: referenceId,
-      })
+      .post(
+        `https://lo.scotttiger.in/api/applicant/account-aggregator/tracking-status/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+        {
+          referenceId: referenceId,
+        },
+      )
       .then(({ data }) => {
         setChecking(false);
         if (data.account_aggregator_response.status === 'COMPLETED') {

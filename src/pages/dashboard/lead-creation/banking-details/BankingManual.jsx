@@ -10,6 +10,7 @@ import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer'
 import SearchableTextInput from '../../../../components/TextInput/SearchableTextInput';
 import axios from 'axios';
 import { LeadContext } from '../../../../context/LeadContextProvider';
+import { useNavigate } from 'react-router';
 
 export const entityType = [
   {
@@ -80,7 +81,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function BankingManual() {
-  const { values: leadValues, active_index } = useContext(LeadContext);
+  const { values: leadValues, activeIndex } = useContext(LeadContext);
 
   const { values, setFieldValue, errors, handleBlur, touched, handleSubmit } = useFormik({
     initialValues: { ...defaultValues },
@@ -101,6 +102,8 @@ export default function BankingManual() {
   const [bankNameData, setBankNameData] = useState([]);
 
   const [searchedIfsc, setSearchedIfsc] = useState();
+
+  const navigate = useNavigate();
 
   const handleRadioChange = (e) => {
     setFieldValue(e.name, e.value);
@@ -148,7 +151,7 @@ export default function BankingManual() {
   const verify = async () => {
     await axios
       .post(
-        `https://lo.scotttiger.in/api/applicant/penny-drop/${leadValues?.applicants?.[active_index]?.applicant_details?.id}`,
+        `https://lo.scotttiger.in/api/applicant/penny-drop/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
         {
           account_number: values?.account_number,
           ifsc_code: values?.ifsc_code,
@@ -156,10 +159,10 @@ export default function BankingManual() {
         },
       )
       .then(({ data }) => {
-        console.log(data);
+        navigate('/lead/banking-details');
       })
       .catch((err) => {
-        console.log(err);
+        navigate('/lead/banking-details');
       });
   };
 
@@ -188,7 +191,7 @@ export default function BankingManual() {
       })
       .then(({ data }) => {
         setFieldValue('bank_name', data[0]?.name);
-        setFieldValue('branch', data[0]?.branch);
+        setFieldValue('branch_name', data[0]?.branch);
       })
       .catch((err) => {
         console.log(err);
@@ -232,6 +235,9 @@ export default function BankingManual() {
   useEffect(() => {
     getAllBanks();
   }, []);
+
+  console.log(errors);
+  console.log(values);
 
   return (
     <>
@@ -362,8 +368,8 @@ export default function BankingManual() {
             inputClasses=' w-full h-[48px]'
             onClick={verify}
             disabled={
-              Object.keys(errors).length !== 0 ||
-              !!Object.keys(values).find((key) => values[key].length === 0)
+              Object.keys(errors)?.length !== 0 ||
+              !!Object.keys(values).find((key) => values[key]?.length === 0)
             }
           >
             Verify
