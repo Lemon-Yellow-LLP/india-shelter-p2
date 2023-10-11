@@ -836,7 +836,12 @@ const BRE_ONE = () => {
             </Button>
           </p>
         </div>
-        <Button disabled={!bre101.res} inputClasses='w-full h-14' primary={true}>
+        <Button
+          disabled={!bre101.res}
+          inputClasses='w-full h-14'
+          primary={true}
+          link='/lead/lnt-charges'
+        >
           Next
         </Button>
       </div>
