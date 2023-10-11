@@ -452,7 +452,7 @@ const ApplicantDetails = () => {
 
   return (
     <>
-      <Topbar title='Lead Creation' id={values?.lead?.id} progress={8} />
+      <Topbar title='Lead Creation' id={values?.lead?.id} />
       <div className='overflow-hidden flex flex-col h-[100vh]'>
         <div
           className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1`}
