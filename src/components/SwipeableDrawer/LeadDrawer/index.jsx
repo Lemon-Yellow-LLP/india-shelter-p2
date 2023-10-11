@@ -20,6 +20,7 @@ import { editFieldsById } from '../../../global';
 import DynamicDrawer from '../DynamicDrawer';
 import Button from '../../Button';
 import BreSteps from './BreSteps';
+import DrawerStepBanking from './DrawerStepBanking';
 
 const drawerBleeding = 0;
 
@@ -365,7 +366,7 @@ export default function SwipeableDrawerComponent() {
                         ?.progress !== 100
                     }
                   />
-                  <DrawerSteps
+                  <DrawerStepBanking
                     key={7}
                     details={applicantStepsProgress[7]}
                     steps={true}
@@ -567,7 +568,7 @@ export default function SwipeableDrawerComponent() {
                               noProgress={true}
                               lock={true}
                             />
-                            <DrawerSteps
+                            <DrawerStepBanking
                               key={5}
                               details={coApplicantStepsProgress[5]}
                               steps={true}

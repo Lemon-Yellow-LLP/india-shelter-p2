@@ -573,7 +573,7 @@ export default function DashboardApplicant() {
           <FormDetails
             title='BANKING DETAILS'
             ref={primarySelectedStep == 'banking_details' ? primarySelectedStepRef : null}
-            progress={primaryApplicant?.banking_details?.extra_params?.progress}
+            progress={primaryApplicant?.applicant_details?.extra_params?.banking_progress}
             data={[]}
           />
           <Separator />
@@ -1025,7 +1025,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={coApplicantSelectedStep == 'banking_details' ? coApplicantSelectedStepRef : null}
             title='BANKING DETAILS'
-            progress={0}
+            progress={activeCoApplicant?.applicant_details?.extra_params?.banking_progress}
             data={[]}
           />
           <Separator />

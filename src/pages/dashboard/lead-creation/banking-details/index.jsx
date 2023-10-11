@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { useState } from 'react';
 import { addApi, editFieldsById } from '../../../../global';
 import { LeadContext } from '../../../../context/LeadContextProvider';
@@ -113,6 +113,40 @@ const BankingDetails = () => {
     }
   };
 
+  useEffect(() => {
+    if (
+      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.banking_progress ===
+        null ||
+      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.banking_progress !== 100
+    ) {
+      if (values?.applicants?.[activeIndex]?.banking_details.length) {
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
+          100,
+        );
+        let newData = { ...values?.applicants?.[activeIndex]?.applicant_details };
+        newData.extra_params.banking_progress = 100;
+        editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
+          'applicant',
+          newData,
+        );
+      } else {
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
+          0,
+        );
+        let newData = { ...values?.applicants?.[activeIndex]?.applicant_details };
+        newData.extra_params.banking_progress = 0;
+        editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
+          'applicant',
+          newData,
+        );
+      }
+    }
+  }, [values?.applicants?.[activeIndex]?.banking_details]);
+
   return (
     <>
       <div className='overflow-hidden flex flex-col h-[100vh]'>
@@ -158,10 +192,8 @@ const BankingDetails = () => {
 
         <div className='bottom-0 fixed'>
           <PreviousNextButtons
-            linkPrevious='/lead/applicant-details'
-            linkNext='/lead/address-details'
-            onNextClick={() => navigate('/lead/reference-details')}
-            onPreviousClick={() => navigate('/lead/property-details')}
+            linkPrevious='/lead/property-details'
+            linkNext='/lead/reference-details'
           />
         </div>
       </div>
