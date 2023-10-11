@@ -26,8 +26,8 @@ export default function Dashboard() {
 
   const [query, setQuery] = useState('');
   const [selectionRange, setSelectionRange] = useState({
-    startDate: parseISO(moment().startOf('month').format()),
-    endDate: parseISO(moment().endOf('month').format()),
+    startDate: parseISO(moment().subtract(30, 'days').format()),
+    endDate: parseISO(moment().format()),
     key: 'selection',
   });
   const navigate = useNavigate();
@@ -36,14 +36,16 @@ export default function Dashboard() {
     e.preventDefault();
     let value = query.trim().toLowerCase();
     setFilteredList(
-      primaryApplicantList.filter(
-        (applicant) =>
+      primaryApplicantList.filter((lead) => {
+        const applicant = lead?.applicants?.find((applicant) => applicant?.is_primary);
+        return (
           String(applicant.lead_id).includes(value) ||
           String(applicant.first_name).toLowerCase().includes(value) ||
           String(applicant.middle_name).toLowerCase().includes(value) ||
           String(applicant.last_name).toLowerCase().includes(value) ||
-          String(applicant.mobile_number).toLowerCase().includes(value),
-      ),
+          String(applicant.mobile_number).toLowerCase().includes(value)
+        );
+      }),
     );
   };
 
@@ -56,7 +58,7 @@ export default function Dashboard() {
     (async () => {
       const data = await getDashboardLeadList({
         fromDate: selectionRange.startDate,
-        toDate: selectionRange.endDate,
+        toDate: moment(selectionRange.endDate).add(1, 'day'),
       });
 
       const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
@@ -80,7 +82,7 @@ export default function Dashboard() {
           <div className='flex items-center'>
             <h4 className='text-[22px] not-italic font-medium text-primary-black'>My Leads </h4>
             <span className='text-xs not-italic font-normal text-primary-black ml-[6px]'>
-              {`(${filteredList?.applicants?.length || 0})`}
+              {`(${filteredList?.filter((l) => l.applicants?.length > 0).length || 0})`}
             </span>
           </div>
           <div>

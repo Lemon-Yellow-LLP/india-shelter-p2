@@ -468,10 +468,13 @@ export default function AddressDetails() {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-                  }
-                  const name = e.target.name.split('.')[2];
-                  if (!requiredFieldsStatus[name]) {
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    }
+                  } else if (value == '') {
+                    setFieldValue(e.currentTarget.name, value);
                   }
                 }}
                 inputClasses='capitalize'
@@ -536,11 +539,13 @@ export default function AddressDetails() {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-                  }
 
-                  const name = e.target.name.split('.')[2];
-                  if (!requiredFieldsStatus[name]) {
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    }
+                  } else if (value == '') {
+                    setFieldValue(e.currentTarget.name, value);
                   }
                 }}
                 inputClasses='capitalize'

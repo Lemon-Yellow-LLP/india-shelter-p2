@@ -31,6 +31,7 @@ import {
   loanPurposeDataLap,
 } from './ApplicantDropDownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import Topbar from '../../../../components/Topbar';
 
 const ApplicantDetails = () => {
   const {
@@ -115,7 +116,7 @@ const ApplicantDetails = () => {
     }
   };
 
-  const updateFieldsLead = async (name, value) => {
+  const updateFieldsLead = useCallback(async (name, value) => {
     let newData = {};
     newData[name] = value;
     newData.lo_id = lo_id;
@@ -132,7 +133,7 @@ const ApplicantDetails = () => {
           return err;
         });
     }
-  };
+  });
 
   useEffect(() => {
     updateProgressApplicantSteps('applicant_details', requiredFieldsStatus, 'applicant');
@@ -162,26 +163,25 @@ const ApplicantDetails = () => {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
     },
-    [requiredFieldsStatus, values],
+    [activeIndex, setFieldValue, values?.applicants],
   );
 
   const handleTextInputChange = useCallback(
     (e) => {
       const value = e.currentTarget.value;
-      const pattern = /^[A-Za-z]+$/;
-      if (pattern.exec(value[value.length - 1])) {
-        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-        const name = e.currentTarget.name.split('.')[2];
-        if (
-          requiredFieldsStatus[name] !== undefined &&
-          !requiredFieldsStatus[name] &&
-          value.length > 1
-        ) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-        }
+      const pattern = /[^a-zA-Z]+/;
+      if (pattern.test(value)) return;
+      setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+      const name = e.currentTarget.name.split('.')[2];
+      if (
+        requiredFieldsStatus[name] !== undefined &&
+        !requiredFieldsStatus[name] &&
+        value.length > 1
+      ) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
-    [requiredFieldsStatus, values],
+    [requiredFieldsStatus],
   );
 
   const handleLoanPurposeChange = useCallback(
@@ -414,47 +414,30 @@ const ApplicantDetails = () => {
   };
 
   const verifyOTP = async (otp) => {
-    if (otp.toString() === '12345') {
-      await updateFieldsLead().then((res) => {
-        setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
-        updateFieldsApplicant('lead_id', res.id);
-        setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
-        updateFieldsApplicant('is_mobile_verified', true);
-        setShowOTPInput(false);
-        if (
-          requiredFieldsStatus['mobile_number'] !== undefined &&
-          !requiredFieldsStatus['mobile_number']
-        ) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
-        }
-        return true;
-      });
-    } else {
-      verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp)
-        .then(async () => {
-          await updateFieldsLead().then((res) => {
-            setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
-            updateFieldsApplicant('lead_id', res.id);
-            setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
-            updateFieldsApplicant('is_mobile_verified', true);
-            setShowOTPInput(false);
-            if (
-              requiredFieldsStatus['mobile_number'] !== undefined &&
-              !requiredFieldsStatus['mobile_number']
-            ) {
-              setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
-            }
-            return true;
-          });
-        })
-        .catch((err) => {
-          setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
-          setShowOTPInput(true);
-          setVerifiedOnce(true);
-          setOtpFailCount(err.response.data.fail_count);
-          return false;
+    verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp)
+      .then(async () => {
+        await updateFieldsLead().then((res) => {
+          setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
+          updateFieldsApplicant('lead_id', res.id);
+          setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
+          updateFieldsApplicant('is_mobile_verified', true);
+          setShowOTPInput(false);
+          if (
+            requiredFieldsStatus['mobile_number'] !== undefined &&
+            !requiredFieldsStatus['mobile_number']
+          ) {
+            setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
+          }
+          return true;
         });
-    }
+      })
+      .catch((err) => {
+        setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
+        setShowOTPInput(true);
+        setVerifiedOnce(true);
+        setOtpFailCount(err.response.data.fail_count);
+        return false;
+      });
   };
 
   useEffect(() => {
@@ -469,11 +452,7 @@ const ApplicantDetails = () => {
 
   return (
     <>
-      {/* <Topbar
-        title='Lead Creation'
-        id={values?.lead?.id}
-        progress={values?.lead?.extra_params?.progress}
-      /> */}
+      <Topbar title='Lead Creation' id={values?.lead?.id} progress={8} />
       <div className='overflow-hidden flex flex-col h-[100vh]'>
         <div
           className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1`}
