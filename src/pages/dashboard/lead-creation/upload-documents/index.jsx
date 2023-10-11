@@ -17,14 +17,11 @@ import {
 } from '../../../../global';
 import imageCompression from 'browser-image-compression';
 
-const isQaulifierActivated = true;
-
 const UploadDocuments = () => {
   const { activeIndex, values, errors, touched, handleBlur, setFieldValue, setFieldError } =
     useContext(LeadContext);
-  const { toastMessage, setToastMessage } = useContext(AuthContext);
+  const { toastMessage, setToastMessage, isQaulifierActivated } = useContext(AuthContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
-  // isQaulifierActivated
 
   const [customerPhotos, setCustomerPhotos] = useState([]);
   const [customerPhotosFile, setCustomerPhotosFile] = useState(null);
@@ -114,6 +111,8 @@ const UploadDocuments = () => {
       addressRef.current.focus();
     }
   }, [editAddressNumber]);
+
+  console.log(isQaulifierActivated);
 
   // useEffect(() => {
   //   if (isQaulifierActivated) {
@@ -271,12 +270,6 @@ const UploadDocuments = () => {
 
     [setFieldError, setMobileVerified],
   );
-
-  // console.log(errors?.applicants?.[activeIndex]?.personal_details?.id_number);
-
-  // console.log(isQaulifierActivated);
-
-  // console.log(selfie.length !== 0);
 
   useEffect(() => {
     async function addPropertyPaperPhotos() {
