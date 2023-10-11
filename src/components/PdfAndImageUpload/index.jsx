@@ -1,8 +1,7 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
 import { editFieldsById, getApplicantById } from '../../global';
-import { LeadContext } from '../../context/LeadContextProvider';
 
 function PdfAndImageUpload({
   files,
@@ -17,7 +16,6 @@ function PdfAndImageUpload({
   hint,
   ...props
 }) {
-  const { values } = useContext(LeadContext);
   const [message, setMessage] = useState();
   const [loader, setLoader] = useState(false);
 
@@ -278,7 +276,7 @@ function PdfAndImageUpload({
             <div className='flex gap-2 my-2'>
               <div
                 style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
-                className={`h-[85px] w-[68px] rounded border-x border-y flex justify-center items-center`}
+                className={`h-[85px] w-[68px] rounded-lg border-x border-y flex justify-center items-center`}
               >
                 <button className='w-full h-full relative'>
                   <svg
@@ -305,6 +303,7 @@ function PdfAndImageUpload({
                       </clipPath>
                     </defs>
                   </svg>
+
                   <input
                     type='file'
                     onChange={handleFile}
@@ -318,34 +317,32 @@ function PdfAndImageUpload({
               <div className='flex gap-2 h-[85px]'>
                 {uploads.data.map((upload, index) => {
                   return (
-                    <div key={index} className='overflow-hidden relative w-[68px]'>
+                    <div key={index} className='overflow-hidden rounded-lg relative w-[68px]'>
                       <button className='absolute right-0 top-0 z-20 w-4 h-4'>
-                        <div className='w-full h-full relative'>
-                          <svg
-                            width='16'
-                            height='16'
-                            viewBox='0 0 16 16'
-                            fill='none'
-                            xmlns='http://www.w3.org/2000/svg'
-                          >
-                            <rect width='16' height='16' rx='8' fill='#DDFFE7' />
-                            <path
-                              d='M4 12H12M8.79307 5.02743C8.79307 5.02743 8.79307 5.75393 9.51957 6.48043C10.2461 7.20693 10.9726 7.20693 10.9726 7.20693M5.91983 10.6614L7.44548 10.4434C7.66555 10.412 7.86949 10.31 8.02668 10.1528L11.6991 6.48043C12.1003 6.07919 12.1003 5.42866 11.6991 5.02743L10.9726 4.30093C10.5713 3.89969 9.92081 3.89969 9.51957 4.30093L5.84718 7.97332C5.68999 8.13051 5.58802 8.33445 5.55658 8.55452L5.33863 10.0802C5.2902 10.4192 5.5808 10.7098 5.91983 10.6614Z'
-                              stroke='#147257'
-                              strokeLinecap='round'
-                            />
-                          </svg>
-
-                          <input
-                            type='file'
-                            onChange={(e) => editImage(e, upload.id)}
-                            className='absolute bottom-0 right-0 opacity-0 w-full h-full'
-                            multiple={true}
-                            name='files[]'
-                            capture='user'
-                            accept='image/*'
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <rect width='16' height='16' rx='8' fill='#DDFFE7' />
+                          <path
+                            d='M4 12H12M8.79307 5.02743C8.79307 5.02743 8.79307 5.75393 9.51957 6.48043C10.2461 7.20693 10.9726 7.20693 10.9726 7.20693M5.91983 10.6614L7.44548 10.4434C7.66555 10.412 7.86949 10.31 8.02668 10.1528L11.6991 6.48043C12.1003 6.07919 12.1003 5.42866 11.6991 5.02743L10.9726 4.30093C10.5713 3.89969 9.92081 3.89969 9.51957 4.30093L5.84718 7.97332C5.68999 8.13051 5.58802 8.33445 5.55658 8.55452L5.33863 10.0802C5.2902 10.4192 5.5808 10.7098 5.91983 10.6614Z'
+                            stroke='#147257'
+                            strokeLinecap='round'
                           />
-                        </div>
+                        </svg>
+
+                        <input
+                          type='file'
+                          onChange={(e) => editImage(e, upload.id)}
+                          className='absolute bottom-0 right-0 opacity-0 w-full h-full'
+                          multiple={true}
+                          name='files[]'
+                          capture='user'
+                          accept='image/*'
+                        />
                       </button>
 
                       <div className='relative rounded-md h-full w-full'>

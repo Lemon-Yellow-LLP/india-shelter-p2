@@ -72,10 +72,6 @@ function PhotoUpload({
   //   getLocation();
   // }, []);
 
-  // const getImage = (value) => {
-  //   setFile(files.filter((img) => img.name !== value.name));
-  // };
-
   async function removeImage(id) {
     const type = uploads.type;
 
@@ -119,8 +115,6 @@ function PhotoUpload({
   useEffect(() => {
     uploads && setLoader(false);
   }, [uploads]);
-
-  // console.log(uploads);
 
   return (
     <div className='w-full'>
