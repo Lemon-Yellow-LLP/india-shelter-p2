@@ -46,10 +46,9 @@ const DashboardRoutes = () => {
               },
             );
 
-            if (!res) return;
-
             window.location.reload();
           } catch (err) {
+            window.location.reload();
             console.log(err);
           }
         };
@@ -61,11 +60,11 @@ const DashboardRoutes = () => {
       };
 
       // Attach an event listener to track user activity
-      window.addEventListener('mousemove', resetSessionTimer);
+      window.addEventListener('touchstart', resetSessionTimer);
 
       // Clean up the event listener when the component unmounts
       return () => {
-        window.removeEventListener('mousemove', resetSessionTimer);
+        window.removeEventListener('touchstart', resetSessionTimer);
       };
     }, []);
 
