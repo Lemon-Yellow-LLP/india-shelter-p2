@@ -12,6 +12,7 @@ export const defaultValues = {
   middle_name: '',
   last_name: '',
   address: '',
+  mobile_number: '',
   alternate_number: '',
   comments: '',
   extra_params: '',
