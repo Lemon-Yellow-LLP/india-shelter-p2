@@ -89,6 +89,7 @@ export const applicantSteps = [
     url: '/lead/upload-documents',
     lock: true,
     Icon: UploadIcon,
+    name: 'applicant_details',
   },
   {
     title: 'Preview',

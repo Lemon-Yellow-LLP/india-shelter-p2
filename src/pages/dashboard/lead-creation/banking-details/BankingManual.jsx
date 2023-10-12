@@ -11,6 +11,9 @@ import SearchableTextInput from '../../../../components/TextInput/SearchableText
 import axios from 'axios';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { useNavigate } from 'react-router';
+import { reUploadDoc, uploadDoc } from '../../../../global';
+import imageCompression from 'browser-image-compression';
+import PdfAndImageUpload from '../../../../components/PdfAndImageUpload';
 
 export const entityType = [
   {
@@ -103,6 +106,19 @@ export default function BankingManual() {
   const [bankNameData, setBankNameData] = useState([]);
 
   const [searchedIfsc, setSearchedIfsc] = useState();
+
+  const [bankStatement, setBankStatement] = useState([]);
+
+  const [bankStatementUploads, setBankStatementUploads] = useState(null);
+
+  const [bankStatementPdf, setBankStatementPdf] = useState(null);
+
+  const [editBankStatement, setEditBankStatement] = useState({
+    file: {},
+    id: null,
+  });
+
+  const [bankStatementFile, setBankStatementFile] = useState(null);
 
   const navigate = useNavigate();
 
@@ -236,8 +252,116 @@ export default function BankingManual() {
     getAllBanks();
   }, []);
 
-  console.log(errors);
-  console.log(values);
+  useEffect(() => {
+    async function addPropertyPaperPhotos() {
+      const data = new FormData();
+      const filename = bankStatementFile.name;
+      data.append('applicant_id', 1);
+      data.append('document_type', 'bank_statement_photo');
+      data.append('document_name', filename);
+      console.log(bankStatementFile.type);
+      if (bankStatementFile.type === 'image/jpeg') {
+        const options = {
+          maxSizeMB: 0.02,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+
+        try {
+          const compressedFile = await imageCompression(bankStatementFile, options);
+
+          const compressedImageFile = new File([compressedFile], filename, {
+            type: compressedFile.type,
+          });
+
+          data.append('file', compressedImageFile);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        data.append('file', bankStatementFile);
+      }
+
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log(res);
+      if (res) {
+        if (bankStatementFile.type === 'image/jpeg') {
+          let active_uploads = [];
+          if (bankStatementUploads?.data) {
+            active_uploads = [...bankStatementUploads?.data, res.document];
+          } else {
+            active_uploads = [res.document];
+          }
+
+          console.log(active_uploads);
+          setBankStatementUploads({ data: active_uploads });
+        } else {
+          setBankStatementPdf(res.document);
+        }
+      }
+    }
+    bankStatement.length > 0 && addPropertyPaperPhotos();
+  }, [bankStatementFile]);
+
+  console.log(bankStatementUploads?.data);
+
+  useEffect(() => {
+    async function editPropertyPaperPhotos() {
+      const data = new FormData();
+      const filename = editBankStatement.file.name;
+      data.append('document_type', 'bank_statement_photo');
+      data.append('document_name', filename);
+
+      if (editBankStatement.file.type === 'image/jpeg') {
+        const options = {
+          maxSizeMB: 0.02,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+
+        try {
+          const compressedFile = await imageCompression(editBankStatement.file, options);
+
+          const compressedImageFile = new File([compressedFile], filename, {
+            type: compressedFile.type,
+          });
+
+          data.append('file', compressedImageFile);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        data.append('file', editBankStatement.file);
+      }
+
+      const res = await reUploadDoc(editBankStatement.id, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (!res) return;
+
+      // const applicant = await getApplicantById(
+      //   values?.applicants?.[activeIndex]?.applicant_details.id,
+      // );
+
+      const active_uploads = applicant.document_meta.bank_statement_photo.filter((data) => {
+        return data.active === true;
+      });
+
+      setBankStatementUploads({ type: 'bank_statement_photo', data: active_uploads });
+      setBankStatement(active_uploads);
+    }
+    editBankStatement.id && editPropertyPaperPhotos();
+  }, [editBankStatement]);
+
+  // console.log(errors);
+  // console.log(values);
 
   return (
     <>
@@ -357,6 +481,20 @@ export default function BankingManual() {
               ''
             )}
           </div>
+
+          <PdfAndImageUpload
+            files={bankStatement}
+            setFile={setBankStatement}
+            uploads={bankStatementUploads}
+            setUploads={setBankStatementUploads}
+            setEdit={setEditBankStatement}
+            pdf={bankStatementPdf}
+            setPdf={setBankStatementPdf}
+            label='Upload 12 months statement'
+            required
+            hint='File size should be less than 5MB'
+            setSingleFile={setBankStatementFile}
+          />
         </div>
 
         <div
