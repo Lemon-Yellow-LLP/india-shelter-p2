@@ -15,8 +15,6 @@ const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
 const ReferenceDetails = () => {
-  const [selectedReferenceTypeOne, setSelectedReferenceTypeOne] = useState(null);
-  const [selectedReferenceTypeTwo, setSelectedReferenceTypeTwo] = useState(null);
   const [referenceOneOptions, setReferenceOneOptions] = useState(referenceDropdownOneOptions);
   const [referenceTwoOptions, setReferenceTwoOptions] = useState(referenceDropdownTwoOptions);
   const {
@@ -79,10 +77,8 @@ const ReferenceDetails = () => {
       });
     });
   }
-
   const handleReferenceTypeChangeOne = useCallback(
     (value) => {
-      setSelectedReferenceTypeOne(value);
       disableTwoOption(value);
       setFieldValue('reference_details.reference_1_type', value);
 
@@ -92,12 +88,11 @@ const ReferenceDetails = () => {
 
       updateFields('reference_1_type', value);
     },
-    [selectedReferenceTypeOne, requiredFieldsStatus],
+    [requiredFieldsStatus],
   );
 
   const handleReferenceTypeChangeTwo = useCallback(
     (value) => {
-      setSelectedReferenceTypeTwo(value);
       disableOneOption(value);
       setFieldValue('reference_details.reference_2_type', value);
 
@@ -107,15 +102,16 @@ const ReferenceDetails = () => {
 
       updateFields('reference_2_type', value);
     },
-    [selectedReferenceTypeOne, requiredFieldsStatus],
+    [requiredFieldsStatus],
   );
 
   const handleTextInputChange = useCallback(
     (e) => {
-      const value = e.currentTarget.value;
+      let value = e.currentTarget.value;
+
       const pattern = /^[A-Za-z\s]+$/;
-      if (pattern.exec(value[value.length - 1])) {
-        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+      if (pattern.test(value) || value.length == 0) {
+        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1)?.trim());
       }
 
       const name = e.target.name.split('.')[1];
@@ -252,7 +248,7 @@ const ReferenceDetails = () => {
             options={referenceOneOptions}
             placeholder='Choose reference type'
             onChange={handleReferenceTypeChangeOne}
-            defaultSelected={selectedReferenceTypeOne}
+            defaultSelected={values?.reference_details?.reference_1_type}
             inputClasses='mt-2'
             name='reference_details.reference_1_type'
             error={errors?.reference_details?.reference_1_type}
@@ -388,18 +384,7 @@ const ReferenceDetails = () => {
               }
             }}
             disabled={inputDisabled}
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-              if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-              }
-
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
+            onChange={handleTextInputChange}
             inputClasses='capitalize'
           />
 
@@ -484,6 +469,7 @@ const ReferenceDetails = () => {
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
+            labelDisabled={!values?.reference_details?.reference_1_city}
             inputClasses='capitalize'
           />
 
@@ -498,6 +484,7 @@ const ReferenceDetails = () => {
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
+            labelDisabled={!values?.reference_details?.reference_1_state}
             inputClasses='capitalize'
           />
 
@@ -544,7 +531,7 @@ const ReferenceDetails = () => {
             options={referenceTwoOptions}
             placeholder='Choose reference type'
             onChange={handleReferenceTypeChangeTwo}
-            defaultSelected={selectedReferenceTypeTwo}
+            defaultSelected={values?.reference_details?.reference_2_type}
             inputClasses='mt-2'
             name='reference_details.reference_2_type'
             error={errors?.reference_details?.reference_2_type}
@@ -680,18 +667,7 @@ const ReferenceDetails = () => {
               }
             }}
             disabled={inputDisabled}
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-              if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-              }
-
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
+            onChange={handleTextInputChange}
             inputClasses='capitalize'
           />
 
@@ -777,6 +753,7 @@ const ReferenceDetails = () => {
             disabled={true}
             onChange={handleTextInputChange}
             inputClasses='capitalize'
+            labelDisabled={!values?.reference_details?.reference_2_city}
           />
 
           <TextInput
@@ -791,6 +768,7 @@ const ReferenceDetails = () => {
             disabled={true}
             onChange={handleTextInputChange}
             inputClasses='capitalize'
+            labelDisabled={!values?.reference_details?.reference_2_state}
           />
 
           <TextInput
