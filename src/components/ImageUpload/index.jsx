@@ -109,7 +109,9 @@ function ImageUpload({
 
     setFile(files.filter((x) => x.name !== id));
 
-    const applicant = await getApplicantById(1);
+    const applicant = await getApplicantById(
+      values?.applicants?.[activeIndex]?.applicant_details.id,
+    );
 
     const document_meta = applicant.document_meta;
 
@@ -127,9 +129,13 @@ function ImageUpload({
 
     const edited_applicant = [...edited_photos, edited_photo];
 
-    const new_edited_applicant = await editFieldsById(1, 'applicant', {
-      document_meta: { ...document_meta, [type]: edited_applicant },
-    });
+    const new_edited_applicant = await editFieldsById(
+      values?.applicants?.[activeIndex]?.applicant_details.id,
+      'applicant',
+      {
+        document_meta: { ...document_meta, [type]: edited_applicant },
+      },
+    );
 
     const edited_type = new_edited_applicant.document_meta[type];
 

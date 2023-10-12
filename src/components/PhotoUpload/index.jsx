@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
 import { editFieldsById, getApplicantById } from '../../global';
+import { LeadContext } from '../../context/LeadContextProvider';
 
 function PhotoUpload({
   files,
@@ -13,6 +14,7 @@ function PhotoUpload({
   hint,
   ...props
 }) {
+  const { values, activeIndex } = useContext(LeadContext);
   const [message, setMessage] = useState();
   const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
@@ -77,7 +79,9 @@ function PhotoUpload({
 
     setFile(files.filter((x) => x.name !== id));
 
-    const applicant = await getApplicantById(1);
+    const applicant = await getApplicantById(
+      values?.applicants?.[activeIndex]?.applicant_details.id,
+    );
     const document_meta = applicant.document_meta;
 
     const photos = applicant.document_meta[type];
@@ -94,9 +98,13 @@ function PhotoUpload({
 
     const edited_applicant = [...edited_photos, edited_photo];
 
-    const new_edited_applicant = await editFieldsById(1, 'applicant', {
-      document_meta: { ...document_meta, [type]: edited_applicant },
-    });
+    const new_edited_applicant = await editFieldsById(
+      values?.applicants?.[activeIndex]?.applicant_details.id,
+      'applicant',
+      {
+        document_meta: { ...document_meta, [type]: edited_applicant },
+      },
+    );
 
     const edited_type = new_edited_applicant.document_meta[type];
 

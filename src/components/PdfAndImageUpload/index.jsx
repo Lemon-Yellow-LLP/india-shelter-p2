@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
 import { editFieldsById, getApplicantById } from '../../global';
+import { LeadContext } from '../../context/LeadContextProvider';
 
 function PdfAndImageUpload({
   files,
@@ -16,6 +17,7 @@ function PdfAndImageUpload({
   hint,
   ...props
 }) {
+  const { activeIndex, values } = useContext(LeadContext);
   const [message, setMessage] = useState();
   const [loader, setLoader] = useState(false);
 
@@ -114,7 +116,9 @@ function PdfAndImageUpload({
   async function removeImage(id) {
     setFile(files.filter((x) => x.name !== id));
 
-    const applicant = await getApplicantById(1);
+    const applicant = await getApplicantById(
+      values?.applicants?.[activeIndex]?.applicant_details.id,
+    );
     const document_meta = applicant.document_meta;
 
     const property_papers = applicant.document_meta.property_paper_photos;
@@ -131,9 +135,13 @@ function PdfAndImageUpload({
 
     const edited_applicant = [...edited_property_papers, edited_property_pdf];
 
-    const new_edited_applicant = await editFieldsById(1, 'applicant', {
-      document_meta: { ...document_meta, property_paper_photos: edited_applicant },
-    });
+    const new_edited_applicant = await editFieldsById(
+      values?.applicants?.[activeIndex]?.applicant_details.id,
+      'applicant',
+      {
+        document_meta: { ...document_meta, property_paper_photos: edited_applicant },
+      },
+    );
 
     const active_uploads = new_edited_applicant.document_meta.property_paper_photos.filter(
       (data) => {
@@ -150,7 +158,9 @@ function PdfAndImageUpload({
   }
 
   async function deletePDF(id) {
-    const applicant = await getApplicantById(1);
+    const applicant = await getApplicantById(
+      values?.applicants?.[activeIndex]?.applicant_details.id,
+    );
     const document_meta = applicant.document_meta;
 
     const property_papers = applicant.document_meta.property_paper_photos;
@@ -167,9 +177,13 @@ function PdfAndImageUpload({
 
     const edited_applicant = [...edited_property_papers, edited_property_pdf];
 
-    const new_edited_applicant = await editFieldsById(1, 'applicant', {
-      document_meta: { ...document_meta, property_paper_photos: edited_applicant },
-    });
+    const new_edited_applicant = await editFieldsById(
+      values?.applicants?.[activeIndex]?.applicant_details.id,
+      'applicant',
+      {
+        document_meta: { ...document_meta, property_paper_photos: edited_applicant },
+      },
+    );
 
     const active_uploads = new_edited_applicant.document_meta.property_paper_photos.filter(
       (data) => {
