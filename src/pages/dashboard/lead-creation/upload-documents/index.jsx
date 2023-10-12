@@ -28,7 +28,7 @@ const UploadDocuments = () => {
     setFieldError,
     updateProgressUploadDocumentSteps,
   } = useContext(LeadContext);
-  const { toastMessage, setToastMessage, isQaulifierActivated } = useContext(AuthContext);
+  const { toastMessage, setToastMessage, isQaulifierActivated, loData } = useContext(AuthContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
   const [customerPhotos, setCustomerPhotos] = useState([]);
@@ -127,6 +127,8 @@ const UploadDocuments = () => {
       addressRef.current.focus();
     }
   }, [editAddressNumber]);
+
+  console.log(requiredFieldsStatus);
 
   useEffect(() => {
     if (isQaulifierActivated) {
@@ -251,11 +253,11 @@ const UploadDocuments = () => {
     setHasSentOTPOnce(true);
     setShowOTPInput(true);
 
-    // const res = await getUploadOtp(login_res.session.user_id);
-    // if (!res) return;
-
-    const res = await getUploadOtp(1);
+    const res = await getUploadOtp(loData.session.user_id);
     if (!res) return;
+
+    // const res = await getUploadOtp(1);
+    // if (!res) return;
 
     setToastMessage('OTP has been sent to the mobile number');
   };
@@ -265,35 +267,16 @@ const UploadDocuments = () => {
       const otp = parseInt(loginotp);
 
       try {
-        // const res = await verifyUploadOtp(login_res.session.user_id, {
-        //   otp,
-        // });
-
-        // if (!res) return;
-
-        const res = await verifyUploadOtp(1, otp);
+        const res = await verifyUploadOtp(loData.session.user_id, otp);
 
         if (!res) return;
 
+        // const res = await verifyUploadOtp(1, otp);
+
+        // if (!res) return;
+
         setDisablePhoneNumber(false);
         setMobileVerified(true);
-
-        // if (res.old_session_message === 'No old sessions') {
-        //   setToken(res.token);
-        //   setDisablePhoneNumber(false);
-        //   setMobileVerified(true);
-        //   setFieldError('username', undefined);
-        //   setShowOTPInput(false);
-        //   setIsAuthenticated(true);
-        //   return true;
-        // }
-        // setIsOpen(true);
-        // setToken(res.token);
-        // setDisablePhoneNumber(false);
-        // setMobileVerified(true);
-        // setFieldError('username', undefined);
-        // setShowOTPInput(false);
-        // setIsOpen(true);
       } catch (err) {
         console.log(err);
 
@@ -380,6 +363,8 @@ const UploadDocuments = () => {
           setPropertyPaperUploads({ data: active_uploads });
         }
       }
+
+      // setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: true }));
     }
     propertyPapers.length > 0 && addPropertyPaperPhotos();
   }, [propertyPapersFile]);
@@ -471,6 +456,7 @@ const UploadDocuments = () => {
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
         );
+        console.log(applicant);
         const document_meta = applicant.document_meta;
         if ('customer_photos' in document_meta == false) {
           document_meta['customer_photos'] = [];
@@ -485,6 +471,7 @@ const UploadDocuments = () => {
             document_meta: document_meta,
           },
         );
+        console.log(edited_applicant);
 
         const active_upload = edited_applicant.document_meta.customer_photos.find((data) => {
           return data.active === true;
@@ -492,6 +479,9 @@ const UploadDocuments = () => {
 
         setCustomerUploads({ type: 'customer_photos', data: active_upload });
       }
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['customer_photo']: true }));
+
+      // setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
     }
     customerPhotos.length > 0 && addCustomerPhotos();
   }, [customerPhotosFile]);
@@ -556,6 +546,8 @@ const UploadDocuments = () => {
 
         setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['id_proof']: true }));
     }
     idProofPhotos.length > 0 && addIdProofPhotos();
   }, [idProofPhotosFile]);
@@ -675,6 +667,8 @@ const UploadDocuments = () => {
 
         setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['address_proof']: true }));
     }
     addressProofPhotos.length > 0 && addAddressProofPhotos();
   }, [addressProofPhotosFile]);
@@ -791,6 +785,8 @@ const UploadDocuments = () => {
 
         setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['salary_slip']: true }));
     }
     salarySlipPhotos.length > 0 && addSalarySlipPhotos();
   }, [salarySlipPhotosFile]);
@@ -897,6 +893,8 @@ const UploadDocuments = () => {
 
         setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['form_60']: true }));
     }
     form60photos.length > 0 && addForm60Photos();
   }, [form60photosFile]);
@@ -1003,6 +1001,8 @@ const UploadDocuments = () => {
 
         setPropertyUploads({ type: 'property_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['property_image']: true }));
     }
     propertyPhotos.length > 0 && addPropertyPhotos();
   }, [propertyPhotosFile]);
@@ -1109,6 +1109,8 @@ const UploadDocuments = () => {
 
         setSelfieUploads({ type: 'lo_selfie', data: active_upload });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: true }));
     }
     selfie.length > 0 && addSelfiePhoto();
   }, [selfieFile]);
@@ -1169,6 +1171,8 @@ const UploadDocuments = () => {
 
         setDocUploads({ type: 'other_docs', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: true }));
     }
     docs.length > 0 && addOtherDocPhotos();
   }, [docsFile]);
