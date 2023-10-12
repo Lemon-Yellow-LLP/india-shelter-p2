@@ -200,6 +200,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
       />
 
       <TextInput
+        type='number'
         label='No. of current loan(s)'
         placeholder='Choose no. of current loan(s)'
         required
@@ -242,26 +243,18 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
         }}
         onChange={(e) => {
           const value = e.currentTarget.value;
-          const address_pattern = /^[0-9]+$/;
-          if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-            if (!requiredFieldsStatus['no_current_loan']) {
-              setRequiredFieldsStatus((prev) => ({
-                ...prev,
-                ['no_current_loan']: true,
-              }));
-            }
+          const address_pattern = /[^\d]/g;
+          if (address_pattern.test(value)) {
+            return;
           }
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Backspace') {
-            setFieldValue(
-              e.currentTarget.name,
-              values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.slice(
-                0,
-                values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan.length - 1,
-              ),
-            );
+
+          setFieldValue(e.currentTarget.name, value && parseInt(value));
+
+          if (!requiredFieldsStatus['no_current_loan']) {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['no_current_loan']: true,
+            }));
           }
         }}
       />

@@ -63,12 +63,7 @@ export default function DashboardApplicant() {
         );
 
         // Get completed lnt charges
-        setLntCharges(
-          data?.lt_charges?.find((charge) => {
-            charge?.airpay_verify_transaction_status == '200' ||
-              charge?.extra_params?.status == 'success';
-          }),
-        );
+        setLntCharges(data?.lt_charges?.find((charge) => charge?.status === 'Completed'));
       } catch (err) {
         console.error(err?.response?.status);
         navigate('/');
@@ -189,8 +184,8 @@ export default function DashboardApplicant() {
             </div>
 
             <div>
-              <span className='not-italic font-medium text-[10px] text-light-grey'>
-                completed:{' '}
+              <span className='not-italic font-normal text-[12px] text-light-grey'>
+              Completed:{' '}
               </span>
               <span className='text-right text-sm not-italic font-medium text-primary-red'>
                 {`${leadData?.lead?.extra_params?.progress ?? 0}%`}
@@ -527,7 +522,7 @@ export default function DashboardApplicant() {
             data={[
               {
                 label: 'Payment method',
-                value: lntCharges?.airpay_verify_chmod ?? lntCharges?.extra_params?.method ?? '-',
+                value: lntCharges?.airpay_verify_chmod ?? lntCharges?.method ?? '-',
               },
             ]}
             message={!lntCharges ? 'L&T charges is pending' : null}
@@ -718,8 +713,8 @@ export default function DashboardApplicant() {
             </div>
 
             <div>
-              <span className='not-italic font-medium text-[10px] text-light-grey'>
-                completed:{' '}
+              <span className='not-italic font-normal text-[12px] text-light-grey'>
+              Completed:{' '}
               </span>
               <span className='text-right text-sm not-italic font-medium text-primary-red'>
                 {`${leadData?.lead?.extra_params?.progress ?? 0}%`}
@@ -1087,7 +1082,7 @@ const Titlebar = ({ title, id }) => {
         <BackIcon2 />
       </button>
       <div className='flex-1'>
-        <h3 className='truncate'>{title}</h3>
+        <h3 className='w-[200px] truncate'>{title}</h3>
         <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
           LEAD ID:
           <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey'>

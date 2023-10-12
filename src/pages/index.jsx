@@ -8,10 +8,51 @@ import { AuthContext } from '../context/AuthContextProvider';
 import { LeadContext } from '../context/LeadContextProvider';
 import DashboardApplicant from './dashboard/DashboardApplicant';
 import axios from 'axios';
+import { logout } from '../global';
+
+const TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
 const DashboardRoutes = () => {
   const RequireAuth = ({ children }) => {
-    const { isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated, token } = useContext(AuthContext);
+
+    useEffect(() => {
+      const resetSessionTimer = () => {
+        const reset = async () => {
+          try {
+            const res = await logout(
+              {
+                status: 'no',
+                logout_via: 'New Login',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
+            window.location.reload();
+          } catch (err) {
+            window.location.reload();
+            console.log(err);
+          }
+        };
+
+        // // Reset the session timer when the user is active
+        const timer = setTimeout(reset, TIMEOUT);
+
+        return () => clearTimeout(timer);
+      };
+
+      // Attach an event listener to track user activity
+      window.addEventListener('touchstart', resetSessionTimer);
+
+      // Clean up the event listener when the component unmounts
+      return () => {
+        window.removeEventListener('touchstart', resetSessionTimer);
+      };
+    }, []);
 
     // Check authentication once and render accordingly
 
