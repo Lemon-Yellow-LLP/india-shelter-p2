@@ -20,6 +20,7 @@ import { editFieldsById } from '../../../global';
 import DynamicDrawer from '../DynamicDrawer';
 import Button from '../../Button';
 import BreSteps from './BreSteps';
+import UploadSteps from './UplodSteps';
 
 const drawerBleeding = 0;
 
@@ -387,7 +388,7 @@ export default function SwipeableDrawerComponent() {
                         ?.progress !== 100
                     }
                   />
-                  <DrawerSteps
+                  <UploadSteps
                     key={9}
                     details={applicantStepsProgress[9]}
                     steps={true}
@@ -578,7 +579,7 @@ export default function SwipeableDrawerComponent() {
                                   ?.extra_params?.progress !== 100
                               }
                             />
-                            <DrawerSteps
+                            <UploadSteps
                               key={6}
                               details={coApplicantStepsProgress[6]}
                               steps={true}
@@ -586,7 +587,7 @@ export default function SwipeableDrawerComponent() {
                               stepIndex={6}
                               lock={
                                 values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.progress !== 100
+                                  ?.extra_params?.upload_progress !== 100
                               }
                             />
                           </div>
