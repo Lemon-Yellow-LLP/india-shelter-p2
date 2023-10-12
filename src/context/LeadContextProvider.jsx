@@ -6,7 +6,7 @@ import { defaultErrorsLead } from './defaultErrorsLead';
 import { defaultValuesLead } from './defaultValuesLead';
 import { useNavigate } from 'react-router-dom';
 import { applicantSteps, coApplicantSteps } from './Steps';
-import { editFieldsById } from '../global';
+import { editFieldsById, getApplicantById } from '../global';
 import { newCoApplicantValues } from './NewCoApplicant';
 
 export const LeadContext = createContext(defaultValuesLead);
@@ -98,20 +98,43 @@ const LeadContextProvider = ({ children }) => {
 
     let newData = formik.values;
 
-    if (newData?.applicant_details && typeof newData?.applicant_details.extra_params === 'object') {
-      newData.applicant_details.extra_params.upload_progress = finalProgress;
-      newData.applicant_details.extra_params.upload_required_fields_status = requiredFieldsStatus;
-      await editFieldsById(
-        formik.values.applicant_details.id,
-        'applicant',
-        newData.applicant_details,
-      );
-    }
+    newData.applicants[activeIndex].applicant_details.extra_params.upload_progress = finalProgress;
+    newData.applicants[activeIndex].applicant_details.extra_params.upload_required_fields_status =
+      requiredFieldsStatus;
+
+    // const updated_field_status = { ...}
+    //    newData.applicants[activeIndex].applicant_details,
+
+    // console.log(
+    //   newData.applicants[activeIndex].applicant_details.extra_params.upload_required_fields_status,
+    // );
+    // console.log(requiredFieldsStatus);
+
+    const applicant = await getApplicantById(
+      formik.values?.applicants?.[activeIndex]?.applicant_details.id,
+    );
+
+    const old_extra_params = applicant.extra_params;
+    const required_fields = applicant.extra_params.upload_required_fields_status;
+    const updated_required_fields = { ...required_fields, ...requiredFieldsStatus };
+
+    // const updated_required_fields_status = {
+    //   upload_required_fields_status: updated_required_fields,
+    // };
+
+    const updated_extra_params = {
+      ...old_extra_params,
+      upload_required_fields_status: updated_required_fields,
+    };
+
+    console.log(updated_extra_params);
+
+    await editFieldsById(formik.values.applicants[activeIndex].applicant_details.id, 'applicant', {
+      extra_params: updated_extra_params,
+    });
 
     formik.setValues(newData);
   };
-
-  // console.log(formik.values.applicants[activeIndex]?.['applicant_details']?.extra_params?.progress);
 
   console.log(formik.values);
 
