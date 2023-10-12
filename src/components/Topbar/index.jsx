@@ -57,7 +57,7 @@ export default function Topbar({ title, id, progress, showBack = false, showClos
           </p>
         </div>
         {showClose ? (
-          <button onClick={() => navigate(id ? '/dashboard/' + id : '/')} className=''>
+          <button onClick={() => navigate('/')} className=''>
             <IconClose />
           </button>
         ) : null}
