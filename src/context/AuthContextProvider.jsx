@@ -24,6 +24,7 @@ export const AuthContext = createContext(defaultValues);
 const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loData, setLoData] = useState(null);
   const [otpFailCount, setOtpFailCount] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
   const [isQaulifierActivated, setIsQaulifierActivated] = useState(null);
@@ -47,6 +48,8 @@ const AuthContextProvider = ({ children }) => {
         setToken,
         isQaulifierActivated,
         setIsQaulifierActivated,
+        loData,
+        setLoData,
       }}
     >
       {children}
