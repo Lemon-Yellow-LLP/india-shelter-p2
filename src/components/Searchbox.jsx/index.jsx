@@ -21,7 +21,7 @@ export default function Searchbox({ query, setQuery, handleSubmit, handleReset }
         }}
         className='w-full truncate'
         type='text'
-        placeholder='Search by name, ID, mobile number'
+        placeholder='Search for name, ID, mobile number'
       />
       {query ? (
         <div className='flex gap-1'>

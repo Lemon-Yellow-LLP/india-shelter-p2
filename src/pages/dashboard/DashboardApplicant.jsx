@@ -1082,7 +1082,7 @@ const Titlebar = ({ title, id }) => {
         <BackIcon2 />
       </button>
       <div className='flex-1'>
-        <h3 className='truncate'>{title}</h3>
+        <h3 className='w-[200px] truncate'>{title}</h3>
         <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
           LEAD ID:
           <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey'>
