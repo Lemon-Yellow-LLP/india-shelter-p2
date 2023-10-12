@@ -37,8 +37,6 @@ const LeadContextProvider = ({ children }) => {
     },
   });
 
-  const updateProgress = async (updateStep, requiredFieldsStatus) => {};
-
   const updateProgressApplicantSteps = async (updateStep, requiredFieldsStatus, page) => {
     let trueCount = 0;
 
@@ -79,7 +77,34 @@ const LeadContextProvider = ({ children }) => {
     formik.setValues(newData);
   };
 
-  console.log(activeIndex);
+  const updateProgressUploadDocumentSteps = async (requiredFieldsStatus) => {
+    let trueCount = 0;
+
+    for (const field in requiredFieldsStatus) {
+      if (requiredFieldsStatus[field] === true) {
+        trueCount++;
+      }
+    }
+
+    let finalProgress = parseInt(
+      (parseInt(trueCount) / parseInt(Object.keys(requiredFieldsStatus).length)) * 100,
+    );
+
+    let newData = formik.values;
+
+    if (newData?.applicant_details && typeof newData?.applicant_details.extra_params === 'object') {
+      newData.applicant_details.extra_params.upload_progress = finalProgress;
+      newData.applicant_details.extra_params.upload_required_fields_status = requiredFieldsStatus;
+      await editFieldsById(
+        formik.values.applicant_details.id,
+        'applicant',
+        newData.applicant_details,
+      );
+    }
+
+    formik.setValues(newData);
+  };
+
   // console.log(formik.values.applicants[activeIndex]?.['applicant_details']?.extra_params?.progress);
 
   console.log(formik.values);
@@ -104,7 +129,6 @@ const LeadContextProvider = ({ children }) => {
         ...formik,
         applicantStepsProgress,
         setApplicantSetpsProgress,
-        updateProgress,
         updateProgressApplicantSteps,
         addApplicant,
         currentStepIndex,
@@ -119,6 +143,7 @@ const LeadContextProvider = ({ children }) => {
         setExistingData,
         coApplicantStepsProgress,
         setCoApplicantSetpsProgress,
+        updateProgressUploadDocumentSteps,
       }}
     >
       {children}

@@ -66,6 +66,7 @@ const defaultValues = {
   account_type: '',
   bank_name: '',
   branch_name: '',
+  bank_statement_url: '',
 };
 
 const validationSchema = Yup.object().shape({
@@ -153,9 +154,7 @@ export default function BankingManual() {
       .post(
         `https://lo.scotttiger.in/api/applicant/penny-drop/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
         {
-          account_number: values?.account_number,
-          ifsc_code: values?.ifsc_code,
-          account_holder_name: values?.account_holder_name,
+          ...values,
         },
       )
       .then(({ data }) => {
@@ -207,6 +206,7 @@ export default function BankingManual() {
         const newData = data.map((item) => {
           return { label: item.branch, value: item.branch };
         });
+        console.log(newData);
         setBranchData(newData);
       })
       .catch((err) => {

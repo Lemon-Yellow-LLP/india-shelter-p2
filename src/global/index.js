@@ -242,6 +242,41 @@ async function checkBre101(id, options) {
   return res.data;
 }
 
+// UPLOAD DOCUMENT
+
+async function uploadDoc(data, options) {
+  const res = await axios.post(`${API_URL}/doc/upload/document`, data, options);
+  return res.data;
+}
+
+async function getApplicantById(id) {
+  const res = await axios.get(`${API_URL}/applicant/${id}`);
+  return res.data;
+}
+
+async function reUploadDoc(id, data, options) {
+  const res = await axios.post(`${API_URL}/doc/upload/document/re-upload/${id}`, data, options);
+  return res.data;
+}
+
+async function getUploadOtp(id) {
+  const res = await axios.get(`${API_URL}/account/send-sms/${id}`, {}, requestOptions);
+  return res;
+}
+
+async function verifyUploadOtp(id, otp) {
+  const res = await axios.post(`${API_URL}/account/verify-sms/${id}`, { otp }, requestOptions);
+  return res;
+}
+
+async function updateLeadDataOnBlur(leadId, fieldName, value) {
+  if (!leadId) return;
+  const inputName = fieldName;
+  const updatedFieldValue = {};
+  updatedFieldValue[inputName] = value;
+  return editLeadById(leadId, updatedFieldValue);
+}
+
 function NaNorNull(value, toReturn = null) {
   return isNaN(value) ? toReturn : value;
 }
@@ -454,4 +489,9 @@ export {
   checkCibil,
   checkCrif,
   checkBre101,
+  uploadDoc,
+  getApplicantById,
+  getUploadOtp,
+  verifyUploadOtp,
+  reUploadDoc,
 };
