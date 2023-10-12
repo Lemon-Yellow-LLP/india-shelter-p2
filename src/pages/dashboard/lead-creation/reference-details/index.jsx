@@ -109,9 +109,9 @@ const ReferenceDetails = () => {
     (e) => {
       let value = e.currentTarget.value;
 
-      const pattern = /^[A-Za-z\s]+$/;
+      const pattern = /^[a-zA-Z ]+$/;
       if (pattern.test(value) || value.length == 0) {
-        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1)?.trim());
+        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
 
       const name = e.target.name.split('.')[1];
@@ -268,6 +268,8 @@ const ReferenceDetails = () => {
             touched={touched?.reference_details?.reference_1_full_name}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
+
               if (
                 !errors?.reference_details?.reference_1_full_name &&
                 values?.reference_details?.reference_1_full_name
@@ -276,6 +278,14 @@ const ReferenceDetails = () => {
                   'reference_1_full_name',
                   values?.reference_details?.reference_1_full_name,
                 );
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             disabled={inputDisabled}
@@ -294,6 +304,7 @@ const ReferenceDetails = () => {
             touched={touched?.reference_details?.reference_1_phone_number}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
 
               if (
                 !errors?.reference_details?.reference_1_phone_number &&
@@ -303,6 +314,14 @@ const ReferenceDetails = () => {
                   'reference_1_phone_number',
                   values?.reference_details?.reference_1_phone_number,
                 );
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             pattern='\d*'
@@ -345,23 +364,6 @@ const ReferenceDetails = () => {
               e.target.value = text;
               handleChange(e);
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Backspace') {
-                setFieldValue(
-                  'reference_details.reference_1_phone_number',
-                  values?.reference_details?.reference_1_phone_number.slice(
-                    0,
-                    values?.reference_details?.reference_1_phone_number.length - 1,
-                  ),
-                );
-                e.preventDefault();
-                return;
-              }
-              if (DISALLOW_CHAR.includes(e.key)) {
-                e.preventDefault();
-                return;
-              }
-            }}
             // disabled={inputDisabled || disablePhoneNumber}
             inputClasses='hidearrow'
           />
@@ -376,11 +378,20 @@ const ReferenceDetails = () => {
             touched={touched?.reference_details?.reference_1_address}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
               if (
                 !errors.reference_details?.reference_1_address &&
                 values?.reference_details?.reference_1_address
               ) {
                 updateFields('reference_1_address', values?.reference_details?.reference_1_address);
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             disabled={inputDisabled}
@@ -401,12 +412,21 @@ const ReferenceDetails = () => {
             disabled={inputDisabled}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
               handleOnPincodeChangeOne();
               if (
                 !errors?.reference_details?.reference_1_pincode &&
                 values?.reference_details?.reference_1_pincode
               ) {
                 updateFields('reference_1_pincode', values?.reference_details?.reference_1_pincode);
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             min='0'
@@ -550,6 +570,7 @@ const ReferenceDetails = () => {
             error={errors?.reference_details?.reference_2_full_name}
             touched={touched?.reference_details?.reference_2_full_name}
             onBlur={(e) => {
+              const name = e.currentTarget.name.split('.')[1];
               handleBlur(e);
               if (
                 !errors?.reference_details?.reference_2_full_name &&
@@ -559,6 +580,14 @@ const ReferenceDetails = () => {
                   'reference_2_full_name',
                   values?.reference_details?.reference_2_full_name,
                 );
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             disabled={inputDisabled}
@@ -577,6 +606,7 @@ const ReferenceDetails = () => {
             touched={touched?.reference_details?.reference_2_phone_number}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
 
               if (
                 !errors.reference_details?.reference_2_phone_number &&
@@ -586,6 +616,14 @@ const ReferenceDetails = () => {
                   'reference_2_phone_number',
                   values?.reference_details?.reference_2_phone_number,
                 );
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             pattern='\d*'
@@ -628,23 +666,6 @@ const ReferenceDetails = () => {
               e.target.value = text;
               handleChange(e);
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Backspace') {
-                setFieldValue(
-                  'reference_details.reference_2_phone_number',
-                  values?.reference_details?.reference_2_phone_number.slice(
-                    0,
-                    values?.reference_details?.reference_2_phone_number.length - 1,
-                  ),
-                );
-                e.preventDefault();
-                return;
-              }
-              if (DISALLOW_CHAR.includes(e.key)) {
-                e.preventDefault();
-                return;
-              }
-            }}
             // disabled={inputDisabled || disablePhoneNumber}
             inputClasses='hidearrow'
           />
@@ -659,11 +680,21 @@ const ReferenceDetails = () => {
             touched={touched?.reference_details?.reference_2_address}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
+
               if (
                 !errors.reference_details?.reference_2_address &&
                 values?.reference_details?.reference_2_address
               ) {
                 updateFields('reference_2_address', values?.reference_details?.reference_2_address);
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             disabled={inputDisabled}
@@ -684,12 +715,21 @@ const ReferenceDetails = () => {
             disabled={inputDisabled}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
               handleOnPincodeChangeTwo();
               if (
                 !errors.reference_details?.reference_2_pincode &&
                 values?.reference_details?.reference_2_pincode
               ) {
                 updateFields('reference_2_pincode', values?.reference_details?.reference_2_pincode);
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             min='0'
