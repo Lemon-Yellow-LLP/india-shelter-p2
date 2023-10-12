@@ -250,7 +250,7 @@ const BRE_ONE = () => {
           {},
         );
 
-        if (bre99_res.bre_99_response.statusCode === 200) {
+        if (bre99_res.bre_99_response.statusCode == 200) {
           setBre99((prev) => ({ ...prev, loader: false, res: 'Valid' }));
           const bre99body = bre99_res.bre_99_response.body;
           callCibilOrCrif = bre99body.find((data) => data.Rule_Name === 'Bureau_Type');
@@ -277,7 +277,7 @@ const BRE_ONE = () => {
             values?.applicants?.[activeIndex]?.applicant_details.id,
             {},
           );
-          if (cibil_res.status === 200) {
+          if (cibil_res.status == 200) {
             setBureau((prev) => ({
               ...prev,
               loader: false,
@@ -298,7 +298,7 @@ const BRE_ONE = () => {
             values?.applicants?.[activeIndex]?.applicant_details.id,
             {},
           );
-          if (crif_res.status === 200) {
+          if (crif_res.status == 200) {
             setBureau((prev) => ({
               ...prev,
               loader: false,
@@ -321,17 +321,17 @@ const BRE_ONE = () => {
           {},
         );
 
-        if (bre_res.bre_101_response.statusCode !== 200) return;
+        if (bre_res.bre_101_response.statusCode != 200) return;
 
         let new_data = { ...values };
 
-        new_data.applicants[activeIndex].applicant_details.extra_params.qualifier = true;
+        // new_data.applicants[activeIndex].applicant_details.extra_params.qualifier = true;
+        const extra_parmas = new_data.applicants[activeIndex].applicant_details.extra_params;
+        const edited_extra_params = { ...extra_parmas, qualifier: true };
 
-        await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          new_data.applicants?.[activeIndex]?.applicant_details,
-        );
+        await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
+          extra_params: edited_extra_params,
+        });
 
         setFieldValue(`applicants[${activeIndex}].applicant_details.extra_params.qualifier`, true);
 
