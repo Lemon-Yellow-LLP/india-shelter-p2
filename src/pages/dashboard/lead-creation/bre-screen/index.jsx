@@ -15,6 +15,7 @@ import {
   verifyPan,
   verifyVoterID,
   checkBre101,
+  editFieldsById,
 } from '../../../../global';
 import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
@@ -23,7 +24,7 @@ import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const BRE_ONE = () => {
   const addApplicant = useContext(LeadContextProvider);
-  const { activeIndex, values } = useContext(LeadContext);
+  const { activeIndex, values, setFieldValue } = useContext(LeadContext);
   const { setIsQaulifierActivated } = useContext(AuthContext);
 
   const SpeedoMeterAnimationRef = useRef(null);
@@ -152,7 +153,6 @@ const BRE_ONE = () => {
           : 3,
       );
 
-      console.log(progress);
       try {
         let response = null;
 
@@ -163,10 +163,10 @@ const BRE_ONE = () => {
           values.applicants[activeIndex]?.work_income_detail.gst_number
         ) {
           response = await Promise.allSettled([
-            verifyPan(293, {}),
-            verifyDL(293, {}),
-            verifyGST(293, {}),
-            checkDedupe(293, {}),
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
           ]);
         } else if (
           (values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
@@ -175,10 +175,10 @@ const BRE_ONE = () => {
           values.applicants[activeIndex]?.work_income_detail.pf_uan
         ) {
           response = await Promise.allSettled([
-            verifyPan(293, {}),
-            verifyDL(293, {}),
-            verifyPFUAN(293, {}),
-            checkDedupe(293, {}),
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
           ]);
         } else if (
           (values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
@@ -187,10 +187,10 @@ const BRE_ONE = () => {
           values.applicants[activeIndex]?.work_income_detail.gst_number
         ) {
           response = await Promise.allSettled([
-            verifyPan(293, {}),
-            verifyVoterID(293, {}),
-            verifyGST(293, {}),
-            checkDedupe(293, {}),
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyVoterID(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
           ]);
         } else if (
           (values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
@@ -199,22 +199,22 @@ const BRE_ONE = () => {
           values.applicants[activeIndex]?.work_income_detail.gst_number
         ) {
           response = await Promise.allSettled([
-            verifyPan(293, {}),
-            verifyVoterID(293, {}),
-            verifyPFUAN(293, {}),
-            checkDedupe(293, {}),
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyVoterID(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
           ]);
         } else if (values.applicants[activeIndex]?.work_income_detail.gst_number) {
           response = await Promise.allSettled([
-            verifyPan(293, {}),
-            verifyPFUAN(293, {}),
-            checkDedupe(293, {}),
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
           ]);
         } else {
           response = await Promise.allSettled([
-            verifyPan(293, {}),
-            verifyGST(293, {}),
-            checkDedupe(293, {}),
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
           ]);
         }
 
@@ -245,7 +245,10 @@ const BRE_ONE = () => {
       let callCibilOrCrif = '';
 
       try {
-        const bre99_res = await checkBre99(293, {});
+        const bre99_res = await checkBre99(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          {},
+        );
 
         if (bre99_res.bre_99_response.statusCode === 200) {
           setBre99((prev) => ({ ...prev, loader: false, res: 'Valid' }));
@@ -270,7 +273,10 @@ const BRE_ONE = () => {
 
       if (callCibilOrCrif.Rule_Value === 'CIBIL') {
         try {
-          const cibil_res = await checkCibil(293, {});
+          const cibil_res = await checkCibil(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            {},
+          );
           if (cibil_res.status === 200) {
             setBureau((prev) => ({
               ...prev,
@@ -288,7 +294,10 @@ const BRE_ONE = () => {
         }
       } else {
         try {
-          const crif_res = await checkCrif(293, {});
+          const crif_res = await checkCrif(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            {},
+          );
           if (crif_res.status === 200) {
             setBureau((prev) => ({
               ...prev,
@@ -307,9 +316,24 @@ const BRE_ONE = () => {
       }
 
       try {
-        const bre_res = await checkBre101(89, {});
+        const bre_res = await checkBre101(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          {},
+        );
 
         if (bre_res.bre_101_response.statusCode !== 200) return;
+
+        let new_data = { ...values };
+
+        new_data.applicants[activeIndex].applicant_details.extra_params.qualifier = true;
+
+        await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          new_data.applicants?.[activeIndex]?.applicant_details,
+        );
+
+        setFieldValue(`applicants[${activeIndex}].applicant_details.extra_params.qualifier`, true);
 
         setIsQaulifierActivated(bre_res);
 
@@ -388,8 +412,6 @@ const BRE_ONE = () => {
       ],
     });
   }, [bre101]);
-
-  console.log(values.applicants[activeIndex]?.work_income_detail.pf_uan);
 
   return (
     <div className='p-4 relative h-screen'>
