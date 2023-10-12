@@ -18,8 +18,16 @@ import {
 import imageCompression from 'browser-image-compression';
 
 const UploadDocuments = () => {
-  const { activeIndex, values, errors, touched, handleBlur, setFieldValue, setFieldError } =
-    useContext(LeadContext);
+  const {
+    activeIndex,
+    values,
+    errors,
+    touched,
+    handleBlur,
+    setFieldValue,
+    setFieldError,
+    updateProgressUploadDocumentSteps,
+  } = useContext(LeadContext);
   const { toastMessage, setToastMessage, isQaulifierActivated } = useContext(AuthContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
@@ -100,6 +108,14 @@ const UploadDocuments = () => {
   const idRef = useRef();
   const addressRef = useRef();
 
+  const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
+    ...values?.applicant_details?.extra_params?.upload_required_fields_status,
+  });
+
+  useEffect(() => {
+    updateProgressUploadDocumentSteps(requiredFieldsStatus);
+  }, [requiredFieldsStatus]);
+
   useEffect(() => {
     if (editIdNumber) {
       idRef.current.focus();
@@ -112,22 +128,43 @@ const UploadDocuments = () => {
     }
   }, [editAddressNumber]);
 
-  console.log(isQaulifierActivated);
+  useEffect(() => {
+    if (isQaulifierActivated) {
+      const bre_Display_body = isQaulifierActivated.bre_101_response.body.Display;
 
-  // useEffect(() => {
-  //   if (isQaulifierActivated) {
-  //     const bre_body = isQaulifierActivated.bre_101_res.body;
+      const id_type = values?.applicants?.[activeIndex]?.personal_details?.id_type;
+      const address_type =
+        values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof;
 
-  //     for (let i in bre_body) {
-  //       if (i === values?.applicants?.[activeIndex]?.personal_details?.id_type) {
-  //         setIdSatus(bre_body[i]);
-  //       }
-  //       if (i === values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof) {
-  //         setAddressSatus(bre_body[i]);
-  //       }
-  //     }
-  //   }
-  // }, [isQaulifierActivated]);
+      let check_id_type = null;
+      let check_address_type = null;
+
+      if (id_type === 'PAN') {
+        check_id_type = 'PAN_status';
+      } else if (id_type === 'Driving license') {
+        check_id_type = 'DL_Status';
+      } else if (id_type === 'Voter ID') {
+        check_id_type = 'Voter_Status';
+      }
+
+      if (address_type === 'PAN') {
+        check_address_type = 'PAN_status';
+      } else if (address_type === 'Driving license') {
+        check_address_type = 'DL_Status';
+      } else if (address_type === 'Voter ID') {
+        check_address_type = 'Voter_Status';
+      }
+
+      for (let i in bre_Display_body) {
+        if (i === check_id_type) {
+          setIdSatus(bre_Display_body[i]);
+        }
+        if (i === check_address_type) {
+          setAddressSatus(bre_Display_body[i]);
+        }
+      }
+    }
+  }, [isQaulifierActivated]);
 
   const changeIdType = useCallback((e) => {
     setFieldValue(`applicants[${activeIndex}].personal_details.id_type`, e);
@@ -308,16 +345,22 @@ const UploadDocuments = () => {
       });
 
       if (res) {
-        const applicant = await getApplicantById(1);
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
         const document_meta = applicant.document_meta;
         if ('property_paper_photos' in document_meta == false) {
           document_meta['property_paper_photos'] = [];
         }
         document_meta['property_paper_photos'].push(res.document);
 
-        const edited_applicant = await editFieldsById(1, 'applicant', {
-          document_meta: document_meta,
-        });
+        const edited_applicant = await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            document_meta: document_meta,
+          },
+        );
 
         const pdf = edited_applicant.document_meta.property_paper_photos.find((data) => {
           if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
@@ -378,7 +421,9 @@ const UploadDocuments = () => {
 
       if (!res) return;
 
-      const applicant = await getApplicantById(1);
+      const applicant = await getApplicantById(
+        values?.applicants?.[activeIndex]?.applicant_details.id,
+      );
 
       const active_uploads = applicant.document_meta.property_paper_photos.filter((data) => {
         return data.active === true;
@@ -423,7 +468,9 @@ const UploadDocuments = () => {
       });
 
       if (res) {
-        const applicant = await getApplicantById(1);
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
         const document_meta = applicant.document_meta;
         if ('customer_photos' in document_meta == false) {
           document_meta['customer_photos'] = [];
@@ -431,9 +478,13 @@ const UploadDocuments = () => {
 
         document_meta['customer_photos'].push(res.document);
 
-        const edited_applicant = await editFieldsById(1, 'applicant', {
-          document_meta: document_meta,
-        });
+        const edited_applicant = await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            document_meta: document_meta,
+          },
+        );
 
         const active_upload = edited_applicant.document_meta.customer_photos.find((data) => {
           return data.active === true;
@@ -478,7 +529,9 @@ const UploadDocuments = () => {
       });
 
       if (res) {
-        const applicant = await getApplicantById(1);
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
         const document_meta = applicant.document_meta;
         if ('id_proof_photos' in document_meta == false) {
           document_meta['id_proof_photos'] = [];
@@ -486,9 +539,13 @@ const UploadDocuments = () => {
 
         document_meta['id_proof_photos'].push(res.document);
 
-        const edited_applicant = await editFieldsById(1, 'applicant', {
-          document_meta: document_meta,
-        });
+        const edited_applicant = await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            document_meta: document_meta,
+          },
+        );
 
         const active_uploads = edited_applicant.document_meta.id_proof_photos.filter((data) => {
           return (
@@ -536,7 +593,9 @@ const UploadDocuments = () => {
 
       if (!res) return;
 
-      const applicant = await getApplicantById(1);
+      const applicant = await getApplicantById(
+        values?.applicants?.[activeIndex]?.applicant_details.id,
+      );
 
       const active_uploads = applicant.document_meta.id_proof_photos.filter((data) => {
         return (
@@ -586,7 +645,9 @@ const UploadDocuments = () => {
       });
 
       if (res) {
-        const applicant = await getApplicantById(1);
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
         const document_meta = applicant.document_meta;
         if ('address_proof_photos' in document_meta == false) {
           document_meta['address_proof_photos'] = [];
@@ -594,9 +655,13 @@ const UploadDocuments = () => {
 
         document_meta['address_proof_photos'].push(res.document);
 
-        const edited_applicant = await editFieldsById(1, 'applicant', {
-          document_meta: document_meta,
-        });
+        const edited_applicant = await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            document_meta: document_meta,
+          },
+        );
 
         const active_uploads = edited_applicant.document_meta.address_proof_photos.filter(
           (data) => {
@@ -652,7 +717,9 @@ const UploadDocuments = () => {
 
       if (!res) return;
 
-      const applicant = await getApplicantById(1);
+      const applicant = await getApplicantById(
+        values?.applicants?.[activeIndex]?.applicant_details.id,
+      );
 
       const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
         return (
@@ -700,7 +767,9 @@ const UploadDocuments = () => {
       });
 
       if (res) {
-        const applicant = await getApplicantById(1);
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
         const document_meta = applicant.document_meta;
         if ('salary_slip_photos' in document_meta == false) {
           document_meta['salary_slip_photos'] = [];
@@ -708,9 +777,13 @@ const UploadDocuments = () => {
 
         document_meta['salary_slip_photos'].push(res.document);
 
-        const edited_applicant = await editFieldsById(1, 'applicant', {
-          document_meta: document_meta,
-        });
+        const edited_applicant = await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            document_meta: document_meta,
+          },
+        );
 
         const active_uploads = edited_applicant.document_meta.salary_slip_photos.filter((data) => {
           return data.active === true;
@@ -755,7 +828,9 @@ const UploadDocuments = () => {
 
       if (!res) return;
 
-      const applicant = await getApplicantById(1);
+      const applicant = await getApplicantById(
+        values?.applicants?.[activeIndex]?.applicant_details.id,
+      );
 
       const active_uploads = applicant.document_meta.salary_slip_photos.filter((data) => {
         return data.active === true;
@@ -799,16 +874,22 @@ const UploadDocuments = () => {
       });
 
       if (res) {
-        const applicant = await getApplicantById(1);
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
         const document_meta = applicant.document_meta;
         if ('form_60_photos' in document_meta == false) {
           document_meta['form_60_photos'] = [];
         }
         document_meta['form_60_photos'].push(res.document);
 
-        const edited_applicant = await editFieldsById(1, 'applicant', {
-          document_meta: document_meta,
-        });
+        const edited_applicant = await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            document_meta: document_meta,
+          },
+        );
 
         const active_uploads = edited_applicant.document_meta.form_60_photos.filter((data) => {
           return data.active === true;
@@ -853,7 +934,9 @@ const UploadDocuments = () => {
 
       if (!res) return;
 
-      const applicant = await getApplicantById(1);
+      const applicant = await getApplicantById(
+        values?.applicants?.[activeIndex]?.applicant_details.id,
+      );
 
       const active_uploads = applicant.document_meta.form_60_photos.filter((data) => {
         return data.active === true;
@@ -897,16 +980,22 @@ const UploadDocuments = () => {
       });
 
       if (res) {
-        const applicant = await getApplicantById(1);
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
         const document_meta = applicant.document_meta;
         if ('property_photos' in document_meta == false) {
           document_meta['property_photos'] = [];
         }
         document_meta['property_photos'].push(res.document);
 
-        const edited_applicant = await editFieldsById(1, 'applicant', {
-          document_meta: document_meta,
-        });
+        const edited_applicant = await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            document_meta: document_meta,
+          },
+        );
 
         const active_uploads = edited_applicant.document_meta.property_photos.filter((data) => {
           return data.active === true;
@@ -951,7 +1040,9 @@ const UploadDocuments = () => {
 
       if (!res) return;
 
-      const applicant = await getApplicantById(1);
+      const applicant = await getApplicantById(
+        values?.applicants?.[activeIndex]?.applicant_details.id,
+      );
 
       const active_uploads = applicant.document_meta.property_photos.filter((data) => {
         return data.active === true;
@@ -995,16 +1086,22 @@ const UploadDocuments = () => {
       });
 
       if (res) {
-        const applicant = await getApplicantById(1);
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
         const document_meta = applicant.document_meta;
         if ('lo_selfie' in document_meta == false) {
           document_meta['lo_selfie'] = [];
         }
         document_meta['lo_selfie'].push(res.document);
 
-        const edited_applicant = await editFieldsById(1, 'applicant', {
-          document_meta: document_meta,
-        });
+        const edited_applicant = await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            document_meta: document_meta,
+          },
+        );
 
         const active_upload = edited_applicant.document_meta.lo_selfie.find((data) => {
           return data.active === true;
@@ -1049,16 +1146,22 @@ const UploadDocuments = () => {
       });
 
       if (res) {
-        const applicant = await getApplicantById(1);
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
         const document_meta = applicant.document_meta;
         if ('other_docs' in document_meta == false) {
           document_meta['other_docs'] = [];
         }
         document_meta['other_docs'].push(res.document);
 
-        const edited_applicant = await editFieldsById(1, 'applicant', {
-          document_meta: document_meta,
-        });
+        const edited_applicant = await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            document_meta: document_meta,
+          },
+        );
 
         const active_uploads = edited_applicant.document_meta.other_docs.filter((data) => {
           return data.active === true;
@@ -1103,7 +1206,9 @@ const UploadDocuments = () => {
 
       if (!res) return;
 
-      const applicant = await getApplicantById(1);
+      const applicant = await getApplicantById(
+        values?.applicants?.[activeIndex]?.applicant_details.id,
+      );
 
       const active_uploads = applicant.document_meta.other_docs.filter((data) => {
         return data.active === true;
@@ -1116,7 +1221,7 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function getPreviousUploads() {
-      const res = await getApplicantById(1);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
 
       if (!res) return;
 
@@ -1339,37 +1444,38 @@ const UploadDocuments = () => {
                       inputClasses='text-xs capitalize h-3'
                     />
                   </div>
-                  {!editIdNumber ? (
-                    <p className='flex gap-1 items-center'>
-                      <svg
-                        width='16'
-                        height='16'
-                        viewBox='0 0 16 16'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
-                      >
-                        <path
-                          d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
-                          stroke='#E33439'
-                          strokeLinecap='round'
-                        />
-                      </svg>
+                  {idStatus !== 'Valid' &&
+                    (!editIdNumber ? (
+                      <p className='flex gap-1 items-center'>
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
+                            stroke='#E33439'
+                            strokeLinecap='round'
+                          />
+                        </svg>
 
+                        <span
+                          className='text-primary-red text-xs font-normal'
+                          onClick={() => setEditIdNumber(!editIdNumber)}
+                        >
+                          Edit
+                        </span>
+                      </p>
+                    ) : (
                       <span
-                        className='text-primary-red text-xs font-normal'
+                        className='text-primary-red text-xs font-normal flex items-center'
                         onClick={() => setEditIdNumber(!editIdNumber)}
                       >
-                        Edit
+                        Save
                       </span>
-                    </p>
-                  ) : (
-                    <span
-                      className='text-primary-red text-xs font-normal flex items-center'
-                      onClick={() => setEditIdNumber(!editIdNumber)}
-                    >
-                      Save
-                    </span>
-                  )}
+                    ))}
                 </div>
 
                 <div className='flex justify-between mt-1'>
@@ -1437,7 +1543,9 @@ const UploadDocuments = () => {
                     )}
                   </div>
 
-                  <p className='text-light-grey leading-5 text-xs font-normal'>Photo mandatory</p>
+                  {idStatus !== 'Valid' && (
+                    <p className='text-light-grey leading-5 text-xs font-normal'>Photo mandatory</p>
+                  )}
                 </div>
               </div>
             ) : (
@@ -1541,37 +1649,39 @@ const UploadDocuments = () => {
                       inputClasses='text-xs capitalize h-3'
                     />
                   </div>
-                  {!editAddressNumber ? (
-                    <p className='flex gap-1 items-center'>
-                      <svg
-                        width='16'
-                        height='16'
-                        viewBox='0 0 16 16'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
-                      >
-                        <path
-                          d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
-                          stroke='#E33439'
-                          strokeLinecap='round'
-                        />
-                      </svg>
 
+                  {addressStatus !== 'Valid' &&
+                    (!editAddressNumber ? (
+                      <p className='flex gap-1 items-center'>
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
+                            stroke='#E33439'
+                            strokeLinecap='round'
+                          />
+                        </svg>
+
+                        <span
+                          className='text-primary-red text-xs font-normal'
+                          onClick={() => setEditAddressNumber(!editAddressNumber)}
+                        >
+                          Edit
+                        </span>
+                      </p>
+                    ) : (
                       <span
-                        className='text-primary-red text-xs font-normal'
+                        className='text-primary-red text-xs font-normal flex items-center'
                         onClick={() => setEditAddressNumber(!editAddressNumber)}
                       >
-                        Edit
+                        Save
                       </span>
-                    </p>
-                  ) : (
-                    <span
-                      className='text-primary-red text-xs font-normal flex items-center'
-                      onClick={() => setEditAddressNumber(!editAddressNumber)}
-                    >
-                      Save
-                    </span>
-                  )}
+                    ))}
                 </div>
 
                 <div className='flex justify-between mt-1'>
@@ -1639,7 +1749,9 @@ const UploadDocuments = () => {
                     )}
                   </div>
 
-                  <p className='text-light-grey leading-5 text-xs font-normal'>Photo mandatory</p>
+                  {addressStatus !== 'Valid' && (
+                    <p className='text-light-grey leading-5 text-xs font-normal'>Photo mandatory</p>
+                  )}
                 </div>
               </div>
             ) : (
