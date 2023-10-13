@@ -52,6 +52,10 @@ export default function AddressDetails() {
 
   const handleRadioChange = useCallback(
     async (e) => {
+      if (e.value === 'Rented') {
+        handlePermanentSameAsCurrentAddress(false, e.value);
+      }
+
       setFieldValue(e.name, e.value);
       const name = e.name.split('.')[2];
       if (values?.applicants?.[activeIndex]?.address_detail?.id) {
@@ -149,11 +153,8 @@ export default function AddressDetails() {
     setFieldValue,
   ]);
 
-  useEffect(() => {
-    if (
-      values?.applicants?.[activeIndex]?.address_detail?.extra_params
-        ?.permanent_address_same_as_current
-    ) {
+  const handlePermanentSameAsCurrentAddress = (isChecked, current_type_of_residence) => {
+    if (isChecked) {
       let newData = JSON.parse(JSON.stringify(values));
 
       newData.applicants[activeIndex].address_detail = {
@@ -169,6 +170,11 @@ export default function AddressDetails() {
         permanent_state: values?.applicants?.[activeIndex]?.address_detail?.current_state,
         permanent_no_of_year_residing:
           values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing,
+        current_type_of_residence: current_type_of_residence,
+        extra_params: {
+          ...newData.applicants[activeIndex].address_detail?.extra_params,
+          permanent_address_same_as_current: isChecked,
+        },
       };
 
       setValues(newData);
@@ -195,6 +201,10 @@ export default function AddressDetails() {
         permanent_city: '',
         permanent_state: '',
         permanent_no_of_year_residing: null,
+        extra_params: {
+          ...newData.applicants[activeIndex].address_detail?.extra_params,
+          permanent_address_same_as_current: isChecked,
+        },
       };
 
       setValues(newData);
@@ -225,19 +235,7 @@ export default function AddressDetails() {
           values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing,
       });
     }
-  }, [
-    values?.applicants?.[activeIndex]?.address_detail?.extra_params
-      ?.permanent_address_same_as_current,
-  ]);
-
-  useEffect(() => {
-    if (values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence === 'Rented') {
-      setFieldValue(
-        `applicants[${activeIndex}].address_detail.extra_params.permanent_address_same_as_current`,
-        false,
-      );
-    }
-  }, [values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence]);
+  };
 
   const handlePermanentPincodeChange = useCallback(async () => {
     if (
@@ -460,7 +458,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-                  if (!address_pattern.test(value) && value.length!=0) {
+                  if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (address_pattern.exec(value[value.length - 1])) {
@@ -531,7 +529,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-                  if (!address_pattern.test(value) && value.length!=0) {
+                  if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (address_pattern.exec(value[value.length - 1])) {
@@ -591,7 +589,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const pattern = /^[A-Za-z\s]+$/;
-                  if (!pattern.test(value) && value.length!=0) {
+                  if (!pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (pattern.exec(value[value.length - 1])) {
@@ -649,7 +647,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const pattern = /^[A-Za-z\s]+$/;
-                  if (!pattern.test(value) && value.length!=0) {
+                  if (!pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (pattern.exec(value[value.length - 1])) {
@@ -809,17 +807,14 @@ export default function AddressDetails() {
                         ?.permanent_address_same_as_current
                     }
                     name={`applicants[${activeIndex}].address_detail.permanent_address_same_as_current`}
-                    onTouchEnd={(e) => {
+                    onTouchEnd={() => {}}
+                    onChange={(e) => {
                       let isChecked = !!e.target.checked;
-                      setFieldValue(
-                        `applicants[${activeIndex}].address_detail.extra_params.permanent_address_same_as_current`,
+                      handlePermanentSameAsCurrentAddress(
                         isChecked,
+                        values?.applicants?.[activeIndex]?.address_detail
+                          ?.current_type_of_residence,
                       );
-                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                        extra_params: {
-                          [permanent_address_same_as_current]: isChecked,
-                        },
-                      });
                     }}
                     disabled={
                       values?.applicants?.[activeIndex]?.address_detail
@@ -879,7 +874,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-                  if (!address_pattern.test(value) && value.length!=0) {
+                  if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (address_pattern.exec(value[value.length - 1])) {
@@ -934,7 +929,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-                  if (!address_pattern.test(value) && value.length!=0) {
+                  if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (address_pattern.exec(value[value.length - 1])) {
@@ -980,7 +975,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const pattern = /^[A-Za-z\s]+$/;
-                  if (!pattern.test(value) && value.length!=0) {
+                  if (!pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (pattern.exec(value[value.length - 1])) {
@@ -1026,7 +1021,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const pattern = /^[A-Za-z\s]+$/;
-                  if (!pattern.test(value) && value.length!=0) {
+                  if (!pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (pattern.exec(value[value.length - 1])) {

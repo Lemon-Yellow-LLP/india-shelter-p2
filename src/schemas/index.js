@@ -380,7 +380,13 @@ export const validationSchemaLead = Yup.object().shape({
       .trim()
       .min(10, 'Enter a valid 10 digit mobile number')
       .max(10, 'Enter a valid 10 digit mobile number')
-      .required('This field is mandatory'),
+      .required('This field is mandatory')
+      .test('reference_1_phone_number', 'Invalid mobile number', async (mobileNumber) => {
+        const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
+        if (DISALLOW_NUM.includes(mobileNumber.at(0))) return false;
+        return true;
+      }),
+
     reference_1_pincode: Yup.string()
       .trim()
       .required('This field is mandatory')
@@ -414,7 +420,12 @@ export const validationSchemaLead = Yup.object().shape({
       .trim()
       .min(10, 'Enter a valid 10 digit mobile number')
       .max(10, 'Enter a valid 10 digit mobile number')
-      .required('This field is mandatory'),
+      .required('This field is mandatory')
+      .test('reference_2_phone_number', 'Invalid mobile number', async (mobileNumber) => {
+        const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
+        if (DISALLOW_NUM.includes(mobileNumber.at(0))) return false;
+        return true;
+      }),
     reference_2_pincode: Yup.string()
       .trim()
       .required('This field is mandatory')
