@@ -1069,7 +1069,20 @@ const Titlebar = ({ title, id }) => {
 
   const handleOpenForm = async (id) => {
     const data = await getDashboardLeadById(id);
-    setValues(data);
+
+    const newApplicants = data.applicants.map((applicant) => {
+      let accounts = [];
+      if (applicant?.banking_details?.length) {
+        accounts = applicant?.banking_details?.filter(
+          (account) => !account?.extra_params?.is_deleted,
+        );
+      }
+
+      return { ...applicant, banking_details: accounts };
+    });
+
+    setValues({ ...data, applicants: newApplicants });
+
     navigate('/lead/applicant-details');
   };
 

@@ -1,12 +1,15 @@
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { useState } from 'react';
 import { addApi, editFieldsById } from '../../../../global';
 import { LeadContext } from '../../../../context/LeadContextProvider';
-import { CardRadio } from '../../../../components';
+import { Button, CardRadio } from '../../../../components';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { useNavigate } from 'react-router-dom';
 import Accounts from './Accounts';
-import { BankingAA, BankingManual } from '../../../../assets/icons';
+import { BankingAA, BankingManual, IconClose } from '../../../../assets/icons';
+import axios from 'axios';
+import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
+import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 
 export const bankingMode = [
   {
@@ -37,54 +40,16 @@ const BankingDetails = () => {
 
   const navigate = useNavigate();
 
-  const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  const [activeState, setActiveState] = useState('');
+  const [openPopup, setOpenPopup] = useState(false);
 
-  const updateFields = async (name, value) => {
-    let newData = {};
-    newData[name] = value;
-
-    if (!name) {
-      const res = await editFieldsById(
-        values?.applicants[activeIndex]?.personal_details?.id,
-        'personal',
-        values?.applicants[activeIndex]?.personal_details,
-      );
-    } else {
-      if (values?.applicants[activeIndex]?.personal_details?.id) {
-        const res = await editFieldsById(
-          values?.applicants[activeIndex]?.personal_details?.id,
-          'personal',
-          newData,
-        );
-      } else {
-        let addData = { ...newCoApplicantValues.personal_details, [name]: value };
-        await addApi('personal', {
-          ...addData,
-          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
-        })
-          .then(async (res) => {
-            setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
-            await editFieldsById(
-              values?.applicants[activeIndex]?.applicant_details?.id,
-              'applicant',
-              { personal_detail: res.id },
-            );
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-    }
-  };
+  const [deleteId, setDeleteId] = useState(null);
 
   const handleRadioChange = (e) => {
     if (e.value === 'Manual') {
-      setActiveState('manual');
       navigate('/lead/banking-details/manual');
     } else {
-      setActiveState('aa');
       navigate('/lead/banking-details/account-aggregator');
     }
   };
@@ -119,7 +84,7 @@ const BankingDetails = () => {
         null ||
       values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.banking_progress !== 100
     ) {
-      if (values?.applicants?.[activeIndex]?.banking_details.length) {
+      if (values?.applicants?.[activeIndex]?.banking_details?.length) {
         setFieldValue(
           `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
           100,
@@ -146,6 +111,59 @@ const BankingDetails = () => {
       }
     }
   }, [values?.applicants?.[activeIndex]?.banking_details]);
+
+  const handleDelete = async () => {
+    await editFieldsById(deleteId, 'banking', { extra_params: { is_deleted: true } });
+    let newBanking = values?.applicants?.[activeIndex]?.banking_details;
+    newBanking = newBanking.filter((account) => account.id !== deleteId);
+    setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
+    setOpenPopup(false);
+  };
+
+  const handleRetry = async (id) => {
+    setLoading(true);
+    let data = {
+      ...values?.applicants?.[activeIndex]?.banking_details?.find((e) => e.id === id),
+      banking_id: id,
+    };
+    await axios
+      .post(
+        `https://lo.scotttiger.in/api/applicant/penny-drop/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+        { ...data },
+      )
+      .then(({ data }) => {
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+      });
+  };
+
+  const handleEdit = (event, id) => {
+    event.preventDefault();
+    const data = values?.applicants?.[activeIndex]?.banking_details?.find((e) => e.id === id);
+    navigate('/lead/banking-details/manual', {
+      state: { preFilledData: data },
+    });
+  };
+
+  const fetchBanking = async () => {
+    await axios
+      .get(`https://lo.scotttiger.in/api/dashboard/lead/${values?.lead?.id}`)
+      .then(({ data }) => {
+        setFieldValue(
+          `applicants[${activeIndex}].banking_details`,
+          data?.applicants?.[activeIndex]?.banking_details,
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    fetchBanking();
+  }, []);
 
   return (
     <>
@@ -181,11 +199,25 @@ const BankingDetails = () => {
                   </span>
                 </div>
               </div>
-              {values?.applicants?.[activeIndex]?.banking_details
-                ?.sort((a, b) => (a.is_primary === b.is_primary ? 0 : a.is_primary ? -1 : 1))
-                .map((account, index) => (
-                  <Accounts key={index} data={account} handlePrimaryChange={handlePrimaryChange} />
-                ))}
+              <div className='flex flex-col gap-3'>
+                {values?.applicants?.[activeIndex]?.banking_details
+                  ?.sort((a, b) => (a.is_primary === b.is_primary ? 0 : a.is_primary ? -1 : 1))
+                  .map((account, index) =>
+                    !account?.extra_params?.is_deleted ? (
+                      <Accounts
+                        key={index}
+                        data={account}
+                        handlePrimaryChange={handlePrimaryChange}
+                        handleDelete={(id) => {
+                          setDeleteId(id);
+                          setOpenPopup(true);
+                        }}
+                        handleRetry={handleRetry}
+                        handleEdit={handleEdit}
+                      />
+                    ) : null,
+                  )}
+              </div>
             </>
           ) : null}
         </div>
@@ -196,7 +228,40 @@ const BankingDetails = () => {
             linkNext='/lead/reference-details'
           />
         </div>
+
+        {loading ? (
+          <div className='absolute w-full h-full bg-[#00000080] z-[9000]'>
+            <LoaderDynamicText text='Verifying your bank account' textColor='white' />
+          </div>
+        ) : null}
       </div>
+
+      <DynamicDrawer open={openPopup} setOpen={setOpenPopup} height='180px'>
+        <div className='flex gap-1'>
+          <div className=''>
+            <h4 className='text-center text-base not-italic font-semibold text-primary-black mb-2'>
+              Are you sure you want to delete this account?
+            </h4>
+            <p className='text-center text-xs not-italic font-normal text-primary-black'>
+              You have option to verify your account again
+            </p>
+          </div>
+          <div className=''>
+            <button onClick={() => setOpenPopup(false)}>
+              <IconClose />
+            </button>
+          </div>
+        </div>
+
+        <div className='w-full flex gap-4 mt-6'>
+          <Button inputClasses='w-full h-[46px]' onClick={() => setOpenPopup(false)}>
+            No, Keep it
+          </Button>
+          <Button primary={true} inputClasses=' w-full h-[46px]' onClick={handleDelete}>
+            Yes, Delete
+          </Button>
+        </div>
+      </DynamicDrawer>
     </>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button, CardRadio, DropDown, TextInput } from '../../../../components';
 import { IconBackBanking, IconClose } from '../../../../assets/icons';
 import { useFormik } from 'formik';
@@ -11,9 +12,10 @@ import SearchableTextInput from '../../../../components/TextInput/SearchableText
 import axios from 'axios';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { useNavigate } from 'react-router';
-import { reUploadDoc, uploadDoc } from '../../../../global';
+import { editFieldsById, reUploadDoc, uploadDoc } from '../../../../global';
 import imageCompression from 'browser-image-compression';
-import PdfAndImageUpload from '../../../../components/PdfAndImageUpload';
+import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
+import PdfAndImageUploadBanking from '../../../../components/PdfAndImageUpload/PdfAndImageUploadBanking';
 
 export const entityType = [
   {
@@ -66,10 +68,10 @@ const defaultValues = {
   account_holder_name: '',
   ifsc_code: '',
   entity_type: '',
-  account_type: '',
+  account_type: 'Savings',
   bank_name: '',
   branch_name: '',
-  bank_statement_url: '',
+  bank_statement_image: [],
 };
 
 const validationSchema = Yup.object().shape({
@@ -82,18 +84,38 @@ const validationSchema = Yup.object().shape({
     .required('Enter a valid IFSC code'),
   entity_type: Yup.string().required('Entity Type is Required'),
   account_type: Yup.string().required('Account Type is Required'),
+  // branch_name: Yup.string().required('Branch Name is Required'),
+  // bank_name: Yup.string().required('Bank Name is Required'),
+  bank_statement_image: Yup.array()
+    .required('Bank Statement is required')
+    .min(1, 'Bank Statement is required'),
 });
 
 export default function BankingManual() {
-  const { values: leadValues, activeIndex } = useContext(LeadContext);
+  const {
+    values: leadValues,
+    activeIndex,
+    setFieldValue: setFieldValueLead,
+  } = useContext(LeadContext);
 
-  const { values, setFieldValue, errors, handleBlur, touched, handleSubmit } = useFormik({
+  const {
+    values,
+    setFieldValue,
+    errors,
+    handleBlur,
+    touched,
+    handleSubmit,
+    setValues,
+    setFieldError,
+  } = useFormik({
     initialValues: { ...defaultValues },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log(values);
+      verify();
     },
   });
+
+  console.log(values);
 
   const [confirmation, setConfirmation] = useState(false);
 
@@ -120,7 +142,13 @@ export default function BankingManual() {
 
   const [bankStatementFile, setBankStatementFile] = useState(null);
 
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const preFilledData = location.state?.preFilledData;
 
   const handleRadioChange = (e) => {
     setFieldValue(e.name, e.value);
@@ -166,18 +194,52 @@ export default function BankingManual() {
   };
 
   const verify = async () => {
+    setLoading(true);
+    let data = { ...values };
+    if (preFilledData) {
+      data = { ...data, banking_id: preFilledData?.id };
+
+      await editFieldsById(preFilledData?.id, 'banking', {
+        ...values,
+      });
+    }
+
     await axios
       .post(
         `https://lo.scotttiger.in/api/applicant/penny-drop/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
         {
-          ...values,
+          ...data,
         },
       )
-      .then(({ data }) => {
+      .then(async (res) => {
+        await axios
+          .get(`https://lo.scotttiger.in/api/dashboard/lead/${leadValues?.lead?.id}`)
+          .then(({ data }) => {
+            setFieldValueLead(
+              `applicants[${activeIndex}].banking_details`,
+              data?.applicants?.[activeIndex]?.banking_details,
+            );
+          })
+          .catch((err) => {
+            console.log(err);
+          });
         navigate('/lead/banking-details');
+        setLoading(false);
       })
-      .catch((err) => {
+      .catch(async (err) => {
+        await axios
+          .get(`https://lo.scotttiger.in/api/dashboard/lead/${leadValues?.lead?.id}`)
+          .then(({ data }) => {
+            setFieldValueLead(
+              `applicants[${activeIndex}].banking_details`,
+              data?.applicants?.[activeIndex]?.banking_details,
+            );
+          })
+          .catch((err) => {
+            console.log(err);
+          });
         navigate('/lead/banking-details');
+        setLoading(false);
       });
   };
 
@@ -209,7 +271,9 @@ export default function BankingManual() {
         setFieldValue('branch_name', data[0]?.branch);
       })
       .catch((err) => {
-        console.log(err);
+        setFieldValue('bank_name', '');
+        setFieldValue('branch_name', '');
+        setFieldError('ifsc_code', 'Invalid IFSC code');
       });
   };
 
@@ -248,6 +312,52 @@ export default function BankingManual() {
     setFieldValue(name, value?.value);
   };
 
+  async function removeImage(id) {
+    let newData = { ...values };
+
+    newData = {
+      ...newData,
+      bank_statement_image: newData.bank_statement_image.map((data) => {
+        if (data.id === id) {
+          return { ...data, active: false };
+        }
+        return data;
+      }),
+    };
+
+    setValues(newData);
+
+    const active_uploads = newData.bank_statement_image.filter((data) => {
+      return data.active === true;
+    });
+
+    setBankStatementUploads({ data: active_uploads });
+  }
+
+  async function deletePDF(id) {
+    let newData = { ...values };
+
+    newData = {
+      ...newData,
+      bank_statement_image: newData.bank_statement_image.map((data) => {
+        if (data.id === id) {
+          return { ...data, active: false };
+        }
+        return data;
+      }),
+    };
+
+    setValues(newData);
+
+    const pdf = newData.bank_statement_image.find((data) => {
+      if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+        return data;
+      }
+    });
+
+    setBankStatementPdf(pdf);
+  }
+
   useEffect(() => {
     getAllBanks();
   }, []);
@@ -256,10 +366,10 @@ export default function BankingManual() {
     async function addPropertyPaperPhotos() {
       const data = new FormData();
       const filename = bankStatementFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', leadValues?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'bank_statement_photo');
       data.append('document_name', filename);
-      console.log(bankStatementFile.type);
+
       if (bankStatementFile.type === 'image/jpeg') {
         const options = {
           maxSizeMB: 0.02,
@@ -287,27 +397,33 @@ export default function BankingManual() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log(res);
-      if (res) {
-        if (bankStatementFile.type === 'image/jpeg') {
-          let active_uploads = [];
-          if (bankStatementUploads?.data) {
-            active_uploads = [...bankStatementUploads?.data, res.document];
-          } else {
-            active_uploads = [res.document];
-          }
 
-          console.log(active_uploads);
+      if (res) {
+        let newData = { ...values };
+
+        newData.bank_statement_image.push(res.document);
+
+        setValues(newData);
+
+        const pdf = values.bank_statement_image.find((data) => {
+          if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+            return data;
+          }
+        });
+
+        if (bankStatementFile.type === 'image/jpeg') {
+          const active_uploads = values.bank_statement_image.filter((data) => {
+            return data.active === true;
+          });
+
           setBankStatementUploads({ data: active_uploads });
         } else {
-          setBankStatementPdf(res.document);
+          setBankStatementPdf(pdf);
         }
       }
     }
     bankStatement.length > 0 && addPropertyPaperPhotos();
   }, [bankStatementFile]);
-
-  console.log(bankStatementUploads?.data);
 
   useEffect(() => {
     async function editPropertyPaperPhotos() {
@@ -346,11 +462,18 @@ export default function BankingManual() {
 
       if (!res) return;
 
-      // const applicant = await getApplicantById(
-      //   values?.applicants?.[activeIndex]?.applicant_details.id,
-      // );
+      let newData = { ...values };
 
-      const active_uploads = applicant.document_meta.bank_statement_photo.filter((data) => {
+      newData.bank_statement_image = newData.bank_statement_image.map((data) => {
+        if (data.id === res.document.id) {
+          return res.document;
+        }
+        return data;
+      });
+
+      setValues(newData);
+
+      const active_uploads = newData.bank_statement_image.filter((data) => {
         return data.active === true;
       });
 
@@ -359,6 +482,32 @@ export default function BankingManual() {
     }
     editBankStatement.id && editPropertyPaperPhotos();
   }, [editBankStatement]);
+
+  useEffect(() => {
+    if (preFilledData) {
+      setValues(preFilledData);
+
+      const pdf = preFilledData?.bank_statement_image?.find((data) => {
+        if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+          return data;
+        }
+      });
+
+      if (pdf) {
+        setBankStatementPdf(pdf);
+        setBankStatement([2]);
+      } else {
+        const active_uploads = preFilledData?.bank_statement_image?.filter((data) => {
+          return data.active === true;
+        });
+
+        if (active_uploads.length) {
+          setBankStatementUploads({ type: 'bank_statement_photo', data: active_uploads });
+          setBankStatement(active_uploads);
+        }
+      }
+    }
+  }, [preFilledData]);
 
   // console.log(errors);
   // console.log(values);
@@ -482,7 +631,7 @@ export default function BankingManual() {
             )}
           </div>
 
-          <PdfAndImageUpload
+          <PdfAndImageUploadBanking
             files={bankStatement}
             setFile={setBankStatement}
             uploads={bankStatementUploads}
@@ -494,25 +643,35 @@ export default function BankingManual() {
             required
             hint='File size should be less than 5MB'
             setSingleFile={setBankStatementFile}
+            removeImage={removeImage}
+            deletePDF={deletePDF}
           />
+          {errors?.bank_statement_image && touched?.bank_statement_image ? (
+            <span
+              className='text-xs text-primary-red'
+              dangerouslySetInnerHTML={{
+                __html: errors?.bank_statement_image,
+              }}
+            />
+          ) : (
+            ''
+          )}
         </div>
 
         <div
           className='flex w-[100vw] p-[16px] bg-white h-[80px] justify-center items-center'
           style={{ boxShadow: '0px -5px 10px #E5E5E580' }}
         >
-          <Button
-            primary={true}
-            inputClasses=' w-full h-[48px]'
-            onClick={verify}
-            disabled={
-              Object.keys(errors)?.length !== 0 ||
-              !!Object.keys(values).find((key) => values[key]?.length === 0)
-            }
-          >
+          <Button primary={true} inputClasses=' w-full h-[48px]' onClick={handleSubmit}>
             Verify
           </Button>
         </div>
+
+        {loading ? (
+          <div className='absolute w-full h-full bg-[#00000080]'>
+            <LoaderDynamicText text='Verifying your bank account' textColor='white' />
+          </div>
+        ) : null}
       </div>
 
       <DynamicDrawer open={open} setOpen={setOpen} height='70vh'>
@@ -612,12 +771,12 @@ export default function BankingManual() {
           <Button
             primary={true}
             inputClasses=' w-full h-[46px]'
-            onClick={() => {
-              setAAInitiated(false);
-              setAARunning(false);
+            onClick={(e) => {
+              e.preventDefault();
+              setValues({ ...defaultValues });
               setConfirmation(false);
+              navigate('/lead/banking-details');
             }}
-            link='/lead/banking-details'
           >
             Leave
           </Button>

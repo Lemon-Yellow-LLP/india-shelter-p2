@@ -3,12 +3,18 @@ import { LeadContext } from '../../../../context/LeadContextProvider';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
 import OpenAccordian from '../../../../assets/icons/OpenAccordian';
 import DummyBankLogo from '../../../../assets/dummyBankLogo.png';
 import ToggleSwitch from '../../../../components/ToggleSwitch';
+import { Button } from '../../../../components';
 
-export default function Accounts({ data, handlePrimaryChange }) {
+export default function Accounts({
+  data,
+  handlePrimaryChange,
+  handleRetry,
+  handleDelete,
+  handleEdit,
+}) {
   const { values, activeIndex } = useContext(LeadContext);
 
   function maskAccountNumber(accountNumber) {
@@ -36,27 +42,53 @@ export default function Accounts({ data, handlePrimaryChange }) {
           expandIcon={<OpenAccordian />}
           aria-controls='panel1a-content'
           id='panel1a-header'
-          style={{ padding: '15px', height: '70px' }}
+          style={{ padding: '15px', paddingTop: '5px', minHeight: '70px' }}
         >
-          <div className='flex flex-row items-center h-[46px]'>
-            <img src={DummyBankLogo} alt='' className='mr-4 h-[32px] w-[32px]' />
-            <div className='flex flex-col gap-[4px]'>
-              <div className='flex gap-[8px] items-center'>
-                <span className='text-[16px] font-normal leading-[24px]'>{data.bank_name}</span>
-                {data.is_primary ? (
-                  <span className='text-[#065381] text-[10px] font-medium border border-[#065381] bg-[#E5F5FF] rounded-[12px] h-[19px] w-[56px] flex items-center justify-center'>
-                    Primary
+          <div className='flex flex-col w-[100%] gap-1'>
+            <div className='flex flex-row items-center h-[46px] pr-[10px]'>
+              <img src={DummyBankLogo} alt='' className='mr-4 h-[32px] w-[32px]' />
+              <div className='flex flex-col gap-[4px]'>
+                <div className='flex gap-[8px] items-center'>
+                  <span
+                    className={`text-[16px] font-normal leading-[24px] w-[130px] whitespace-nowrap overflow-hidden overflow-ellipsis`}
+                  >
+                    {data.bank_name}
                   </span>
-                ) : null}
+                  {data.is_primary ? (
+                    <span className='text-[#065381] text-[10px] font-medium border border-[#065381] bg-[#E5F5FF] rounded-[12px] h-[19px] w-[56px] flex items-center justify-center'>
+                      Primary
+                    </span>
+                  ) : null}
+                </div>
+                <span className='text-[12px] text-[#707070] font-normal leading-[18px]'>
+                  {maskAccountNumber(data.account_number)}
+                </span>
               </div>
-              <span className='text-[12px] text-[#707070] font-normal leading-[18px]'>
-                {maskAccountNumber(data.account_number)}
-              </span>
+            </div>
+            <div className='flex justify-between pr-[10px]'>
+              {data?.penny_drop_response?.result?.active === 'yes' ? (
+                <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[19px] pl-[10px] pr-[10px] flex items-center justify-center'>
+                  Penny drop successful
+                </span>
+              ) : (
+                <>
+                  <span className='text-[#E33439] text-[10px] font-medium border border-[#E33439] bg-[#FFD6D7] rounded-[12px] h-[19px] pl-[10px] pr-[10px] flex items-center justify-center'>
+                    Penny drop failed
+                  </span>
+
+                  <button
+                    className='text-[#E33439] text-[14px] font-medium'
+                    onClick={() => handleRetry(data.id)}
+                  >
+                    Retry
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </AccordionSummary>
 
-        <AccordionDetails style={{ height: '114px' }}>
+        <AccordionDetails style={{ minHeight: '114px' }}>
           <hr className='border border-[#D9D9D9] w-100' />
           <div className='flex flex-col justify-between h-full mt-1'>
             <div className='flex gap-[4px]'>
@@ -79,6 +111,20 @@ export default function Accounts({ data, handlePrimaryChange }) {
                 onChange={(e) => handlePrimaryChange(data.id, e.currentTarget.checked)}
               />
             </div>
+            {data?.penny_drop_response?.result?.active === 'no' ? (
+              <div className='flex gap-[10px] mt-[10px]'>
+                <Button inputClasses='w-full h-[46px]' onClick={() => handleDelete(data.id)}>
+                  Delete
+                </Button>
+                <Button
+                  primary={true}
+                  inputClasses='w-full h-[46px]'
+                  onClick={(e) => handleEdit(e, data.id)}
+                >
+                  Edit Details
+                </Button>
+              </div>
+            ) : null}
           </div>
         </AccordionDetails>
       </Accordion>

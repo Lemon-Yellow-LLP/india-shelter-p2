@@ -66,11 +66,22 @@ export default function AccountAggregator() {
           referenceId: referenceId,
         },
       )
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         setChecking(false);
         if (data.account_aggregator_response.status === 'COMPLETED') {
           setAAInitiated(false);
           setAARunning(false);
+          await axios
+            .get(`https://lo.scotttiger.in/api/dashboard/lead/${values?.lead?.id}`)
+            .then((res) => {
+              setFieldValueLead(
+                `applicants[${activeIndex}].banking_details`,
+                res?.data?.applicants?.[activeIndex]?.banking_details,
+              );
+            })
+            .catch((err) => {
+              console.log(err);
+            });
           navigate('/lead/banking-details');
         }
       })

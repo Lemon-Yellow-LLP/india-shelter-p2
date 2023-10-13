@@ -21,22 +21,47 @@ export default function BreSteps({ details, steps, index, stepIndex, noProgress,
   return (
     <div
       className={`flex flex-col w-[100%] max-h-[77px] rounded-lg border p-2 justify-between ${
-        lock ? 'bg-[#FDECE8] border-[#E33439]' : null
+        lock
+          ? 'bg-[#FDECE8] border-[#E33439]'
+          : values?.applicants?.[index]?.applicant_details?.extra_params?.[details.name]
+          ? 'bg-[#D9F2CB] border-[#147257]'
+          : 'bg-[#FBF7D9] border-[#E1CE3F]'
       } `}
       onClick={lock ? null : handleClick}
     >
       <div className='flex justify-between gap-1'>
         <details.Icon />
         <div className='flex flex-col flex-1'>
-          <span className='text-[14px] font-normal'>{details.title}</span>
-          {steps ? (
-            <span className='text-[11px] font-normal text-[#727376]'>{details.description}</span>
-          ) : null}
+          {lock ? (
+            <>
+              <span className='text-[14px] font-normal'>Qualifier is not activated</span>
+
+              <span className='text-[11px] font-normal text-[#727376]'>
+                Complete Applicant, Personal, Address and Work & Income details to activate
+              </span>
+            </>
+          ) : values?.applicants?.[index]?.applicant_details?.extra_params?.[details.name] ? (
+            <>
+              <span className='text-[14px] font-normal'>Qualifier completed</span>
+
+              <span className='text-[11px] font-normal text-[#727376]'>
+                The option to pay L&T charges has been unlocked
+              </span>
+            </>
+          ) : (
+            <>
+              <span className='text-[14px] font-normal'>Qualifier is activated</span>
+
+              <span className='text-[11px] font-normal text-[#727376]'>
+                Run the verifications now to complete the first milestone
+              </span>
+            </>
+          )}
         </div>
         {!details.hideProgress ? (
           !lock && steps ? (
             <>
-              {values?.applicants?.[index]?.[details.name]?.extra_params?.progress === 100 ? (
+              {values?.applicants?.[index]?.applicant_details?.extra_params?.[details.name] ? (
                 <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
                   Done
                 </span>
@@ -54,7 +79,9 @@ export default function BreSteps({ details, steps, index, stepIndex, noProgress,
 
       {!lock && !noProgress ? (
         <ProgressBar
-          progress={values?.applicants?.[index]?.[details.name]?.extra_params?.progress || 0}
+          progress={
+            values?.applicants?.[index]?.applicant_details?.extra_params?.[details.name] || 0
+          }
         />
       ) : null}
     </div>

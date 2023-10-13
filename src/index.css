@@ -211,6 +211,10 @@ body {
   padding: 0px 16px !important;
 }
 
+.MuiAccordionSummary-content {
+  margin: 8px 12px 12px 0 !important;
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
