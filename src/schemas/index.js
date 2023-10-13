@@ -240,7 +240,7 @@ const applicantSchema = Yup.object().shape({
 
     gst_number: Yup.string().when('profession', {
       is: 'Self-employed',
-      then: Yup.string().required('This field is mandatory'),
+      then: Yup.string(),
     }),
 
     //Pentioner
