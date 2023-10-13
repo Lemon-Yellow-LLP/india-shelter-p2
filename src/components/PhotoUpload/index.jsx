@@ -58,22 +58,6 @@ function PhotoUpload({
     }
   };
 
-  // useEffect(() => {
-  //   async function getLocation() {
-  //     const res = await fetch('https://ipinfo.io/json');
-
-  //     console.log(res);
-  //     if (res.ok) {
-  //       const data = await res.json();
-  //       let state = data.region;
-
-  //       console.log(state);
-  //     }
-  //   }
-
-  //   getLocation();
-  // }, []);
-
   async function removeImage(id) {
     const type = uploads.type;
 
