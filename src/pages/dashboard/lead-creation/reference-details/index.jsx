@@ -108,14 +108,17 @@ const ReferenceDetails = () => {
   const handleTextInputChange = useCallback(
     (e) => {
       let value = e.currentTarget.value;
-
       const pattern = /^[a-zA-Z ]+$/;
       if (pattern.test(value) || value.length == 0) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
 
       const name = e.target.name.split('.')[1];
-      if (!requiredFieldsStatus[name]) {
+      if (
+        requiredFieldsStatus[name] !== undefined &&
+        !requiredFieldsStatus[name] &&
+        value.length > 1
+      ) {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
