@@ -156,8 +156,8 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
 
       <TextInput
         label='GST number'
-        placeholder='Eg: ABC45678'
-        required
+        placeholder='Eg: 06AAAPB2117A1ZI'
+        // required
         name={`applicants[${activeIndex}].work_income_detail.gst_number`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number}

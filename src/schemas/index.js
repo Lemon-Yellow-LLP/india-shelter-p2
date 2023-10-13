@@ -240,7 +240,7 @@ const applicantSchema = Yup.object().shape({
 
     gst_number: Yup.string().when('profession', {
       is: 'Self-employed',
-      then: Yup.string().required('This field is mandatory'),
+      then: Yup.string(),
     }),
 
     //Pentioner
@@ -347,7 +347,7 @@ export const validationSchemaLead = Yup.object().shape({
     project_society_colony: Yup.string()
       .trim()
       .required('This field is mandatory')
-      .min(10, 'Address must be atleast 10 characters long')
+      .min(2, 'Address must be atleast 2 characters long')
       .max(90, 'Address can be max 90 characters long')
       .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
     pincode: Yup.string()
