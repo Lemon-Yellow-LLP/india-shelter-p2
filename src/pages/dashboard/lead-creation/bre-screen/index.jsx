@@ -20,12 +20,10 @@ import {
 import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
 import LeadContextProvider, { LeadContext } from '../../../../context/LeadContextProvider';
-import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const BRE_ONE = () => {
   const addApplicant = useContext(LeadContextProvider);
   const { activeIndex, values, setFieldValue } = useContext(LeadContext);
-  const { setIsQaulifierActivated } = useContext(AuthContext);
 
   const SpeedoMeterAnimationRef = useRef(null);
 
@@ -330,12 +328,11 @@ const BRE_ONE = () => {
         const edited_extra_params = { ...extra_parmas, qualifier: true };
 
         await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
+          bre_101_response: bre_res.bre_101_response,
           extra_params: edited_extra_params,
         });
 
         setFieldValue(`applicants[${activeIndex}].applicant_details.extra_params.qualifier`, true);
-
-        setIsQaulifierActivated(bre_res);
 
         setDL((prev) => ({
           ...prev,
