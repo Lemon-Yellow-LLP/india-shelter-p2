@@ -161,7 +161,13 @@ const LnTCharges = ({ amount = 1500 }) => {
 
   const handleOnPhoneNumberChange = async (e) => {
     const phoneNumber = e.currentTarget.value;
+     
+    const pattern = /^\d+$/
+    if(!pattern.test(phoneNumber)&&phoneNumber.length>0){
+      return
+    }
 
+    
     if (phoneNumber < 0) {
       e.preventDefault();
       return;
