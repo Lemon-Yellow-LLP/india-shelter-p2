@@ -123,12 +123,12 @@ const applicantSchema = Yup.object().shape({
       .required('Mobile number is required'),
     father_husband_name: Yup.string()
       .min(2, 'Father/Husbands Name must be atleast 2 characters long')
-      .max(10, 'Father/Husbands Name can be max 10 characters long')
+      .max(90, 'Father/Husbands Name can be max 90 characters long')
       .required('Father/Husbands Name is required')
-      .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
+      .matches(/^[a-zA-Z\s]*$/, 'Invalid characters in First Name'),
     mother_name: Yup.string()
       .min(2, 'Mother Name must be atleast 2 characters long')
-      .max(10, 'Mother Name can be max 10 characters long')
+      .max(90, 'Mother Name can be max 90 characters long')
       .required('Mother Name is required')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     marital_status: Yup.string().required('This field is mandatory.'),
