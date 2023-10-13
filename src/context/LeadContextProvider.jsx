@@ -125,6 +125,7 @@ const LeadContextProvider = ({ children }) => {
     const updated_extra_params = {
       ...old_extra_params,
       upload_required_fields_status: updated_required_fields,
+      upload_progress: finalProgress,
     };
 
     console.log(updated_extra_params);
