@@ -1,11 +1,11 @@
 import { useCallback, useEffect } from 'react';
-import { IconClose } from '../../assets/icons';
+import { IconClose, TostErrorIcon } from '../../assets/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import propTypes from 'prop-types';
 
 const DEFAULT_TIMEOUT = 3000;
 
-const ToastMessage = ({ message, setMessage, timeout = DEFAULT_TIMEOUT }) => {
+const ErrorTost = ({ message, setMessage, timeout = DEFAULT_TIMEOUT }) => {
   const handleOnCloseClick = useCallback(
     (e) => {
       e.stopPropagation();
@@ -26,7 +26,7 @@ const ToastMessage = ({ message, setMessage, timeout = DEFAULT_TIMEOUT }) => {
       {message && (
         <motion.div
           style={{
-            backgroundColor: '#4E8D7C',
+            backgroundColor: '#EF8D32',
             zIndex: 10000,
           }}
           className={`flex gap-4 items-center 
@@ -40,22 +40,7 @@ const ToastMessage = ({ message, setMessage, timeout = DEFAULT_TIMEOUT }) => {
           exit={{ opacity: 0, translateY: -100 }}
           transition={{ ease: 'easeOut', duration: 0.52 }}
         >
-          <svg
-            width='24'
-            height='24'
-            viewBox='0 0 24 24'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <rect width='24' height='24' rx='12' fill='#FEFEFE' />
-            <path
-              d='M17.3337 8L10.0003 15.3333L6.66699 12'
-              stroke='#4E8D7C'
-              strokeWidth='1.5'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            />
-          </svg>
+          <TostErrorIcon />
 
           <span className='flex-1 leading-5 text-sm font-medium text-neutral-white'>{message}</span>
 
@@ -68,9 +53,9 @@ const ToastMessage = ({ message, setMessage, timeout = DEFAULT_TIMEOUT }) => {
   );
 };
 
-export default ToastMessage;
+export default ErrorTost;
 
-ToastMessage.propTypes = {
+ErrorTost.propTypes = {
   message: propTypes.any,
   setMessage: propTypes.func,
   timeout: propTypes.number,

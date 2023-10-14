@@ -1,8 +1,8 @@
-import { useCallback, useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useState } from 'react';
-import { addApi, editFieldsById } from '../../../../global';
+import { editFieldsById } from '../../../../global';
 import { LeadContext } from '../../../../context/LeadContextProvider';
-import { Button, CardRadio } from '../../../../components';
+import { Button, CardRadio, ToastMessage } from '../../../../components';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { useNavigate } from 'react-router-dom';
 import Accounts from './Accounts';
@@ -10,6 +10,7 @@ import { BankingAA, BankingManual, IconClose } from '../../../../assets/icons';
 import axios from 'axios';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
+import ErrorTost from '../../../../components/ToastMessage/ErrorTost';
 
 export const bankingMode = [
   {
@@ -27,16 +28,16 @@ export const bankingMode = [
 const BankingDetails = () => {
   const {
     values,
-    updateProgressApplicantSteps,
-    errors,
-    touched,
     setFieldValue,
     activeIndex,
-    setActiveIndex,
-    existingData,
     setValues,
-    setCurrentStepIndex,
+    bankSuccessTost,
+    setBankSuccessTost,
+    bankErrorTost,
+    setBankErrorTost,
   } = useContext(LeadContext);
+
+  console.log(activeIndex);
 
   const navigate = useNavigate();
 
@@ -133,9 +134,11 @@ const BankingDetails = () => {
       )
       .then(({ data }) => {
         setLoading(false);
+        setBankSuccessTost('Bank verified successfully');
       })
       .catch((err) => {
         setLoading(false);
+        setBankErrorTost('Bank verified unsuccessfully');
       });
   };
 
@@ -149,12 +152,12 @@ const BankingDetails = () => {
 
   const fetchBanking = async () => {
     await axios
-      .get(`https://lo.scotttiger.in/api/dashboard/lead/${values?.lead?.id}`)
+      .get(
+        `https://lo.scotttiger.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+      )
       .then(({ data }) => {
-        setFieldValue(
-          `applicants[${activeIndex}].banking_details`,
-          data?.applicants?.[activeIndex]?.banking_details,
-        );
+        const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
+        setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
       })
       .catch((err) => {
         console.log(err);
@@ -163,11 +166,13 @@ const BankingDetails = () => {
 
   useEffect(() => {
     fetchBanking();
-  }, []);
+  }, [activeIndex]);
 
   return (
     <>
       <div className='overflow-hidden flex flex-col h-[100vh]'>
+        <ToastMessage message={bankSuccessTost} setMessage={setBankSuccessTost} />
+        <ErrorTost message={bankErrorTost} setMessage={setBankErrorTost} />
         <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
           <div className='flex flex-col gap-2'>
             <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>

@@ -744,14 +744,13 @@ const WorkIncomeDetails = () => {
             linkNext='/lead/qualifier'
             onNextClick={handleNextClick}
             onPreviousClick={() => setCurrentStepIndex(2)}
-            // disableNext={
-            //   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !==
-            //     100 ||
-            //   values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
-            //   values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
-            //   values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
-            // }
-            disableNext={true}
+            disableNext={
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !==
+                100 ||
+              values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
+              values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
+              values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
+            }
           />
         </div>
       </div>

@@ -11,7 +11,7 @@ import { LeadContext } from '../../../../context/LeadContextProvider';
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
 export default function AccountAggregator() {
-  const { values, activeIndex } = useContext(LeadContext);
+  const { values, activeIndex, setBankSuccessTost, setFieldValue } = useContext(LeadContext);
   const navigate = useNavigate();
   const [mobileNo, setMobileNo] = useState('');
   const [aaInitiated, setAAInitiated] = useState(false);
@@ -72,17 +72,18 @@ export default function AccountAggregator() {
           setAAInitiated(false);
           setAARunning(false);
           await axios
-            .get(`https://lo.scotttiger.in/api/dashboard/lead/${values?.lead?.id}`)
+            .get(
+              `https://lo.scotttiger.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            )
             .then((res) => {
-              setFieldValueLead(
-                `applicants[${activeIndex}].banking_details`,
-                res?.data?.applicants?.[activeIndex]?.banking_details,
-              );
+              const newBanking = res?.data?.filter((bank) => !bank?.extra_params?.is_deleted);
+              setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
+              navigate('/lead/banking-details');
+              setBankSuccessTost('Bank added successfully');
             })
             .catch((err) => {
               console.log(err);
             });
-          navigate('/lead/banking-details');
         }
       })
       .catch((err) => {
