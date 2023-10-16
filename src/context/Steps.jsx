@@ -160,5 +160,6 @@ export const coApplicantSteps = [
     url: '/lead/upload-documents',
     lock: true,
     Icon: UploadIcon,
+    name: 'upload_documents',
   },
 ];
