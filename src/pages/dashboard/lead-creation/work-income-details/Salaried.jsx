@@ -155,7 +155,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
           onChange={(e) => {
             const value = e.currentTarget.value;
             const pattern = /^[a-zA-Z\s]+$/;
-            if (!pattern.test(value) && value.length!=0) {
+            if (!pattern.test(value) && value.length != 0) {
               return;
             }
             if (pattern.exec(value[value.length - 1])) {
@@ -220,7 +220,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
       <TextInput
         label='PF UAN'
         placeholder='Eg: 100563503285'
-        type="number"
+        type='number'
         name={`applicants[${activeIndex}].work_income_detail.pf_uan`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}

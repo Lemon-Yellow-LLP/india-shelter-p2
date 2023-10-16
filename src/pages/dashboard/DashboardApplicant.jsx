@@ -185,7 +185,7 @@ export default function DashboardApplicant() {
 
             <div>
               <span className='not-italic font-normal text-[12px] text-light-grey'>
-              Completed:{' '}
+                Completed:{' '}
               </span>
               <span className='text-right text-sm not-italic font-medium text-primary-red'>
                 {`${leadData?.lead?.extra_params?.progress ?? 0}%`}
@@ -714,7 +714,7 @@ export default function DashboardApplicant() {
 
             <div>
               <span className='not-italic font-normal text-[12px] text-light-grey'>
-              Completed:{' '}
+                Completed:{' '}
               </span>
               <span className='text-right text-sm not-italic font-medium text-primary-red'>
                 {`${leadData?.lead?.extra_params?.progress ?? 0}%`}
