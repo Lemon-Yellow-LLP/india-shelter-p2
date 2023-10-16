@@ -12,6 +12,8 @@ import CurrencyInput from '../../../../components/CurrencyInput';
 import { addApi, checkIsValidStatePincode, editFieldsById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -244,7 +246,18 @@ const WorkIncomeDetails = () => {
   return (
     <>
       <div className='overflow-hidden flex flex-col h-[100vh]'>
-        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
+        {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+          <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        ) : (
+          <Topbar
+            title='Adding Co-applicant'
+            id={values?.lead?.id}
+            showClose={false}
+            showBack={true}
+            coApplicant={true}
+          />
+        )}
+        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
           <div className='flex flex-col gap-2'>
             <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
               Profession <span className='text-primary-red text-xs'>*</span>
@@ -751,21 +764,20 @@ const WorkIncomeDetails = () => {
           ) : null}
         </div>
 
-        <div className='bottom-0 fixed'>
-          <PreviousNextButtons
-            linkPrevious='/lead/address-details'
-            linkNext='/lead/qualifier'
-            onNextClick={handleNextClick}
-            onPreviousClick={() => setCurrentStepIndex(2)}
-            disableNext={
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !==
-                100 ||
-              values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
-              values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
-              values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
-            }
-          />
-        </div>
+        <PreviousNextButtons
+          linkPrevious='/lead/address-details'
+          linkNext='/lead/qualifier'
+          onNextClick={handleNextClick}
+          onPreviousClick={() => setCurrentStepIndex(2)}
+          disableNext={
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !== 100 ||
+            values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
+            values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
+            values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
+          }
+        />
+
+        <SwipeableDrawerComponent />
       </div>
 
       {/* For Phase 2----------------------- */}

@@ -202,7 +202,7 @@ export default function SwipeableDrawerComponent() {
   };
 
   return (
-    <Root>
+    <div>
       <SwipeableDrawer
         anchor='bottom'
         open={drawerOpen}
@@ -685,6 +685,6 @@ export default function SwipeableDrawerComponent() {
           </Button>
         </div>
       </DynamicDrawer>
-    </Root>
+    </div>
   );
 }

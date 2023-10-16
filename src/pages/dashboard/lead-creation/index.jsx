@@ -113,12 +113,13 @@ const LeadCreationRoutes = () => {
 
   return (
     <>
-      {params['*'] === 'qualifier' ||
+      {/* {params['*'] === 'applicant-details' ||
+      params['*'] === 'qualifier' ||
       params['*'] === 'lnt-charges' ||
       params['*'] === 'banking-details/manual' ||
       params['*'] === 'banking-details/account-aggregator' ? null : (
         <SwipeableDrawerComponent />
-      )}
+      )} */}
       <Routes>
         <Route index element={<ApplicantDetails />} />
         <Route path='applicant-details' element={<ApplicantDetails />} />
