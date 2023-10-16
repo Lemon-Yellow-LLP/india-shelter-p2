@@ -1,10 +1,10 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import ProgressBar from './ProgressBar';
 import { useNavigate } from 'react-router-dom';
 import { LeadContext } from '../../../context/LeadContextProvider';
 import { LockIcon } from '../../../assets/icons';
 
-export default function BreSteps({ details, steps, index, stepIndex, noProgress, lock }) {
+export default function EligibilityStep({ details, steps, index, stepIndex, noProgress, lock }) {
   const { setCurrentStepIndex, setDrawerOpen, drawerOpen, setActiveIndex, values } =
     useContext(LeadContext);
   const navigate = useNavigate();
@@ -34,27 +34,26 @@ export default function BreSteps({ details, steps, index, stepIndex, noProgress,
         <div className='flex flex-col flex-1'>
           {lock ? (
             <>
-              <span className='text-[14px] font-normal'>Qualifier is not activated</span>
+              <span className='text-[14px] font-normal'>Eligibility is not activated</span>
 
               <span className='text-[11px] font-normal text-[#727376]'>
-                Complete Applicant, Personal, Address and Work & Income details to activate
+                Complete all the steps to activate
               </span>
             </>
           ) : values?.applicants?.[index]?.applicant_details?.extra_params?.[details.name] ? (
             <>
-              <span className='text-[14px] font-normal'>Qualifier completed</span>
-
-              <span className='text-[11px] font-normal text-[#727376]'>
-                The option to pay L&T charges has been unlocked
-              </span>
+              <span className='text-[14px] font-normal'>Eligibility completed</span>
             </>
           ) : (
             <>
-              <span className='text-[14px] font-normal'>Qualifier is activated</span>
+              <span className='text-[14px] font-normal'>Eligibility is activated</span>
 
-              <span className='text-[11px] font-normal text-[#727376]'>
-                Run the verifications now to complete the first milestone
-              </span>
+              <div className='flex justify-between w-[100%]'>
+                <span className='text-[11px] font-normal text-[#727376]'>
+                  Run the verifications now to complete the first milestone
+                </span>
+                <span className='text-[#E33439] text-[14px] font-semibold'>Verify</span>
+              </div>
             </>
           )}
         </div>

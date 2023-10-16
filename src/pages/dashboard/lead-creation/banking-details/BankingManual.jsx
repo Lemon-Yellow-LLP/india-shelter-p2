@@ -96,6 +96,8 @@ export default function BankingManual() {
     values: leadValues,
     activeIndex,
     setFieldValue: setFieldValueLead,
+    setBankSuccessTost,
+    setBankErrorTost,
   } = useContext(LeadContext);
 
   const {
@@ -110,18 +112,14 @@ export default function BankingManual() {
   } = useFormik({
     initialValues: { ...defaultValues },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
+    onSubmit: () => {
       verify();
     },
   });
 
-  console.log(values);
-
   const [confirmation, setConfirmation] = useState(false);
 
   const [open, setOpen] = useState(false);
-
-  const [bankData, setBankData] = useState([]);
 
   const [branchData, setBranchData] = useState([]);
 
@@ -195,9 +193,9 @@ export default function BankingManual() {
 
   const verify = async () => {
     setLoading(true);
-    let data = { ...values };
+    let valuesData = { ...values };
     if (preFilledData) {
-      data = { ...data, banking_id: preFilledData?.id };
+      valuesData = { ...valuesData, banking_id: preFilledData?.id };
 
       await editFieldsById(preFilledData?.id, 'banking', {
         ...values,
@@ -208,37 +206,41 @@ export default function BankingManual() {
       .post(
         `https://lo.scotttiger.in/api/applicant/penny-drop/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
         {
-          ...data,
+          ...valuesData,
         },
       )
       .then(async (res) => {
         await axios
-          .get(`https://lo.scotttiger.in/api/dashboard/lead/${leadValues?.lead?.id}`)
+          .get(
+            `https://lo.scotttiger.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+          )
           .then(({ data }) => {
-            setFieldValueLead(
-              `applicants[${activeIndex}].banking_details`,
-              data?.applicants?.[activeIndex]?.banking_details,
-            );
+            const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
+            setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
           })
           .catch((err) => {
             console.log(err);
           });
         navigate('/lead/banking-details');
+        setBankSuccessTost('Bank verified successfully');
         setLoading(false);
       })
       .catch(async (err) => {
+        console.log(err);
+
         await axios
-          .get(`https://lo.scotttiger.in/api/dashboard/lead/${leadValues?.lead?.id}`)
+          .get(
+            `https://lo.scotttiger.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+          )
           .then(({ data }) => {
-            setFieldValueLead(
-              `applicants[${activeIndex}].banking_details`,
-              data?.applicants?.[activeIndex]?.banking_details,
-            );
+            const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
+            setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
           })
           .catch((err) => {
             console.log(err);
           });
         navigate('/lead/banking-details');
+        setBankErrorTost('Bank verified unsuccessfully');
         setLoading(false);
       });
   };

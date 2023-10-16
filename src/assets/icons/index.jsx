@@ -48,6 +48,8 @@ import CurrentIcon from './currentIcon';
 import CashCreditIcon from './cashCreditIcon';
 import OverDraftIcon from './overDraftIcon';
 
+import TostErrorIcon from './TostErrorIcon';
+
 export {
   OverDraftIcon,
   CashCreditIcon,
@@ -95,4 +97,5 @@ export {
   IconSingle,
   IconSalarid,
   IconSelfEmployed,
+  TostErrorIcon,
 };
