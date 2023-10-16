@@ -16,31 +16,6 @@ const DashboardRoutes = () => {
   const RequireAuth = ({ children }) => {
     const { isAuthenticated, token } = useContext(AuthContext);
 
-    //for testing
-    const { setValues, setActiveIndex } = useContext(LeadContext);
-    const getLead = async () => {
-      await axios.get(`https://lo.scotttiger.in/api/dashboard/lead/377`).then(({ data }) => {
-        const newApplicants = data.applicants.map((applicant) => {
-          let accounts = [];
-          if (applicant?.banking_details?.length) {
-            accounts = applicant?.banking_details?.filter(
-              (account) => !account?.extra_params?.is_deleted,
-            );
-          }
-
-          return { ...applicant, banking_details: accounts };
-        });
-
-        setValues({ ...data, applicants: newApplicants });
-        setActiveIndex(0);
-      });
-    };
-    useEffect(() => {
-      getLead();
-    }, []);
-
-    //for testing end
-
     useEffect(() => {
       const resetSessionTimer = () => {
         const reset = async () => {
@@ -81,13 +56,11 @@ const DashboardRoutes = () => {
 
     // Check authentication once and render accordingly
 
-    // if (isAuthenticated) {
-    //   return children;
-    // } else {
-    //   return <Navigate to='/login' />;
-    // }
-
-    return children;
+    if (isAuthenticated) {
+      return children;
+    } else {
+      return <Navigate to='/login' />;
+    }
   };
 
   return (
