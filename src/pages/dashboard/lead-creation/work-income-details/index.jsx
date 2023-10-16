@@ -343,7 +343,7 @@ const WorkIncomeDetails = () => {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-                  if (!address_pattern.test(value) && value.length!=0) {
+                  if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (address_pattern.exec(value[value.length - 1])) {
@@ -398,7 +398,7 @@ const WorkIncomeDetails = () => {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-                  if (!address_pattern.test(value) && value.length!=0) {
+                  if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (address_pattern.exec(value[value.length - 1])) {
@@ -449,7 +449,7 @@ const WorkIncomeDetails = () => {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z\s]+$/;
-                  if (!address_pattern.test(value) && value.length!=0) {
+                  if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (address_pattern.exec(value[value.length - 1])) {
@@ -500,7 +500,7 @@ const WorkIncomeDetails = () => {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z\s]+$/;
-                  if (!address_pattern.test(value) && value.length!=0) {
+                  if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
                   if (address_pattern.exec(value[value.length - 1])) {
