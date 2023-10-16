@@ -116,7 +116,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
           placeholder='Enter company name'
           name={`applicants[${activeIndex}].work_income_detail.extra_params.extra_company_name`}
           value={
-            values?.applicants?.[activeIndex]?.work_income_detail?.extra_params.extra_company_name
+            values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.extra_company_name
           }
           error={
             errors?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.extra_company_name

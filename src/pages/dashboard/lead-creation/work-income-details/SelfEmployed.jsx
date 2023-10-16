@@ -11,8 +11,8 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
     useContext(LeadContext);
 
   const handleDropdownChange = useCallback(
-    (value) => {
-      setFieldValue('work_income_detail.industries', value);
+    (name, value) => {
+      setFieldValue(name, value);
 
       editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
         industries: value,
@@ -99,7 +99,9 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
         required
         options={industriesOptions}
         placeholder='Choose industries'
-        onChange={handleDropdownChange}
+        onChange={(e) =>
+          handleDropdownChange(`applicants[${activeIndex}].work_income_detail.industries`, e)
+        }
         defaultSelected={values?.applicants?.[activeIndex]?.work_income_detail?.industries}
         name={`applicants[${activeIndex}].work_income_detail.industries`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.industries}
