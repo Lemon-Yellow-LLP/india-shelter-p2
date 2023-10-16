@@ -25,7 +25,7 @@ import IconSelfEmployed from './self-employed.jsx';
 
 import ApplicantDetailsIcon from './ApplicantDetailsIcon';
 import AddressDetailsIcon from './AddressDetailsIcon';
-import BankingDetailsIcon from './bankingDetailsIcon';
+import BankingDetailsIcon from './BankingDetailsIcon';
 import LnTIcon from './lnTIcon';
 import PersonalDetailsIcon from './PersonalDetailsIcon';
 import PreviewIcon from './PreviewIcon';
