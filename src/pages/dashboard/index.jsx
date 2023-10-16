@@ -60,8 +60,8 @@ export default function Dashboard() {
         fromDate: selectionRange.startDate,
         toDate: moment(selectionRange.endDate).add(1, 'day'),
       });
-
       const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
+      console.log(formatted.length);
       setLeadList(formatted);
     })();
   }, [selectionRange]);
@@ -82,7 +82,7 @@ export default function Dashboard() {
           <div className='flex items-center'>
             <h4 className='text-[22px] not-italic font-medium text-primary-black'>My Leads </h4>
             <span className='text-xs not-italic font-normal text-primary-black ml-[6px]'>
-              {`(${filteredList?.filter((l) => l.applicants?.length > 0).length || 0})`}
+              {`(${filteredList?.length || 0})`}
             </span>
           </div>
           <div>
