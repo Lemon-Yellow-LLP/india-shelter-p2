@@ -1,16 +1,16 @@
 export default function IconClose({ color }) {
   return (
-    <svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+    <svg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'>
       <path
-        d='M17 7L7 17'
-        stroke={color || '#373435'}
+        d='M22.6654 9.3335L9.33203 22.6668'
+        stroke='#FEFEFE'
         strokeWidth='1.5'
         strokeLinecap='round'
         strokeLinejoin='round'
       />
       <path
-        d='M7 7L17 17'
-        stroke={color || '#373435'}
+        d='M9.33203 9.3335L22.6654 22.6668'
+        stroke='#FEFEFE'
         strokeWidth='1.5'
         strokeLinecap='round'
         strokeLinejoin='round'

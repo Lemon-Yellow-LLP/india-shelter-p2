@@ -1,20 +1,45 @@
 import { Route, Routes } from 'react-router-dom';
-import Dashboard, { DashboardTest } from './dashboard';
+import Dashboard from './dashboard';
 import LeadCreationRoutes from './dashboard/lead-creation';
 import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
-import { LeadContext } from '../context/LeadContextProvider';
 import DashboardApplicant from './dashboard/DashboardApplicant';
 import axios from 'axios';
 import { logout } from '../global';
+import { LeadContext } from '../context/LeadContextProvider';
 
 const TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
 const DashboardRoutes = () => {
   const RequireAuth = ({ children }) => {
     const { isAuthenticated, token } = useContext(AuthContext);
+
+    //for testing
+    const { setValues, setActiveIndex } = useContext(LeadContext);
+    const getLead = async () => {
+      await axios.get(`https://lo.scotttiger.in/api/dashboard/lead/377`).then(({ data }) => {
+        const newApplicants = data.applicants.map((applicant) => {
+          let accounts = [];
+          if (applicant?.banking_details?.length) {
+            accounts = applicant?.banking_details?.filter(
+              (account) => !account?.extra_params?.is_deleted,
+            );
+          }
+
+          return { ...applicant, banking_details: accounts };
+        });
+
+        setValues({ ...data, applicants: newApplicants });
+        setActiveIndex(0);
+      });
+    };
+    useEffect(() => {
+      getLead();
+    }, []);
+
+    //for testing end
 
     useEffect(() => {
       const resetSessionTimer = () => {
@@ -56,11 +81,13 @@ const DashboardRoutes = () => {
 
     // Check authentication once and render accordingly
 
-    if (isAuthenticated) {
-      return children;
-    } else {
-      return <Navigate to='/login' />;
-    }
+    // if (isAuthenticated) {
+    //   return children;
+    // } else {
+    //   return <Navigate to='/login' />;
+    // }
+
+    return children;
   };
 
   return (

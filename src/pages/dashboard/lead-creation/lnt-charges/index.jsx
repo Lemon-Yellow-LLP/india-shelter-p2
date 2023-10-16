@@ -459,7 +459,6 @@ const LnTCharges = ({ amount = 1500 }) => {
             inputClasses=' w-full h-[46px]'
             onClick={() => {
               hideConfirmSkip();
-              // setPaymentStatus('failure');
             }}
             link='/lead/property-details'
           >

@@ -844,7 +844,12 @@ const ReferenceDetails = () => {
         </div>
       </div>
 
-      <PreviousNextButtons linkPrevious='/lead/banking-details' linkNext='/lead/upload-documents' />
+      <div className='bottom-0 fixed'>
+        <PreviousNextButtons
+          linkPrevious='/lead/banking-details'
+          linkNext='/lead/upload-documents'
+        />
+      </div>
     </div>
   );
 };

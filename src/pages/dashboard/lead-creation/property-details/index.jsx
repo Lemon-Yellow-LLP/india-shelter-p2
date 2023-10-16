@@ -162,7 +162,9 @@ const PropertyDetails = () => {
 
       {/* <button onClick={handleSubmit}>submit</button> */}
 
-      <PreviousNextButtons linkPrevious='/lead/lnt-charges' linkNext='/lead/banking-details' />
+      <div className='bottom-0 fixed'>
+        <PreviousNextButtons linkPrevious='/lead/lnt-charges' linkNext='/lead/banking-details' />
+      </div>
     </div>
   );
 };

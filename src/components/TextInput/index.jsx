@@ -83,7 +83,7 @@ const TextInput = memo(
         )}
         {message ? (
           <span
-            className='flex text-primary-black text-xs leading-[18px]'
+            className='flex text-[#727376] text-xs leading-[18px]'
             dangerouslySetInnerHTML={{
               __html: message,
             }}

@@ -221,6 +221,12 @@ const ApplicantDetails = () => {
         return
       }
 
+      const pattern = /[^\d]/g;
+      if (pattern.test(phoneNumber)) {
+        e.preventDefault();
+        return;
+      }
+
       if (phoneNumber < 0) {
         e.preventDefault();
         return;
