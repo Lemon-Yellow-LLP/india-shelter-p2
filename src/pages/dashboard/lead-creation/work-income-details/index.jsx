@@ -343,6 +343,9 @@ const WorkIncomeDetails = () => {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  if (!address_pattern.test(value) && value.length!=0) {
+                    return;
+                  }
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
                       e.currentTarget.name,
@@ -395,6 +398,9 @@ const WorkIncomeDetails = () => {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  if (!address_pattern.test(value) && value.length!=0) {
+                    return;
+                  }
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
                       e.currentTarget.name,
@@ -414,6 +420,7 @@ const WorkIncomeDetails = () => {
               <TextInput
                 label='Town'
                 placeholder='Eg: Igatpuri'
+                required
                 name={`applicants[${activeIndex}].work_income_detail.town`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.town}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.town}
@@ -442,6 +449,9 @@ const WorkIncomeDetails = () => {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z\s]+$/;
+                  if (!address_pattern.test(value) && value.length!=0) {
+                    return;
+                  }
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
                       e.currentTarget.name,
@@ -490,6 +500,9 @@ const WorkIncomeDetails = () => {
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z\s]+$/;
+                  if (!address_pattern.test(value) && value.length!=0) {
+                    return;
+                  }
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
                       e.currentTarget.name,

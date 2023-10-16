@@ -15,8 +15,6 @@ const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
 const ReferenceDetails = () => {
-  const [selectedReferenceTypeOne, setSelectedReferenceTypeOne] = useState(null);
-  const [selectedReferenceTypeTwo, setSelectedReferenceTypeTwo] = useState(null);
   const [referenceOneOptions, setReferenceOneOptions] = useState(referenceDropdownOneOptions);
   const [referenceTwoOptions, setReferenceTwoOptions] = useState(referenceDropdownTwoOptions);
   const {
@@ -79,10 +77,8 @@ const ReferenceDetails = () => {
       });
     });
   }
-
   const handleReferenceTypeChangeOne = useCallback(
     (value) => {
-      setSelectedReferenceTypeOne(value);
       disableTwoOption(value);
       setFieldValue('reference_details.reference_1_type', value);
 
@@ -92,12 +88,11 @@ const ReferenceDetails = () => {
 
       updateFields('reference_1_type', value);
     },
-    [selectedReferenceTypeOne, requiredFieldsStatus],
+    [requiredFieldsStatus],
   );
 
   const handleReferenceTypeChangeTwo = useCallback(
     (value) => {
-      setSelectedReferenceTypeTwo(value);
       disableOneOption(value);
       setFieldValue('reference_details.reference_2_type', value);
 
@@ -107,19 +102,23 @@ const ReferenceDetails = () => {
 
       updateFields('reference_2_type', value);
     },
-    [selectedReferenceTypeOne, requiredFieldsStatus],
+    [requiredFieldsStatus],
   );
 
   const handleTextInputChange = useCallback(
     (e) => {
-      const value = e.currentTarget.value;
-      const pattern = /^[A-Za-z\s]+$/;
-      if (pattern.exec(value[value.length - 1])) {
+      let value = e.currentTarget.value;
+      const pattern = /^[a-zA-Z ]+$/;
+      if (pattern.test(value) || value.length == 0) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
 
       const name = e.target.name.split('.')[1];
-      if (!requiredFieldsStatus[name]) {
+      if (
+        requiredFieldsStatus[name] !== undefined &&
+        !requiredFieldsStatus[name] &&
+        value.length > 1
+      ) {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
@@ -252,7 +251,7 @@ const ReferenceDetails = () => {
             options={referenceOneOptions}
             placeholder='Choose reference type'
             onChange={handleReferenceTypeChangeOne}
-            defaultSelected={selectedReferenceTypeOne}
+            defaultSelected={values?.reference_details?.reference_1_type}
             inputClasses='mt-2'
             name='reference_details.reference_1_type'
             error={errors?.reference_details?.reference_1_type}
@@ -272,6 +271,8 @@ const ReferenceDetails = () => {
             touched={touched?.reference_details?.reference_1_full_name}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
+
               if (
                 !errors?.reference_details?.reference_1_full_name &&
                 values?.reference_details?.reference_1_full_name
@@ -280,6 +281,14 @@ const ReferenceDetails = () => {
                   'reference_1_full_name',
                   values?.reference_details?.reference_1_full_name,
                 );
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             disabled={inputDisabled}
@@ -298,6 +307,7 @@ const ReferenceDetails = () => {
             touched={touched?.reference_details?.reference_1_phone_number}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
 
               if (
                 !errors?.reference_details?.reference_1_phone_number &&
@@ -307,6 +317,14 @@ const ReferenceDetails = () => {
                   'reference_1_phone_number',
                   values?.reference_details?.reference_1_phone_number,
                 );
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             pattern='\d*'
@@ -349,23 +367,6 @@ const ReferenceDetails = () => {
               e.target.value = text;
               handleChange(e);
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Backspace') {
-                setFieldValue(
-                  'reference_details.reference_1_phone_number',
-                  values?.reference_details?.reference_1_phone_number.slice(
-                    0,
-                    values?.reference_details?.reference_1_phone_number.length - 1,
-                  ),
-                );
-                e.preventDefault();
-                return;
-              }
-              if (DISALLOW_CHAR.includes(e.key)) {
-                e.preventDefault();
-                return;
-              }
-            }}
             // disabled={inputDisabled || disablePhoneNumber}
             inputClasses='hidearrow'
           />
@@ -380,26 +381,24 @@ const ReferenceDetails = () => {
             touched={touched?.reference_details?.reference_1_address}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
               if (
                 !errors.reference_details?.reference_1_address &&
                 values?.reference_details?.reference_1_address
               ) {
                 updateFields('reference_1_address', values?.reference_details?.reference_1_address);
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             disabled={inputDisabled}
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-              if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-              }
-
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
+            onChange={handleTextInputChange}
             inputClasses='capitalize'
           />
 
@@ -416,12 +415,21 @@ const ReferenceDetails = () => {
             disabled={inputDisabled}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
               handleOnPincodeChangeOne();
               if (
                 !errors?.reference_details?.reference_1_pincode &&
                 values?.reference_details?.reference_1_pincode
               ) {
                 updateFields('reference_1_pincode', values?.reference_details?.reference_1_pincode);
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             min='0'
@@ -484,6 +492,7 @@ const ReferenceDetails = () => {
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
+            labelDisabled={!values?.reference_details?.reference_1_city}
             inputClasses='capitalize'
           />
 
@@ -498,6 +507,7 @@ const ReferenceDetails = () => {
             onBlur={handleBlur}
             disabled={true}
             onChange={handleTextInputChange}
+            labelDisabled={!values?.reference_details?.reference_1_state}
             inputClasses='capitalize'
           />
 
@@ -544,7 +554,7 @@ const ReferenceDetails = () => {
             options={referenceTwoOptions}
             placeholder='Choose reference type'
             onChange={handleReferenceTypeChangeTwo}
-            defaultSelected={selectedReferenceTypeTwo}
+            defaultSelected={values?.reference_details?.reference_2_type}
             inputClasses='mt-2'
             name='reference_details.reference_2_type'
             error={errors?.reference_details?.reference_2_type}
@@ -563,6 +573,7 @@ const ReferenceDetails = () => {
             error={errors?.reference_details?.reference_2_full_name}
             touched={touched?.reference_details?.reference_2_full_name}
             onBlur={(e) => {
+              const name = e.currentTarget.name.split('.')[1];
               handleBlur(e);
               if (
                 !errors?.reference_details?.reference_2_full_name &&
@@ -572,6 +583,14 @@ const ReferenceDetails = () => {
                   'reference_2_full_name',
                   values?.reference_details?.reference_2_full_name,
                 );
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             disabled={inputDisabled}
@@ -590,6 +609,7 @@ const ReferenceDetails = () => {
             touched={touched?.reference_details?.reference_2_phone_number}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
 
               if (
                 !errors.reference_details?.reference_2_phone_number &&
@@ -599,6 +619,14 @@ const ReferenceDetails = () => {
                   'reference_2_phone_number',
                   values?.reference_details?.reference_2_phone_number,
                 );
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             pattern='\d*'
@@ -641,23 +669,6 @@ const ReferenceDetails = () => {
               e.target.value = text;
               handleChange(e);
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Backspace') {
-                setFieldValue(
-                  'reference_details.reference_2_phone_number',
-                  values?.reference_details?.reference_2_phone_number.slice(
-                    0,
-                    values?.reference_details?.reference_2_phone_number.length - 1,
-                  ),
-                );
-                e.preventDefault();
-                return;
-              }
-              if (DISALLOW_CHAR.includes(e.key)) {
-                e.preventDefault();
-                return;
-              }
-            }}
             // disabled={inputDisabled || disablePhoneNumber}
             inputClasses='hidearrow'
           />
@@ -672,26 +683,25 @@ const ReferenceDetails = () => {
             touched={touched?.reference_details?.reference_2_address}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
+
               if (
                 !errors.reference_details?.reference_2_address &&
                 values?.reference_details?.reference_2_address
               ) {
                 updateFields('reference_2_address', values?.reference_details?.reference_2_address);
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             disabled={inputDisabled}
-            onChange={(e) => {
-              const value = e.currentTarget.value;
-              const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
-              if (address_pattern.exec(value[value.length - 1])) {
-                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-              }
-
-              const name = e.target.name.split('.')[1];
-              if (!requiredFieldsStatus[name]) {
-                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              }
-            }}
+            onChange={handleTextInputChange}
             inputClasses='capitalize'
           />
 
@@ -708,12 +718,21 @@ const ReferenceDetails = () => {
             disabled={inputDisabled}
             onBlur={(e) => {
               handleBlur(e);
+              const name = e.currentTarget.name.split('.')[1];
               handleOnPincodeChangeTwo();
               if (
                 !errors.reference_details?.reference_2_pincode &&
                 values?.reference_details?.reference_2_pincode
               ) {
                 updateFields('reference_2_pincode', values?.reference_details?.reference_2_pincode);
+
+                if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                }
+              } else {
+                if (requiredFieldsStatus[name] !== undefined) {
+                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                }
               }
             }}
             min='0'
@@ -777,6 +796,7 @@ const ReferenceDetails = () => {
             disabled={true}
             onChange={handleTextInputChange}
             inputClasses='capitalize'
+            labelDisabled={!values?.reference_details?.reference_2_city}
           />
 
           <TextInput
@@ -791,6 +811,7 @@ const ReferenceDetails = () => {
             disabled={true}
             onChange={handleTextInputChange}
             inputClasses='capitalize'
+            labelDisabled={!values?.reference_details?.reference_2_state}
           />
 
           <TextInput

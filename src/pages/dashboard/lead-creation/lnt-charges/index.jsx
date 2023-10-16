@@ -161,7 +161,13 @@ const LnTCharges = ({ amount = 1500 }) => {
 
   const handleOnPhoneNumberChange = async (e) => {
     const phoneNumber = e.currentTarget.value;
+     
+    const pattern = /^\d+$/
+    if(!pattern.test(phoneNumber)&&phoneNumber.length>0){
+      return
+    }
 
+    
     if (phoneNumber < 0) {
       e.preventDefault();
       return;
@@ -239,8 +245,8 @@ const LnTCharges = ({ amount = 1500 }) => {
               <div className='flex items-start gap-2 mb-6'>
                 <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
                 <p className='text-xs not-italic font-normal text-dark-grey'>
-                  As per location this applicant has to pay L&T charges in the amount of
-                  <span className='text-xs not-italic font-semibold text-primary-black'>{` ₹ ${amount}/-`}</span>
+                L&T charges for this application is
+                  <span className='text-xs not-italic font-semibold text-primary-black'>{` Rs. ${amount}/-`}</span>
                 </p>
               </div>
 

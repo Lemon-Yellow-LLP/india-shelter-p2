@@ -119,9 +119,17 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     (e) => {
       const value = e.target.value;
       const pattern = /^[A-Za-z]+$/;
+      const pattern2 = /^[a-zA-Z\s]*$/;
 
       if (value?.trim() == '') {
         setFieldValue(e.target.name, value);
+      }
+
+      if (
+        pattern2.test(value) &&
+        e.target.name == `applicants[${activeIndex}].personal_details.father_husband_name`
+      ) {
+        setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
 
       if (
@@ -651,7 +659,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       />
 
       <TextInput
-        label='Mothers name'
+        label={`Mother's name`}
         placeholder='Eg: Rupali'
         required
         name={`applicants[${activeIndex}].personal_details.mother_name`}

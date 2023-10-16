@@ -33,11 +33,6 @@ const PropertyDetails = () => {
     setValues,
     updateProgressApplicantSteps,
   } = useContext(LeadContext);
-  const [propertyIdentification, setPropertyIdentification] = useState(null);
-
-  useEffect(() => {
-    setPropertyIdentification(values?.property_details?.property_identification_is);
-  }, [values?.property_details?.property_identification_is]);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.property_details?.extra_params?.required_fields_status,
@@ -49,12 +44,10 @@ const PropertyDetails = () => {
 
   const handleRadioChange = useCallback(
     async (e) => {
-      setPropertyIdentification(e.value);
-      setFieldValue('property_details.property_identification_is', e.value);
-
       const name = e.name;
 
       setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+      setFieldValue('property_details.property_identification_is', e.value);
 
       if (values?.property_details?.id) {
         editPropertyById(values?.property_details?.id, {
@@ -89,6 +82,7 @@ const PropertyDetails = () => {
           ...values,
           property_details: {
             ...values.property_details,
+            property_identification_is: e.value,
             property_value_estimate: '',
             owner_name: '',
             plot_house_flat: '',
@@ -98,6 +92,20 @@ const PropertyDetails = () => {
             state: '',
           },
         });
+
+        setRequiredFieldsStatus({
+          property_identification_is: true,
+        });
+      } else {
+        setRequiredFieldsStatus((prev) => ({
+          ...prev,
+          owner_name: false,
+          pincode: false,
+          plot_house_flat: false,
+          project_society_colony: false,
+          property_identification_is: true,
+          property_value_estimate: false,
+        }));
       }
     },
     [requiredFieldsStatus, setFieldValue],
@@ -122,7 +130,7 @@ const PropertyDetails = () => {
               label={option.label}
               name='property_identification_is'
               value={option.value}
-              current={propertyIdentification}
+              current={values?.property_details?.property_identification_is}
               onChange={handleRadioChange}
               containerClasses='flex-1'
             >
@@ -143,7 +151,7 @@ const PropertyDetails = () => {
           ''
         )}
 
-        {propertyIdentification === 'done' ? (
+        {values?.property_details?.property_identification_is === 'done' ? (
           <IdentificationDoneFields
             selectedLoanType={selectedLoanType}
             requiredFieldsStatus={requiredFieldsStatus}

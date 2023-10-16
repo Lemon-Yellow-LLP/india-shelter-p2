@@ -32,14 +32,13 @@ const IdentificationDoneFields = ({
   const handleTextInputChange = useCallback(
     (e) => {
       const value = e.currentTarget.value;
+      const name = e.target.name.split('.')[1];
       const pattern = /^[A-Za-z\s]+$/;
-      if (pattern.exec(value[value.length - 1])) {
+      if (pattern.test(value) || value.length === 0) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
 
-      const name = e.target.name.split('.')[1];
       if (!requiredFieldsStatus[name]) {
-        updateProgress(4, requiredFieldsStatus);
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
@@ -54,12 +53,15 @@ const IdentificationDoneFields = ({
     ) {
       setFieldValue('property_details.city', '');
       setFieldValue('property_details.state', '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: false }));
       return;
     }
 
     const res = await checkIsValidStatePincode(values?.property_details?.pincode);
     if (!res) {
       setFieldError('property_details.pincode', 'Invalid Pincode');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: false }));
+
       return;
     }
 
@@ -113,7 +115,6 @@ const IdentificationDoneFields = ({
 
             const name = e.target.name.split('.')[1];
             if (!requiredFieldsStatus[name]) {
-              updateProgress(4, requiredFieldsStatus);
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
             }
           }}
@@ -130,6 +131,7 @@ const IdentificationDoneFields = ({
             } else {
               handleBlur(e);
             }
+            const name = e.currentTarget.name.split('.')[1];
 
             if (
               !errors?.property_details?.property_value_estimate &&
@@ -140,6 +142,14 @@ const IdentificationDoneFields = ({
               editPropertyById(values?.property_details?.id, {
                 property_value_estimate: values?.property_details?.property_value_estimate,
               });
+
+              if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+              }
+            } else {
+              if (requiredFieldsStatus[name]) {
+                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+              }
             }
           }}
         />
@@ -156,11 +166,20 @@ const IdentificationDoneFields = ({
         onChange={handleTextInputChange}
         onBlur={(e) => {
           handleBlur(e);
+          const name = e.currentTarget.name.split('.')[1];
 
           if (!errors?.property_details?.owner_name && values?.property_details?.owner_name) {
             editPropertyById(values?.property_details?.id, {
               owner_name: values?.property_details?.owner_name,
             });
+
+            if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
+          } else {
+            if (requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            }
           }
         }}
       />
@@ -182,12 +201,12 @@ const IdentificationDoneFields = ({
 
           const name = e.target.name.split('.')[1];
           if (!requiredFieldsStatus[name]) {
-            updateProgress(4, requiredFieldsStatus);
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
           }
         }}
         onBlur={(e) => {
           handleBlur(e);
+          const name = e.currentTarget.name.split('.')[1];
 
           if (
             !errors?.property_details?.plot_house_flat &&
@@ -196,6 +215,13 @@ const IdentificationDoneFields = ({
             editPropertyById(values?.property_details?.id, {
               plot_house_flat: values?.property_details?.plot_house_flat,
             });
+            if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
+          } else {
+            if (requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            }
           }
         }}
       />
@@ -217,13 +243,13 @@ const IdentificationDoneFields = ({
 
           const name = e.target.name.split('.')[1];
           if (!requiredFieldsStatus[name]) {
-            updateProgress(4, requiredFieldsStatus);
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
           }
         }}
         inputClasses='capitalize'
         onBlur={(e) => {
           handleBlur(e);
+          const name = e.target.name.split('.')[1];
 
           if (
             !errors?.property_details?.project_society_colony &&
@@ -232,6 +258,13 @@ const IdentificationDoneFields = ({
             editPropertyById(values?.property_details?.id, {
               project_society_colony: values?.property_details?.project_society_colony,
             });
+            if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            }
+          } else {
+            if (requiredFieldsStatus[name]) {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            }
           }
         }}
       />
@@ -290,7 +323,7 @@ const IdentificationDoneFields = ({
             e.preventDefault();
             return;
           }
-          setFieldValue(e.currentTarget.name, parseInt(e.currentTarget.value));
+          setFieldValue(e.currentTarget.name, value ? parseInt(e.currentTarget.value) : value);
         }}
         onKeyDown={(e) => {
           //capturing ctrl V and ctrl C
