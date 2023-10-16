@@ -215,11 +215,6 @@ const ApplicantDetails = () => {
   const handleOnPhoneNumberChange = useCallback(
     async (e) => {
       const phoneNumber = e.currentTarget.value;
-      
-      const pattern = /^\d+$/
-      if(!pattern.test(phoneNumber)&&phoneNumber.length>0){
-        return
-      }
 
       const pattern = /[^\d]/g;
       if (pattern.test(phoneNumber)) {
