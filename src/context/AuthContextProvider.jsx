@@ -12,6 +12,7 @@ export const defaultValues = {
   middle_name: '',
   last_name: '',
   address: '',
+  mobile_number: '',
   alternate_number: '',
   comments: '',
   extra_params: '',
@@ -25,6 +26,7 @@ const AuthContextProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [otpFailCount, setOtpFailCount] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
+  const [isQaulifierActivated, setIsQaulifierActivated] = useState(null);
 
   const formik = useFormik({
     initialValues: { ...defaultValues },
@@ -43,6 +45,8 @@ const AuthContextProvider = ({ children }) => {
         setOtpFailCount,
         token,
         setToken,
+        isQaulifierActivated,
+        setIsQaulifierActivated,
       }}
     >
       {children}

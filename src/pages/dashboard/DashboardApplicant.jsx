@@ -185,7 +185,7 @@ export default function DashboardApplicant() {
 
             <div>
               <span className='not-italic font-normal text-[12px] text-light-grey'>
-              Completed:{' '}
+                Completed:{' '}
               </span>
               <span className='text-right text-sm not-italic font-medium text-primary-red'>
                 {`${leadData?.lead?.extra_params?.progress ?? 0}%`}
@@ -573,7 +573,7 @@ export default function DashboardApplicant() {
           <FormDetails
             title='BANKING DETAILS'
             ref={primarySelectedStep == 'banking_details' ? primarySelectedStepRef : null}
-            progress={primaryApplicant?.banking_details?.extra_params?.progress}
+            progress={primaryApplicant?.applicant_details?.extra_params?.banking_progress}
             data={[]}
           />
           <Separator />
@@ -714,7 +714,7 @@ export default function DashboardApplicant() {
 
             <div>
               <span className='not-italic font-normal text-[12px] text-light-grey'>
-              Completed:{' '}
+                Completed:{' '}
               </span>
               <span className='text-right text-sm not-italic font-medium text-primary-red'>
                 {`${leadData?.lead?.extra_params?.progress ?? 0}%`}
@@ -1025,7 +1025,7 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={coApplicantSelectedStep == 'banking_details' ? coApplicantSelectedStepRef : null}
             title='BANKING DETAILS'
-            progress={0}
+            progress={activeCoApplicant?.applicant_details?.extra_params?.banking_progress}
             data={[]}
           />
           <Separator />
@@ -1069,7 +1069,20 @@ const Titlebar = ({ title, id }) => {
 
   const handleOpenForm = async (id) => {
     const data = await getDashboardLeadById(id);
-    setValues(data);
+
+    const newApplicants = data.applicants.map((applicant) => {
+      let accounts = [];
+      if (applicant?.banking_details?.length) {
+        accounts = applicant?.banking_details?.filter(
+          (account) => !account?.extra_params?.is_deleted,
+        );
+      }
+
+      return { ...applicant, banking_details: accounts };
+    });
+
+    setValues({ ...data, applicants: newApplicants });
+
     navigate('/lead/applicant-details');
   };
 
