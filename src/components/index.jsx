@@ -9,11 +9,12 @@ import OtpInput from './OtpInput';
 import BottomSheetHandle from './BottomSheetHandle';
 import TermsAndConditions from './TermsAndConditions';
 import CurrencyInput from './CurrencyInput';
-import DesktopPopUp from './DesktopPopUp';
+import DesktopPopUp from './UploadDocsModal';
 import PanInput from './TextInput/PanInput';
 import MapInput from './MapInput';
 import Map from './Map';
 import ToastMessage from './ToastMessage';
+import UploadDocsInput from './TextInput/UploadDocsInput';
 
 export {
   TextInput,
@@ -32,4 +33,5 @@ export {
   MapInput,
   Map,
   ToastMessage,
+  UploadDocsInput,
 };

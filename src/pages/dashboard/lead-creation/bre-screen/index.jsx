@@ -15,29 +15,22 @@ import {
   verifyPan,
   verifyVoterID,
   checkBre101,
+  editFieldsById,
 } from '../../../../global';
 import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
-import LeadContextProvider from '../../../../context/LeadContextProvider';
-
-const pan = true;
-const dl = false;
-const voterId = true;
-const pf = true;
-const gst = false;
-// values.applicants[activeIndex]?.personal_details.id_type === 'PAN'
-// values.applicants[activeIndex]?.personal_details.id_type === 'DL'
-// values.applicants[activeIndex]?.personal_details.id_type === 'VoterID'
-// values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN'
-// values.applicants[activeIndex]?.personal_details.selected_address_proof === 'DL'
-// values.applicants[activeIndex]?.personal_details.selected_address_proof === 'VoterID'
-// values.applicants[activeIndex]?.work_income_details.pf_uan
-// values.applicants[activeIndex]?.work_income_details.gst_number
+import LeadContextProvider, { LeadContext } from '../../../../context/LeadContextProvider';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const BRE_ONE = () => {
   const addApplicant = useContext(LeadContextProvider);
+  const { activeIndex, values, setFieldValue } = useContext(LeadContext);
+  const { setIsQaulifierActivated } = useContext(AuthContext);
+
   const SpeedoMeterAnimationRef = useRef(null);
+
   const [progress, setProgress] = useState(0);
+
   const [PAN, setPAN] = useState({
     res: false,
     loader: false,
@@ -87,93 +80,175 @@ const BRE_ONE = () => {
 
   useEffect(() => {
     async function breOne() {
-      if (pan) {
+      if (
+        values.applicants[activeIndex]?.personal_details.id_type === 'PAN' ||
+        values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN'
+      ) {
         setPAN((prev) => ({
           ...prev,
           loader: true,
           ran: true,
         }));
         setProgress(1);
-
-        try {
-          const pan_res = await verifyPan(293, {});
-        } catch (err) {
-          console.log(err);
-        }
       }
 
-      if (dl) {
+      if (
+        values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+        values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+          'Driving license'
+      ) {
         setDL((prev) => ({
           ...prev,
           loader: true,
           ran: true,
         }));
         setProgress(2);
-
-        try {
-          const dl_res = await verifyDL(293, {});
-        } catch (err) {
-          console.log(err);
-        }
       }
 
-      if (voterId) {
+      if (
+        values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+        values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
+      ) {
         setVoterID((prev) => ({
           ...prev,
           loader: true,
           ran: true,
         }));
         setProgress(2);
-
-        try {
-          const voterId_res = await verifyVoterID(293, {});
-        } catch (err) {
-          console.log(err);
-        }
       }
 
-      if (pf) {
+      if (values.applicants[activeIndex]?.work_income_detail.pf_uan) {
         setPfUAN((prev) => ({ ...prev, loader: true, ran: true }));
-        setProgress(dl || voterId ? 3 : 2);
-
-        try {
-          const pf_res = await verifyPFUAN(293, {});
-        } catch (err) {
-          console.log(err);
-        }
+        setProgress(
+          values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+              'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
+            ? 3
+            : 2,
+        );
       }
 
-      if (gst) {
+      if (values.applicants[activeIndex]?.work_income_detail.gst_number) {
         setGST((prev) => ({ ...prev, loader: true, ran: true }));
-        setProgress(dl || voterId ? 3 : 2);
-
-        try {
-          const gst_res = await verifyGST(293, {});
-        } catch (err) {
-          console.log(err);
-        }
+        setProgress(
+          values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+              'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
+            ? 3
+            : 2,
+        );
       }
-
       setDedupe((prev) => ({ ...prev, loader: true, ran: true }));
-      setProgress(dl || voterId ? 4 : 3);
+      setProgress(
+        values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+          values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+            'Driving license' ||
+          values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+          values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
+          ? 4
+          : 3,
+      );
 
       try {
-        const dedupe_res = await checkDedupe(293, {});
-        if (dedupe_res.status === 200) {
+        let response = null;
+
+        if (
+          (values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+              'Driving license') &&
+          values.applicants[activeIndex]?.work_income_detail.gst_number
+        ) {
+          response = await Promise.allSettled([
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+          ]);
+        } else if (
+          (values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+              'Driving license') &&
+          values.applicants[activeIndex]?.work_income_detail.pf_uan
+        ) {
+          response = await Promise.allSettled([
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+          ]);
+        } else if (
+          (values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+              'Voter ID') &&
+          values.applicants[activeIndex]?.work_income_detail.gst_number
+        ) {
+          response = await Promise.allSettled([
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyVoterID(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+          ]);
+        } else if (
+          (values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+              'Voter ID') &&
+          values.applicants[activeIndex]?.work_income_detail.gst_number
+        ) {
+          response = await Promise.allSettled([
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyVoterID(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+          ]);
+        } else if (values.applicants[activeIndex]?.work_income_detail.gst_number) {
+          response = await Promise.allSettled([
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+          ]);
+        } else {
+          response = await Promise.allSettled([
+            verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+          ]);
+        }
+
+        const filtered_dedupe_res = response.find((res) => {
+          return res.value.status == 200;
+        });
+
+        if (!filtered_dedupe_res) {
+          setDedupe((prev) => ({ ...prev, loader: false, res: 'Error' }));
+        } else {
           setDedupe((prev) => ({ ...prev, loader: false, res: 'Valid' }));
         }
       } catch (err) {
-        console.log(err);
-        setDedupe((prev) => ({ ...prev, loader: false, res: 'Error' }));
+        console.log('error occured');
       }
 
       setBre99((prev) => ({ ...prev, loader: true, ran: true }));
-      setProgress(dl || voterId ? 5 : 4);
+      setProgress(
+        values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+          values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+            'Driving license' ||
+          values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+          values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
+          ? 5
+          : 4,
+      );
 
       let callCibilOrCrif = '';
 
       try {
-        const bre99_res = await checkBre99(293, {});
+        const bre99_res = await checkBre99(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          {},
+        );
 
         if (bre99_res.bre_99_response.statusCode === 200) {
           setBre99((prev) => ({ ...prev, loader: false, res: 'Valid' }));
@@ -186,11 +261,22 @@ const BRE_ONE = () => {
       }
 
       setBureau((prev) => ({ ...prev, loader: true, ran: true }));
-      setProgress(dl || voterId ? 6 : 5);
+      setProgress(
+        values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+          values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+            'Driving license' ||
+          values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+          values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
+          ? 6
+          : 5,
+      );
 
       if (callCibilOrCrif.Rule_Value === 'CIBIL') {
         try {
-          const cibil_res = await checkCibil(293, {});
+          const cibil_res = await checkCibil(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            {},
+          );
           if (cibil_res.status === 200) {
             setBureau((prev) => ({
               ...prev,
@@ -208,7 +294,10 @@ const BRE_ONE = () => {
         }
       } else {
         try {
-          const crif_res = await checkCrif(293, {});
+          const crif_res = await checkCrif(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            {},
+          );
           if (crif_res.status === 200) {
             setBureau((prev) => ({
               ...prev,
@@ -227,47 +316,64 @@ const BRE_ONE = () => {
       }
 
       try {
-        const bre_res = await checkBre101(89, {});
+        const bre_res = await checkBre101(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          {},
+        );
 
-        if (bre_res.bre_101_response.statusCode !== '200') return;
+        if (bre_res.bre_101_response.statusCode !== 200) return;
+
+        let new_data = { ...values };
+
+        new_data.applicants[activeIndex].applicant_details.extra_params.qualifier = true;
+
+        await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          new_data.applicants?.[activeIndex]?.applicant_details,
+        );
+
+        setFieldValue(`applicants[${activeIndex}].applicant_details.extra_params.qualifier`, true);
+
+        setIsQaulifierActivated(bre_res);
 
         setDL((prev) => ({
           ...prev,
           loader: false,
-          res: bre_res.bre_101_response.body.DL_Status,
+          res: bre_res.bre_101_response.body.Display.DL_Status,
         }));
 
         setVoterID((prev) => ({
           ...prev,
           loader: false,
-          res: bre_res.bre_101_response.body.Voter_Status,
+          res: bre_res.bre_101_response.body.Display.Voter_Status,
         }));
 
         setPfUAN((prev) => ({
           ...prev,
           loader: false,
-          res: bre_res.bre_101_response.body.UAN_Status,
+          res: bre_res.bre_101_response.body.Display.UAN_Status,
         }));
 
         setGST((prev) => ({
           ...prev,
           loader: false,
-          res: bre_res.bre_101_response.body.GST_Status,
+          res: bre_res.bre_101_response.body.Display.GST_Status,
         }));
 
         setPAN((prev) => ({
           ...prev,
           loader: false,
-          res: bre_res.bre_101_response.body.PAN_status,
+          res: bre_res.bre_101_response.body.Display.PAN_status,
         }));
 
-        if (bre_res.bre_101_response.body.red_amber_green === 'Red') {
+        if (bre_res.bre_101_response.body.Display.red_amber_green === 'Red') {
           setBre101((prev) => ({ ...prev, red: true, res: true }));
         }
-        if (bre_res.bre_101_response.body.red_amber_green === 'Amber') {
+        if (bre_res.bre_101_response.body.Display.red_amber_green === 'Amber') {
           setBre101((prev) => ({ ...prev, amber: true, res: true }));
         }
-        if (bre_res.bre_101_response.body.red_amber_green === 'Green') {
+        if (bre_res.bre_101_response.body.Display.red_amber_green === 'Green') {
           setBre101((prev) => ({ ...prev, green: true, res: true }));
         }
       } catch (err) {
@@ -277,8 +383,6 @@ const BRE_ONE = () => {
 
     breOne();
   }, []);
-
-  useEffect(() => {}, []);
 
   function checkELigibilty() {
     if (bre101.red) {
@@ -324,7 +428,7 @@ const BRE_ONE = () => {
         <div className='flex justify-between text-primary-black font-medium'>
           <h3>Verification in progress</h3>
           <h3>
-            {progress}/{voterId || dl ? 6 : 5}
+            {progress}/{voterID.ran || DL.ran ? 6 : 5}
           </h3>
         </div>
 
@@ -338,7 +442,6 @@ const BRE_ONE = () => {
               <SpeedoMeterAnimation
                 id='speedo-meter-animation'
                 className='w-[152px]'
-                // className={`absolute h-[78px] top-0 md:top-auto md:bottom-0 left-0 w-full max-h-[600px]`}
                 loop
                 play
                 ref={SpeedoMeterAnimationRef}
@@ -349,7 +452,8 @@ const BRE_ONE = () => {
       </div>
 
       <div className='mt-4 flex flex-col gap-2'>
-        {pan && (
+        {(values.applicants[activeIndex]?.personal_details.id_type === 'PAN' ||
+          values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN') && (
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
               {!PAN.ran ? (
@@ -395,7 +499,9 @@ const BRE_ONE = () => {
           </div>
         )}
 
-        {dl && (
+        {(values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+          values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+            'Driving license') && (
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
               {!DL.ran ? (
@@ -441,7 +547,9 @@ const BRE_ONE = () => {
           </div>
         )}
 
-        {voterId && (
+        {(values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+          values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+            'Voter ID') && (
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
               {!voterID.ran ? (
@@ -489,7 +597,7 @@ const BRE_ONE = () => {
           </div>
         )}
 
-        {pf && (
+        {values.applicants[activeIndex]?.work_income_detail.pf_uan && (
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
               {!pfUAN.ran ? (
@@ -539,7 +647,7 @@ const BRE_ONE = () => {
           </div>
         )}
 
-        {gst && (
+        {values.applicants[activeIndex]?.work_income_detail.gst_number && (
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
               {!GST.ran ? (
@@ -750,7 +858,12 @@ const BRE_ONE = () => {
             </Button>
           </p>
         </div>
-        <Button disabled={!bre101.res} inputClasses='w-full h-14' primary={true}>
+        <Button
+          disabled={!bre101.res}
+          inputClasses='w-full h-14'
+          primary={true}
+          link='/lead/lnt-charges'
+        >
           Next
         </Button>
       </div>

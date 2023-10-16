@@ -42,7 +42,7 @@ const SearchableTextInput = memo(
     }, [inputRef.current]);
 
     return (
-      <div className='flex flex-col gap-1'>
+      <div className='flex flex-col gap-1 w-full'>
         <label htmlFor={name} className='flex gap-0.5 items-center text-primary-black'>
           {label}
           {props.required && <span className='text-primary-red text-sm'>*</span>}
@@ -83,7 +83,9 @@ const SearchableTextInput = memo(
             onChange={(e, value) => onChange(name, value)}
             options={options}
             sx={{ width: 300, border: 'none' }}
-            renderInput={(params) => <TextField {...params} label='Movie' placeholder='Eg: Idea' />}
+            renderInput={(params) => (
+              <TextField {...params} label='Movie' placeholder={props.placeholder} />
+            )}
           />
           <img src={SearchIcon} />
         </div>

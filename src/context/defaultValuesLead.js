@@ -89,8 +89,11 @@ export const defaultValuesLead = {
         is_mobile_verified: false,
         extra_params: {
           progress: 0,
+          banking_progress: 0,
           is_existing: false,
           is_existing_done: false,
+          upload_progress: 0,
+          upload_required_fields_status: {},
           required_fields_status: {
             loan_type: false,
             applied_amount: true,
@@ -100,6 +103,8 @@ export const defaultValuesLead = {
             property_type: false,
             mobile_number: false,
           },
+          qualifier: false,
+          eligibilty: false,
         },
       },
       personal_details: {

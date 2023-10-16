@@ -25,7 +25,7 @@ import IconSelfEmployed from './self-employed.jsx';
 
 import ApplicantDetailsIcon from './ApplicantDetailsIcon';
 import AddressDetailsIcon from './AddressDetailsIcon';
-import BankingDetailsIcon from './BankingDetailsIcon';
+import BankingDetailsIcon from './bankingDetailsIcon';
 import LnTIcon from './lnTIcon';
 import PersonalDetailsIcon from './PersonalDetailsIcon';
 import PreviewIcon from './PreviewIcon';
@@ -39,7 +39,25 @@ import ToolTipIcon from './ToolTipIcon';
 import DustbinIcon from './DustbinIcon';
 import CommingSoon from './CommingSoon.svg';
 
+import BankingManual from './bankingManual.jsx';
+import BankingAA from './bankingAA.jsx';
+import IconBackBanking from './iconBackHeader';
+
+import SavingIcon from './savingsIcon';
+import CurrentIcon from './currentIcon';
+import CashCreditIcon from './cashCreditIcon';
+import OverDraftIcon from './overDraftIcon';
+
+import TostErrorIcon from './TostErrorIcon';
+
 export {
+  OverDraftIcon,
+  CashCreditIcon,
+  CurrentIcon,
+  SavingIcon,
+  IconBackBanking,
+  BankingAA,
+  BankingManual,
   CommingSoon,
   DustbinIcon,
   ToolTipIcon,
@@ -79,4 +97,5 @@ export {
   IconSingle,
   IconSalarid,
   IconSelfEmployed,
+  TostErrorIcon,
 };

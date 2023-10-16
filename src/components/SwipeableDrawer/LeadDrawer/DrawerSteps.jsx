@@ -7,6 +7,7 @@ import { LockIcon } from '../../../assets/icons';
 export default function DrawerSteps({ details, steps, index, stepIndex, noProgress, lock }) {
   const { setCurrentStepIndex, setDrawerOpen, drawerOpen, setActiveIndex, values } =
     useContext(LeadContext);
+
   const navigate = useNavigate();
 
   const handleClick = () => {
