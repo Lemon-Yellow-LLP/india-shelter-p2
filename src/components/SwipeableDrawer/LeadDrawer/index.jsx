@@ -354,7 +354,9 @@ export default function SwipeableDrawerComponent() {
                     noProgress={true}
                     lock={
                       values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100
+                        ?.progress !== 100 ||
+                      !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.qualifier
                     }
                   />
                   <DrawerSteps
@@ -376,7 +378,9 @@ export default function SwipeableDrawerComponent() {
                     stepIndex={7}
                     lock={
                       values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100
+                        ?.progress !== 100 ||
+                      !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                        ?.qualifier
                     }
                   />
                   <DrawerSteps
@@ -578,7 +582,9 @@ export default function SwipeableDrawerComponent() {
                               stepIndex={5}
                               lock={
                                 values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.progress !== 100
+                                  ?.extra_params?.progress !== 100 ||
+                                !values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.extra_params?.qualifier
                               }
                             />
                             <UploadSteps
