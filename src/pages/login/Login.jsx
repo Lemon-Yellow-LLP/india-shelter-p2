@@ -39,6 +39,11 @@ export default function Login() {
   const handleOnPhoneNumberChange = useCallback(async (e) => {
     const phoneNumber = e.currentTarget.value;
 
+    const pattern = /^\d+$/;
+    if (!pattern.test(phoneNumber) && phoneNumber.length > 0) {
+      return;
+    }
+
     if (phoneNumber < 0) {
       e.preventDefault();
       return;
@@ -196,7 +201,7 @@ export default function Login() {
           style={{
             height: 'calc(100vh - 290px)',
           }}
-          className='flex flex-col gap-5 px-4 pb-4 pt-3 rounded-t-2xl bg-white'
+          className='flex flex-col gap-5 px-4 pb-4 pt-3 rounded-t-2xl bg-white overflow-auto no-scrollbar'
         >
           <div>
             <h2 className='text-primary-black font-semibold'>Welcome!</h2>

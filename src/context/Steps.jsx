@@ -90,6 +90,7 @@ export const applicantSteps = [
     lock: true,
     Icon: UploadIcon,
     name: 'upload_documents',
+    name: 'applicant_details',
   },
   {
     title: 'Preview',

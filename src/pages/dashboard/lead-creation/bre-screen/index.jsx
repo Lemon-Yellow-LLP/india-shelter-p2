@@ -16,6 +16,7 @@ import {
   verifyVoterID,
   checkBre101,
   editFieldsById,
+  editFieldsById,
 } from '../../../../global';
 import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';

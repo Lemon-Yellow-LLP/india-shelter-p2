@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { LeadContext } from '../../../context/LeadContextProvider';
 import { LockIcon } from '../../../assets/icons';
 
-export default function BreSteps({ details, steps, index, stepIndex, noProgress, lock }) {
+export default function DrawerStepBanking({ details, steps, index, stepIndex, noProgress, lock }) {
   const { setCurrentStepIndex, setDrawerOpen, drawerOpen, setActiveIndex, values } =
     useContext(LeadContext);
+
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -20,9 +21,7 @@ export default function BreSteps({ details, steps, index, stepIndex, noProgress,
 
   return (
     <div
-      className={`flex flex-col w-[100%] max-h-[77px] rounded-lg border p-2 justify-between ${
-        lock ? 'bg-[#FDECE8] border-[#E33439]' : null
-      } `}
+      className='flex flex-col w-[100%] max-h-[77px] rounded-lg border p-2 justify-between'
       onClick={lock ? null : handleClick}
     >
       <div className='flex justify-between gap-1'>
@@ -35,17 +34,16 @@ export default function BreSteps({ details, steps, index, stepIndex, noProgress,
         </div>
         {!details.hideProgress ? (
           !lock && steps ? (
-            <>
-              {values?.applicants?.[index]?.[details.name]?.extra_params?.progress === 100 ? (
-                <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
-                  Done
-                </span>
-              ) : (
-                <span className='text-[#065381] text-[10px] font-medium border border-[#065381] bg-[#E5F5FF] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
-                  In Progress
-                </span>
-              )}
-            </>
+            values?.applicants?.[index]?.applicant_details?.extra_params?.banking_progress ===
+            100 ? (
+              <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
+                Done
+              </span>
+            ) : (
+              <span className='text-[#065381] text-[10px] font-medium border border-[#065381] bg-[#E5F5FF] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
+                In Progress
+              </span>
+            )
           ) : (
             <LockIcon />
           )
@@ -54,7 +52,9 @@ export default function BreSteps({ details, steps, index, stepIndex, noProgress,
 
       {!lock && !noProgress ? (
         <ProgressBar
-          progress={values?.applicants?.[index]?.[details.name]?.extra_params?.progress || 0}
+          progress={
+            values?.applicants?.[index]?.applicant_details?.extra_params?.banking_progress || 0
+          }
         />
       ) : null}
     </div>

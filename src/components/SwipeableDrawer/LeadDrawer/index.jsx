@@ -19,7 +19,9 @@ import ToggleSwitch from '../../ToggleSwitch';
 import { editFieldsById } from '../../../global';
 import DynamicDrawer from '../DynamicDrawer';
 import Button from '../../Button';
-import BreSteps from './BreSteps';
+import DrawerStepBanking from './DrawerStepBanking';
+import QualifierStep from './QualifierStep';
+import EligibilityStep from './EligibilityStep';
 import UploadSteps from './UplodSteps';
 
 const drawerBleeding = 0;
@@ -325,7 +327,7 @@ export default function SwipeableDrawerComponent() {
                         ?.progress !== 100
                     }
                   />
-                  <BreSteps
+                  <QualifierStep
                     key={4}
                     details={applicantStepsProgress[4]}
                     steps={true}
@@ -366,7 +368,7 @@ export default function SwipeableDrawerComponent() {
                         ?.progress !== 100
                     }
                   />
-                  <DrawerSteps
+                  <DrawerStepBanking
                     key={7}
                     details={applicantStepsProgress[7]}
                     steps={true}
@@ -411,7 +413,7 @@ export default function SwipeableDrawerComponent() {
                         ?.progress !== 100
                     }
                   />
-                  <BreSteps
+                  <EligibilityStep
                     key={11}
                     details={applicantStepsProgress[11]}
                     steps={true}
@@ -559,7 +561,7 @@ export default function SwipeableDrawerComponent() {
                                   ?.extra_params?.progress !== 100
                               }
                             />
-                            <BreSteps
+                            <QualifierStep
                               key={4}
                               details={coApplicantStepsProgress[4]}
                               steps={true}
@@ -568,7 +570,7 @@ export default function SwipeableDrawerComponent() {
                               noProgress={true}
                               lock={true}
                             />
-                            <DrawerSteps
+                            <DrawerStepBanking
                               key={5}
                               details={coApplicantStepsProgress[5]}
                               steps={true}

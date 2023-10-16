@@ -123,12 +123,12 @@ const applicantSchema = Yup.object().shape({
       .required('Mobile number is required'),
     father_husband_name: Yup.string()
       .min(2, 'Father/Husbands Name must be atleast 2 characters long')
-      .max(10, 'Father/Husbands Name can be max 10 characters long')
+      .max(90, 'Father/Husbands Name can be max 90 characters long')
       .required('Father/Husbands Name is required')
-      .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
+      .matches(/^[a-zA-Z\s]*$/, 'Invalid characters in First Name'),
     mother_name: Yup.string()
       .min(2, 'Mother Name must be atleast 2 characters long')
-      .max(10, 'Mother Name can be max 10 characters long')
+      .max(90, 'Mother Name can be max 90 characters long')
       .required('Mother Name is required')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     marital_status: Yup.string().required('This field is mandatory.'),
@@ -240,7 +240,7 @@ const applicantSchema = Yup.object().shape({
 
     gst_number: Yup.string().when('profession', {
       is: 'Self-employed',
-      then: Yup.string().required('This field is mandatory'),
+      then: Yup.string(),
     }),
 
     //Pentioner
@@ -347,7 +347,7 @@ export const validationSchemaLead = Yup.object().shape({
     project_society_colony: Yup.string()
       .trim()
       .required('This field is mandatory')
-      .min(10, 'Address must be atleast 10 characters long')
+      .min(2, 'Address must be atleast 2 characters long')
       .max(90, 'Address can be max 90 characters long')
       .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
     pincode: Yup.string()
@@ -380,7 +380,13 @@ export const validationSchemaLead = Yup.object().shape({
       .trim()
       .min(10, 'Enter a valid 10 digit mobile number')
       .max(10, 'Enter a valid 10 digit mobile number')
-      .required('This field is mandatory'),
+      .required('This field is mandatory')
+      .test('reference_1_phone_number', 'Invalid mobile number', async (mobileNumber) => {
+        const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
+        if (DISALLOW_NUM.includes(mobileNumber.at(0))) return false;
+        return true;
+      }),
+
     reference_1_pincode: Yup.string()
       .trim()
       .required('This field is mandatory')
@@ -414,7 +420,12 @@ export const validationSchemaLead = Yup.object().shape({
       .trim()
       .min(10, 'Enter a valid 10 digit mobile number')
       .max(10, 'Enter a valid 10 digit mobile number')
-      .required('This field is mandatory'),
+      .required('This field is mandatory')
+      .test('reference_2_phone_number', 'Invalid mobile number', async (mobileNumber) => {
+        const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
+        if (DISALLOW_NUM.includes(mobileNumber.at(0))) return false;
+        return true;
+      }),
     reference_2_pincode: Yup.string()
       .trim()
       .required('This field is mandatory')

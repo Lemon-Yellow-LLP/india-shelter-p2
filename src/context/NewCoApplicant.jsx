@@ -11,6 +11,7 @@ export const newCoApplicantValues = {
     is_mobile_verified: false,
     extra_params: {
       progress: 57,
+      banking_progress: 0,
       is_existing: false,
       is_existing_done: false,
       upload_progress: 0,
@@ -25,6 +26,8 @@ export const newCoApplicantValues = {
         upload_selfie: false,
         other_doc: false,
       },
+      upload_progress: 0,
+      upload_required_fields_status: {},
       required_fields_status: {
         loan_type: true,
         applied_amount: true,

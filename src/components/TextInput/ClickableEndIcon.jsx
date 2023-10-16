@@ -8,8 +8,8 @@ import PropTypes from 'prop-types';
  * @param error - String
  * @param Icon React JSX Element
  */
-const TextInput = memo(
-  forwardRef(function TextInput(
+const ClickableEndIcon = memo(
+  forwardRef(function ClickableEndIcon(
     {
       label,
       name,
@@ -22,6 +22,8 @@ const TextInput = memo(
       message,
       onChange,
       labelDisabled,
+      EndIcon,
+      onEndButtonClick,
       ...props
     },
     ref,
@@ -46,10 +48,7 @@ const TextInput = memo(
           />
         )}
         <div
-          role='button'
           tabIndex={-1}
-          onClick={() => (ref ? ref.current.focus() : inputRef.current.focus())}
-          onKeyDown={() => (ref ? ref.current?.focus() : inputRef.current.focus())}
           className={`input-container px-4 py-3 border rounded-lg
         flex gap-1
         transition-all ease-out duration-150
@@ -70,7 +69,13 @@ const TextInput = memo(
             onChange={(e) => onChange(e)}
             {...props}
           />
+          {EndIcon && (
+            <div onClick={onEndButtonClick}>
+              <EndIcon />
+            </div>
+          )}
         </div>
+
         {displayError && !message ? (
           <span
             className='text-xs text-primary-red'
@@ -96,9 +101,9 @@ const TextInput = memo(
   }),
 );
 
-export default TextInput;
+export default ClickableEndIcon;
 
-TextInput.propTypes = {
+ClickableEndIcon.propTypes = {
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   hint: PropTypes.string,

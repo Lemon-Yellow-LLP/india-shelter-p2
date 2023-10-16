@@ -12,18 +12,16 @@ import { newCoApplicantValues } from './NewCoApplicant';
 export const LeadContext = createContext(defaultValuesLead);
 
 const LeadContextProvider = ({ children }) => {
+  const navigate = useNavigate();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
-
   const [existingData, setExistingData] = useState({});
-
   const [applicantStepsProgress, setApplicantSetpsProgress] = useState([...applicantSteps]);
-
   const [coApplicantStepsProgress, setCoApplicantSetpsProgress] = useState([...coApplicantSteps]);
-
-  const navigate = useNavigate();
+  const [bankSuccessTost, setBankSuccessTost] = useState('');
+  const [bankErrorTost, setBankErrorTost] = useState('');
 
   const formik = useFormik({
     initialValues: { ...defaultValuesLead },
@@ -58,9 +56,6 @@ const LeadContextProvider = ({ children }) => {
         newData[updateStep].extra_params.required_fields_status = requiredFieldsStatus;
         await editFieldsById(formik.values[updateStep].id, page, newData[updateStep]);
       }
-      // else {
-      //   console.error('Some properties are missing, cannot update progress');
-      // }
     } else {
       if (
         newData.applicants?.[activeIndex]?.[updateStep]?.extra_params &&
@@ -76,9 +71,6 @@ const LeadContextProvider = ({ children }) => {
           newData.applicants[activeIndex][updateStep],
         );
       }
-      // else {
-      //   console.error('Some properties are missing, cannot update progress');
-      // }
     }
     formik.setValues(newData);
   };
@@ -153,8 +145,6 @@ const LeadContextProvider = ({ children }) => {
     setDrawerOpen(false);
   };
 
-  // console.log(activeIndex);
-
   return (
     <LeadContext.Provider
       value={{
@@ -176,6 +166,11 @@ const LeadContextProvider = ({ children }) => {
         coApplicantStepsProgress,
         setCoApplicantSetpsProgress,
         updateProgressUploadDocumentSteps,
+        updateProgressUploadDocumentSteps,
+        bankSuccessTost,
+        setBankSuccessTost,
+        bankErrorTost,
+        setBankErrorTost,
       }}
     >
       {children}
