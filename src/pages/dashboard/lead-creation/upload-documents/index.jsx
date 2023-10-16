@@ -8,6 +8,7 @@ import { DropDown, ToastMessage, UploadDocsInput } from '../../../../components'
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import OtpInputNoEdit from '../../../../components/OtpInput/OtpInputNoEdit';
 import {
+  addApi,
   editFieldsById,
   getApplicantById,
   getUploadOtp,
@@ -15,7 +16,9 @@ import {
   uploadDoc,
   verifyUploadOtp,
 } from '../../../../global';
+import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import imageCompression from 'browser-image-compression';
+import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 
 const UploadDocuments = () => {
   const {
@@ -28,7 +31,8 @@ const UploadDocuments = () => {
     setFieldError,
     updateProgressUploadDocumentSteps,
   } = useContext(LeadContext);
-  const { toastMessage, setToastMessage, isQaulifierActivated } = useContext(AuthContext);
+  const { toastMessage, setToastMessage, isQaulifierActivated, loData, setIsQaulifierActivated } =
+    useContext(AuthContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
   const [customerPhotos, setCustomerPhotos] = useState([]);
@@ -128,9 +132,13 @@ const UploadDocuments = () => {
     }
   }, [editAddressNumber]);
 
+  console.log(requiredFieldsStatus);
+
   useEffect(() => {
-    if (isQaulifierActivated) {
-      const bre_Display_body = isQaulifierActivated.bre_101_response.body.Display;
+    async function getQualifierResponse() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
+
+      const bre_Display_body = res.bre_101_response.body.Display;
 
       const id_type = values?.applicants?.[activeIndex]?.personal_details?.id_type;
       const address_type =
@@ -163,31 +171,62 @@ const UploadDocuments = () => {
           setAddressSatus(bre_Display_body[i]);
         }
       }
-    }
-  }, [isQaulifierActivated]);
 
-  const changeIdType = useCallback((e) => {
-    setFieldValue(`applicants[${activeIndex}].personal_details.id_type`, e);
-    setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
-    // updateFields('id_type', e);
-    // updateFields('id_number', '');
-    // if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-    //   updateFields('selected_address_proof', e);
-    //   updateFields('address_proof_number', '');
-    // }
-    // if (!requiredFieldsStatus.id_type) {
-    //   setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true }));
-    // }
+      setIsQaulifierActivated(res.bre_101_response);
+    }
+    getQualifierResponse();
   }, []);
 
-  const changeSelectedAddressProof = useCallback((e) => {
+  const updateFields = async (name, value) => {
+    let newData = {};
+    newData[name] = value;
+
+    if (!name) {
+      const res = await editFieldsById(
+        values?.applicants[activeIndex]?.personal_details?.id,
+        'personal',
+        values?.applicants[activeIndex]?.personal_details,
+      );
+    } else {
+      if (values?.applicants[activeIndex]?.personal_details?.id) {
+        const res = await editFieldsById(
+          values?.applicants[activeIndex]?.personal_details?.id,
+          'personal',
+          newData,
+        );
+      } else {
+        let addData = { ...newCoApplicantValues.personal_details, [name]: value };
+        await addApi('personal', {
+          ...addData,
+          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+        })
+          .then(async (res) => {
+            setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
+            await editFieldsById(
+              values?.applicants[activeIndex]?.applicant_details?.id,
+              'applicant',
+              { personal_detail: res.id },
+            );
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    }
+  };
+
+  const changeIdType = useCallback(async (e) => {
+    setFieldValue(`applicants[${activeIndex}].personal_details.id_type`, e);
+    setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
+
+    updateFields('id_type', e);
+  }, []);
+
+  const changeSelectedAddressProof = useCallback(async (e) => {
     setFieldValue(`applicants[${activeIndex}].personal_details.selected_address_proof`, e);
     setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
-    // updateFields('selected_address_proof', e);
-    // updateFields('address_proof_number', '');
-    // if (!requiredFieldsStatus.selected_address_proof) {
-    //   setRequiredFieldsStatus((prev) => ({ ...prev, selected_address_proof: true }));
-    // }
+
+    updateFields('selected_address_proof', e);
   }, []);
 
   const handleTextInputChange = useCallback(
@@ -251,11 +290,11 @@ const UploadDocuments = () => {
     setHasSentOTPOnce(true);
     setShowOTPInput(true);
 
-    // const res = await getUploadOtp(login_res.session.user_id);
-    // if (!res) return;
-
-    const res = await getUploadOtp(1);
+    const res = await getUploadOtp(loData.session.user_id);
     if (!res) return;
+
+    // const res = await getUploadOtp(1);
+    // if (!res) return;
 
     setToastMessage('OTP has been sent to the mobile number');
   };
@@ -265,35 +304,16 @@ const UploadDocuments = () => {
       const otp = parseInt(loginotp);
 
       try {
-        // const res = await verifyUploadOtp(login_res.session.user_id, {
-        //   otp,
-        // });
-
-        // if (!res) return;
-
-        const res = await verifyUploadOtp(1, otp);
+        const res = await verifyUploadOtp(loData.session.user_id, otp);
 
         if (!res) return;
 
+        // const res = await verifyUploadOtp(1, otp);
+
+        // if (!res) return;
+
         setDisablePhoneNumber(false);
         setMobileVerified(true);
-
-        // if (res.old_session_message === 'No old sessions') {
-        //   setToken(res.token);
-        //   setDisablePhoneNumber(false);
-        //   setMobileVerified(true);
-        //   setFieldError('username', undefined);
-        //   setShowOTPInput(false);
-        //   setIsAuthenticated(true);
-        //   return true;
-        // }
-        // setIsOpen(true);
-        // setToken(res.token);
-        // setDisablePhoneNumber(false);
-        // setMobileVerified(true);
-        // setFieldError('username', undefined);
-        // setShowOTPInput(false);
-        // setIsOpen(true);
       } catch (err) {
         console.log(err);
 
@@ -312,7 +332,7 @@ const UploadDocuments = () => {
     async function addPropertyPaperPhotos() {
       const data = new FormData();
       const filename = propertyPapersFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'property_paper_photos');
       data.append('document_name', filename);
 
@@ -380,6 +400,8 @@ const UploadDocuments = () => {
           setPropertyPaperUploads({ data: active_uploads });
         }
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: true }));
     }
     propertyPapers.length > 0 && addPropertyPaperPhotos();
   }, [propertyPapersFile]);
@@ -436,10 +458,24 @@ const UploadDocuments = () => {
   }, [editPropertyPaper]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.property_paper_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: false }));
+      }
+    }
+    removeProgress();
+  }, [propertyPaperUploads]);
+
+  useEffect(() => {
     async function addCustomerPhotos() {
       const data = new FormData();
       const filename = customerPhotosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'customer_photos');
       data.append('document_name', filename);
 
@@ -471,6 +507,7 @@ const UploadDocuments = () => {
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
         );
+        console.log(applicant);
         const document_meta = applicant.document_meta;
         if ('customer_photos' in document_meta == false) {
           document_meta['customer_photos'] = [];
@@ -485,6 +522,7 @@ const UploadDocuments = () => {
             document_meta: document_meta,
           },
         );
+        console.log(edited_applicant);
 
         const active_upload = edited_applicant.document_meta.customer_photos.find((data) => {
           return data.active === true;
@@ -492,15 +530,32 @@ const UploadDocuments = () => {
 
         setCustomerUploads({ type: 'customer_photos', data: active_upload });
       }
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['customer_photo']: true }));
+
+      // setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
     }
     customerPhotos.length > 0 && addCustomerPhotos();
   }, [customerPhotosFile]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.customer_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['customer_photo']: false }));
+      }
+    }
+    removeProgress();
+  }, [customerUploads]);
+
+  useEffect(() => {
     async function addIdProofPhotos() {
       const data = new FormData();
       const filename = idProofPhotosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', values?.applicants?.[activeIndex]?.personal_details?.id_type);
       data.append('document_name', filename);
 
@@ -556,6 +611,8 @@ const UploadDocuments = () => {
 
         setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['id_proof']: true }));
     }
     idProofPhotos.length > 0 && addIdProofPhotos();
   }, [idProofPhotosFile]);
@@ -610,10 +667,24 @@ const UploadDocuments = () => {
   }, [editIdProof]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.id_proof_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['id_proof']: false }));
+      }
+    }
+    removeProgress();
+  }, [idProofUploads]);
+
+  useEffect(() => {
     async function addAddressProofPhotos() {
       const data = new FormData();
       const filename = addressProofPhotosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append(
         'document_type',
         values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof,
@@ -675,6 +746,8 @@ const UploadDocuments = () => {
 
         setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['address_proof']: true }));
     }
     addressProofPhotos.length > 0 && addAddressProofPhotos();
   }, [addressProofPhotosFile]);
@@ -735,10 +808,24 @@ const UploadDocuments = () => {
   }, [editAddressProof]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.address_proof_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['address_proof']: false }));
+      }
+    }
+    removeProgress();
+  }, [addressProofUploads]);
+
+  useEffect(() => {
     async function addSalarySlipPhotos() {
       const data = new FormData();
       const filename = salarySlipPhotosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'salary_slip_photos');
       data.append('document_name', filename);
 
@@ -791,6 +878,8 @@ const UploadDocuments = () => {
 
         setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['salary_slip']: true }));
     }
     salarySlipPhotos.length > 0 && addSalarySlipPhotos();
   }, [salarySlipPhotosFile]);
@@ -842,10 +931,24 @@ const UploadDocuments = () => {
   }, [editSalarySlip]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.salary_slip_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['salary_slip']: false }));
+      }
+    }
+    removeProgress();
+  }, [salarySlipUploads]);
+
+  useEffect(() => {
     async function addForm60Photos() {
       const data = new FormData();
       const filename = form60photosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'form_60_photos');
       data.append('document_name', filename);
 
@@ -897,6 +1000,8 @@ const UploadDocuments = () => {
 
         setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['form_60']: true }));
     }
     form60photos.length > 0 && addForm60Photos();
   }, [form60photosFile]);
@@ -948,10 +1053,24 @@ const UploadDocuments = () => {
   }, [form60photos]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.form_60_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['form_60']: false }));
+      }
+    }
+    removeProgress();
+  }, [form60Uploads]);
+
+  useEffect(() => {
     async function addPropertyPhotos() {
       const data = new FormData();
       const filename = propertyPhotosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'property_photos');
       data.append('document_name', filename);
 
@@ -1003,6 +1122,8 @@ const UploadDocuments = () => {
 
         setPropertyUploads({ type: 'property_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['property_image']: true }));
     }
     propertyPhotos.length > 0 && addPropertyPhotos();
   }, [propertyPhotosFile]);
@@ -1054,10 +1175,24 @@ const UploadDocuments = () => {
   }, [editProperty]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.property_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['property_image']: false }));
+      }
+    }
+    removeProgress();
+  }, [propertyUploads]);
+
+  useEffect(() => {
     async function addSelfiePhoto() {
       const data = new FormData();
       const filename = selfieFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'lo_selfie');
       data.append('document_name', filename);
 
@@ -1109,15 +1244,31 @@ const UploadDocuments = () => {
 
         setSelfieUploads({ type: 'lo_selfie', data: active_upload });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: true }));
     }
     selfie.length > 0 && addSelfiePhoto();
   }, [selfieFile]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.lo_selfie.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: false }));
+      }
+    }
+    removeProgress();
+  }, [selfieUploads]);
+
+  useEffect(() => {
     async function addOtherDocPhotos() {
       const data = new FormData();
       const filename = docsFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'other_docs');
       data.append('document_name', filename);
 
@@ -1169,6 +1320,8 @@ const UploadDocuments = () => {
 
         setDocUploads({ type: 'other_docs', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: true }));
     }
     docs.length > 0 && addOtherDocPhotos();
   }, [docsFile]);
@@ -1218,6 +1371,19 @@ const UploadDocuments = () => {
     }
     editDoc.id && editOtherDocPhotos();
   }, [editDoc]);
+
+  useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.other_docs.find((data) => {
+        return data.active === true;
+      });
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: false }));
+      }
+    }
+    removeProgress();
+  }, [docUploads]);
 
   useEffect(() => {
     async function getPreviousUploads() {
@@ -1348,6 +1514,17 @@ const UploadDocuments = () => {
     values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
   ]);
 
+  useEffect(() => {
+    async function getRequiredFields() {
+      const { extra_params } = await getApplicantById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+      );
+
+      setRequiredFieldsStatus({ ...extra_params.upload_required_fields_status });
+    }
+    getRequiredFields();
+  }, []);
+
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
       <ToastMessage message={toastMessage} setMessage={setToastMessage} />
@@ -1382,14 +1559,6 @@ const UploadDocuments = () => {
             }
             onBlur={(e) => {
               handleBlur(e);
-              if (
-                values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type
-              ) {
-                updateFields(
-                  'selected_address_proof',
-                  values?.applicants[activeIndex]?.personal_details.id_type,
-                );
-              }
             }}
           />
 
@@ -1440,7 +1609,19 @@ const UploadDocuments = () => {
                       }
                       ref={idRef}
                       disabled={editIdNumber ? false : true}
-                      onBlur={handleBlur}
+                      onBlur={(e) => {
+                        handleBlur(e);
+
+                        if (!errors.applicants?.[activeIndex]?.personal_details?.id_number) {
+                          editFieldsById(
+                            values?.applicants?.[activeIndex]?.personal_details.id,
+                            'personal',
+                            {
+                              id_number: e.target.value,
+                            },
+                          );
+                        }
+                      }}
                       inputClasses='text-xs capitalize h-3'
                     />
                   </div>
@@ -1645,7 +1826,21 @@ const UploadDocuments = () => {
                       }
                       ref={addressRef}
                       disabled={editAddressNumber ? false : true}
-                      onBlur={handleBlur}
+                      onBlur={(e) => {
+                        handleBlur(e);
+
+                        if (
+                          !errors.applicants?.[activeIndex]?.personal_details?.address_proof_number
+                        ) {
+                          editFieldsById(
+                            values?.applicants?.[activeIndex]?.personal_details.id,
+                            'personal',
+                            {
+                              address_proof_number: e.target.value,
+                            },
+                          );
+                        }
+                      }}
                       inputClasses='text-xs capitalize h-3'
                     />
                   </div>
@@ -1874,6 +2069,10 @@ const UploadDocuments = () => {
           hint='File size should be less than 5MB'
           setSingleFile={setDocsFile}
         />
+      </div>
+
+      <div className='bottom-0 fixed'>
+        <PreviousNextButtons linkPrevious='/lead/reference-details' linkNext='/lead/preview' />
       </div>
     </div>
   );

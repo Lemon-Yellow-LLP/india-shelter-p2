@@ -27,7 +27,7 @@ export default function Login() {
     token,
     setToken,
   } = useContext(AuthContext);
-  const { toastMessage, setToastMessage } = useContext(AuthContext);
+  const { toastMessage, setToastMessage, setLoData } = useContext(AuthContext);
 
   const [showOTPInput, setShowOTPInput] = useState(false);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
@@ -131,6 +131,7 @@ export default function Login() {
           setFieldError('username', undefined);
           setShowOTPInput(false);
           setIsOpen(true);
+          setLoData(res);
         } catch (err) {
           setMobileVerified(false);
           setOtpFailCount(err.response.data.fail_count);
