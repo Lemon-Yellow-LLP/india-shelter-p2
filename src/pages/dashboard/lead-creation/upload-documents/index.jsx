@@ -8,6 +8,7 @@ import { DropDown, ToastMessage, UploadDocsInput } from '../../../../components'
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import OtpInputNoEdit from '../../../../components/OtpInput/OtpInputNoEdit';
 import {
+  addApi,
   editFieldsById,
   getApplicantById,
   getUploadOtp,
@@ -15,10 +16,11 @@ import {
   uploadDoc,
   verifyUploadOtp,
 } from '../../../../global';
+import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import imageCompression from 'browser-image-compression';
-import Topbar from '../../../../components/Topbar';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Topbar from '../../../../components/Topbar';
 
 const UploadDocuments = () => {
   const {
@@ -31,7 +33,8 @@ const UploadDocuments = () => {
     setFieldError,
     updateProgressUploadDocumentSteps,
   } = useContext(LeadContext);
-  const { toastMessage, setToastMessage, isQaulifierActivated } = useContext(AuthContext);
+  const { toastMessage, setToastMessage, isQaulifierActivated, loData, setIsQaulifierActivated } =
+    useContext(AuthContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
   const [customerPhotos, setCustomerPhotos] = useState([]);
@@ -131,9 +134,13 @@ const UploadDocuments = () => {
     }
   }, [editAddressNumber]);
 
+  console.log(requiredFieldsStatus);
+
   useEffect(() => {
-    if (isQaulifierActivated) {
-      const bre_Display_body = isQaulifierActivated.bre_101_response.body.Display;
+    async function getQualifierResponse() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
+
+      const bre_Display_body = res.bre_101_response.body.Display;
 
       const id_type = values?.applicants?.[activeIndex]?.personal_details?.id_type;
       const address_type =
@@ -166,31 +173,62 @@ const UploadDocuments = () => {
           setAddressSatus(bre_Display_body[i]);
         }
       }
-    }
-  }, [isQaulifierActivated]);
 
-  const changeIdType = useCallback((e) => {
-    setFieldValue(`applicants[${activeIndex}].personal_details.id_type`, e);
-    setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
-    // updateFields('id_type', e);
-    // updateFields('id_number', '');
-    // if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-    //   updateFields('selected_address_proof', e);
-    //   updateFields('address_proof_number', '');
-    // }
-    // if (!requiredFieldsStatus.id_type) {
-    //   setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true }));
-    // }
+      setIsQaulifierActivated(res.bre_101_response);
+    }
+    getQualifierResponse();
   }, []);
 
-  const changeSelectedAddressProof = useCallback((e) => {
+  const updateFields = async (name, value) => {
+    let newData = {};
+    newData[name] = value;
+
+    if (!name) {
+      const res = await editFieldsById(
+        values?.applicants[activeIndex]?.personal_details?.id,
+        'personal',
+        values?.applicants[activeIndex]?.personal_details,
+      );
+    } else {
+      if (values?.applicants[activeIndex]?.personal_details?.id) {
+        const res = await editFieldsById(
+          values?.applicants[activeIndex]?.personal_details?.id,
+          'personal',
+          newData,
+        );
+      } else {
+        let addData = { ...newCoApplicantValues.personal_details, [name]: value };
+        await addApi('personal', {
+          ...addData,
+          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+        })
+          .then(async (res) => {
+            setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
+            await editFieldsById(
+              values?.applicants[activeIndex]?.applicant_details?.id,
+              'applicant',
+              { personal_detail: res.id },
+            );
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    }
+  };
+
+  const changeIdType = useCallback(async (e) => {
+    setFieldValue(`applicants[${activeIndex}].personal_details.id_type`, e);
+    setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
+
+    updateFields('id_type', e);
+  }, []);
+
+  const changeSelectedAddressProof = useCallback(async (e) => {
     setFieldValue(`applicants[${activeIndex}].personal_details.selected_address_proof`, e);
     setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
-    // updateFields('selected_address_proof', e);
-    // updateFields('address_proof_number', '');
-    // if (!requiredFieldsStatus.selected_address_proof) {
-    //   setRequiredFieldsStatus((prev) => ({ ...prev, selected_address_proof: true }));
-    // }
+
+    updateFields('selected_address_proof', e);
   }, []);
 
   const handleTextInputChange = useCallback(
@@ -254,11 +292,11 @@ const UploadDocuments = () => {
     setHasSentOTPOnce(true);
     setShowOTPInput(true);
 
-    // const res = await getUploadOtp(login_res.session.user_id);
-    // if (!res) return;
-
-    const res = await getUploadOtp(1);
+    const res = await getUploadOtp(loData.session.user_id);
     if (!res) return;
+
+    // const res = await getUploadOtp(1);
+    // if (!res) return;
 
     setToastMessage('OTP has been sent to the mobile number');
   };
@@ -268,35 +306,16 @@ const UploadDocuments = () => {
       const otp = parseInt(loginotp);
 
       try {
-        // const res = await verifyUploadOtp(login_res.session.user_id, {
-        //   otp,
-        // });
-
-        // if (!res) return;
-
-        const res = await verifyUploadOtp(1, otp);
+        const res = await verifyUploadOtp(loData.session.user_id, otp);
 
         if (!res) return;
 
+        // const res = await verifyUploadOtp(1, otp);
+
+        // if (!res) return;
+
         setDisablePhoneNumber(false);
         setMobileVerified(true);
-
-        // if (res.old_session_message === 'No old sessions') {
-        //   setToken(res.token);
-        //   setDisablePhoneNumber(false);
-        //   setMobileVerified(true);
-        //   setFieldError('username', undefined);
-        //   setShowOTPInput(false);
-        //   setIsAuthenticated(true);
-        //   return true;
-        // }
-        // setIsOpen(true);
-        // setToken(res.token);
-        // setDisablePhoneNumber(false);
-        // setMobileVerified(true);
-        // setFieldError('username', undefined);
-        // setShowOTPInput(false);
-        // setIsOpen(true);
       } catch (err) {
         console.log(err);
 
@@ -315,7 +334,7 @@ const UploadDocuments = () => {
     async function addPropertyPaperPhotos() {
       const data = new FormData();
       const filename = propertyPapersFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'property_paper_photos');
       data.append('document_name', filename);
 
@@ -383,6 +402,8 @@ const UploadDocuments = () => {
           setPropertyPaperUploads({ data: active_uploads });
         }
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: true }));
     }
     propertyPapers.length > 0 && addPropertyPaperPhotos();
   }, [propertyPapersFile]);
@@ -439,10 +460,24 @@ const UploadDocuments = () => {
   }, [editPropertyPaper]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.property_paper_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: false }));
+      }
+    }
+    removeProgress();
+  }, [propertyPaperUploads]);
+
+  useEffect(() => {
     async function addCustomerPhotos() {
       const data = new FormData();
       const filename = customerPhotosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'customer_photos');
       data.append('document_name', filename);
 
@@ -474,6 +509,7 @@ const UploadDocuments = () => {
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
         );
+        console.log(applicant);
         const document_meta = applicant.document_meta;
         if ('customer_photos' in document_meta == false) {
           document_meta['customer_photos'] = [];
@@ -488,6 +524,7 @@ const UploadDocuments = () => {
             document_meta: document_meta,
           },
         );
+        console.log(edited_applicant);
 
         const active_upload = edited_applicant.document_meta.customer_photos.find((data) => {
           return data.active === true;
@@ -495,15 +532,32 @@ const UploadDocuments = () => {
 
         setCustomerUploads({ type: 'customer_photos', data: active_upload });
       }
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['customer_photo']: true }));
+
+      // setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
     }
     customerPhotos.length > 0 && addCustomerPhotos();
   }, [customerPhotosFile]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.customer_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['customer_photo']: false }));
+      }
+    }
+    removeProgress();
+  }, [customerUploads]);
+
+  useEffect(() => {
     async function addIdProofPhotos() {
       const data = new FormData();
       const filename = idProofPhotosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', values?.applicants?.[activeIndex]?.personal_details?.id_type);
       data.append('document_name', filename);
 
@@ -559,6 +613,8 @@ const UploadDocuments = () => {
 
         setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['id_proof']: true }));
     }
     idProofPhotos.length > 0 && addIdProofPhotos();
   }, [idProofPhotosFile]);
@@ -613,10 +669,24 @@ const UploadDocuments = () => {
   }, [editIdProof]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.id_proof_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['id_proof']: false }));
+      }
+    }
+    removeProgress();
+  }, [idProofUploads]);
+
+  useEffect(() => {
     async function addAddressProofPhotos() {
       const data = new FormData();
       const filename = addressProofPhotosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append(
         'document_type',
         values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof,
@@ -678,6 +748,8 @@ const UploadDocuments = () => {
 
         setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['address_proof']: true }));
     }
     addressProofPhotos.length > 0 && addAddressProofPhotos();
   }, [addressProofPhotosFile]);
@@ -738,10 +810,24 @@ const UploadDocuments = () => {
   }, [editAddressProof]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.address_proof_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['address_proof']: false }));
+      }
+    }
+    removeProgress();
+  }, [addressProofUploads]);
+
+  useEffect(() => {
     async function addSalarySlipPhotos() {
       const data = new FormData();
       const filename = salarySlipPhotosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'salary_slip_photos');
       data.append('document_name', filename);
 
@@ -794,6 +880,8 @@ const UploadDocuments = () => {
 
         setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['salary_slip']: true }));
     }
     salarySlipPhotos.length > 0 && addSalarySlipPhotos();
   }, [salarySlipPhotosFile]);
@@ -845,10 +933,24 @@ const UploadDocuments = () => {
   }, [editSalarySlip]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.salary_slip_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['salary_slip']: false }));
+      }
+    }
+    removeProgress();
+  }, [salarySlipUploads]);
+
+  useEffect(() => {
     async function addForm60Photos() {
       const data = new FormData();
       const filename = form60photosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'form_60_photos');
       data.append('document_name', filename);
 
@@ -900,6 +1002,8 @@ const UploadDocuments = () => {
 
         setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['form_60']: true }));
     }
     form60photos.length > 0 && addForm60Photos();
   }, [form60photosFile]);
@@ -951,10 +1055,24 @@ const UploadDocuments = () => {
   }, [form60photos]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.form_60_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['form_60']: false }));
+      }
+    }
+    removeProgress();
+  }, [form60Uploads]);
+
+  useEffect(() => {
     async function addPropertyPhotos() {
       const data = new FormData();
       const filename = propertyPhotosFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'property_photos');
       data.append('document_name', filename);
 
@@ -1006,6 +1124,8 @@ const UploadDocuments = () => {
 
         setPropertyUploads({ type: 'property_photos', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['property_image']: true }));
     }
     propertyPhotos.length > 0 && addPropertyPhotos();
   }, [propertyPhotosFile]);
@@ -1057,10 +1177,24 @@ const UploadDocuments = () => {
   }, [editProperty]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.property_photos.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['property_image']: false }));
+      }
+    }
+    removeProgress();
+  }, [propertyUploads]);
+
+  useEffect(() => {
     async function addSelfiePhoto() {
       const data = new FormData();
       const filename = selfieFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'lo_selfie');
       data.append('document_name', filename);
 
@@ -1112,15 +1246,31 @@ const UploadDocuments = () => {
 
         setSelfieUploads({ type: 'lo_selfie', data: active_upload });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: true }));
     }
     selfie.length > 0 && addSelfiePhoto();
   }, [selfieFile]);
 
   useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.lo_selfie.find((data) => {
+        return data.active === true;
+      });
+
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: false }));
+      }
+    }
+    removeProgress();
+  }, [selfieUploads]);
+
+  useEffect(() => {
     async function addOtherDocPhotos() {
       const data = new FormData();
       const filename = docsFile.name;
-      data.append('applicant_id', 1);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'other_docs');
       data.append('document_name', filename);
 
@@ -1172,6 +1322,8 @@ const UploadDocuments = () => {
 
         setDocUploads({ type: 'other_docs', data: active_uploads });
       }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: true }));
     }
     docs.length > 0 && addOtherDocPhotos();
   }, [docsFile]);
@@ -1221,6 +1373,19 @@ const UploadDocuments = () => {
     }
     editDoc.id && editOtherDocPhotos();
   }, [editDoc]);
+
+  useEffect(() => {
+    async function removeProgress() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const active_uploads = res.document_meta.other_docs.find((data) => {
+        return data.active === true;
+      });
+      if (!active_uploads) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: false }));
+      }
+    }
+    removeProgress();
+  }, [docUploads]);
 
   useEffect(() => {
     async function getPreviousUploads() {
@@ -1351,8 +1516,19 @@ const UploadDocuments = () => {
     values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
   ]);
 
+  useEffect(() => {
+    async function getRequiredFields() {
+      const { extra_params } = await getApplicantById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+      );
+
+      setRequiredFieldsStatus({ ...extra_params.upload_required_fields_status });
+    }
+    getRequiredFields();
+  }, []);
+
   return (
-    <>
+    <div className='overflow-hidden flex flex-col h-[100vh]'>
       <div className='overflow-hidden flex flex-col h-[100vh]'>
         {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
           <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
@@ -1365,419 +1541,269 @@ const UploadDocuments = () => {
             coApplicant={true}
           />
         )}
-        <ToastMessage message={toastMessage} setMessage={setToastMessage} />
+      </div>
+      <ToastMessage message={toastMessage} setMessage={setToastMessage} />
 
-        <div className='flex flex-col bg-medium-grey gap-9 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
-          <PhotoUpload
-            files={customerPhotos}
-            setFile={setCustomerPhotos}
-            setSingleFile={setCustomerPhotosFile}
-            uploads={customerUploads}
-            setUploads={setCustomerUploads}
-            label='Customer photo'
+      <div className='flex flex-col bg-medium-grey gap-9 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
+        <PhotoUpload
+          files={customerPhotos}
+          setFile={setCustomerPhotos}
+          setSingleFile={setCustomerPhotosFile}
+          uploads={customerUploads}
+          setUploads={setCustomerUploads}
+          label='Customer photo'
+          required
+        />
+
+        <div className='flex flex-col gap-5'>
+          <DropDown
+            label='Select ID type'
+            name={`applicants[${activeIndex}].personal_details.id_type`}
             required
+            options={manualModeDropdownOptions[0].options}
+            placeholder='Choose ID type'
+            onChange={changeIdType}
+            defaultSelected={values?.applicants?.[activeIndex]?.personal_details?.id_type}
+            // error={errors.applicants?.[activeIndex]?.personal_details?.id_type}
+            touched={
+              touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.id_type
+            }
+            disabled={values?.applicants?.[activeIndex]?.personal_details?.id_type ? true : false}
+            disableOption={
+              values?.applicants[activeIndex]?.personal_details?.selected_address_proof
+            }
+            onBlur={(e) => {
+              handleBlur(e);
+            }}
           />
 
-          <div className='flex flex-col gap-5'>
-            <DropDown
-              label='Select ID type'
-              name={`applicants[${activeIndex}].personal_details.id_type`}
-              required
-              options={manualModeDropdownOptions[0].options}
-              placeholder='Choose ID type'
-              onChange={changeIdType}
-              defaultSelected={values?.applicants?.[activeIndex]?.personal_details?.id_type}
-              // error={errors.applicants?.[activeIndex]?.personal_details?.id_type}
-              touched={
-                touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.id_type
-              }
-              disabled={values?.applicants?.[activeIndex]?.personal_details?.id_type ? true : false}
-              disableOption={
-                values?.applicants[activeIndex]?.personal_details?.selected_address_proof
-              }
-              onBlur={(e) => {
-                handleBlur(e);
-                if (
-                  values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type
-                ) {
-                  updateFields(
-                    'selected_address_proof',
-                    values?.applicants[activeIndex]?.personal_details.id_type,
-                  );
-                }
+          <div>
+            <label className='flex gap-0.5 items-center text-primary-black font-medium'>
+              ID proof
+              <span className='text-primary-red text-sm'>*</span>
+            </label>
+            <span
+              className='mb-1.5 text-light-grey text-xs font-normal'
+              dangerouslySetInnerHTML={{
+                __html: 'File size should be less than 5MB',
               }}
             />
 
-            <div>
-              <label className='flex gap-0.5 items-center text-primary-black font-medium'>
-                ID proof
-                <span className='text-primary-red text-sm'>*</span>
-              </label>
-              <span
-                className='mb-1.5 text-light-grey text-xs font-normal'
-                dangerouslySetInnerHTML={{
-                  __html: 'File size should be less than 5MB',
-                }}
-              />
-
-              {isQaulifierActivated ? (
-                <div className='bg-white mt-1 border-x border-y border-stroke rounded-lg px-2 pb-2'>
-                  <ImageUpload
-                    files={idProofPhotos}
-                    setFile={setIdProofPhotos}
-                    setSingleFile={setIdProofPhotosFile}
-                    uploads={idProofUploads}
-                    setUploads={setIdProofUploads}
-                    noBorder={true}
-                    setEdit={setEditIdProof}
-                  />
-
-                  <div
-                    className={`flex gap-2 justify-between border-x border-y ${
-                      editIdNumber ? '' : 'border-stroke'
-                    }  p-2 rounded`}
-                  >
-                    <div className='flex gap-2 w-full'>
-                      <p className='text-dark-grey text-xs font-normal self-center'>
-                        {values?.applicants?.[activeIndex]?.personal_details?.id_type}:
-                      </p>
-                      <UploadDocsInput
-                        name={`applicants[${activeIndex}].personal_details.id_number`}
-                        value={values?.applicants?.[activeIndex]?.personal_details?.id_number}
-                        onChange={(e) => {
-                          e.target.value = e.target.value.toUpperCase();
-                          handleTextInputChange(e);
-                        }}
-                        error={errors.applicants?.[activeIndex]?.personal_details?.id_number}
-                        touched={
-                          touched?.applicants &&
-                          touched?.applicants?.[activeIndex]?.personal_details?.id_number
-                        }
-                        ref={idRef}
-                        disabled={editIdNumber ? false : true}
-                        onBlur={handleBlur}
-                        inputClasses='text-xs capitalize h-3'
-                      />
-                    </div>
-                    {idStatus !== 'Valid' &&
-                      (!editIdNumber ? (
-                        <p className='flex gap-1 items-center'>
-                          <svg
-                            width='16'
-                            height='16'
-                            viewBox='0 0 16 16'
-                            fill='none'
-                            xmlns='http://www.w3.org/2000/svg'
-                          >
-                            <path
-                              d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
-                              stroke='#E33439'
-                              strokeLinecap='round'
-                            />
-                          </svg>
-
-                          <span
-                            className='text-primary-red text-xs font-normal'
-                            onClick={() => setEditIdNumber(!editIdNumber)}
-                          >
-                            Edit
-                          </span>
-                        </p>
-                      ) : (
-                        <span
-                          className='text-primary-red text-xs font-normal flex items-center'
-                          onClick={() => setEditIdNumber(!editIdNumber)}
-                        >
-                          Save
-                        </span>
-                      ))}
-                  </div>
-
-                  <div className='flex justify-between mt-1'>
-                    <div className='flex items-center gap-1'>
-                      {idStatus === 'Valid' ? (
-                        <>
-                          <svg
-                            width='18'
-                            height='18'
-                            viewBox='0 0 18 18'
-                            fill='none'
-                            xmlns='http://www.w3.org/2000/svg'
-                          >
-                            <path
-                              d='M15 4.5L6.75 12.75L3 9'
-                              stroke='#147257'
-                              strokeWidth='1.5'
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                            />
-                          </svg>
-                          <span className='text-secondary-green leading-5 text-xs font-normal'>
-                            Verified
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <svg
-                            width='16'
-                            height='16'
-                            viewBox='0 0 16 16'
-                            fill='none'
-                            xmlns='http://www.w3.org/2000/svg'
-                          >
-                            <g clipPath='url(#clip0_3732_51311)'>
-                              <path
-                                d='M8 5.28003V8.3867'
-                                stroke='#E33439'
-                                strokeWidth='1.5'
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                              />
-                              <path
-                                d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
-                                fill='#E33439'
-                              />
-                              <path
-                                d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
-                                stroke='#E33439'
-                                strokeWidth='1.5'
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                              />
-                            </g>
-                            <defs>
-                              <clipPath id='clip0_3732_51311'>
-                                <rect width='16' height='16' fill='white' />
-                              </clipPath>
-                            </defs>
-                          </svg>
-                          <span className='text-primary-red leading-5 text-xs font-normal'>
-                            Not Verified
-                          </span>
-                        </>
-                      )}
-                    </div>
-
-                    {idStatus !== 'Valid' && (
-                      <p className='text-light-grey leading-5 text-xs font-normal'>
-                        Photo mandatory
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ) : (
+            {isQaulifierActivated ? (
+              <div className='bg-white mt-1 border-x border-y border-stroke rounded-lg px-2 pb-2'>
                 <ImageUpload
                   files={idProofPhotos}
                   setFile={setIdProofPhotos}
                   setSingleFile={setIdProofPhotosFile}
                   uploads={idProofUploads}
                   setUploads={setIdProofUploads}
+                  noBorder={true}
                   setEdit={setEditIdProof}
                 />
-              )}
 
-              {isQaulifierActivated && (
-                <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
-                  To be verified during the eligibility step
-                </p>
-              )}
-            </div>
-          </div>
+                <div
+                  className={`flex gap-2 justify-between border-x border-y ${
+                    editIdNumber ? '' : 'border-stroke'
+                  }  p-2 rounded`}
+                >
+                  <div className='flex gap-2 w-full'>
+                    <p className='text-dark-grey text-xs font-normal self-center'>
+                      {values?.applicants?.[activeIndex]?.personal_details?.id_type}:
+                    </p>
+                    <UploadDocsInput
+                      name={`applicants[${activeIndex}].personal_details.id_number`}
+                      value={values?.applicants?.[activeIndex]?.personal_details?.id_number}
+                      onChange={(e) => {
+                        e.target.value = e.target.value.toUpperCase();
+                        handleTextInputChange(e);
+                      }}
+                      error={errors.applicants?.[activeIndex]?.personal_details?.id_number}
+                      touched={
+                        touched?.applicants &&
+                        touched?.applicants?.[activeIndex]?.personal_details?.id_number
+                      }
+                      ref={idRef}
+                      disabled={editIdNumber ? false : true}
+                      onBlur={(e) => {
+                        handleBlur(e);
 
-          <div className='flex flex-col gap-5'>
-            <DropDown
-              label='Select address proof'
-              name={`applicants[${activeIndex}].personal_details.selected_address_proof`}
-              required
-              options={manualModeDropdownOptions[1].options}
-              placeholder='Choose address proof'
-              onChange={changeSelectedAddressProof}
-              defaultSelected={
-                values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
-              }
-              // error={errors.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
-              touched={
-                touched?.applicants &&
-                touched.applicants?.[activeIndex]?.personal_details?.selected_address_proof
-              }
-              disabled={
-                values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
-                  ? true
-                  : false
-              }
-              disableOption={values?.applicants?.[activeIndex]?.personal_details?.id_type}
-              onBlur={(e) => {
-                handleBlur(e);
-              }}
-            />
-
-            <div>
-              <label className='flex gap-0.5 items-center text-primary-black font-medium'>
-                Address proof
-                <span className='text-primary-red text-sm'>*</span>
-              </label>
-              <span
-                className='mb-1.5 text-light-grey text-xs font-normal'
-                dangerouslySetInnerHTML={{
-                  __html: 'File size should be less than 5MB',
-                }}
-              />
-
-              {isQaulifierActivated ? (
-                <div className='bg-white mt-1 border-x border-y border-stroke rounded-lg px-2 pb-2'>
-                  <ImageUpload
-                    files={addressProofPhotos}
-                    setFile={setAddressProofPhotos}
-                    setSingleFile={setAddressProofPhotosFile}
-                    setEdit={setEditAddressProof}
-                    uploads={addressProofUploads}
-                    setUploads={setAddressProofUploads}
-                    noBorder={true}
-                  />
-
-                  <div
-                    className={`flex gap-2 justify-between border-x border-y ${
-                      editAddressNumber ? '' : 'border-stroke'
-                    }  p-2 rounded`}
-                  >
-                    <div className='flex gap-2 w-full'>
-                      <p className='text-dark-grey text-xs font-normal self-center'>
-                        {
-                          values?.applicants?.[activeIndex]?.personal_details
-                            ?.selected_address_proof
+                        if (!errors.applicants?.[activeIndex]?.personal_details?.id_number) {
+                          editFieldsById(
+                            values?.applicants?.[activeIndex]?.personal_details.id,
+                            'personal',
+                            {
+                              id_number: e.target.value,
+                            },
+                          );
                         }
-                        :
-                      </p>
-                      <UploadDocsInput
-                        name={`applicants[${activeIndex}].personal_details.address_proof_number`}
-                        value={
-                          values?.applicants?.[activeIndex]?.personal_details?.address_proof_number
-                        }
-                        onChange={(e) => {
-                          e.target.value = e.target.value.toUpperCase();
-                          handleTextInputChange(e);
-                        }}
-                        error={
-                          errors.applicants?.[activeIndex]?.personal_details?.address_proof_number
-                        }
-                        touched={
-                          touched?.applicants &&
-                          touched?.applicants?.[activeIndex]?.personal_details?.address_proof_number
-                        }
-                        ref={addressRef}
-                        disabled={editAddressNumber ? false : true}
-                        onBlur={handleBlur}
-                        inputClasses='text-xs capitalize h-3'
-                      />
-                    </div>
-
-                    {addressStatus !== 'Valid' &&
-                      (!editAddressNumber ? (
-                        <p className='flex gap-1 items-center'>
-                          <svg
-                            width='16'
-                            height='16'
-                            viewBox='0 0 16 16'
-                            fill='none'
-                            xmlns='http://www.w3.org/2000/svg'
-                          >
-                            <path
-                              d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
-                              stroke='#E33439'
-                              strokeLinecap='round'
-                            />
-                          </svg>
-
-                          <span
-                            className='text-primary-red text-xs font-normal'
-                            onClick={() => setEditAddressNumber(!editAddressNumber)}
-                          >
-                            Edit
-                          </span>
-                        </p>
-                      ) : (
-                        <span
-                          className='text-primary-red text-xs font-normal flex items-center'
-                          onClick={() => setEditAddressNumber(!editAddressNumber)}
-                        >
-                          Save
-                        </span>
-                      ))}
+                      }}
+                      inputClasses='text-xs capitalize h-3'
+                    />
                   </div>
+                  {idStatus !== 'Valid' &&
+                    (!editIdNumber ? (
+                      <p className='flex gap-1 items-center'>
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
+                            stroke='#E33439'
+                            strokeLinecap='round'
+                          />
+                        </svg>
 
-                  <div className='flex justify-between mt-1'>
-                    <div className='flex items-center gap-1'>
-                      {addressStatus === 'Valid' ? (
-                        <>
-                          <svg
-                            width='18'
-                            height='18'
-                            viewBox='0 0 18 18'
-                            fill='none'
-                            xmlns='http://www.w3.org/2000/svg'
-                          >
+                        <span
+                          className='text-primary-red text-xs font-normal'
+                          onClick={() => setEditIdNumber(!editIdNumber)}
+                        >
+                          Edit
+                        </span>
+                      </p>
+                    ) : (
+                      <span
+                        className='text-primary-red text-xs font-normal flex items-center'
+                        onClick={() => setEditIdNumber(!editIdNumber)}
+                      >
+                        Save
+                      </span>
+                    ))}
+                </div>
+
+                <div className='flex justify-between mt-1'>
+                  <div className='flex items-center gap-1'>
+                    {idStatus === 'Valid' ? (
+                      <>
+                        <svg
+                          width='18'
+                          height='18'
+                          viewBox='0 0 18 18'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M15 4.5L6.75 12.75L3 9'
+                            stroke='#147257'
+                            strokeWidth='1.5'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                          />
+                        </svg>
+                        <span className='text-secondary-green leading-5 text-xs font-normal'>
+                          Verified
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <g clipPath='url(#clip0_3732_51311)'>
                             <path
-                              d='M15 4.5L6.75 12.75L3 9'
-                              stroke='#147257'
+                              d='M8 5.28003V8.3867'
+                              stroke='#E33439'
                               strokeWidth='1.5'
                               strokeLinecap='round'
                               strokeLinejoin='round'
                             />
-                          </svg>
-                          <span className='text-secondary-green leading-5 text-xs font-normal'>
-                            Verified
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <svg
-                            width='16'
-                            height='16'
-                            viewBox='0 0 16 16'
-                            fill='none'
-                            xmlns='http://www.w3.org/2000/svg'
-                          >
-                            <g clipPath='url(#clip0_3732_51311)'>
-                              <path
-                                d='M8 5.28003V8.3867'
-                                stroke='#E33439'
-                                strokeWidth='1.5'
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                              />
-                              <path
-                                d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
-                                fill='#E33439'
-                              />
-                              <path
-                                d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
-                                stroke='#E33439'
-                                strokeWidth='1.5'
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                              />
-                            </g>
-                            <defs>
-                              <clipPath id='clip0_3732_51311'>
-                                <rect width='16' height='16' fill='white' />
-                              </clipPath>
-                            </defs>
-                          </svg>
-                          <span className='text-primary-red leading-5 text-xs font-normal'>
-                            Not Verified
-                          </span>
-                        </>
-                      )}
-                    </div>
-
-                    {addressStatus !== 'Valid' && (
-                      <p className='text-light-grey leading-5 text-xs font-normal'>
-                        Photo mandatory
-                      </p>
+                            <path
+                              d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
+                              fill='#E33439'
+                            />
+                            <path
+                              d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id='clip0_3732_51311'>
+                              <rect width='16' height='16' fill='white' />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <span className='text-primary-red leading-5 text-xs font-normal'>
+                          Not Verified
+                        </span>
+                      </>
                     )}
                   </div>
+
+                  {idStatus !== 'Valid' && (
+                    <p className='text-light-grey leading-5 text-xs font-normal'>Photo mandatory</p>
+                  )}
                 </div>
-              ) : (
+              </div>
+            ) : (
+              <ImageUpload
+                files={idProofPhotos}
+                setFile={setIdProofPhotos}
+                setSingleFile={setIdProofPhotosFile}
+                uploads={idProofUploads}
+                setUploads={setIdProofUploads}
+                setEdit={setEditIdProof}
+              />
+            )}
+
+            {isQaulifierActivated && (
+              <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
+                To be verified during the eligibility step
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className='flex flex-col gap-5'>
+          <DropDown
+            label='Select address proof'
+            name={`applicants[${activeIndex}].personal_details.selected_address_proof`}
+            required
+            options={manualModeDropdownOptions[1].options}
+            placeholder='Choose address proof'
+            onChange={changeSelectedAddressProof}
+            defaultSelected={
+              values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+            }
+            // error={errors.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
+            touched={
+              touched?.applicants &&
+              touched.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+            }
+            disabled={
+              values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+                ? true
+                : false
+            }
+            disableOption={values?.applicants?.[activeIndex]?.personal_details?.id_type}
+            onBlur={(e) => {
+              handleBlur(e);
+            }}
+          />
+
+          <div>
+            <label className='flex gap-0.5 items-center text-primary-black font-medium'>
+              Address proof
+              <span className='text-primary-red text-sm'>*</span>
+            </label>
+            <span
+              className='mb-1.5 text-light-grey text-xs font-normal'
+              dangerouslySetInnerHTML={{
+                __html: 'File size should be less than 5MB',
+              }}
+            />
+
+            {isQaulifierActivated ? (
+              <div className='bg-white mt-1 border-x border-y border-stroke rounded-lg px-2 pb-2'>
                 <ImageUpload
                   files={addressProofPhotos}
                   setFile={setAddressProofPhotos}
@@ -1785,124 +1811,284 @@ const UploadDocuments = () => {
                   setEdit={setEditAddressProof}
                   uploads={addressProofUploads}
                   setUploads={setAddressProofUploads}
+                  noBorder={true}
                 />
-              )}
 
-              {isQaulifierActivated && (
-                <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
-                  To be verified during the eligibility step
-                </p>
-              )}
-            </div>
-          </div>
+                <div
+                  className={`flex gap-2 justify-between border-x border-y ${
+                    editAddressNumber ? '' : 'border-stroke'
+                  }  p-2 rounded`}
+                >
+                  <div className='flex gap-2 w-full'>
+                    <p className='text-dark-grey text-xs font-normal self-center'>
+                      {values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}:
+                    </p>
+                    <UploadDocsInput
+                      name={`applicants[${activeIndex}].personal_details.address_proof_number`}
+                      value={
+                        values?.applicants?.[activeIndex]?.personal_details?.address_proof_number
+                      }
+                      onChange={(e) => {
+                        e.target.value = e.target.value.toUpperCase();
+                        handleTextInputChange(e);
+                      }}
+                      error={
+                        errors.applicants?.[activeIndex]?.personal_details?.address_proof_number
+                      }
+                      touched={
+                        touched?.applicants &&
+                        touched?.applicants?.[activeIndex]?.personal_details?.address_proof_number
+                      }
+                      ref={addressRef}
+                      disabled={editAddressNumber ? false : true}
+                      onBlur={(e) => {
+                        handleBlur(e);
 
-          <PdfAndImageUpload
-            files={propertyPapers}
-            setFile={setPropertyPapers}
-            uploads={propertyPaperUploads}
-            setUploads={setPropertyPaperUploads}
-            setEdit={setEditPropertyPaper}
-            pdf={propertyPdf}
-            setPdf={setPropertyPdf}
-            label='Property papers'
-            required
-            hint='File size should be less than 5MB'
-            setSingleFile={setPropertyPapersFile}
-          />
+                        if (
+                          !errors.applicants?.[activeIndex]?.personal_details?.address_proof_number
+                        ) {
+                          editFieldsById(
+                            values?.applicants?.[activeIndex]?.personal_details.id,
+                            'personal',
+                            {
+                              address_proof_number: e.target.value,
+                            },
+                          );
+                        }
+                      }}
+                      inputClasses='text-xs capitalize h-3'
+                    />
+                  </div>
 
-          <ImageUpload
-            files={salarySlipPhotos}
-            setFile={setSalarySlipPhotos}
-            uploads={salarySlipUploads}
-            setUploads={setSalarySlipUploads}
-            setEdit={setEditSalarySlip}
-            label='Salary slip'
-            required
-            hint='File size should be less than 5MB'
-            setSingleFile={setSalarySlipPhotosFile}
-          />
+                  {addressStatus !== 'Valid' &&
+                    (!editAddressNumber ? (
+                      <p className='flex gap-1 items-center'>
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
+                            stroke='#E33439'
+                            strokeLinecap='round'
+                          />
+                        </svg>
 
-          <ImageUpload
-            files={form60photos}
-            setFile={setForm60photos}
-            uploads={form60Uploads}
-            setUploads={setForm60Uploads}
-            setEdit={setEditForm60}
-            label='Form 60'
-            required
-            hint='File size should be less than 5MB'
-            setSingleFile={setForm60photosFile}
-          />
+                        <span
+                          className='text-primary-red text-xs font-normal'
+                          onClick={() => setEditAddressNumber(!editAddressNumber)}
+                        >
+                          Edit
+                        </span>
+                      </p>
+                    ) : (
+                      <span
+                        className='text-primary-red text-xs font-normal flex items-center'
+                        onClick={() => setEditAddressNumber(!editAddressNumber)}
+                      >
+                        Save
+                      </span>
+                    ))}
+                </div>
 
-          <ImageUpload
-            files={propertyPhotos}
-            setFile={setPropertyPhotos}
-            uploads={propertyUploads}
-            setUploads={setPropertyUploads}
-            setEdit={setEditProperty}
-            label='Property image'
-            required
-            hint='File size should be less than 5MB'
-            setSingleFile={setPropertyPhotosFile}
-          />
+                <div className='flex justify-between mt-1'>
+                  <div className='flex items-center gap-1'>
+                    {addressStatus === 'Valid' ? (
+                      <>
+                        <svg
+                          width='18'
+                          height='18'
+                          viewBox='0 0 18 18'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M15 4.5L6.75 12.75L3 9'
+                            stroke='#147257'
+                            strokeWidth='1.5'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                          />
+                        </svg>
+                        <span className='text-secondary-green leading-5 text-xs font-normal'>
+                          Verified
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <g clipPath='url(#clip0_3732_51311)'>
+                            <path
+                              d='M8 5.28003V8.3867'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                            <path
+                              d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
+                              fill='#E33439'
+                            />
+                            <path
+                              d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id='clip0_3732_51311'>
+                              <rect width='16' height='16' fill='white' />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <span className='text-primary-red leading-5 text-xs font-normal'>
+                          Not Verified
+                        </span>
+                      </>
+                    )}
+                  </div>
 
-          <div className='flex justify-between gap-2'>
-            <div className='w-[65%]'>
-              <PhotoUpload
-                files={selfie}
-                setFile={setSelfie}
-                setSingleFile={setSelfieFile}
-                uploads={selfieUploads}
-                setUploads={setSelfieUploads}
-                label='Upload selfie'
-                required
+                  {addressStatus !== 'Valid' && (
+                    <p className='text-light-grey leading-5 text-xs font-normal'>Photo mandatory</p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <ImageUpload
+                files={addressProofPhotos}
+                setFile={setAddressProofPhotos}
+                setSingleFile={setAddressProofPhotosFile}
+                setEdit={setEditAddressProof}
+                uploads={addressProofUploads}
+                setUploads={setAddressProofUploads}
               />
-            </div>
+            )}
 
-            <button
-              className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
-                mobileVerified || hasSentOTPOnce || selfie.length === 0
-                  ? 'text-dark-grey bg-stroke pointer-events-none'
-                  : 'bg-primary-red text-white'
-              }`}
-              disabled={disablePhoneNumber || mobileVerified}
-              onClick={sendMobileOtp}
-            >
-              Send OTP
-            </button>
+            {isQaulifierActivated && (
+              <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
+                To be verified during the eligibility step
+              </p>
+            )}
+          </div>
+        </div>
+
+        <PdfAndImageUpload
+          files={propertyPapers}
+          setFile={setPropertyPapers}
+          uploads={propertyPaperUploads}
+          setUploads={setPropertyPaperUploads}
+          setEdit={setEditPropertyPaper}
+          pdf={propertyPdf}
+          setPdf={setPropertyPdf}
+          label='Property papers'
+          required
+          hint='File size should be less than 5MB'
+          setSingleFile={setPropertyPapersFile}
+        />
+
+        <ImageUpload
+          files={salarySlipPhotos}
+          setFile={setSalarySlipPhotos}
+          uploads={salarySlipUploads}
+          setUploads={setSalarySlipUploads}
+          setEdit={setEditSalarySlip}
+          label='Salary slip'
+          required
+          hint='File size should be less than 5MB'
+          setSingleFile={setSalarySlipPhotosFile}
+        />
+
+        <ImageUpload
+          files={form60photos}
+          setFile={setForm60photos}
+          uploads={form60Uploads}
+          setUploads={setForm60Uploads}
+          setEdit={setEditForm60}
+          label='Form 60'
+          required
+          hint='File size should be less than 5MB'
+          setSingleFile={setForm60photosFile}
+        />
+
+        <ImageUpload
+          files={propertyPhotos}
+          setFile={setPropertyPhotos}
+          uploads={propertyUploads}
+          setUploads={setPropertyUploads}
+          setEdit={setEditProperty}
+          label='Property image'
+          required
+          hint='File size should be less than 5MB'
+          setSingleFile={setPropertyPhotosFile}
+        />
+
+        <div className='flex justify-between gap-2'>
+          <div className='w-[65%]'>
+            <PhotoUpload
+              files={selfie}
+              setFile={setSelfie}
+              setSingleFile={setSelfieFile}
+              uploads={selfieUploads}
+              setUploads={setSelfieUploads}
+              label='Upload selfie'
+              required
+            />
           </div>
 
-          {showOTPInput && selfie.length >= 1 ? (
-            <OtpInputNoEdit
-              label='Enter OTP'
-              required
-              verified={mobileVerified}
-              setOTPVerified={setMobileVerified}
-              onSendOTPClick={sendMobileOtp}
-              defaultResendTime={30}
-              disableSendOTP={!mobileVerified}
-              verifyOTPCB={verifyOTP}
-              hasSentOTPOnce={hasSentOTPOnce}
-            />
-          ) : null}
-
-          <ImageUpload
-            files={docs}
-            setFile={setDocs}
-            uploads={docUploads}
-            setUploads={setDocUploads}
-            setEdit={setEditDoc}
-            label='Other documents'
-            required
-            hint='File size should be less than 5MB'
-            setSingleFile={setDocsFile}
-          />
+          <button
+            className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
+              mobileVerified || hasSentOTPOnce || selfie.length === 0
+                ? 'text-dark-grey bg-stroke pointer-events-none'
+                : 'bg-primary-red text-white'
+            }`}
+            disabled={disablePhoneNumber || mobileVerified}
+            onClick={sendMobileOtp}
+          >
+            Send OTP
+          </button>
         </div>
-        <PreviousNextButtons linkPrevious='/lead/reference-details' linkNext='/lead/preview' />
 
-        <SwipeableDrawerComponent />
+        {showOTPInput && selfie.length >= 1 ? (
+          <OtpInputNoEdit
+            label='Enter OTP'
+            required
+            verified={mobileVerified}
+            setOTPVerified={setMobileVerified}
+            onSendOTPClick={sendMobileOtp}
+            defaultResendTime={30}
+            disableSendOTP={!mobileVerified}
+            verifyOTPCB={verifyOTP}
+            hasSentOTPOnce={hasSentOTPOnce}
+          />
+        ) : null}
+
+        <ImageUpload
+          files={docs}
+          setFile={setDocs}
+          uploads={docUploads}
+          setUploads={setDocUploads}
+          setEdit={setEditDoc}
+          label='Other documents'
+          required
+          hint='File size should be less than 5MB'
+          setSingleFile={setDocsFile}
+        />
       </div>
-    </>
+
+      <PreviousNextButtons linkPrevious='/lead/reference-details' linkNext='/lead/preview' />
+      <SwipeableDrawerComponent />
+    </div>
   );
 };
 

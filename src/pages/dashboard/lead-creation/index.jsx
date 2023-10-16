@@ -19,8 +19,6 @@ const PropertyDetails = lazy(() => import('./property-details'));
 const UploadDocuments = lazy(() => import('./upload-documents'));
 
 const LeadCreationRoutes = () => {
-  const params = useParams();
-
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

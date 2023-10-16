@@ -49,9 +49,11 @@ const UploadDocsModal = ({
                           alt={photo.document_fetch_url}
                           className='h-full w-full object-cover object-center rounded-t-lg'
                         />
-                        <p className='absolute bottom-0 left-0 text-white p-3'>
-                          Lat: {lat}, Long: {long}
-                        </p>
+                        {lat && long ? (
+                          <p className='absolute bottom-0 left-0 text-white p-3'>
+                            Lat: {lat}, Long: {long}
+                          </p>
+                        ) : null}
                       </div>
                     ),
                 )
