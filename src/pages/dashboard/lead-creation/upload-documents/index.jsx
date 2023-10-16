@@ -1529,19 +1529,18 @@ const UploadDocuments = () => {
 
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
-        {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
-          <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
-        ) : (
-          <Topbar
-            title='Adding Co-applicant'
-            id={values?.lead?.id}
-            showClose={false}
-            showBack={true}
-            coApplicant={true}
-          />
-        )}
-      </div>
+      {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+        <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+      ) : (
+        <Topbar
+          title='Adding Co-applicant'
+          id={values?.lead?.id}
+          showClose={false}
+          showBack={true}
+          coApplicant={true}
+        />
+      )}
+
       <ToastMessage message={toastMessage} setMessage={setToastMessage} />
 
       <div className='flex flex-col bg-medium-grey gap-9 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>

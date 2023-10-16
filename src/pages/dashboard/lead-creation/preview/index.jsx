@@ -687,7 +687,7 @@ export default function Preview() {
     <>
       <div className='overflow-hidden flex flex-col h-[100vh] bg-[#F9F9F9]'>
         <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
-        <div className='py-4'>
+        <div className='pt-4 overflow-auto no-scrollbar'>
           <div className='px-6 mb-3 flex justify-between'>
             <span className='text-xs not-italic font-medium text-dark-grey'>APPLICANTS</span>
             <span className='text-right text-xs not-italic font-normal text-primary-black'>{`${
@@ -748,9 +748,9 @@ export default function Preview() {
               </Step>
             ))}
           </Stepper>
-        </div>
 
-        {activeStep == 0 ? <PrimaryApplicantDetails /> : <CoApplicantDetails />}
+          {activeStep == 0 ? <PrimaryApplicantDetails /> : <CoApplicantDetails />}
+        </div>
 
         <div
           className='flex w-[100vw] p-[18px] bg-white gap-[20px] justify-end'
@@ -843,7 +843,7 @@ function PreviewCard({ title, count, link, hide, children }) {
 
 function StepCompleted() {
   return (
-    <div className='h-full w-full flex justify-center items-center bg-[#EEF0DD]'>
+    <div className='h-full w-full flex justify-center items-center bg-[#EEF0DD] mt-[20px]'>
       <StepCompletedIllustration />
     </div>
   );

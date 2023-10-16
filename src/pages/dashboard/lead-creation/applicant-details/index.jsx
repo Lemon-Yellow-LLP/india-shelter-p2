@@ -758,13 +758,14 @@ const ApplicantDetails = () => {
             disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
           />
         </div>
-
+        {console.log(errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details)}
+        {console.log(errors.lead)}
         <PreviousNextButtons
           disablePrevious={true}
           disableNext={
             !values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
             (errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details) ||
-            errors.lead
+            Object.values(errors?.lead || {}).some((value) => value !== null)
           }
           onNextClick={() => {
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
