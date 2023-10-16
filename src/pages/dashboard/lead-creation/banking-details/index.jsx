@@ -151,17 +151,19 @@ const BankingDetails = () => {
   };
 
   const fetchBanking = async () => {
-    await axios
-      .get(
-        `https://lo.scotttiger.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
-      )
-      .then(({ data }) => {
-        const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
-        setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (values?.applicants?.[activeIndex]?.applicant_details?.id) {
+      await axios
+        .get(
+          `https://lo.scotttiger.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+        )
+        .then(({ data }) => {
+          const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
+          setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   useEffect(() => {
