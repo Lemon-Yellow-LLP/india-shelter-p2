@@ -16,16 +16,15 @@ import {
   verifyVoterID,
   checkBre101,
   editFieldsById,
+  getApplicantById,
 } from '../../../../global';
 import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
 import LeadContextProvider, { LeadContext } from '../../../../context/LeadContextProvider';
-import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const BRE_ONE = () => {
   const addApplicant = useContext(LeadContextProvider);
   const { activeIndex, values, setFieldValue } = useContext(LeadContext);
-  const { setIsQaulifierActivated } = useContext(AuthContext);
 
   const SpeedoMeterAnimationRef = useRef(null);
 
@@ -80,6 +79,73 @@ const BRE_ONE = () => {
 
   useEffect(() => {
     async function breOne() {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
+
+      const bre_101_response = res.bre_101_response;
+
+      if (bre_101_response) {
+        setProgress(
+          values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+              'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
+            ? 6
+            : 5,
+        );
+
+        setDL((prev) => ({
+          ...prev,
+          loader: false,
+          ran: true,
+          res: bre_101_response.body.Display.DL_Status,
+        }));
+
+        setVoterID((prev) => ({
+          ...prev,
+          loader: false,
+          ran: true,
+          res: bre_101_response.body.Display.Voter_Status,
+        }));
+
+        setPfUAN((prev) => ({
+          ...prev,
+          loader: false,
+          ran: true,
+          res: bre_101_response.body.Display.UAN_Status,
+        }));
+
+        setGST((prev) => ({
+          ...prev,
+          loader: false,
+          ran: true,
+          res: bre_101_response.body.Display.GST_Status,
+        }));
+
+        setPAN((prev) => ({
+          ...prev,
+          loader: false,
+          ran: true,
+          res: bre_101_response.body.Display.PAN_status,
+        }));
+
+        setDedupe((prev) => ({ ...prev, ran: true }));
+        setBre99((prev) => ({ ...prev, ran: true }));
+        setBureau((prev) => ({ ...prev, ran: true }));
+
+        if (bre_101_response.body.Display.red_amber_green === 'Red') {
+          setBre101((prev) => ({ ...prev, red: true, res: true }));
+        }
+        if (bre_101_response.body.Display.red_amber_green === 'Amber') {
+          setBre101((prev) => ({ ...prev, amber: true, res: true }));
+        }
+        if (bre_101_response.body.Display.red_amber_green === 'Green') {
+          setBre101((prev) => ({ ...prev, green: true, res: true }));
+        }
+
+        return;
+      }
+
       if (
         values.applicants[activeIndex]?.personal_details.id_type === 'PAN' ||
         values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN'
@@ -250,7 +316,7 @@ const BRE_ONE = () => {
           {},
         );
 
-        if (bre99_res.bre_99_response.statusCode === 200) {
+        if (bre99_res.bre_99_response.statusCode == 200) {
           setBre99((prev) => ({ ...prev, loader: false, res: 'Valid' }));
           const bre99body = bre99_res.bre_99_response.body;
           callCibilOrCrif = bre99body.find((data) => data.Rule_Name === 'Bureau_Type');
@@ -277,7 +343,7 @@ const BRE_ONE = () => {
             values?.applicants?.[activeIndex]?.applicant_details.id,
             {},
           );
-          if (cibil_res.status === 200) {
+          if (cibil_res.status == 200) {
             setBureau((prev) => ({
               ...prev,
               loader: false,
@@ -298,7 +364,7 @@ const BRE_ONE = () => {
             values?.applicants?.[activeIndex]?.applicant_details.id,
             {},
           );
-          if (crif_res.status === 200) {
+          if (crif_res.status == 200) {
             setBureau((prev) => ({
               ...prev,
               loader: false,
@@ -321,21 +387,20 @@ const BRE_ONE = () => {
           {},
         );
 
-        if (bre_res.bre_101_response.statusCode !== 200) return;
+        if (bre_res.bre_101_response.statusCode != 200) return;
 
         let new_data = { ...values };
 
-        new_data.applicants[activeIndex].applicant_details.extra_params.qualifier = true;
+        // new_data.applicants[activeIndex].applicant_details.extra_params.qualifier = true;
+        const extra_parmas = new_data.applicants[activeIndex].applicant_details.extra_params;
+        const edited_extra_params = { ...extra_parmas, qualifier: true };
 
-        await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          new_data.applicants?.[activeIndex]?.applicant_details,
-        );
+        await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
+          bre_101_response: bre_res.bre_101_response,
+          extra_params: edited_extra_params,
+        });
 
         setFieldValue(`applicants[${activeIndex}].applicant_details.extra_params.qualifier`, true);
-
-        setIsQaulifierActivated(bre_res);
 
         setDL((prev) => ({
           ...prev,
@@ -428,7 +493,14 @@ const BRE_ONE = () => {
         <div className='flex justify-between text-primary-black font-medium'>
           <h3>Verification in progress</h3>
           <h3>
-            {progress}/{voterID.ran || DL.ran ? 6 : 5}
+            {progress}/
+            {values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+              'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
+              ? 6
+              : 5}
           </h3>
         </div>
 
@@ -852,7 +924,7 @@ const BRE_ONE = () => {
               className={`underline ${
                 !bre101.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
               }`}
-              onClick={() => addApplicant()}
+              link='/lead/applicant-details'
             >
               Add now
             </Button>

@@ -22,29 +22,11 @@ function ImageUpload({
 
   const [show, setShow] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
-  const [lat, setLat] = useState('');
-  const [long, setLong] = useState('');
 
   const handleFile = (e) => {
     setMessage('');
 
     setLoader(true);
-
-    let userLocation = navigator.geolocation;
-
-    if (userLocation) {
-      userLocation.getCurrentPosition(success);
-    } else {
-      ('The geolocation API is not supported by your browser.');
-    }
-
-    function success(data) {
-      let lat = data.coords.latitude;
-      let long = data.coords.longitude;
-
-      setLat(lat);
-      setLong(long);
-    }
 
     let file = e.target.files;
 
@@ -394,8 +376,6 @@ function ImageUpload({
             setShowPopUp={setShow}
             index={previewFile}
             callback={removeImage}
-            lat={lat}
-            long={long}
             photos={uploads.data}
           />
 

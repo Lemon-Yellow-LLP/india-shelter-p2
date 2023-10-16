@@ -269,6 +269,14 @@ async function verifyUploadOtp(id, otp) {
   return res;
 }
 
+async function updateLeadDataOnBlur(leadId, fieldName, value) {
+  if (!leadId) return;
+  const inputName = fieldName;
+  const updatedFieldValue = {};
+  updatedFieldValue[inputName] = value;
+  return editLeadById(leadId, updatedFieldValue);
+}
+
 function NaNorNull(value, toReturn = null) {
   return isNaN(value) ? toReturn : value;
 }

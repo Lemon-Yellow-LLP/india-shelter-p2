@@ -22,6 +22,7 @@ import Button from '../../Button';
 import DrawerStepBanking from './DrawerStepBanking';
 import QualifierStep from './QualifierStep';
 import EligibilityStep from './EligibilityStep';
+import UploadSteps from './UplodSteps';
 
 const drawerBleeding = 0;
 
@@ -393,7 +394,7 @@ export default function SwipeableDrawerComponent() {
                         ?.progress !== 100
                     }
                   />
-                  <DrawerSteps
+                  <UploadSteps
                     key={9}
                     details={applicantStepsProgress[9]}
                     steps={true}
@@ -586,7 +587,7 @@ export default function SwipeableDrawerComponent() {
                                   ?.extra_params?.qualifier
                               }
                             />
-                            <DrawerSteps
+                            <UploadSteps
                               key={6}
                               details={coApplicantStepsProgress[6]}
                               steps={true}
@@ -594,7 +595,7 @@ export default function SwipeableDrawerComponent() {
                               stepIndex={6}
                               lock={
                                 values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.progress !== 100
+                                  ?.extra_params?.upload_progress !== 100
                               }
                             />
                           </div>

@@ -15,6 +15,18 @@ export const newCoApplicantValues = {
       is_existing: false,
       is_existing_done: false,
       upload_progress: 0,
+      upload_required_fields_status: {
+        customer_photo: false,
+        id_proof: false,
+        address_proof: false,
+        property_paper: false,
+        salary_slip: false,
+        form_60: false,
+        property_image: false,
+        upload_selfie: false,
+        other_doc: false,
+      },
+      upload_progress: 0,
       upload_required_fields_status: {},
       required_fields_status: {
         loan_type: true,
