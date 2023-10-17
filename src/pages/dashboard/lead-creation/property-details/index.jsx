@@ -8,6 +8,8 @@ import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const propertyIdentificationOptions = [
   {

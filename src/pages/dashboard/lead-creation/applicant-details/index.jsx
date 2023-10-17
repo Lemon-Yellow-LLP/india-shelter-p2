@@ -33,6 +33,7 @@ import {
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const ApplicantDetails = () => {
   const {

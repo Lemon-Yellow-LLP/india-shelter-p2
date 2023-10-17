@@ -13,6 +13,8 @@ import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 import ErrorTost from '../../../../components/ToastMessage/ErrorTost';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 export const bankingMode = [
   {

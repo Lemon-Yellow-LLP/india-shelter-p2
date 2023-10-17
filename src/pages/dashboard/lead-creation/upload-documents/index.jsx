@@ -21,6 +21,8 @@ import imageCompression from 'browser-image-compression';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Topbar from '../../../../components/Topbar';
 
 const UploadDocuments = () => {
   const {

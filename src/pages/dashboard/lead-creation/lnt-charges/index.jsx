@@ -25,6 +25,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
+import Topbar from '../../../../components/Topbar';
 
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
@@ -497,6 +498,7 @@ const PaymentSuccess = ({ amount, method }) => {
               L&T charges have been paid using {method}
             </p>
           </div>
+          {/* </div> */}
           {/* </div> */}
         </div>
       </div>
