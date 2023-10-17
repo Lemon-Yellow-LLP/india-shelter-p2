@@ -424,7 +424,7 @@ export default function SwipeableDrawerComponent() {
                     index={primaryIndex}
                     stepIndex={11}
                     noProgress={true}
-                    lock={true}
+                    lock={false}
                   />
                 </div>
               </TabPanel>
