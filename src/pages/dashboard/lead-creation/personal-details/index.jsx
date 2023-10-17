@@ -10,8 +10,6 @@ import { Button } from '../../../../components';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
-import Topbar from '../../../../components/Topbar';
-import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const PersonalDetails = () => {
   const {

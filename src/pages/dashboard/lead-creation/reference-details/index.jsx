@@ -12,8 +12,6 @@ import { referenceDropdownOneOptions, referenceDropdownTwoOptions } from './Refe
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
-import Topbar from '../../../../components/Topbar';
-import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];

@@ -22,7 +22,6 @@ import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
 import LeadContextProvider, { LeadContext } from '../../../../context/LeadContextProvider';
 import Topbar from '../../../../components/Topbar';
-import Topbar from '../../../../components/Topbar';
 
 const BRE_ONE = () => {
   const addApplicant = useContext(LeadContextProvider);
