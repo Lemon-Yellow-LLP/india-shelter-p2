@@ -242,7 +242,11 @@ const BankingDetails = () => {
 
         <PreviousNextButtons
           linkPrevious='/lead/property-details'
-          linkNext='/lead/reference-details'
+          linkNext={
+            values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+              ? '/lead/reference-details'
+              : '/lead/upload-documents'
+          }
         />
         <SwipeableDrawerComponent />
 
