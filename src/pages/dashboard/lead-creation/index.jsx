@@ -1,7 +1,8 @@
 import React, { lazy, useEffect, useState } from 'react';
 import { Route, Routes, useParams, useNavigate } from 'react-router-dom';
 import SwipeableDrawerComponent from '../../../components/SwipeableDrawer/LeadDrawer';
-import BRE_ONE from './bre-screen';
+import Qualifier from './Qualifier';
+import Eligibility from './Eligibility';
 import Preview from './preview';
 import { Snackbar } from '@mui/material';
 import { useSearchParams, useLocation } from 'react-router-dom';
@@ -130,9 +131,10 @@ const LeadCreationRoutes = () => {
         <Route path='personal-details' element={<PersonalDetails />} />
         <Route path='reference-details' element={<ReferenceDetails />} />
         <Route path='work-income-details' element={<WorkIncomeDetails />} />
-        <Route path='qualifier' element={<BRE_ONE />} />
+        <Route path='qualifier' element={<Qualifier />} />
         <Route path='property-details' element={<PropertyDetails />} />
         <Route path='upload-documents' element={<UploadDocuments />} />
+        <Route path='eligibility' element={<Eligibility />}></Route>
         <Route path='preview' element={<Preview />} />
         <Route path='*' element={<h1>404, Page not found!</h1>} />
       </Routes>

@@ -1,6 +1,4 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { create } from '@lottiefiles/lottie-interactivity';
 
 import InfoIcon from '../../../../assets/icons/info.svg';
 import loading from '../../../../assets/icons/loading.svg';
@@ -19,14 +17,10 @@ import {
   getApplicantById,
 } from '../../../../global';
 import { Button } from '../../../../components';
-import SpeedoMeterAnimation from '../../../../components/speedometer';
 import LeadContextProvider, { LeadContext } from '../../../../context/LeadContextProvider';
 
-const BRE_ONE = () => {
-  const addApplicant = useContext(LeadContextProvider);
+const Eligibility = () => {
   const { activeIndex, values, setFieldValue } = useContext(LeadContext);
-
-  const SpeedoMeterAnimationRef = useRef(null);
 
   const [progress, setProgress] = useState(0);
 
@@ -78,7 +72,7 @@ const BRE_ONE = () => {
   });
 
   useEffect(() => {
-    async function breOne() {
+    async function breTwo() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
 
       const bre_101_response = res.bre_101_response;
@@ -446,51 +440,23 @@ const BRE_ONE = () => {
       }
     }
 
-    breOne();
+    breTwo();
   }, []);
 
-  function checkELigibilty() {
-    if (bre101.red) {
-      return [1, 3];
-    }
-    if (bre101.amber) {
-      return [1, 42.5];
-    }
-    if (bre101.green) {
-      return [1, 30];
-    } else {
-      [];
-    }
-  }
-
-  useEffect(() => {
-    if (SpeedoMeterAnimationRef.current && bre101.res);
-    create({
-      player: SpeedoMeterAnimationRef.current,
-      mode: 'chain',
-      actions: [
-        {
-          state: 'autoplay',
-          frames: bre101.res && checkELigibilty(),
-          repeat: 1,
-        },
-      ],
-    });
-  }, [bre101]);
-
   return (
-    <div className='p-4 relative h-screen'>
+    <div className='p-4 h-screen'>
       <div className='flex items-start gap-2'>
         <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
         <p className='text-xs not-italic font-normal text-dark-grey'>
-          The qualifier provides information regarding the status of all the verification and lead
+          The eligibilty provides information regarding the status of all the verification and lead
           eligibility.
         </p>
       </div>
 
       <div className='mt-4'>
         <p className='text-xs text-primary-black font-normal'>Applicant name: Santosh Yadav</p>
-        <div className='flex justify-between text-primary-black font-medium'>
+        <p className='text-xs text-primary-black font-normal mt-0.5'>Salesforce ID: 1234567</p>
+        <div className='flex justify-between text-primary-black font-medium mt-1'>
           <h3>Verification in progress</h3>
           <h3>
             {progress}/
@@ -504,22 +470,19 @@ const BRE_ONE = () => {
           </h3>
         </div>
 
-        <div className='flex justify-center mt-3'>
-          <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transitionDuration: 2 }}
-              exit={{ opacity: 0 }}
-            >
-              <SpeedoMeterAnimation
-                id='speedo-meter-animation'
-                className='w-[152px]'
-                loop
-                play
-                ref={SpeedoMeterAnimationRef}
+        <div className='flex justify-center gap-3 mt-3 bg-primary-black rounded-lg p-4'>
+          {true ? (
+            <div className='ml-auto flex items-center'>
+              <img
+                src={loading}
+                alt='loading'
+                className='h-8 w-8 animate-spin duration-300 ease-out'
               />
-            </motion.div>
-          </AnimatePresence>
+            </div>
+          ) : null}
+          <p className='text-white text-xs'>
+            Thank you for your patience while the verification process is completed.
+          </p>
         </div>
       </div>
 
@@ -916,30 +879,16 @@ const BRE_ONE = () => {
       </p>
 
       <div className='flex flex-col gap-[18px] absolute bottom-4 w-full p-4 left-2/4 -translate-x-2/4'>
-        <div className='flex items-start gap-2'>
-          <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
-          <p className='text-sm not-italic font-normal text-dark-grey'>
-            Eligibility can be increased by adding Co-applicant{' '}
-            <Button
-              className={`underline ${
-                !bre101.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
-              }`}
-              link='/lead/applicant-details'
-            >
-              Add now
-            </Button>
-          </p>
-        </div>
         <Button
           disabled={!bre101.res}
-          inputClasses='w-full h-14'
+          inputClasses='w-full h-12 font-semibold'
           primary={true}
-          link='/lead/lnt-charges'
+          link='/'
         >
-          Next
+          Go to Dashboard
         </Button>
       </div>
     </div>
   );
 };
-export default BRE_ONE;
+export default Eligibility;
