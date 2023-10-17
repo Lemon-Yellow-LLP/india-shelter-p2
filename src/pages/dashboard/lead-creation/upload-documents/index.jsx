@@ -21,6 +21,8 @@ import imageCompression from 'browser-image-compression';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Topbar from '../../../../components/Topbar';
 
 const UploadDocuments = () => {
   const {
@@ -1528,7 +1530,7 @@ const UploadDocuments = () => {
   }, []);
 
   return (
-    <div className='overflow-hidden flex flex-col h-[100vh]'>
+    <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
       {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
         <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
       ) : (

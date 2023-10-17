@@ -10,6 +10,8 @@ import { Button } from '../../../../components';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const PersonalDetails = () => {
   const {
@@ -187,7 +189,7 @@ const PersonalDetails = () => {
 
   return (
     <>
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
           <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
         ) : (

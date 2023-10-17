@@ -22,6 +22,7 @@ import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
 import LeadContextProvider, { LeadContext } from '../../../../context/LeadContextProvider';
 import Topbar from '../../../../components/Topbar';
+import Topbar from '../../../../components/Topbar';
 
 const BRE_ONE = () => {
   const addApplicant = useContext(LeadContextProvider);
@@ -480,7 +481,7 @@ const BRE_ONE = () => {
   }, [bre101]);
 
   return (
-    <div className='overflow-hidden flex flex-col h-[100vh]'>
+    <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
       {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
         <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
       ) : (
@@ -503,7 +504,9 @@ const BRE_ONE = () => {
         </div>
 
         <div className='mt-4'>
-          <p className='text-xs text-primary-black font-normal'>Applicant name: Santosh Yadav</p>
+          <p className='text-xs text-primary-black font-normal'>
+            Applicant name: {values?.applicants?.[activeIndex]?.applicant_details?.first_name}
+          </p>
           <div className='flex justify-between text-primary-black font-medium'>
             <h3>Verification in progress</h3>
             <h3>

@@ -12,6 +12,8 @@ import { referenceDropdownOneOptions, referenceDropdownTwoOptions } from './Refe
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
@@ -235,7 +237,7 @@ const ReferenceDetails = () => {
 
   return (
     <>
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
         <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
           <h2 className='text-xs text-dark-grey'>
@@ -249,6 +251,21 @@ const ReferenceDetails = () => {
               Reference detail 1 <span className='text-primary-red text-xs pt-1'>*</span>
             </label>
 
+            <DropDown
+              label='Reference type'
+              required
+              options={referenceOneOptions}
+              placeholder='Choose reference type'
+              onChange={handleReferenceTypeChangeOne}
+              defaultSelected={values?.reference_details?.reference_1_type}
+              inputClasses='mt-2'
+              name='reference_details.reference_1_type'
+              error={errors?.reference_details?.reference_1_type}
+              touched={touched?.reference_details?.reference_1_type}
+              onBlur={(e) => {
+                handleBlur(e);
+              }}
+            />
             <DropDown
               label='Reference type'
               required

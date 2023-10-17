@@ -8,6 +8,8 @@ import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const propertyIdentificationOptions = [
   {
@@ -115,7 +117,7 @@ const PropertyDetails = () => {
 
   return (
     <>
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
         <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[160px] flex-1'>
           <label

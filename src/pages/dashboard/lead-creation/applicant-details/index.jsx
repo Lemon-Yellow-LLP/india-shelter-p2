@@ -33,6 +33,7 @@ import {
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const ApplicantDetails = () => {
   const {
@@ -459,7 +460,7 @@ const ApplicantDetails = () => {
 
   return (
     <>
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
           <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
         ) : (
