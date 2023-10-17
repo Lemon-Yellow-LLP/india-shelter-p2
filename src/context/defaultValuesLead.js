@@ -87,12 +87,14 @@ export const defaultValuesLead = {
         date_of_birth: null,
         mobile_number: '',
         is_mobile_verified: false,
+        bre_101_response: null,
         extra_params: {
           progress: 0,
           banking_progress: 0,
           is_existing: false,
           is_existing_done: false,
           upload_progress: 0,
+          qualifier_api_progress: 0,
           upload_required_fields_status: {
             customer_photo: false,
             id_proof: false,
