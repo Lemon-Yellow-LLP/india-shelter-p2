@@ -90,7 +90,6 @@ const WorkIncomeDetails = () => {
               no_of_dependents: false,
               business_name: false,
               industries: false,
-              gst_number: false,
             };
             setRequiredFieldsStatus(_requiredFieldStatus);
           }
@@ -175,7 +174,7 @@ const WorkIncomeDetails = () => {
       } else {
         let addData = { ...newCoApplicantValues.work_income_detail, [name]: e.value };
 
-        if (!requiredFieldsStatus[name]) {
+        if (requiredFieldsStatus && !requiredFieldsStatus[name]) {
           setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
         }
 

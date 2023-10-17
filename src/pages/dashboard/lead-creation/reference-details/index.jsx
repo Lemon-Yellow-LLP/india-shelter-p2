@@ -540,6 +540,13 @@ const ReferenceDetails = () => {
                 }
               }}
               onChange={(e) => {
+                const value = e.currentTarget.value;
+                const email_pattern = /^[a-zA-Z0-9\s,@\.\/]+$/;
+
+                if (!email_pattern.test(value)) {
+                  return;
+                }
+
                 handleChange(e);
 
                 const name = e.target.name.split('.')[1];
@@ -849,6 +856,13 @@ const ReferenceDetails = () => {
                 }
               }}
               onChange={(e) => {
+                const value = e.currentTarget.value;
+                const email_pattern = /^[a-zA-Z0-9\s,@\.\/]+$/;
+
+                if (!email_pattern.test(value)) {
+                  return;
+                }
+
                 handleChange(e);
 
                 const name = e.target.name.split('.')[1];

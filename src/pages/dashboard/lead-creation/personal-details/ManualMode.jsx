@@ -142,6 +142,13 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       }
 
       if (e.target.name === `applicants[${activeIndex}].personal_details.email`) {
+        const value = e.currentTarget.value;
+        const email_pattern = /^[a-zA-Z0-9\s,@\.\/]+$/;
+
+        if (!email_pattern.test(value)) {
+          return;
+        }
+
         setFieldValue(e.target.name, value);
         setHasSentOTPOnce(false);
         setShowOTPInput(false);
