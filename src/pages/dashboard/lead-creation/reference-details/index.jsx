@@ -235,7 +235,7 @@ const ReferenceDetails = () => {
 
   return (
     <>
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
         <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
           <h2 className='text-xs text-dark-grey'>

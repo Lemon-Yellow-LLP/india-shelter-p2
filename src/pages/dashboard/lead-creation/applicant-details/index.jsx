@@ -459,7 +459,7 @@ const ApplicantDetails = () => {
 
   return (
     <>
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
           <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
         ) : (

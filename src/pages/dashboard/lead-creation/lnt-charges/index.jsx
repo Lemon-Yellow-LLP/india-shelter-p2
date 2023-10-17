@@ -478,7 +478,7 @@ const PaymentSuccess = ({ amount, method }) => {
   const { values } = useContext(LeadContext);
   const navigate = useNavigate();
   return (
-    <div className='overflow-hidden flex flex-col h-[100vh]'>
+    <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
       <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
       <div className='h-screen bg-[#EEF0DD] flex flex-col w-full'>
         <div className='flex-1 flex-col flex items-center z-0 overflow-auto'>
