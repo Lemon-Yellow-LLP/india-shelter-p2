@@ -74,6 +74,7 @@ export const applicantSteps = [
     url: '/lead/banking-details',
     lock: true,
     Icon: BankingDetailsIcon,
+    name: 'banking_details',
   },
   {
     title: 'Reference Details',
@@ -89,7 +90,6 @@ export const applicantSteps = [
     url: '/lead/upload-documents',
     lock: true,
     Icon: UploadIcon,
-    name: 'upload_documents',
     name: 'applicant_details',
   },
   {
@@ -147,6 +147,7 @@ export const coApplicantSteps = [
     url: '/lead/qualifier',
     hideProgress: true,
     Icon: QualifierIcon,
+    name: 'qualifier',
   },
   {
     title: 'Banking Details',
@@ -154,6 +155,7 @@ export const coApplicantSteps = [
     url: '/lead/banking-details',
     lock: true,
     Icon: BankingDetailsIcon,
+    name: 'banking_details',
   },
   {
     title: 'Upload Documents',
@@ -161,6 +163,6 @@ export const coApplicantSteps = [
     url: '/lead/upload-documents',
     lock: true,
     Icon: UploadIcon,
-    name: 'upload_documents',
+    name: 'applicant_details',
   },
 ];

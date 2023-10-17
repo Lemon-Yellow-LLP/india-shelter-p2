@@ -19,8 +19,6 @@ const PropertyDetails = lazy(() => import('./property-details'));
 const UploadDocuments = lazy(() => import('./upload-documents'));
 
 const LeadCreationRoutes = () => {
-  const params = useParams();
-
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -113,12 +111,13 @@ const LeadCreationRoutes = () => {
 
   return (
     <>
-      {params['*'] === 'qualifier' ||
+      {/* {params['*'] === 'applicant-details' ||
+      params['*'] === 'qualifier' ||
       params['*'] === 'lnt-charges' ||
       params['*'] === 'banking-details/manual' ||
       params['*'] === 'banking-details/account-aggregator' ? null : (
         <SwipeableDrawerComponent />
-      )}
+      )} */}
       <Routes>
         <Route index element={<ApplicantDetails />} />
         <Route path='applicant-details' element={<ApplicantDetails />} />

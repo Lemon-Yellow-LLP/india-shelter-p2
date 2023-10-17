@@ -11,6 +11,8 @@ import axios from 'axios';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 import ErrorTost from '../../../../components/ToastMessage/ErrorTost';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 export const bankingMode = [
   {
@@ -36,8 +38,6 @@ const BankingDetails = () => {
     bankErrorTost,
     setBankErrorTost,
   } = useContext(LeadContext);
-
-  console.log(activeIndex);
 
   const navigate = useNavigate();
 
@@ -173,9 +173,20 @@ const BankingDetails = () => {
   return (
     <>
       <div className='overflow-hidden flex flex-col h-[100vh]'>
+        {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+          <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        ) : (
+          <Topbar
+            title='Adding Co-applicant'
+            id={values?.lead?.id}
+            showClose={false}
+            showBack={true}
+            coApplicant={true}
+          />
+        )}
         <ToastMessage message={bankSuccessTost} setMessage={setBankSuccessTost} />
         <ErrorTost message={bankErrorTost} setMessage={setBankErrorTost} />
-        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
+        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
           <div className='flex flex-col gap-2'>
             <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
               Add a bank account <span className='text-primary-red text-xs'>*</span>
@@ -229,12 +240,15 @@ const BankingDetails = () => {
           ) : null}
         </div>
 
-        <div className='bottom-0 fixed'>
-          <PreviousNextButtons
-            linkPrevious='/lead/property-details'
-            linkNext='/lead/reference-details'
-          />
-        </div>
+        <PreviousNextButtons
+          linkPrevious='/lead/property-details'
+          linkNext={
+            values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+              ? '/lead/reference-details'
+              : '/lead/upload-documents'
+          }
+        />
+        <SwipeableDrawerComponent />
 
         {loading ? (
           <div className='absolute w-full h-full bg-[#00000080] z-[9000]'>

@@ -12,6 +12,8 @@ import { Button } from '../../../../components';
 import StepCompletedIllustration from '../../../../assets/step-completed';
 import { validationSchemaLead } from '../../../../schemas';
 import { Snackbar } from '@mui/material';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -684,7 +686,8 @@ export default function Preview() {
   return (
     <>
       <div className='overflow-hidden flex flex-col h-[100vh] bg-[#F9F9F9]'>
-        <div className='py-4'>
+        <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        <div className='pt-4 overflow-auto no-scrollbar'>
           <div className='px-6 mb-3 flex justify-between'>
             <span className='text-xs not-italic font-medium text-dark-grey'>APPLICANTS</span>
             <span className='text-right text-xs not-italic font-normal text-primary-black'>{`${
@@ -745,35 +748,34 @@ export default function Preview() {
               </Step>
             ))}
           </Stepper>
+
+          {activeStep == 0 ? <PrimaryApplicantDetails /> : <CoApplicantDetails />}
         </div>
 
-        {activeStep == 0 ? <PrimaryApplicantDetails /> : <CoApplicantDetails />}
-
-        <div className='bottom-0 fixed'>
-          <div
-            className='flex w-[100vw] p-[18px] bg-white gap-[20px] justify-end mb-[62.6px]'
-            style={{ boxShadow: '0px -5px 10px #E5E5E580' }}
+        <div
+          className='flex w-[100vw] p-[18px] bg-white gap-[20px] justify-end'
+          style={{ boxShadow: '0px -5px 10px #E5E5E580' }}
+        >
+          <Button inputClasses='w-1/2 h-[46px]' onClick={previousStep}>
+            Previous
+          </Button>
+          <Button
+            link={activeStep === coApplicantIndexes.length ? '/lead/eligibility' : null}
+            primary={true}
+            disabled={
+              activeStep === 0
+                ? errors?.applicants?.[primaryIndex] ||
+                  errors?.propertySchema ||
+                  errors?.referenceSchema
+                : errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]
+            }
+            inputClasses='w-1/2 h-[46px]'
+            onClick={nextStep}
           >
-            <Button inputClasses='w-1/2 h-[46px]' onClick={previousStep}>
-              Previous
-            </Button>
-            <Button
-              link={activeStep === coApplicantIndexes.length ? '/lead/eligibility' : null}
-              primary={true}
-              disabled={
-                activeStep === 0
-                  ? errors?.applicants?.[primaryIndex] ||
-                    errors?.propertySchema ||
-                    errors?.referenceSchema
-                  : errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]
-              }
-              inputClasses='w-1/2 h-[46px]'
-              onClick={nextStep}
-            >
-              Next
-            </Button>
-          </div>
+            Next
+          </Button>
         </div>
+        <SwipeableDrawerComponent />
       </div>
 
       {/* Lnt Charges */}
@@ -841,7 +843,7 @@ function PreviewCard({ title, count, link, hide, children }) {
 
 function StepCompleted() {
   return (
-    <div className='h-full w-full flex justify-center pt-32 bg-[#EEF0DD]'>
+    <div className='h-full w-full flex justify-center items-center bg-[#EEF0DD] mt-[20px]'>
       <StepCompletedIllustration />
     </div>
   );

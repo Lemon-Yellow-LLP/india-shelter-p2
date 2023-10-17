@@ -21,6 +21,7 @@ import {
 import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
 import LeadContextProvider, { LeadContext } from '../../../../context/LeadContextProvider';
+import Topbar from '../../../../components/Topbar';
 
 const BRE_ONE = () => {
   const addApplicant = useContext(LeadContextProvider);
@@ -479,447 +480,470 @@ const BRE_ONE = () => {
   }, [bre101]);
 
   return (
-    <div className='p-4 relative h-screen'>
-      <div className='flex items-start gap-2'>
-        <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
-        <p className='text-xs not-italic font-normal text-dark-grey'>
-          The qualifier provides information regarding the status of all the verification and lead
-          eligibility.
+    <div className='overflow-hidden flex flex-col h-[100vh]'>
+      {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+        <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+      ) : (
+        <Topbar
+          title='Adding Co-applicant'
+          id={values?.lead?.id}
+          showClose={false}
+          showBack={true}
+          coApplicant={true}
+        />
+      )}
+
+      <div className='flex flex-col bg-white gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
+        <div className='flex items-start gap-2'>
+          <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
+          <p className='text-xs not-italic font-normal text-dark-grey'>
+            The qualifier provides information regarding the status of all the verification and lead
+            eligibility.
+          </p>
+        </div>
+
+        <div className='mt-4'>
+          <p className='text-xs text-primary-black font-normal'>Applicant name: Santosh Yadav</p>
+          <div className='flex justify-between text-primary-black font-medium'>
+            <h3>Verification in progress</h3>
+            <h3>
+              {progress}/
+              {values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+              values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+                'Driving license' ||
+              values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+              values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
+                ? 6
+                : 5}
+            </h3>
+          </div>
+
+          <div className='flex justify-center mt-3'>
+            <AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transitionDuration: 2 }}
+                exit={{ opacity: 0 }}
+              >
+                <SpeedoMeterAnimation
+                  id='speedo-meter-animation'
+                  className='w-[152px]'
+                  loop
+                  play
+                  ref={SpeedoMeterAnimationRef}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <div className='mt-4 flex flex-col gap-2'>
+          {(values.applicants[activeIndex]?.personal_details.id_type === 'PAN' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN') && (
+            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex items-center gap-1'>
+                {!PAN.ran ? (
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                      stroke='#EC7739'
+                      strokeWidth='1.5'
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width='24'
+                    height='13'
+                    viewBox='0 0 18 13'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M17 1L6 12L1 7'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                )}
+
+                <p className='text-sm text-primary-black'>PAN card</p>
+              </div>
+              {PAN.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {PAN.res && <span className='text-xs font-normal text-light-grey'>{PAN.res}</span>}
+            </div>
+          )}
+
+          {(values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+              'Driving license') && (
+            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex items-center gap-1'>
+                {!DL.ran ? (
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                      stroke='#EC7739'
+                      strokeWidth='1.5'
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width='24'
+                    height='13'
+                    viewBox='0 0 18 13'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M17 1L6 12L1 7'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                )}
+
+                <p className='text-sm text-primary-black'>Driving license</p>
+              </div>
+              {DL.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {DL.res && <span className='text-xs font-normal text-light-grey'>{DL.res}</span>}
+            </div>
+          )}
+
+          {(values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
+            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
+              'Voter ID') && (
+            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex items-center gap-1'>
+                {!voterID.ran ? (
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                      stroke='#EC7739'
+                      strokeWidth='1.5'
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width='24'
+                    height='13'
+                    viewBox='0 0 18 13'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M17 1L6 12L1 7'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                )}
+
+                <p className='text-sm text-primary-black'>Voter ID</p>
+              </div>
+              {voterID.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {voterID.res && (
+                <span className='text-xs font-normal text-light-grey'>{voterID.res}</span>
+              )}
+            </div>
+          )}
+
+          {values.applicants[activeIndex]?.work_income_detail.pf_uan && (
+            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex items-center gap-1'>
+                {!pfUAN.ran ? (
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                      stroke='#EC7739'
+                      strokeWidth='1.5'
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width='24'
+                    height='13'
+                    viewBox='0 0 18 13'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M17 1L6 12L1 7'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                )}
+
+                <p className='text-sm text-primary-black'>PF UAN</p>
+              </div>
+              <div>
+                {pfUAN.loader ? (
+                  <div className='ml-auto'>
+                    <img
+                      src={loading}
+                      alt='loading'
+                      className='animate-spin duration-300 ease-out'
+                    />
+                  </div>
+                ) : null}
+                {pfUAN.res && (
+                  <span className='text-xs font-normal text-light-grey'>{pfUAN.res}</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {values.applicants[activeIndex]?.work_income_detail.gst_number && (
+            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex items-center gap-1'>
+                {!GST.ran ? (
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                      stroke='#EC7739'
+                      strokeWidth='1.5'
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width='24'
+                    height='13'
+                    viewBox='0 0 18 13'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M17 1L6 12L1 7'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                )}
+
+                <p className='text-sm text-primary-black'>GST</p>
+              </div>
+              <div>
+                {GST.loader ? (
+                  <div className='ml-auto'>
+                    <img
+                      src={loading}
+                      alt='loading'
+                      className='animate-spin duration-300 ease-out'
+                    />
+                  </div>
+                ) : null}
+                {GST.res && <span className='text-xs font-normal text-light-grey'>{GST.res}</span>}
+              </div>
+            </div>
+          )}
+
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!dedupe.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>Dedupe</p>
+            </div>
+            <div>
+              {dedupe.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {dedupe.res && (
+                <span className='text-xs font-normal text-light-grey'>{dedupe.res}</span>
+              )}
+            </div>
+          </div>
+
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!bre99.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>BRE 99</p>
+            </div>
+            <div>
+              {bre99.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {bre99.res && (
+                <span className='text-xs font-normal text-light-grey'>{bre99.res}</span>
+              )}
+            </div>
+          </div>
+
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!bureau.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>Bureau</p>
+            </div>
+            <div>
+              {bureau.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {bureau.res && (
+                <span className='text-xs font-normal text-light-grey'>{bureau.res}</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center'>
+          Do not close the app or go back. Please wait for ID <br /> verification as it may take
+          some time. We are validating these checks as per your consent
         </p>
       </div>
-
-      <div className='mt-4'>
-        <p className='text-xs text-primary-black font-normal'>Applicant name: Santosh Yadav</p>
-        <div className='flex justify-between text-primary-black font-medium'>
-          <h3>Verification in progress</h3>
-          <h3>
-            {progress}/
-            {values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
-            values.applicants[activeIndex]?.personal_details.selected_address_proof ===
-              'Driving license' ||
-            values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
-            values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
-              ? 6
-              : 5}
-          </h3>
-        </div>
-
-        <div className='flex justify-center mt-3'>
-          <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transitionDuration: 2 }}
-              exit={{ opacity: 0 }}
-            >
-              <SpeedoMeterAnimation
-                id='speedo-meter-animation'
-                className='w-[152px]'
-                loop
-                play
-                ref={SpeedoMeterAnimationRef}
-              />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
-
-      <div className='mt-4 flex flex-col gap-2'>
-        {(values.applicants[activeIndex]?.personal_details.id_type === 'PAN' ||
-          values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN') && (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!PAN.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>PAN card</p>
-            </div>
-            {PAN.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {PAN.res && <span className='text-xs font-normal text-light-grey'>{PAN.res}</span>}
-          </div>
-        )}
-
-        {(values.applicants[activeIndex]?.personal_details.id_type === 'Driving license' ||
-          values.applicants[activeIndex]?.personal_details.selected_address_proof ===
-            'Driving license') && (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!DL.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>Driving license</p>
-            </div>
-            {DL.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {DL.res && <span className='text-xs font-normal text-light-grey'>{DL.res}</span>}
-          </div>
-        )}
-
-        {(values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID' ||
-          values.applicants[activeIndex]?.personal_details.selected_address_proof ===
-            'Voter ID') && (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!voterID.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>Voter ID</p>
-            </div>
-            {voterID.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {voterID.res && (
-              <span className='text-xs font-normal text-light-grey'>{voterID.res}</span>
-            )}
-          </div>
-        )}
-
-        {values.applicants[activeIndex]?.work_income_detail.pf_uan && (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!pfUAN.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>PF UAN</p>
-            </div>
-            <div>
-              {pfUAN.loader ? (
-                <div className='ml-auto'>
-                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-                </div>
-              ) : null}
-              {pfUAN.res && (
-                <span className='text-xs font-normal text-light-grey'>{pfUAN.res}</span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {values.applicants[activeIndex]?.work_income_detail.gst_number && (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!GST.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>GST</p>
-            </div>
-            <div>
-              {GST.loader ? (
-                <div className='ml-auto'>
-                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-                </div>
-              ) : null}
-              {GST.res && <span className='text-xs font-normal text-light-grey'>{GST.res}</span>}
-            </div>
-          </div>
-        )}
-
-        <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-          <div className='flex items-center gap-1'>
-            {!dedupe.ran ? (
-              <svg
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                  stroke='#EC7739'
-                  strokeWidth='1.5'
-                />
-              </svg>
-            ) : (
-              <svg
-                width='24'
-                height='13'
-                viewBox='0 0 18 13'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M17 1L6 12L1 7'
-                  stroke='#147257'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            )}
-
-            <p className='text-sm text-primary-black'>Dedupe</p>
-          </div>
-          <div>
-            {dedupe.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {dedupe.res && (
-              <span className='text-xs font-normal text-light-grey'>{dedupe.res}</span>
-            )}
-          </div>
-        </div>
-
-        <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-          <div className='flex items-center gap-1'>
-            {!bre99.ran ? (
-              <svg
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                  stroke='#EC7739'
-                  strokeWidth='1.5'
-                />
-              </svg>
-            ) : (
-              <svg
-                width='24'
-                height='13'
-                viewBox='0 0 18 13'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M17 1L6 12L1 7'
-                  stroke='#147257'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            )}
-
-            <p className='text-sm text-primary-black'>BRE 99</p>
-          </div>
-          <div>
-            {bre99.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {bre99.res && <span className='text-xs font-normal text-light-grey'>{bre99.res}</span>}
-          </div>
-        </div>
-
-        <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-          <div className='flex items-center gap-1'>
-            {!bureau.ran ? (
-              <svg
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                  stroke='#EC7739'
-                  strokeWidth='1.5'
-                />
-              </svg>
-            ) : (
-              <svg
-                width='24'
-                height='13'
-                viewBox='0 0 18 13'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M17 1L6 12L1 7'
-                  stroke='#147257'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            )}
-
-            <p className='text-sm text-primary-black'>Bureau</p>
-          </div>
-          <div>
-            {bureau.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {bureau.res && (
-              <span className='text-xs font-normal text-light-grey'>{bureau.res}</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center'>
-        Do not close the app or go back. Please wait for ID <br /> verification as it may take some
-        time. We are validating these checks as per your consent
-      </p>
-
-      <div className='flex flex-col gap-[18px] absolute bottom-4 w-full p-4 left-2/4 -translate-x-2/4'>
+      <div className='flex flex-col w-[100vw] p-[18px] bg-white gap-[20px] justify-center'>
         <div className='flex items-start gap-2'>
           <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
           <p className='text-sm not-italic font-normal text-dark-grey'>
-            Eligibility can be increased by adding Co-applicant{' '}
+            Eligibility can be increased by adding Co-applicant
             <Button
               className={`underline ${
                 !bre101.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
@@ -934,7 +958,11 @@ const BRE_ONE = () => {
           disabled={!bre101.res}
           inputClasses='w-full h-14'
           primary={true}
-          link='/lead/lnt-charges'
+          link={
+            values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+              ? '/lead/lnt-charges'
+              : '/lead/banking-details'
+          }
         >
           Next
         </Button>

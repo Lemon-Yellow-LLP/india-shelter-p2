@@ -1,7 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import BackIcon2 from '../../assets/icons/back-2';
-import { IconBack, IconClose } from '../../assets/icons';
-import { Button } from '@mui/material';
+import { IconClose } from '../../assets/icons';
 
 export const pages = [
   '/lead/applicant-details',
@@ -9,14 +7,23 @@ export const pages = [
   '/lead/address-details',
   '/lead/work-income-details',
   '/lead/qualifier',
+  '/lead/lnt-charges',
   '/lead/property-details',
+  '/lead/banking-details',
   '/lead/reference-details',
   '/lead/upload-documents',
   '/lead/preview',
   '/lead/eligibility',
 ];
 
-export default function Topbar({ title, id, progress, showBack = false, showClose = true }) {
+export default function Topbar({
+  title,
+  id,
+  progress,
+  showBack = false,
+  showClose = true,
+  coApplicant,
+}) {
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -50,7 +57,7 @@ export default function Topbar({ title, id, progress, showBack = false, showClos
         <div className='flex-1'>
           <h3 className='truncate'>{title}</h3>
           <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
-            APP ID:
+            {coApplicant ? 'CO-APPLICANT:' : 'APP ID:'}
             <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey pl-1'>
               {id}
             </span>
