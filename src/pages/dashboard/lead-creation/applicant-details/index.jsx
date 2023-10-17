@@ -32,6 +32,7 @@ import {
 } from './ApplicantDropDownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const ApplicantDetails = () => {
   const {
@@ -458,10 +459,20 @@ const ApplicantDetails = () => {
 
   return (
     <>
-      <Topbar title='Lead Creation' id={values?.lead?.id} progress={8} />
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
+        {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+          <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        ) : (
+          <Topbar
+            title='Adding Co-applicant'
+            id={values?.lead?.id}
+            showClose={false}
+            showBack={true}
+            coApplicant={true}
+          />
+        )}
         <div
-          className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1`}
+          className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1`}
         >
           <div className='flex flex-col gap-2'>
             <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
@@ -747,29 +758,30 @@ const ApplicantDetails = () => {
             disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
           />
         </div>
+        {console.log(errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details)}
+        {console.log(errors.lead)}
+        <PreviousNextButtons
+          disablePrevious={true}
+          disableNext={
+            !values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
+            (errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details) ||
+            Object.values(errors?.lead || {}).some((value) => value !== null)
+          }
+          onNextClick={() => {
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
+              ? setOpenExistingPopup(true)
+              : setCurrentStepIndex(1);
+          }}
+          linkNext={
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
+              ? undefined
+              : '/lead/personal-details'
+          }
+        />
 
-        <div className='bottom-0 fixed'>
-          <PreviousNextButtons
-            disablePrevious={true}
-            disableNext={
-              !values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
-              (errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details) ||
-              errors.lead
-            }
-            onNextClick={() => {
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
-                ? setOpenExistingPopup(true)
-                : setCurrentStepIndex(1);
-            }}
-            linkNext={
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
-                ? undefined
-                : '/lead/personal-details'
-            }
-          />
-        </div>
+        <SwipeableDrawerComponent />
       </div>
 
       <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='223px'>

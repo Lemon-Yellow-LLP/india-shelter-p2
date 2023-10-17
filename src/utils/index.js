@@ -125,7 +125,7 @@ export const pages = {
   property_details: {
     title: 'Property Details',
     url: '/lead/property-details',
-    name: 'propertySchema',
+    name: 'property_details',
   },
   banking_details: {
     title: 'Banking Details',
@@ -135,7 +135,7 @@ export const pages = {
   reference_details: {
     title: 'Reference Details',
     url: '/lead/reference-details',
-    name: 'referenceSchema',
+    name: 'reference_details',
   },
   upload_documents: {
     title: 'Upload Documents',

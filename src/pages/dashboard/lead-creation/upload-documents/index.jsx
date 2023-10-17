@@ -19,6 +19,8 @@ import {
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import imageCompression from 'browser-image-compression';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Topbar from '../../../../components/Topbar';
 
 const UploadDocuments = () => {
   const {
@@ -1526,7 +1528,19 @@ const UploadDocuments = () => {
   }, []);
 
   return (
-    <div className='overflow-hidden flex flex-col h-[100vh]'>
+    <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
+      {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+        <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+      ) : (
+        <Topbar
+          title='Adding Co-applicant'
+          id={values?.lead?.id}
+          showClose={false}
+          showBack={true}
+          coApplicant={true}
+        />
+      )}
+
       <ToastMessage message={toastMessage} setMessage={setToastMessage} />
 
       <div className='flex flex-col bg-medium-grey gap-9 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
@@ -2071,9 +2085,8 @@ const UploadDocuments = () => {
         />
       </div>
 
-      <div className='bottom-0 fixed'>
-        <PreviousNextButtons linkPrevious='/lead/reference-details' linkNext='/lead/preview' />
-      </div>
+      <PreviousNextButtons linkPrevious='/lead/reference-details' linkNext='/lead/preview' />
+      <SwipeableDrawerComponent />
     </div>
   );
 };

@@ -11,16 +11,19 @@ export const signInSchema = Yup.object({
 const applicantSchema = Yup.object().shape({
   applicant_details: Yup.object().shape({
     first_name: Yup.string()
+      .trim()
       .min(2, 'First Name must be atleast 2 characters long')
       .max(10, 'First Name can be max 10 characters long')
       .required('First Name is required')
       .matches(/^[A-Za-z][A-Za-z\s]*$/, 'Invalid characters in First Name'),
     middle_name: Yup.string()
+      .trim()
       .nullable()
       .min(2, 'Middle Name must be atleast 2 characters long')
       .max(10, 'Middle Name can be max 10 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters'),
     last_name: Yup.string()
+      .trim()
       .nullable()
       .min(2, 'Last Name must be atleast 2 characters long')
       .max(10, 'Last Name can be max 10 characters long')
@@ -144,7 +147,13 @@ const applicantSchema = Yup.object().shape({
       .required('This field is mandatory')
       .min(0, 'No. of Current loan(s) can be min 0')
       .max(99, 'No. of Current loan(s) can be max 99'),
-    ongoing_emi: Yup.string().required('This field is mandatory'),
+    ongoing_emi: Yup.number()
+      .required('This field is mandatory')
+      .when('no_current_loan', {
+        is: (val) => val > 0,
+        then: (schema) => schema.min(1, 'EMI amount should be greater than 0'),
+        otherwise: (schema) => schema.min(0),
+      }),
     total_family_number: Yup.string().required('This field is mandatory'),
     total_household_income: Yup.string().required('This field is mandatory'),
     no_of_dependents: Yup.string().required('This field is mandatory'),
@@ -153,18 +162,12 @@ const applicantSchema = Yup.object().shape({
         .trim()
         .min(2, 'Company name must be atleast 2 characters long')
         .max(90, 'Company name can be max 90 characters long')
-        .when('company_name', {
-          is: 'Others',
-          then: Yup.string().required('This field is mandatory'),
-        }),
+        .required('This field is mandatory'),
       extra_industries: Yup.string()
         .trim()
         .min(2, 'Industry name must be atleast 2 characters long')
         .max(90, 'Industry name can be max 90 characters long')
-        .when('industries', {
-          is: 'Others',
-          then: Yup.string().required('This field is mandatory'),
-        }),
+        .required('This field is mandatory'),
     }),
 
     //Salaried and Self Employed
@@ -172,40 +175,27 @@ const applicantSchema = Yup.object().shape({
       .trim()
       .required('This field is mandatory')
       .min(2, 'Address must be atleast 2 characters long')
-      .max(90, 'Address can be max 90 characters long')
-      .when('profession', {
-        is: 'Self-employed' || 'Salaried',
-        then: Yup.string().required('This field is mandatory'),
-      }),
+      .max(90, 'Address can be max 90 characters long'),
     street_area_locality: Yup.string()
       .trim()
+      .required('This field is mandatory')
       .min(2, 'Address must be atleast 2 characters long')
-      .max(90, 'Address can be max 90 characters long')
-      .when('profession', {
-        is: 'Self-employed' || 'Salaried',
-        then: Yup.string().required('This field is mandatory'),
-      }),
+      .max(90, 'Address can be max 90 characters long'),
     town: Yup.string()
       .trim()
       .min(2, 'Town must be atleast 2 characters long')
-      .max(90, 'Town can be max 90 characters long'),
+      .max(90, 'Town can be max 90 characters long')
+      .required('This field is mandatory'),
     landmark: Yup.string()
       .trim()
+      .required('This field is mandatory')
       .min(2, 'Landmark must be atleast 2 characters long')
-      .max(90, 'Landmark can be max 90 characters long')
-      .when('profession', {
-        is: 'Self-employed' || 'Salaried',
-        then: Yup.string().required('This field is mandatory'),
-      }),
+      .max(90, 'Landmark can be max 90 characters long'),
     pincode: Yup.string()
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
+      .required('This field is mandatory')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode')
-      .when('profession', {
-        is: 'Self-employed' || 'Salaried',
-        then: Yup.string().required('This field is mandatory'),
-      }),
-
+      .max(6, 'Enter a valid Pincode'),
     //Salaried
     company_name: Yup.string().required('This field is mandatory'),
     total_income: Yup.number()
@@ -229,25 +219,13 @@ const applicantSchema = Yup.object().shape({
       .trim()
       .min(2, 'Business name must be atleast 2 characters long')
       .max(90, 'Business name can be max 90 characters long')
-      .when('profession', {
-        is: 'Self-employed',
-        then: Yup.string().required('This field is mandatory'),
-      }),
-    industries: Yup.string().when('profession', {
-      is: 'Self-employed',
-      then: Yup.string().required('This field is mandatory'),
-    }),
+      .required('This field is mandatory'),
+    industries: Yup.string().required('This field is mandatory'),
 
-    gst_number: Yup.string().when('profession', {
-      is: 'Self-employed',
-      then: Yup.string(),
-    }),
+    gst_number: Yup.string(),
 
     //Pentioner
-    pention_amount: Yup.string().when('profession', {
-      is: 'Retired',
-      then: Yup.string().required('This field is mandatory'),
-    }),
+    pention_amount: Yup.string().required('This field is mandatory'),
   }),
 
   address_detail: Yup.object().shape({

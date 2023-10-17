@@ -203,7 +203,7 @@ export default function SwipeableDrawerComponent() {
   };
 
   return (
-    <Root>
+    <div>
       <SwipeableDrawer
         anchor='bottom'
         open={drawerOpen}
@@ -572,7 +572,16 @@ export default function SwipeableDrawerComponent() {
                               index={activeCoApplicantIndex}
                               stepIndex={4}
                               noProgress={true}
-                              lock={true}
+                              lock={
+                                values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                                  ?.progress !== 100 ||
+                                values?.applicants?.[primaryIndex]?.personal_details?.extra_params
+                                  ?.progress !== 100 ||
+                                values?.applicants?.[primaryIndex]?.address_detail?.extra_params
+                                  ?.progress !== 100 ||
+                                values?.applicants?.[primaryIndex]?.work_income_detail?.extra_params
+                                  ?.progress !== 100
+                              }
                             />
                             <DrawerStepBanking
                               key={5}
@@ -594,8 +603,8 @@ export default function SwipeableDrawerComponent() {
                               index={activeCoApplicantIndex}
                               stepIndex={6}
                               lock={
-                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.upload_progress !== 100
+                                values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                                  ?.progress !== 100
                               }
                             />
                           </div>
@@ -686,6 +695,6 @@ export default function SwipeableDrawerComponent() {
           </Button>
         </div>
       </DynamicDrawer>
-    </Root>
+    </div>
   );
 }

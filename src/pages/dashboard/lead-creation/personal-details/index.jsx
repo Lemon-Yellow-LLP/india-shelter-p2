@@ -8,6 +8,8 @@ import { addApi, editFieldsById } from '../../../../global';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import { Button } from '../../../../components';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const PersonalDetails = () => {
   const {
@@ -185,8 +187,19 @@ const PersonalDetails = () => {
 
   return (
     <>
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
-        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
+        {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+          <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        ) : (
+          <Topbar
+            title='Adding Co-applicant'
+            id={values?.lead?.id}
+            showClose={false}
+            showBack={true}
+            coApplicant={true}
+          />
+        )}
+        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
           <div className='flex flex-col gap-2'>
             <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
               How would you like to proceed <span className='text-primary-red text-xs'>*</span>
@@ -236,14 +249,14 @@ const PersonalDetails = () => {
           )}
         </div>
 
-        <div className='bottom-0 fixed'>
-          <PreviousNextButtons
-            linkPrevious='/lead/applicant-details'
-            linkNext='/lead/address-details'
-            onNextClick={handleNextClick}
-            onPreviousClick={() => setCurrentStepIndex(0)}
-          />
-        </div>
+        <PreviousNextButtons
+          linkPrevious='/lead/applicant-details'
+          linkNext='/lead/address-details'
+          onNextClick={handleNextClick}
+          onPreviousClick={() => setCurrentStepIndex(0)}
+        />
+
+        <SwipeableDrawerComponent />
       </div>
 
       <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>

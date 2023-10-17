@@ -24,6 +24,7 @@ import {
 } from '../../../../global';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import Topbar from '../../../../components/Topbar';
 
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
@@ -238,162 +239,164 @@ const LnTCharges = ({ amount = 1500 }) => {
     <>
       {!paymentStatus ? (
         <>
-          <div className='h-screen bg-medium-grey flex flex-col w-full p-4'>
-            <div className='flex-1'>
-              {/* Label */}
-              <div className='flex items-start gap-2 mb-6'>
-                <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
-                <p className='text-xs not-italic font-normal text-dark-grey'>
-                  L&T charges for this application is
-                  <span className='text-xs not-italic font-semibold text-primary-black'>{` Rs. ${amount}/-`}</span>
-                </p>
-              </div>
+          <div className='overflow-hidden flex flex-col h-[100vh] bg-medium-grey'>
+            <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
 
-              {/* Select Payment */}
-              <div>
-                <p className='text-base not-italic font-medium text-dark-grey mb-3'>
-                  Select payment method
-                </p>
+            <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
+              <div className='flex flex-col'>
+                {/* Label */}
+                <div className='flex items-start gap-2 mb-6'>
+                  <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
+                  <p className='text-xs not-italic font-normal text-dark-grey'>
+                    L&T charges for this application is
+                    <span className='text-xs not-italic font-semibold text-primary-black'>{` Rs. ${amount}/-`}</span>
+                  </p>
+                </div>
 
-                {/* Accordion */}
-                <div className='bg-white rounded-lg flex p-3 flex-col items-center'>
-                  <AccordionItem
-                    label={'UPI Payment'}
-                    iconImage={ScannerIcon}
-                    open={activeItem == 'UPI Payment'}
-                    setOpen={handleClick}
-                    disabled={checkingStatus && checkingStatus !== 'UPI Payment'}
-                    defaultOption
-                  >
-                    <div className='mb-4'>
-                      {activeItem == '' || activeItem == 'UPI Payment' ? (
-                        <div className='flex justify-center items-center py-2'>
-                          {loadingQr ? (
-                            <div className='w-[180px] h-[180px] flex justify-center items-center'>
-                              <LoaderIcon className='w-12 h-12' />
-                            </div>
-                          ) : (
-                            <QRCode title='GeeksForGeeks' value={qrCode} size={180} />
-                          )}
-                        </div>
-                      ) : null}
+                {/* Select Payment */}
+                <div>
+                  <p className='text-base not-italic font-medium text-dark-grey mb-3'>
+                    Select payment method
+                  </p>
 
-                      {activeItem == 'UPI Payment' ? (
-                        <>
-                          <p className='text-black text-center text-sm not-italic font-normal mb-4'>
-                            QR code will get changed in
-                            <span className='text-black text-sm not-italic font-semibold'>
-                              {` ${secondsToMinSecFormat(qrTime)}s`}
-                            </span>
-                          </p>
+                  {/* Accordion */}
+                  <div className='bg-white rounded-lg flex p-3 flex-col items-center'>
+                    <AccordionItem
+                      label={'UPI Payment'}
+                      iconImage={ScannerIcon}
+                      open={activeItem == 'UPI Payment'}
+                      setOpen={handleClick}
+                      disabled={checkingStatus && checkingStatus !== 'UPI Payment'}
+                      defaultOption
+                    >
+                      <div className='mb-4'>
+                        {activeItem == '' || activeItem == 'UPI Payment' ? (
+                          <div className='flex justify-center items-center py-2'>
+                            {loadingQr ? (
+                              <div className='w-[180px] h-[180px] flex justify-center items-center'>
+                                <LoaderIcon className='w-12 h-12' />
+                              </div>
+                            ) : (
+                              <QRCode title='GeeksForGeeks' value={qrCode} size={180} />
+                            )}
+                          </div>
+                        ) : null}
 
-                          <StatusButton
-                            onClick={() => handleCheckingStatus('UPI Payment')}
-                            isLoading={checkingStatus === 'UPI Payment'}
-                          />
-                        </>
-                      ) : null}
-                    </div>
-                  </AccordionItem>
-                  <Separator />
-                  <AccordionItem
-                    label={'Cash'}
-                    iconImage={CashIcon}
-                    open={activeItem == 'Cash'}
-                    setOpen={handleClick}
-                    disabled={checkingStatus && checkingStatus !== 'Cash'}
-                  ></AccordionItem>
-                  <Separator />
-                  <AccordionItem
-                    label={'Pay via Link'}
-                    iconImage={LinkIcon}
-                    open={activeItem == 'Pay via Link'}
-                    setOpen={handleClick}
-                    disabled={checkingStatus && checkingStatus !== 'Pay via Link'}
-                    className='space-y-4'
-                  >
-                    <TextInputWithSendOtp
-                      type='tel'
-                      inputClasses='hidearrow'
-                      label='Mobile Number'
-                      placeholder='Eg: 1234567890'
-                      required
-                      name='lnt_mobile_number.mobile_number'
-                      value={mobile_number}
-                      onChange={handleOnPhoneNumberChange}
-                      error={errors?.lnt_mobile_number?.mobile_number}
-                      touched={touched?.lnt_mobile_number?.mobile_number}
-                      onOTPSendClick={sendPaymentLink}
-                      disabledOtpButton={
-                        !mobile_number ||
-                        !!errors?.lnt_mobile_number?.mobile_number ||
-                        hasSentOTPOnce
-                      }
-                      hideOTPButton={hasSentOTPOnce}
-                      disabled={disablePhoneNumber}
-                      buttonLabel='Send Link'
-                      onBlur={(e) => {
-                        handleBlur(e);
-                      }}
-                      pattern='\d*'
-                      onFocus={(e) =>
-                        e.target.addEventListener(
-                          'wheel',
-                          function (e) {
-                            e.preventDefault();
-                          },
-                          { passive: false },
-                        )
-                      }
-                      min='0'
-                      // onInput={(e) => {
-                      //   if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
-                      // }}
-                    />
-                    <div className='flex items-center'>
-                      {sendLinkTime && sendLinkTime > 0 ? (
-                        <span className='mr-auto text-primary-red cursor-pointer'>
-                          {`${secondsToMinSecFormat(sendLinkTime)}s`}
-                        </span>
-                      ) : null}
+                        {activeItem == 'UPI Payment' ? (
+                          <>
+                            <p className='text-black text-center text-sm not-italic font-normal mb-4'>
+                              QR code will get changed in
+                              <span className='text-black text-sm not-italic font-semibold'>
+                                {` ${secondsToMinSecFormat(qrTime)}s`}
+                              </span>
+                            </p>
 
-                      {showResendLink ? (
-                        <button
-                          type='button'
-                          className='text-primary-red cursor-pointer font-semibold ml-auto'
-                          onClick={sendPaymentLink}
-                        >
-                          <span>Resend Link</span>
-                        </button>
-                      ) : null}
-                    </div>
+                            <StatusButton
+                              onClick={() => handleCheckingStatus('UPI Payment')}
+                              isLoading={checkingStatus === 'UPI Payment'}
+                            />
+                          </>
+                        ) : null}
+                      </div>
+                    </AccordionItem>
+                    <Separator />
+                    <AccordionItem
+                      label={'Cash'}
+                      iconImage={CashIcon}
+                      open={activeItem == 'Cash'}
+                      setOpen={handleClick}
+                      disabled={checkingStatus && checkingStatus !== 'Cash'}
+                    ></AccordionItem>
+                    <Separator />
+                    <AccordionItem
+                      label={'Pay via Link'}
+                      iconImage={LinkIcon}
+                      open={activeItem == 'Pay via Link'}
+                      setOpen={handleClick}
+                      disabled={checkingStatus && checkingStatus !== 'Pay via Link'}
+                      className='space-y-4'
+                    >
+                      <TextInputWithSendOtp
+                        type='tel'
+                        inputClasses='hidearrow'
+                        label='Mobile Number'
+                        placeholder='Eg: 1234567890'
+                        required
+                        name='lnt_mobile_number.mobile_number'
+                        value={mobile_number}
+                        onChange={handleOnPhoneNumberChange}
+                        error={errors?.lnt_mobile_number?.mobile_number}
+                        touched={touched?.lnt_mobile_number?.mobile_number}
+                        onOTPSendClick={sendPaymentLink}
+                        disabledOtpButton={
+                          !mobile_number ||
+                          !!errors?.lnt_mobile_number?.mobile_number ||
+                          hasSentOTPOnce
+                        }
+                        hideOTPButton={hasSentOTPOnce}
+                        disabled={disablePhoneNumber}
+                        buttonLabel='Send Link'
+                        onBlur={(e) => {
+                          handleBlur(e);
+                        }}
+                        pattern='\d*'
+                        onFocus={(e) =>
+                          e.target.addEventListener(
+                            'wheel',
+                            function (e) {
+                              e.preventDefault();
+                            },
+                            { passive: false },
+                          )
+                        }
+                        min='0'
+                        // onInput={(e) => {
+                        //   if (!e.currentTarget.validity.valid) e.currentTarget.value = '';
+                        // }}
+                      />
+                      <div className='flex items-center'>
+                        {sendLinkTime && sendLinkTime > 0 ? (
+                          <span className='mr-auto text-primary-red cursor-pointer'>
+                            {`${secondsToMinSecFormat(sendLinkTime)}s`}
+                          </span>
+                        ) : null}
 
-                    <StatusButton
-                      disabled={!mobile_number || !!errors.lnt_mobile_number?.mobile_number}
-                      onClick={() => handleCheckingStatus('Pay via Link')}
-                      isLoading={checkingStatus === 'Pay via Link'}
-                    />
-                  </AccordionItem>
+                        {showResendLink ? (
+                          <button
+                            type='button'
+                            className='text-primary-red cursor-pointer font-semibold ml-auto'
+                            onClick={sendPaymentLink}
+                          >
+                            <span>Resend Link</span>
+                          </button>
+                        ) : null}
+                      </div>
+
+                      <StatusButton
+                        disabled={!mobile_number || !!errors.lnt_mobile_number?.mobile_number}
+                        onClick={() => handleCheckingStatus('Pay via Link')}
+                        isLoading={checkingStatus === 'Pay via Link'}
+                      />
+                    </AccordionItem>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <div className='mt-auto w-full space-y-4'>
+            <div className='pl-[20px] pr-[20px] mt-auto w-full space-y-4 bg-transparent flex flex-col items-center'>
               {activeItem === 'Cash' ? (
-                <Button primary={true} inputClasses={'h-12'} onClick={showConfirmPayment}>
+                <Button primary={true} inputClasses={'h-12 w-full'} onClick={showConfirmPayment}>
                   Confirm Payment
                 </Button>
               ) : null}
-              <Button
-                inputClasses={
-                  'border-none text-center text-base not-italic font-semibold underline h-12 bg-transparent'
-                }
+              <span
+                className='border-none text-center text-base not-italic font-semibold underline h-12 bg-transparent text-primary-red'
                 onClick={showConfirmSkip}
               >
                 Skip for now
-              </Button>
+              </span>
             </div>
           </div>
+
           {/* Confirm payment by cash */}
           <DynamicDrawer
             open={isConfirmPaymentVisible}
@@ -472,11 +475,14 @@ const LnTCharges = ({ amount = 1500 }) => {
 };
 
 const PaymentSuccess = ({ amount, method }) => {
+  const { values } = useContext(LeadContext);
   const navigate = useNavigate();
   return (
-    <div className='h-screen bg-[#EEF0DD] flex flex-col w-full'>
-      <div className='flex-1 flex items-center z-0'>
-        <div className='w-full relative z-0'>
+    <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
+      <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+      <div className='h-screen bg-[#EEF0DD] flex flex-col w-full'>
+        <div className='flex-1 flex-col flex items-center z-0 overflow-auto'>
+          {/* <div className='w-full relative z-0'> */}
           <div className='flex justify-center pointer-events-none'>
             <PaymentSuccessIllustration />
           </div>
@@ -491,9 +497,11 @@ const PaymentSuccess = ({ amount, method }) => {
               L&T charges have been paid using {method}
             </p>
           </div>
+          {/* </div> */}
+          {/* </div> */}
         </div>
       </div>
-      <div className='mt-auto w-full p-4'>
+      <div className='mt-auto w-full p-4 bg-[#EEF0DD]'>
         <Button primary={true} inputClasses='h-12' link='/lead/property-details'>
           Next
         </Button>
@@ -503,20 +511,24 @@ const PaymentSuccess = ({ amount, method }) => {
 };
 
 const PaymentFailure = ({ back, next, skip, reload }) => {
+  const { values } = useContext(LeadContext);
   return (
-    <div className='h-screen bg-medium-grey flex flex-col w-full'>
-      <div className='flex-1 flex items-center z-0'>
-        <div className='w-full relative z-0'>
-          <div className='flex justify-center pointer-events-none'>
-            <PaymentFailureIllustration />
-          </div>
-          <div className='-translate-y-32'>
-            <h4 className='text-center text-xl not-italic font-medium text-primary-black mb-2'>
-              Payment unsuccessful!
-            </h4>
-            <p className='text-center text-sm not-italic font-normal text-light-grey'>
-              Please try other payment options
-            </p>
+    <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+      <div className='h-screen bg-medium-grey flex flex-col w-full'>
+        <div className='flex-1 flex items-center z-0'>
+          <div className='w-full relative z-0'>
+            <div className='flex justify-center pointer-events-none'>
+              <PaymentFailureIllustration />
+            </div>
+            <div className='-translate-y-32'>
+              <h4 className='text-center text-xl not-italic font-medium text-primary-black mb-2'>
+                Payment unsuccessful!
+              </h4>
+              <p className='text-center text-sm not-italic font-normal text-light-grey'>
+                Please try other payment options
+              </p>
+            </div>
           </div>
         </div>
       </div>

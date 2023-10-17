@@ -12,6 +12,8 @@ import { residenceData, yearsResidingData } from './AddressDropdownData';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -368,8 +370,19 @@ export default function AddressDetails() {
 
   return (
     <>
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
-        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
+        {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+          <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        ) : (
+          <Topbar
+            title='Adding Co-applicant'
+            id={values?.lead?.id}
+            showClose={false}
+            showBack={true}
+            coApplicant={true}
+          />
+        )}
+        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
           <div className='flex flex-col gap-2'>
             <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
               Type of residence <span className='text-primary-red text-xs'>*</span>
@@ -1186,14 +1199,15 @@ export default function AddressDetails() {
             </>
           ) : null}
         </div>
-        <div className='bottom-0 fixed'>
-          <PreviousNextButtons
-            linkPrevious='/lead/personal-details'
-            linkNext='/lead/work-income-details'
-            onNextClick={handleNextClick}
-            onPreviousClick={() => setCurrentStepIndex(1)}
-          />
-        </div>
+
+        <PreviousNextButtons
+          linkPrevious='/lead/personal-details'
+          linkNext='/lead/work-income-details'
+          onNextClick={handleNextClick}
+          onPreviousClick={() => setCurrentStepIndex(1)}
+        />
+
+        <SwipeableDrawerComponent />
       </div>
 
       <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>
