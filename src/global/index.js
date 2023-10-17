@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'https://lo.scotttiger.in/api';
 
 const requestOptions = {};
 
-const bre_timeout = 900000;
+const bre_timeout = 90000;
 
 axiosRetry(axios, { retries: 0 });
 
