@@ -264,21 +264,6 @@ const ReferenceDetails = () => {
                 handleBlur(e);
               }}
             />
-            <DropDown
-              label='Reference type'
-              required
-              options={referenceOneOptions}
-              placeholder='Choose reference type'
-              onChange={handleReferenceTypeChangeOne}
-              defaultSelected={values?.reference_details?.reference_1_type}
-              inputClasses='mt-2'
-              name='reference_details.reference_1_type'
-              error={errors?.reference_details?.reference_1_type}
-              touched={touched?.reference_details?.reference_1_type}
-              onBlur={(e) => {
-                handleBlur(e);
-              }}
-            />
 
             <TextInput
               label='Full Name'
