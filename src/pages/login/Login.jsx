@@ -190,9 +190,8 @@ export default function Login() {
 
   return (
     <>
-      <Header />
-
-      <div className='bg-[#CCE2BE] overflow-hidden'>
+      <div className='bg-[#CCE2BE] overflow-hidden h-[100vh]'>
+        <Header />
         <div>
           <img src='./IS-Login-Logo.png' alt='login-logo' />
         </div>
