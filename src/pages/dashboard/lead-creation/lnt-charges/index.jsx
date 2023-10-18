@@ -63,7 +63,7 @@ const LnTCharges = ({ amount = 1500 }) => {
     try {
       setLoadingQr(true);
       const resp = await getLnTChargesQRCode(values?.lead?.id);
-      setQrCode(resp.DecryptedData.QRCODE_STRING);
+      if (resp.DecryptedData?.QRCODE_STRING) setQrCode(resp.DecryptedData.QRCODE_STRING);
     } catch (err) {
       console.log(err);
     } finally {
