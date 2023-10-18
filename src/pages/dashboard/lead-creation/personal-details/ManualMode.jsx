@@ -60,7 +60,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       const finalDate = `${year}-${month}-${day}`;
 
       setFieldValue(`applicants[${activeIndex}].personal_details.date_of_birth`, finalDate);
-      updateFields('date_of_birth', finalDate);
+      if (values?.applicants[activeIndex]?.personal_details?.id) {
+        updateFields('date_of_birth', finalDate);
+      }
     }
   }, [date]);
 
@@ -211,7 +213,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   );
 
   useEffect(() => {
-    updateFields();
+    if (values?.applicants[activeIndex]?.personal_details?.id) {
+      updateFields();
+    }
   }, [values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type]);
 
   useEffect(() => {
@@ -281,7 +285,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
   useEffect(() => {
-    mobileNumberUpdate();
+    if (values?.applicants[activeIndex]?.personal_details?.id) {
+      mobileNumberUpdate();
+    }
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
   // console.log(values?.applicants[activeIndex]?.personal_details?.id_type);
