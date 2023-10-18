@@ -758,8 +758,6 @@ const ApplicantDetails = () => {
             disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
           />
         </div>
-        {console.log(errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details)}
-        {console.log(errors.lead)}
         <PreviousNextButtons
           disablePrevious={true}
           disableNext={

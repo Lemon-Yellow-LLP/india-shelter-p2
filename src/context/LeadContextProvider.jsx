@@ -97,11 +97,6 @@ const LeadContextProvider = ({ children }) => {
     // const updated_field_status = { ...}
     //    newData.applicants[activeIndex].applicant_details,
 
-    // console.log(
-    //   newData.applicants[activeIndex].applicant_details.extra_params.upload_required_fields_status,
-    // );
-    // console.log(requiredFieldsStatus);
-
     const applicant = await getApplicantById(
       formik.values?.applicants?.[activeIndex]?.applicant_details.id,
     );
@@ -119,8 +114,6 @@ const LeadContextProvider = ({ children }) => {
       upload_required_fields_status: updated_required_fields,
       upload_progress: finalProgress,
     };
-
-    console.log(updated_extra_params);
 
     await editFieldsById(formik.values.applicants[activeIndex].applicant_details.id, 'applicant', {
       extra_params: updated_extra_params,
@@ -165,7 +158,6 @@ const LeadContextProvider = ({ children }) => {
         setExistingData,
         coApplicantStepsProgress,
         setCoApplicantSetpsProgress,
-        updateProgressUploadDocumentSteps,
         updateProgressUploadDocumentSteps,
         bankSuccessTost,
         setBankSuccessTost,
