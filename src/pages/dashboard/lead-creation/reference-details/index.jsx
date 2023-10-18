@@ -587,7 +587,7 @@ const ReferenceDetails = () => {
                 const value = e.currentTarget.value;
                 const email_pattern = /^[a-zA-Z0-9\s,@\.\/]+$/;
 
-                if (!email_pattern.test(value)) {
+                if (!email_pattern.test(value) && value.length > 0) {
                   return;
                 }
 
@@ -910,7 +910,7 @@ const ReferenceDetails = () => {
                 const value = e.currentTarget.value;
                 const email_pattern = /^[a-zA-Z0-9\s,@\.\/]+$/;
 
-                if (!email_pattern.test(value)) {
+                if (!email_pattern.test(value) && value.length > 0) {
                   return;
                 }
 
