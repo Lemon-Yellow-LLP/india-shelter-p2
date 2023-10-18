@@ -251,6 +251,18 @@ const ApplicantDetails = () => {
       if (phoneNumber.length === 10) {
         setHasSentOTPOnce(false);
         updateFieldsApplicant('mobile_number', phoneNumber);
+        if (values?.applicants[activeIndex]?.applicant_details?.id) {
+          await editFieldsById(
+            values?.applicants[activeIndex]?.applicant_details?.id,
+            'applicant',
+            {
+              otp: null,
+              otp_send_on: null,
+              otp_fail_count: 0,
+              otp_fail_release: null,
+            },
+          );
+        }
       }
     },
     [requiredFieldsStatus, values],
