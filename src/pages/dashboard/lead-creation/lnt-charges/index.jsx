@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import PaymentFailureIllustration from '../../../../assets/payment-failure';
 import PaymentSuccessIllustration from '../../../../assets/payment-success';
 import InfoIcon from '../../../../assets/icons/info.svg';
@@ -5,7 +7,7 @@ import ScannerIcon from '../../../../assets/icons/scanner.svg';
 import CashIcon from '../../../../assets/icons/cash.svg';
 import LinkIcon from '../../../../assets/icons/link.svg';
 import { Button, ToastMessage } from '../../../../components';
-import { memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import LoaderIcon from '../../../../assets/loader';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import { IconClose } from '../../../../assets/icons';
@@ -16,32 +18,19 @@ import {
   addLnTCharges,
   checkIfLntExists,
   checkPaymentStatus,
-  doesLnTChargesExist,
-  editLnTCharges,
   getLnTChargesQRCode,
   makePaymentByCash,
   makePaymentByLink,
 } from '../../../../global';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
+import PropTypes from 'prop-types';
 
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
 
 const LnTCharges = ({ amount = 1500 }) => {
-  const {
-    inputDisabled,
-    values,
-    currentLeadId,
-    errors,
-    touched,
-    handleBlur,
-    handleChange,
-    setFieldError,
-    setFieldValue,
-    updateProgress,
-  } = useContext(LeadContext);
+  const { values, errors, touched, handleBlur, setFieldValue } = useContext(LeadContext);
 
   const [toastMessage, setToastMessage] = useState('');
 
@@ -196,7 +185,7 @@ const LnTCharges = ({ amount = 1500 }) => {
   };
 
   const handlePaymentByCash = async () => {
-    const resp = await makePaymentByCash(lntId);
+    await makePaymentByCash(lntId);
     setPaymentStatus('success');
   };
 
@@ -476,7 +465,6 @@ const LnTCharges = ({ amount = 1500 }) => {
 
 const PaymentSuccess = ({ amount, method }) => {
   const { values } = useContext(LeadContext);
-  const navigate = useNavigate();
   return (
     <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
       <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
@@ -510,7 +498,7 @@ const PaymentSuccess = ({ amount, method }) => {
   );
 };
 
-const PaymentFailure = ({ back, next, skip, reload }) => {
+const PaymentFailure = ({ back, skip }) => {
   const { values } = useContext(LeadContext);
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
@@ -598,32 +586,51 @@ const Separator = () => {
   return <div className='border-t-2 border-b-0 my-4 w-full'></div>;
 };
 
-const StatusButton = memo(
-  ({
-    primary,
-    children,
-    inputClasses,
-    link,
-    disabled,
-    isLoading = false,
-    checkingStatus = false,
-    ...props
-  }) => {
-    return (
-      <button
-        disabled={disabled}
-        className={`p-2 md:py-3 text-base md:text-lg rounded md:w-64 flex justify-center items-center gap-2 h-12 w-full
+const StatusButton = ({ disabled, isLoading = false, ...props }) => {
+  return (
+    <button
+      disabled={disabled}
+      className={`p-2 md:py-3 text-base md:text-lg rounded md:w-64 flex justify-center items-center gap-2 h-12 w-full
        ${
          isLoading ? 'pointer-events-none' : 'pointer-events-auto'
        } bg-primary-red border border-primary-red text-white disabled:bg-[#D9D9D9] disabled:text-[#96989A] disabled:border-transparent transition-colors ease-out duration-300
        `}
-        {...props}
-      >
-        {isLoading ? <LoaderIcon className='animate-spin' /> : null}
-        <span className='text-center text-base not-italic font-semibold'>
-          {isLoading && !disabled ? 'Checking Status' : 'Check Status'}
-        </span>
-      </button>
-    );
-  },
-);
+      {...props}
+    >
+      {isLoading ? <LoaderIcon className='animate-spin' /> : null}
+      <span className='text-center text-base not-italic font-semibold'>
+        {isLoading && !disabled ? 'Checking Status' : 'Check Status'}
+      </span>
+    </button>
+  );
+};
+
+LnTCharges.propTypes = {
+  amount: PropTypes.number,
+};
+
+PaymentSuccess.propTypes = {
+  amount: PropTypes.any,
+  method: PropTypes.any,
+};
+
+PaymentFailure.propTypes = {
+  back: PropTypes.any,
+  skip: PropTypes.any,
+};
+
+StatusButton.propTypes = {
+  disabled: PropTypes.bool,
+  isLoading: PropTypes.bool,
+};
+
+AccordionItem.propTypes = {
+  iconImage: PropTypes.any,
+  label: PropTypes.any,
+  children: PropTypes.any,
+  open: PropTypes.any,
+  setOpen: PropTypes.any,
+  className: PropTypes.any,
+  disabled: PropTypes.any,
+  defaultOption: PropTypes.any,
+};

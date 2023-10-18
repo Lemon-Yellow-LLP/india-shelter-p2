@@ -1,41 +1,22 @@
-import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { useContext, useEffect, useState } from 'react';
 import ArrowRightIcon2 from '../../../../assets/icons/arrow-right-2';
-import { fieldLabels, nonRequiredFields, pages } from '../../../../utils';
+import { fieldLabels, pages } from '../../../../utils';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../../../components';
 import StepCompletedIllustration from '../../../../assets/step-completed';
-import { validationSchemaLead } from '../../../../schemas';
 import { Snackbar } from '@mui/material';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
-
-const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
+import PropTypes from 'prop-types';
 
 const steps = ['', '', '', '', ''];
 
 export default function Preview() {
-  const {
-    inputDisabled,
-    values,
-    currentLeadId,
-    errors,
-    touched,
-    handleBlur,
-    handleChange,
-    setFieldError,
-    setFieldValue,
-    updateProgress,
-    activeIndex,
-    setValues,
-    setActiveIndex,
-    handleSubmit,
-  } = useContext(LeadContext);
+  const { values, errors, setActiveIndex, handleSubmit } = useContext(LeadContext);
 
   const navigate = useNavigate();
 
@@ -66,27 +47,7 @@ export default function Preview() {
     return flattenExtraParamsHelper(obj);
   }
 
-  function removePropertiesByKeys(obj, keysToRemove) {
-    if (Array.isArray(obj)) {
-      // If it's an array, recursively call the function for each element
-      obj.forEach((item, index) => {
-        removePropertiesByKeys(item, keysToRemove);
-      });
-    } else if (typeof obj === 'object') {
-      for (const key in obj) {
-        if (keysToRemove.includes(key)) {
-          delete obj[key];
-        } else {
-          removePropertiesByKeys(obj[key], keysToRemove);
-        }
-      }
-    }
-  }
-
   useEffect(() => {
-    // removePropertiesByKeys(errors, nonRequiredFields);
-    console.log('-------------');
-    console.log(flattenExtraParams(errors));
     setFlattedErrors(flattenExtraParams(errors));
   }, []);
 
@@ -851,4 +812,12 @@ function StepCompleted() {
 
 const Separator = () => {
   return <div className='border-t-2 border-b-0 w-full'></div>;
+};
+
+PreviewCard.propTypes = {
+  title: PropTypes.string,
+  link: PropTypes.any,
+  count: PropTypes.any,
+  hide: PropTypes.any,
+  children: PropTypes.any,
 };

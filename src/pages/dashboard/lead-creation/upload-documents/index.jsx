@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import { useContext, useState, useCallback, useRef, useEffect } from 'react';
 import ImageUpload from '../../../../components/ImageUpload';
 import PdfAndImageUpload from '../../../../components/PdfAndImageUpload';
@@ -133,8 +136,6 @@ const UploadDocuments = () => {
       addressRef.current.focus();
     }
   }, [editAddressNumber]);
-
-  console.log(requiredFieldsStatus);
 
   useEffect(() => {
     async function getQualifierResponse() {
@@ -524,7 +525,6 @@ const UploadDocuments = () => {
             document_meta: document_meta,
           },
         );
-        console.log(edited_applicant);
 
         const active_upload = edited_applicant.document_meta.customer_photos.find((data) => {
           return data.active === true;
@@ -769,8 +769,6 @@ const UploadDocuments = () => {
         maxWidthOrHeight: 1920,
         useWebWorker: true,
       };
-
-      console.log(values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof);
 
       try {
         const compressedFile = await imageCompression(editAddressProof.file, options);

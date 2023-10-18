@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { forwardRef, memo, useRef } from 'react';
 import PropTypes from 'prop-types';
 
@@ -101,8 +103,6 @@ const ClickableEndIcon = memo(
   }),
 );
 
-export default ClickableEndIcon;
-
 ClickableEndIcon.propTypes = {
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
@@ -117,4 +117,9 @@ ClickableEndIcon.propTypes = {
   disabled: PropTypes.bool,
   message: PropTypes.string,
   onChange: PropTypes.func.isRequired,
+  labelDisabled: PropTypes.any,
+  EndIcon: PropTypes.any,
+  onEndButtonClick: PropTypes.any,
 };
+
+export default ClickableEndIcon;

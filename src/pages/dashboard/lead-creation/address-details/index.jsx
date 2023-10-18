@@ -21,11 +21,9 @@ export default function AddressDetails() {
   const {
     inputDisabled,
     values,
-    currentLeadId,
     errors,
     touched,
     handleBlur,
-    handleChange,
     setFieldError,
     setFieldValue,
     updateProgressApplicantSteps,
@@ -470,7 +468,7 @@ export default function AddressDetails() {
                 disabled={inputDisabled}
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -541,7 +539,7 @@ export default function AddressDetails() {
                 disabled={inputDisabled}
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -886,7 +884,7 @@ export default function AddressDetails() {
                 }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -941,7 +939,7 @@ export default function AddressDetails() {
                 }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }

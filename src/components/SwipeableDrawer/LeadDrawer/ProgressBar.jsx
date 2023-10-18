@@ -22,3 +22,7 @@ LinearProgressWithLabel.propTypes = {
 export default function ProgressBar({ progress }) {
   return <LinearProgressWithLabel className='rounded' variant='determinate' value={progress} />;
 }
+
+ProgressBar.propTypes = {
+  progress: propTypes.any,
+};

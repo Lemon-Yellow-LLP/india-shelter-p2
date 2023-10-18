@@ -13,8 +13,8 @@ const Loader = ({ extraClasses }) => {
   );
 };
 
-export default Loader;
-
 Loader.propTypes = {
   extraClasses: PropTypes.string,
 };
+
+export default Loader;
