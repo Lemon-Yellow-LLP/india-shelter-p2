@@ -98,7 +98,7 @@ const PersonalDetails = () => {
 
   const handleNextClick = () => {
     setCurrentStepIndex(2);
-    updateFields();
+    // updateFields();
   };
 
   const handleAutofill = async () => {

@@ -54,7 +54,9 @@ const LeadContextProvider = ({ children }) => {
       if (newData?.[updateStep] && typeof newData[updateStep]?.extra_params === 'object') {
         newData[updateStep].extra_params.progress = finalProgress;
         newData[updateStep].extra_params.required_fields_status = requiredFieldsStatus;
-        await editFieldsById(formik.values[updateStep].id, page, newData[updateStep]);
+        await editFieldsById(formik.values[updateStep].id, page, {
+          extra_params: newData[updateStep].extra_params,
+        });
       }
     } else {
       if (
@@ -65,11 +67,9 @@ const LeadContextProvider = ({ children }) => {
         newData.applicants[activeIndex][updateStep].extra_params.required_fields_status =
           requiredFieldsStatus;
 
-        await editFieldsById(
-          formik.values.applicants[activeIndex][updateStep].id,
-          page,
-          newData.applicants[activeIndex][updateStep],
-        );
+        await editFieldsById(formik.values.applicants[activeIndex][updateStep].id, page, {
+          extra_params: newData.applicants[activeIndex][updateStep].extra_params,
+        });
       }
     }
     formik.setValues(newData);

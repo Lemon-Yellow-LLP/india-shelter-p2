@@ -92,9 +92,27 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       updateFields('id_number', '');
       setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true, id_number: false }));
       if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-        updateFields('selected_address_proof', e);
-        updateFields('address_proof_number', '');
-        setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: false }));
+        if (e === 'PAN') {
+          setFieldValue(
+            `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
+            false,
+          );
+          setFieldValue(`applicants[${activeIndex}].personal_details.selected_address_proof`, '');
+          setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
+          updateFields('selected_address_proof', '');
+          updateFields('address_proof_number', '');
+          setRequiredFieldsStatus((prev) => ({
+            ...prev,
+            selected_address_proof: false,
+            address_proof_number: false,
+          }));
+        } else {
+          setFieldValue(`applicants[${activeIndex}].personal_details.selected_address_proof`, e);
+          setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
+          updateFields('selected_address_proof', e);
+          updateFields('address_proof_number', '');
+          setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: false }));
+        }
       }
     },
     [requiredFieldsStatus],
@@ -155,6 +173,24 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       }
 
       if (
+        e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
+        values?.applicants?.[activeIndex]?.personal_details?.id_type === 'Passport'
+      ) {
+        if (value[0] === 'Q' || value[0] === 'X' || value[0] === 'Z') {
+          return;
+        }
+      }
+
+      if (
+        e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
+        values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'Passport'
+      ) {
+        if (value[0] === 'Q' || value[0] === 'X' || value[0] === 'Z') {
+          return;
+        }
+      }
+
+      if (
         e.target.name === `applicants[${activeIndex}].personal_details.id_number` ||
         e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number`
       ) {
@@ -162,6 +198,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
           values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR'
         ) {
+          if (e.target.selectionStart !== value.length) {
+            e.target.selectionStart = e.target.selectionEnd = value.length;
+            return;
+          }
           let aadharPattern = /^\d$/;
           if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
             const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
@@ -176,6 +216,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
           values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR'
         ) {
+          if (e.target.selectionStart !== value.length) {
+            e.target.selectionStart = e.target.selectionEnd = value.length;
+            return;
+          }
           let aadharPattern = /^\d$/;
           if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
             const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
@@ -211,7 +255,16 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   );
 
   useEffect(() => {
-    updateFields();
+    if (values?.applicants[activeIndex]?.personal_details?.id) {
+      console.log(errors?.applicants?.[activeIndex]);
+      if (
+        !errors?.applicants?.[activeIndex]?.personal_details?.id_type &&
+        !errors?.applicants?.[activeIndex]?.personal_details?.id_number
+      ) {
+        console.log('hii');
+        updateFields();
+      }
+    }
   }, [values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type]);
 
   useEffect(() => {
@@ -341,20 +394,33 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
             }
+
+            if (
+              values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+            ) {
+              updateFields(
+                'address_proof_number',
+                values?.applicants?.[activeIndex]?.personal_details?.[name],
+              );
+              if (
+                requiredFieldsStatus.address_proof_number !== undefined &&
+                !requiredFieldsStatus.address_proof_number
+              ) {
+                setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: true }));
+              }
+            }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
           }
-          if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-            updateFields(
-              'address_proof_number',
-              values?.applicants?.[activeIndex]?.personal_details?.[name],
-            );
-            if (
-              requiredFieldsStatus.address_proof_number !== undefined &&
-              !requiredFieldsStatus.address_proof_number
-            ) {
-              setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: true }));
-            }
+        }}
+        onKeyDown={(e) => {
+          if (
+            e.key === 'ArrowUp' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'ArrowLeft' ||
+            e.key === 'ArrowRight'
+          ) {
+            e.preventDefault();
           }
         }}
       />
@@ -366,10 +432,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
           name='terms-agreed'
           onTouchEnd={(e) => {
-            setFieldValue(
-              `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
-              e.target.checked,
-            );
             if (!e.target.checked) {
               setFieldValue(
                 `applicants[${activeIndex}].personal_details.selected_address_proof`,
@@ -383,30 +445,42 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                 address_proof_number: false,
               }));
             } else {
-              setFieldValue(
-                `applicants[${activeIndex}].personal_details.selected_address_proof`,
-                values?.applicants?.[activeIndex]?.personal_details?.id_type,
-              );
-              setFieldValue(
-                `applicants[${activeIndex}].personal_details.address_proof_number`,
-                values?.applicants?.[activeIndex]?.personal_details?.id_number,
-              );
-              setFieldError(
-                `applicants[${activeIndex}].personal_details.selected_address_proof`,
-                null,
-              );
-              setFieldError(
-                `applicants[${activeIndex}].personal_details.address_proof_number`,
-                null,
-              );
+              if (!errors?.applicants?.[activeIndex]?.personal_details?.id_type) {
+                setFieldValue(
+                  `applicants[${activeIndex}].personal_details.selected_address_proof`,
+                  values?.applicants?.[activeIndex]?.personal_details?.id_type,
+                );
+                setFieldError(
+                  `applicants[${activeIndex}].personal_details.selected_address_proof`,
+                  null,
+                );
+              }
+              if (
+                !errors?.applicants?.[activeIndex]?.personal_details?.id_type &&
+                !errors?.applicants?.[activeIndex]?.personal_details?.id_number
+              ) {
+                setFieldValue(
+                  `applicants[${activeIndex}].personal_details.address_proof_number`,
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number,
+                );
 
-              setRequiredFieldsStatus((prev) => ({
-                ...prev,
-                selected_address_proof: true,
-                address_proof_number: true,
-              }));
+                setFieldError(
+                  `applicants[${activeIndex}].personal_details.address_proof_number`,
+                  null,
+                );
+
+                setRequiredFieldsStatus((prev) => ({
+                  ...prev,
+                  selected_address_proof: true,
+                  address_proof_number: true,
+                }));
+              }
             }
-            updateFields();
+
+            setFieldValue(
+              `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
+              e.target.checked,
+            );
           }}
           disabled={
             !values?.applicants?.[activeIndex]?.personal_details?.id_type
@@ -489,6 +563,16 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+          }
+        }}
+        onKeyDown={(e) => {
+          if (
+            e.key === 'ArrowUp' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'ArrowLeft' ||
+            e.key === 'ArrowRight'
+          ) {
+            e.preventDefault();
           }
         }}
       />
