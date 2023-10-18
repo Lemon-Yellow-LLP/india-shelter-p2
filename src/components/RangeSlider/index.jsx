@@ -30,8 +30,6 @@ const RangeSlider = memo(({ initialValue, onChange, minValueLabel, maxValueLabel
   );
 });
 
-export default RangeSlider;
-
 RangeSlider.propTypes = {
   initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
@@ -39,3 +37,5 @@ RangeSlider.propTypes = {
   maxValueLabel: PropTypes.string,
   max: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
+
+export default RangeSlider;

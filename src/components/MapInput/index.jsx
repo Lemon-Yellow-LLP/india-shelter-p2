@@ -94,8 +94,6 @@ const MapInput = forwardRef(function TextInput(
   );
 });
 
-export default MapInput;
-
 MapInput.propTypes = {
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
@@ -112,3 +110,5 @@ MapInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   onMapButtonClick: PropTypes.func,
 };
+
+export default MapInput;

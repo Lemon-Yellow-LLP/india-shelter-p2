@@ -133,8 +133,6 @@ const DropDown = memo(
   },
 );
 
-export default DropDown;
-
 DropDown.propTypes = {
   defaultSelected: PropTypes.any,
   placeholder: PropTypes.string,
@@ -145,4 +143,13 @@ DropDown.propTypes = {
   optionsMaxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   showIcon: PropTypes.bool,
   disabled: PropTypes.bool,
+  inputClasses: PropTypes.any,
+  error: PropTypes.any,
+  touched: PropTypes.any,
+  onBlur: PropTypes.any,
+  disableOption: PropTypes.any,
+  disabledError: PropTypes.any,
+  labelClassName: PropTypes.any,
 };
+
+export default DropDown;

@@ -32,7 +32,7 @@ transition-all duration-300 ease-out`}
         tabIndex={0}
         role='radio'
         aria-checked={current === value}
-        onClick={() => onChange({ value, name })}
+        // onClick={() => onChange({ value, name })}
         onTouchStart={() => onChange({ value, name })}
       >
         {children}

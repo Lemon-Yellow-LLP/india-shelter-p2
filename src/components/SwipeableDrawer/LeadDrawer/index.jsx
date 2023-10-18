@@ -26,11 +26,6 @@ import UploadSteps from './UplodSteps';
 
 const drawerBleeding = 0;
 
-const Root = styled('div')(({ theme }) => ({
-  height: '100%',
-  backgroundColor: theme.palette.mode === 'light' ? grey[100] : theme.palette.background.default,
-}));
-
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'light' ? '#fff' : grey[800],
 }));

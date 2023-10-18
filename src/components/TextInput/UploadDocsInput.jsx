@@ -112,4 +112,5 @@ UploadDocsInput.propTypes = {
   disabled: PropTypes.bool,
   message: PropTypes.string,
   onChange: PropTypes.func.isRequired,
+  labelDisabled: PropTypes.any,
 };

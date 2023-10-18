@@ -1,5 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconClose } from '../../assets/icons';
+import { AuthContext } from '../../context/AuthContextProvider';
+import { useContext } from 'react';
 
 export const pages = [
   '/lead/applicant-details',
@@ -27,6 +29,7 @@ export default function Topbar({
   const navigate = useNavigate();
 
   const location = useLocation();
+  const { setPhoneNumberList } = useContext(AuthContext);
 
   return (
     <>
@@ -64,7 +67,13 @@ export default function Topbar({
           </p>
         </div>
         {showClose ? (
-          <button onClick={() => navigate('/')} className=''>
+          <button
+            onClick={() => {
+              setPhoneNumberList({});
+              navigate('/');
+            }}
+            className=''
+          >
             <IconClose />
           </button>
         ) : null}

@@ -22,7 +22,7 @@ export const applicantSteps = [
   },
   {
     title: 'Personal Details',
-    description: 'OCR, e-KYC, Address',
+    description: 'OCR, e-KYC, Manual',
     url: '/lead/personal-details',
     lock: false,
     Icon: PersonalDetailsIcon,
@@ -30,7 +30,7 @@ export const applicantSteps = [
   },
   {
     title: 'Address Details',
-    description: 'OCR, e-KYC, Address',
+    description: 'Current, Permanent',
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,
@@ -62,7 +62,7 @@ export const applicantSteps = [
   },
   {
     title: 'Property Details',
-    description: 'Profession details, Family Income',
+    description: 'Property Identification, Property address',
     url: '/lead/property-details',
     lock: true,
     Icon: PropertyDetailsIcon,
@@ -119,7 +119,7 @@ export const coApplicantSteps = [
   },
   {
     title: 'Personal Details',
-    description: 'OCR, e-KYC, Address',
+    description: 'OCR, e-KYC, Manual',
     url: '/lead/personal-details',
     lock: false,
     Icon: PersonalDetailsIcon,
@@ -127,7 +127,7 @@ export const coApplicantSteps = [
   },
   {
     title: 'Address Details',
-    description: 'OCR, e-KYC, Address',
+    description: 'Current, Permanent',
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,

@@ -98,10 +98,10 @@ const DatePicker = ({
   );
 };
 
-export default DatePicker;
-
 DatePicker.propTypes = {
   // startDate: PropTypes.object,
   setStartDate: PropTypes.func,
   label: PropTypes.string,
 };
+
+export default DatePicker;

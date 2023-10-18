@@ -94,11 +94,11 @@ const DatePickerInput = forwardRef(function DatePickerInput(
   );
 });
 
-export default DatePickerInput;
-
 DatePickerInput.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
   error: PropTypes.string,
   datepickerref: PropTypes.object,
 };
+
+export default DatePickerInput;

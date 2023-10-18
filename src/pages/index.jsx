@@ -3,12 +3,11 @@ import Dashboard from './dashboard';
 import LeadCreationRoutes from './dashboard/lead-creation';
 import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
 import DashboardApplicant from './dashboard/DashboardApplicant';
-import axios from 'axios';
 import { logout } from '../global';
-import { LeadContext } from '../context/LeadContextProvider';
+import PropTypes from 'prop-types';
 
 const TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
@@ -20,7 +19,7 @@ const DashboardRoutes = () => {
       const resetSessionTimer = () => {
         const reset = async () => {
           try {
-            const res = await logout(
+            await logout(
               {
                 status: 'no',
                 logout_via: 'New Login',
@@ -103,6 +102,10 @@ const DashboardRoutes = () => {
       </Routes>
     </>
   );
+};
+
+DashboardRoutes.propTypes = {
+  children: PropTypes.any,
 };
 
 export default DashboardRoutes;

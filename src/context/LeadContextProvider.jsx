@@ -54,7 +54,9 @@ const LeadContextProvider = ({ children }) => {
       if (newData?.[updateStep] && typeof newData[updateStep]?.extra_params === 'object') {
         newData[updateStep].extra_params.progress = finalProgress;
         newData[updateStep].extra_params.required_fields_status = requiredFieldsStatus;
-        await editFieldsById(formik.values[updateStep].id, page, newData[updateStep]);
+        await editFieldsById(formik.values[updateStep].id, page, {
+          extra_params: newData[updateStep].extra_params,
+        });
       }
     } else {
       if (
@@ -65,11 +67,9 @@ const LeadContextProvider = ({ children }) => {
         newData.applicants[activeIndex][updateStep].extra_params.required_fields_status =
           requiredFieldsStatus;
 
-        await editFieldsById(
-          formik.values.applicants[activeIndex][updateStep].id,
-          page,
-          newData.applicants[activeIndex][updateStep],
-        );
+        await editFieldsById(formik.values.applicants[activeIndex][updateStep].id, page, {
+          extra_params: newData.applicants[activeIndex][updateStep].extra_params,
+        });
       }
     }
     formik.setValues(newData);
@@ -97,11 +97,6 @@ const LeadContextProvider = ({ children }) => {
     // const updated_field_status = { ...}
     //    newData.applicants[activeIndex].applicant_details,
 
-    // console.log(
-    //   newData.applicants[activeIndex].applicant_details.extra_params.upload_required_fields_status,
-    // );
-    // console.log(requiredFieldsStatus);
-
     const applicant = await getApplicantById(
       formik.values?.applicants?.[activeIndex]?.applicant_details.id,
     );
@@ -119,8 +114,6 @@ const LeadContextProvider = ({ children }) => {
       upload_required_fields_status: updated_required_fields,
       upload_progress: finalProgress,
     };
-
-    console.log(updated_extra_params);
 
     await editFieldsById(formik.values.applicants[activeIndex].applicant_details.id, 'applicant', {
       extra_params: updated_extra_params,
@@ -165,7 +158,6 @@ const LeadContextProvider = ({ children }) => {
         setExistingData,
         coApplicantStepsProgress,
         setCoApplicantSetpsProgress,
-        updateProgressUploadDocumentSteps,
         updateProgressUploadDocumentSteps,
         bankSuccessTost,
         setBankSuccessTost,
