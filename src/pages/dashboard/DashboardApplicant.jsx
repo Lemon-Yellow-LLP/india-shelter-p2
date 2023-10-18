@@ -28,7 +28,6 @@ export default function DashboardApplicant() {
   const [coApplicantSelectedStep, setCoApplicantSelectedStep] = useState(
     CoApplicantDropdownOptions[0].value,
   );
-
   const [lntCharges, setLntCharges] = useState(null);
 
   function a11yProps(index) {
@@ -1055,6 +1054,8 @@ export default function DashboardApplicant() {
 
 const Titlebar = ({ title, id }) => {
   const { values, setValues } = useContext(LeadContext);
+  const { setPhoneNumberList } = useContext(AuthContext);
+
   const [totalProgress, setTotalProgress] = useState(0);
   const navigate = useNavigate();
 
@@ -1069,6 +1070,19 @@ const Titlebar = ({ title, id }) => {
 
   const handleOpenForm = async (id) => {
     const data = await getDashboardLeadById(id);
+
+    setPhoneNumberList((prev) => {
+      return {
+        ...prev,
+        applicant_0: data?.applicants?.[0]?.applicant_details?.mobile_number ?? '',
+        applicant_1: data?.applicants?.[1]?.applicant_details?.mobile_number ?? '',
+        applicant_2: data?.applicants?.[2]?.applicant_details?.mobile_number ?? '',
+        applicant_3: data?.applicants?.[3]?.applicant_details?.mobile_number ?? '',
+        applicant_4: data?.applicants?.[4]?.applicant_details?.mobile_number ?? '',
+        reference_1: data?.reference_details?.reference_1_phone_number ?? '',
+        reference_2: data?.reference_details?.reference_2_phone_number ?? '',
+      };
+    });
 
     const newApplicants = data.applicants.map((applicant) => {
       let accounts = [];

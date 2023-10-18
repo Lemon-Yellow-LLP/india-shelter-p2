@@ -51,7 +51,7 @@ const ApplicantDetails = () => {
     setCurrentStepIndex,
   } = useContext(LeadContext);
 
-  const { setOtpFailCount } = useContext(AuthContext);
+  const { setOtpFailCount, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
 
   const { lo_id } = useContext(AuthContext);
 
@@ -453,7 +453,38 @@ const ApplicantDetails = () => {
     );
   }, [activeIndex]);
 
-  // console.log('values', values.applicants[activeIndex]?.applicant_details);
+  // For unique phone numbers
+  useEffect(() => {
+    const _phoneNumberList = Object.assign({}, phoneNumberList);
+    if (_phoneNumberList?.[`applicant_${activeIndex}`]) {
+      delete _phoneNumberList?.[[`applicant_${activeIndex}`]];
+    }
+
+    if (
+      values?.applicants?.[activeIndex]?.applicant_details?.mobile_number &&
+      _phoneNumberList &&
+      Object.values(_phoneNumberList)?.includes(
+        values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
+      )
+    ) {
+      setFieldError(
+        `applicants[${activeIndex}].applicant_details.mobile_number`,
+        'Phone number must be unique',
+      );
+    } else {
+      setPhoneNumberList((prev) => {
+        return {
+          ...prev,
+          [`applicant_${activeIndex}`]:
+            values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
+        };
+      });
+    }
+  }, [
+    values?.applicants?.[activeIndex]?.applicant_details,
+    errors?.applicants?.[activeIndex]?.applicant_details,
+  ]);
+
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
 
@@ -672,6 +703,7 @@ const ApplicantDetails = () => {
             onBlur={(e) => {
               handleBlur(e);
               const name = e.target.name.split('.')[1];
+
               if (
                 !errors?.applicants?.[activeIndex]?.applicant_details?.[name] &&
                 values?.applicants?.[activeIndex]?.applicant_details?.[name]
@@ -680,6 +712,13 @@ const ApplicantDetails = () => {
                   name,
                   values.applicants?.[activeIndex]?.applicant_details?.[name],
                 );
+                setPhoneNumberList((prev) => {
+                  return {
+                    ...prev,
+                    [applicant + activeIndex]:
+                      values.applicants?.[activeIndex]?.applicant_details?.[name],
+                  };
+                });
               }
             }}
             pattern='\d*'

@@ -26,6 +26,7 @@ const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loData, setLoData] = useState(null);
+  const [phoneNumberList, setPhoneNumberList] = useState({});
   const [otpFailCount, setOtpFailCount] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
   const [isQaulifierActivated, setIsQaulifierActivated] = useState(null);
@@ -51,6 +52,8 @@ const AuthContextProvider = ({ children }) => {
         setIsQaulifierActivated,
         loData,
         setLoData,
+        phoneNumberList,
+        setPhoneNumberList,
       }}
     >
       {children}
