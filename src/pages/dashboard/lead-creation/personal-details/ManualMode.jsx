@@ -418,10 +418,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         onKeyDown={(e) => {
           if (
-            e.key === 'ArrowUp' ||
-            e.key === 'ArrowDown' ||
-            e.key === 'ArrowLeft' ||
-            e.key === 'ArrowRight'
+            values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
+            (e.key === 'ArrowUp' ||
+              e.key === 'ArrowDown' ||
+              e.key === 'ArrowLeft' ||
+              e.key === 'ArrowRight')
           ) {
             e.preventDefault();
           }
@@ -570,10 +571,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         onKeyDown={(e) => {
           if (
-            e.key === 'ArrowUp' ||
-            e.key === 'ArrowDown' ||
-            e.key === 'ArrowLeft' ||
-            e.key === 'ArrowRight'
+            values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ===
+              'AADHAR' &&
+            (e.key === 'ArrowUp' ||
+              e.key === 'ArrowDown' ||
+              e.key === 'ArrowLeft' ||
+              e.key === 'ArrowRight')
           ) {
             e.preventDefault();
           }
