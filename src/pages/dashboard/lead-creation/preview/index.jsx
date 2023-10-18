@@ -15,14 +15,6 @@ import PropTypes from 'prop-types';
 
 const steps = ['', '', '', '', ''];
 
-PreviewCard.propTypes = {
-  title: PropTypes.string,
-  link: PropTypes.any,
-  count: PropTypes.any,
-  hide: PropTypes.any,
-  children: PropTypes.any,
-};
-
 export default function Preview() {
   const { values, errors, setActiveIndex, handleSubmit } = useContext(LeadContext);
 
@@ -820,4 +812,12 @@ function StepCompleted() {
 
 const Separator = () => {
   return <div className='border-t-2 border-b-0 w-full'></div>;
+};
+
+PreviewCard.propTypes = {
+  title: PropTypes.string,
+  link: PropTypes.any,
+  count: PropTypes.any,
+  hide: PropTypes.any,
+  children: PropTypes.any,
 };

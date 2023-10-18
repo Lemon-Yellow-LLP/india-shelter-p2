@@ -22,7 +22,7 @@ export const applicantSteps = [
   },
   {
     title: 'Personal Details',
-    description: 'OCR, e-KYC, Address',
+    description: 'OCR, e-KYC, Manual',
     url: '/lead/personal-details',
     lock: false,
     Icon: PersonalDetailsIcon,
@@ -30,7 +30,7 @@ export const applicantSteps = [
   },
   {
     title: 'Address Details',
-    description: 'OCR, e-KYC, Address',
+    description: 'Current / Parmanent / Communictaion Address',
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,

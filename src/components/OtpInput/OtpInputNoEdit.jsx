@@ -172,8 +172,6 @@ const OtpInputNoEdit = ({
   );
 };
 
-export default OtpInputNoEdit;
-
 OtpInputNoEdit.propTypes = {
   label: PropTypes.string.isRequired,
   required: PropTypes.bool,
@@ -183,4 +181,7 @@ OtpInputNoEdit.propTypes = {
   disableSendOTP: PropTypes.bool,
   verifyOTPCB: PropTypes.func,
   defaultResendTime: PropTypes.number,
+  hasSentOTPOnce: PropTypes.any,
 };
+
+export default OtpInputNoEdit;

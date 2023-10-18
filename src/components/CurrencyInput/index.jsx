@@ -33,9 +33,9 @@ const CurrencyInput = memo(({ ...props }) => {
   );
 });
 
-export default CurrencyInput;
-
 CurrencyInput.propTypes = {
   value: PropTypes.any,
   onChange: PropTypes.func,
 };
+
+export default CurrencyInput;

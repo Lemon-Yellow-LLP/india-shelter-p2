@@ -74,8 +74,6 @@ const Selector = ({
   );
 };
 
-export default Selector;
-
 Selector.propTypes = {
   label: PropTypes.any.isRequired,
   options: PropTypes.arrayOf(PropTypes.any),
@@ -84,3 +82,5 @@ Selector.propTypes = {
   listContainerId: PropTypes.string,
   onShowOptionCB: PropTypes.func,
 };
+
+export default Selector;

@@ -11,10 +11,6 @@ import PropTypes from 'prop-types';
 
 const TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
-DashboardRoutes.propTypes = {
-  children: PropTypes.any,
-};
-
 const DashboardRoutes = () => {
   const RequireAuth = ({ children }) => {
     const { isAuthenticated, token } = useContext(AuthContext);
@@ -106,6 +102,10 @@ const DashboardRoutes = () => {
       </Routes>
     </>
   );
+};
+
+DashboardRoutes.propTypes = {
+  children: PropTypes.any,
 };
 
 export default DashboardRoutes;

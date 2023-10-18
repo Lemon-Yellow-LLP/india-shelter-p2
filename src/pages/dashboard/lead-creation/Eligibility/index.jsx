@@ -17,7 +17,7 @@ import {
   getApplicantById,
 } from '../../../../global';
 import { Button } from '../../../../components';
-import LeadContextProvider, { LeadContext } from '../../../../context/LeadContextProvider';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 
 const Eligibility = () => {
   const { activeIndex, values, setFieldValue } = useContext(LeadContext);

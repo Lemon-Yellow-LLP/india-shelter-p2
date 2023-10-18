@@ -110,8 +110,6 @@ const PanInput = memo(
   },
 );
 
-export default PanInput;
-
 PanInput.propTypes = {
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
@@ -130,3 +128,5 @@ PanInput.propTypes = {
   placeholder: PropTypes.string,
   processing: PropTypes.bool,
 };
+
+export default PanInput;

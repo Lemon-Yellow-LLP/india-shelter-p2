@@ -30,4 +30,6 @@ Button.propTypes = {
   primary: PropTypes.bool,
   children: PropTypes.any,
   inputClasses: PropTypes.string,
+  link: PropTypes.any,
+  disabled: PropTypes.any,
 };

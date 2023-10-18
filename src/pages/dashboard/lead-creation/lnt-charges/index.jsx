@@ -29,36 +29,6 @@ import PropTypes from 'prop-types';
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
 
-LnTCharges.propTypes = {
-  amount: PropTypes.number,
-};
-
-PaymentSuccess.propTypes = {
-  amount: PropTypes.any,
-  method: PropTypes.any,
-};
-
-PaymentFailure.propTypes = {
-  back: PropTypes.any,
-  skip: PropTypes.any,
-};
-
-StatusButton.propTypes = {
-  disabled: PropTypes.bool,
-  isLoading: PropTypes.bool,
-};
-
-AccordionItem.propTypes = {
-  iconImage: PropTypes.any,
-  label: PropTypes.any,
-  children: PropTypes.any,
-  open: PropTypes.any,
-  setOpen: PropTypes.any,
-  className: PropTypes.any,
-  disabled: PropTypes.any,
-  defaultOption: PropTypes.any,
-};
-
 const LnTCharges = ({ amount = 1500 }) => {
   const { values, errors, touched, handleBlur, setFieldValue } = useContext(LeadContext);
 
@@ -633,4 +603,34 @@ const StatusButton = ({ disabled, isLoading = false, ...props }) => {
       </span>
     </button>
   );
+};
+
+LnTCharges.propTypes = {
+  amount: PropTypes.number,
+};
+
+PaymentSuccess.propTypes = {
+  amount: PropTypes.any,
+  method: PropTypes.any,
+};
+
+PaymentFailure.propTypes = {
+  back: PropTypes.any,
+  skip: PropTypes.any,
+};
+
+StatusButton.propTypes = {
+  disabled: PropTypes.bool,
+  isLoading: PropTypes.bool,
+};
+
+AccordionItem.propTypes = {
+  iconImage: PropTypes.any,
+  label: PropTypes.any,
+  children: PropTypes.any,
+  open: PropTypes.any,
+  setOpen: PropTypes.any,
+  className: PropTypes.any,
+  disabled: PropTypes.any,
+  defaultOption: PropTypes.any,
 };
