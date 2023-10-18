@@ -242,6 +242,22 @@ async function checkBre101(id, options) {
   return res.data;
 }
 
+async function checkBre201(id, options) {
+  const res = await axios.post(
+    `${API_URL}/applicant/bre-201/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res.data;
+}
+
 // UPLOAD DOCUMENT
 
 async function uploadDoc(data, options) {
@@ -481,6 +497,7 @@ export {
   checkCibil,
   checkCrif,
   checkBre101,
+  checkBre201,
   uploadDoc,
   getApplicantById,
   getUploadOtp,
