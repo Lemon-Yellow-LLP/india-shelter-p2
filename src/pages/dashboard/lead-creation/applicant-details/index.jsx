@@ -727,7 +727,7 @@ const ApplicantDetails = () => {
                 setPhoneNumberList((prev) => {
                   return {
                     ...prev,
-                    [applicant + activeIndex]:
+                    [`applicant_${activeIndex}`]:
                       values.applicants?.[activeIndex]?.applicant_details?.[name],
                   };
                 });
@@ -813,8 +813,7 @@ const ApplicantDetails = () => {
           disablePrevious={true}
           disableNext={
             !values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
-            (errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details) ||
-            Object.values(errors?.lead || {}).some((value) => value !== null)
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !== 100
           }
           onNextClick={() => {
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
