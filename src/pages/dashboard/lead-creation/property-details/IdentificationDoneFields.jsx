@@ -307,6 +307,7 @@ const IdentificationDoneFields = ({
       <TextInput
         name='property_details.pincode'
         label='Pincode'
+        type='number'
         required
         hint='City and State fields will get filled based on Pincode'
         placeholder='Eg: 123456'

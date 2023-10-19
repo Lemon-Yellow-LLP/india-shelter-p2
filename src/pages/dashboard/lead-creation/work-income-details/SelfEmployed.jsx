@@ -206,6 +206,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
         label='No. of current loan(s)'
         placeholder='Eg: 1'
         required
+        pattern='\d*'
         name={`applicants[${activeIndex}].work_income_detail.no_current_loan`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
