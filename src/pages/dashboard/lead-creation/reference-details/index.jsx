@@ -50,7 +50,8 @@ const ReferenceDetails = () => {
     if (values?.reference_details?.id) {
       await editFieldsById(values?.reference_details?.id, 'reference', newData);
     } else {
-      let addData = { ...defaultValuesLead.reference_details, [name]: value };
+      let newDefaultValues = structuredClone(defaultValuesLead);
+      let addData = { ...newDefaultValues.reference_details, [name]: value };
       await addApi('reference', {
         ...addData,
         lead_id: values?.lead?.id,

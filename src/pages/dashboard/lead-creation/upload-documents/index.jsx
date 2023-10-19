@@ -198,7 +198,8 @@ const UploadDocuments = () => {
           newData,
         );
       } else {
-        let addData = { ...newCoApplicantValues.personal_details, [name]: value };
+        let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
+        let addData = { ...clonedCoApplicantValues.personal_details, [name]: value };
         await addApi('personal', {
           ...addData,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,

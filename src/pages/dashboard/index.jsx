@@ -147,7 +147,8 @@ export default function Dashboard() {
       </div>
       <button
         onClick={() => {
-          setValues(defaultValuesLead);
+          let newDefaultValues = structuredClone(defaultValuesLead);
+          setValues(newDefaultValues);
           navigate('/lead/applicant-details');
         }}
         className='fixed bottom-4 right-6 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'

@@ -63,7 +63,8 @@ export default function AddressDetails() {
           [name]: e.value,
         });
       } else {
-        let addData = { ...newCoApplicantValues.address_detail, [name]: e.value };
+        let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
+        let addData = { ...clonedCoApplicantValues.address_detail, [name]: e.value };
         await addApi('address', {
           ...addData,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,

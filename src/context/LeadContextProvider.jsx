@@ -24,10 +24,8 @@ const LeadContextProvider = ({ children }) => {
   const [bankErrorTost, setBankErrorTost] = useState('');
 
   const formik = useFormik({
-    initialValues: { ...defaultValuesLead },
-    initialErrors: {
-      ...defaultErrorsLead,
-    },
+    initialValues: structuredClone(defaultValuesLead),
+    initialErrors: structuredClone(defaultErrorsLead),
     validationSchema: validationSchemaLead,
     onSubmit: (_, action) => {
       console.log(action);
@@ -122,12 +120,12 @@ const LeadContextProvider = ({ children }) => {
     formik.setValues(newData);
   };
 
-  console.log(formik.values);
+  // console.log(formik.values);
 
   const addApplicant = () => {
     formik.setValues((prev) => {
       let newData = { ...prev };
-      newData.applicants.push({ ...newCoApplicantValues });
+      newData.applicants.push(structuredClone(newCoApplicantValues));
       return newData;
     });
 
