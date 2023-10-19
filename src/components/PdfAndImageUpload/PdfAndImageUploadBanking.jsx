@@ -1,8 +1,6 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
-import { editFieldsById, getApplicantById } from '../../global';
-import { LeadContext } from '../../context/LeadContextProvider';
 
 function PdfAndImageUploadBanking({
   files,
@@ -19,7 +17,6 @@ function PdfAndImageUploadBanking({
   deletePDF,
   ...props
 }) {
-  const { activeIndex, values } = useContext(LeadContext);
   const [message, setMessage] = useState();
   const [loader, setLoader] = useState(false);
 
@@ -57,8 +54,13 @@ function PdfAndImageUploadBanking({
       const validImageTypes = ['image/jpeg', 'application/pdf'];
 
       if (validImageTypes.includes(fileType)) {
-        setSingleFile(file[i]);
-        setFile([...files, file[i]]);
+        if (file[i].size <= 5000000) {
+          setSingleFile(file[i]);
+          setFile([...files, file[i]]);
+        } else {
+          setLoader(false);
+          setMessage('File size should be less than 5MB');
+        }
       } else {
         setLoader(false);
         setMessage('File format not supported');
@@ -75,6 +77,7 @@ function PdfAndImageUploadBanking({
   }, [pdf]);
 
   const editImage = (e, id) => {
+    console.log(id);
     setMessage('');
 
     setLoader(true);
@@ -103,11 +106,16 @@ function PdfAndImageUploadBanking({
       const validImageTypes = ['image/jpeg'];
 
       if (validImageTypes.includes(fileType)) {
-        setEdit({
-          file: file[i],
-          id: id,
-        });
-        setFile([...files, file[i]]);
+        if (file[i].size <= 5000000) {
+          setEdit({
+            file: file[i],
+            id: id,
+          });
+          setFile([...files, file[i]]);
+        } else {
+          setLoader(false);
+          setMessage('File size should be less than 5MB');
+        }
       } else {
         setLoader(false);
         setMessage('File format not supported');
@@ -131,7 +139,7 @@ function PdfAndImageUploadBanking({
         />
       )}
 
-      {!files.length ? (
+      {files?.length === 0 ? (
         <div className=''>
           <div className='bg-white flex items-center justify-center w-full'>
             <label
@@ -199,7 +207,7 @@ function PdfAndImageUploadBanking({
         </div>
       ) : null}
 
-      {uploads && !pdf && !loader ? (
+      {files?.length && files?.length !== 0 && uploads && !pdf && !loader ? (
         <>
           <div className='flex justify-start overflow-auto'>
             <div className='flex gap-2 my-2'>

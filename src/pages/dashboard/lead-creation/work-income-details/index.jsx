@@ -172,8 +172,8 @@ const WorkIncomeDetails = () => {
           setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
         }
       } else {
-        let addData = { ...newCoApplicantValues.work_income_detail, [name]: e.value };
-
+        let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
+        let addData = { ...clonedCoApplicantValues.work_income_detail, [name]: e.value };
         if (requiredFieldsStatus && !requiredFieldsStatus[name]) {
           setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
         }

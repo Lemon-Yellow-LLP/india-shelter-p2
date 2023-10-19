@@ -56,7 +56,8 @@ const PropertyDetails = () => {
           property_identification_is: e.value,
         });
       } else {
-        let addData = { ...defaultValuesLead.property_details, [name]: e.value };
+        let newDefaultValues = structuredClone(defaultValuesLead);
+        let addData = { ...newDefaultValues.property_details, [name]: e.value };
         await addApi('property', {
           ...addData,
           lead_id: values?.lead?.id,
