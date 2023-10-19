@@ -331,13 +331,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       `applicants[${activeIndex}].personal_details.mobile_number`,
       values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
     );
-    updateFields('mobile_number', values.applicant_details?.mobile_number);
+    if (values?.applicants[activeIndex]?.personal_details?.id)
+      updateFields('mobile_number', values.applicant_details?.mobile_number);
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
   useEffect(() => {
-    if (values?.applicants[activeIndex]?.personal_details?.id) {
-      mobileNumberUpdate();
-    }
+    mobileNumberUpdate();
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
   // console.log(values?.applicants[activeIndex]?.personal_details?.id_type);
