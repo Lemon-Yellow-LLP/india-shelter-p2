@@ -848,7 +848,11 @@ const Qualifier = () => {
           disabled={!bre101.res}
           inputClasses='w-full h-14'
           primary={true}
-          link='/lead/lnt-charges'
+          link={
+            values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+              ? '/lead/lnt-charges'
+              : '/lead/banking-details'
+          }
         >
           Next
         </Button>

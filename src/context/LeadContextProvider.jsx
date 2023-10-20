@@ -120,7 +120,7 @@ const LeadContextProvider = ({ children }) => {
     formik.setValues(newData);
   };
 
-  // console.log(formik.values);
+  console.log(formik.values);
 
   const addApplicant = () => {
     formik.setValues((prev) => {
