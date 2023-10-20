@@ -77,53 +77,41 @@ async function getAllLoanOfficers() {
 
 //BRE SCREEN
 
-async function verifyPan(id, options) {
-  const res = await axios.post(
-    `${API_URL}/applicant/pan/${id}`,
-    {},
-    {
-      ...options,
-      timeout: bre_timeout,
-      'axios-retry': {
-        retries: 3,
-        retryCondition: () => true,
-      },
+async function verifyPan(id, data, options) {
+  const res = await axios.post(`${API_URL}/applicant/pan/${id}`, data, {
+    ...options,
+    timeout: bre_timeout,
+    'axios-retry': {
+      retries: 3,
+      retryCondition: () => true,
     },
-  );
+  });
 
   return res.data;
 }
 
-async function verifyDL(id, options) {
-  const res = await axios.post(
-    `${API_URL}/applicant/driver-license/${id}`,
-    {},
-    {
-      ...options,
-      timeout: bre_timeout,
-      'axios-retry': {
-        retries: 3,
-        retryCondition: () => true,
-      },
+async function verifyDL(id, data, options) {
+  const res = await axios.post(`${API_URL}/applicant/driver-license/${id}`, data, {
+    ...options,
+    timeout: bre_timeout,
+    'axios-retry': {
+      retries: 3,
+      retryCondition: () => true,
     },
-  );
+  });
 
   return res.data;
 }
 
-async function verifyVoterID(id, options) {
-  const res = await axios.post(
-    `${API_URL}/applicant/voter/${id}`,
-    {},
-    {
-      ...options,
-      timeout: bre_timeout,
-      'axios-retry': {
-        retries: 3,
-        retryCondition: () => true,
-      },
+async function verifyVoterID(id, data, options) {
+  const res = await axios.post(`${API_URL}/applicant/voter/${id}`, data, {
+    ...options,
+    timeout: bre_timeout,
+    'axios-retry': {
+      retries: 3,
+      retryCondition: () => true,
     },
-  );
+  });
 
   return res.data;
 }
@@ -255,6 +243,27 @@ async function checkBre201(id, options) {
       },
     },
   );
+  return res.data;
+}
+
+async function pushToSalesforce(id, options) {
+  const res = await axios.post(
+    `${API_URL}/lead/salesforce-push/${id}`,
+    {},
+    {
+      ...options,
+      timeout: bre_timeout,
+      'axios-retry': {
+        retries: 3,
+        retryCondition: () => true,
+      },
+    },
+  );
+  return res.data;
+}
+
+async function getLeadById(id) {
+  const res = await axios.get(`${API_URL}/lead/${id}`);
   return res.data;
 }
 
@@ -498,6 +507,8 @@ export {
   checkCrif,
   checkBre101,
   checkBre201,
+  pushToSalesforce,
+  getLeadById,
   uploadDoc,
   getApplicantById,
   getUploadOtp,
