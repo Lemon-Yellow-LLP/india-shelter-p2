@@ -19,7 +19,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
       const new_name = name.split('.')[2];
 
       editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-        [new_name]: value?.label,
+        [new_name]: value?.value,
       });
 
       if (!requiredFieldsStatus[new_name]) {

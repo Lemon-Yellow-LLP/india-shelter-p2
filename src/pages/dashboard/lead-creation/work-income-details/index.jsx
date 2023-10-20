@@ -265,7 +265,7 @@ const WorkIncomeDetails = () => {
         ) : (
           <Topbar
             title='Adding Co-applicant'
-            id={values?.lead?.id}
+            id={values?.applicants?.[activeIndex]?.applicant_details?.id}
             showClose={false}
             showBack={true}
             coApplicant={true}
