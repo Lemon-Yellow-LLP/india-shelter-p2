@@ -21,6 +21,7 @@ import {
 import { Button, ToastMessage } from '../../../../components';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import Topbar from '../../../../components/Topbar';
 
 const Eligibility = () => {
   const { activeIndex, values, setFieldValue } = useContext(LeadContext);
@@ -627,402 +628,78 @@ const Eligibility = () => {
   }, []);
 
   return (
-    <div className='p-4 h-screen'>
-      <ToastMessage message={toastMessage} setMessage={setToastMessage} />
+    <>
+      {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+        <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+      ) : (
+        <Topbar
+          title='Adding Co-applicant'
+          id={values?.lead?.id}
+          showClose={false}
+          showBack={true}
+          coApplicant={true}
+        />
+      )}
 
-      <div className='flex items-start gap-2'>
-        <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
-        <p className='text-xs not-italic font-normal text-dark-grey'>
-          The eligibilty provides information regarding the status of all the verification and lead
-          eligibility.
-        </p>
-      </div>
+      <div className='p-4 h-screen'>
+        <ToastMessage message={toastMessage} setMessage={setToastMessage} />
 
-      <div className='mt-4'>
-        <p className='text-xs text-primary-black font-normal'>
-          Applicant name:
-          {' ' +
-            values?.applicants?.[activeIndex]?.applicant_details.first_name +
-            ' ' +
-            values?.applicants?.[activeIndex]?.applicant_details.middle_name +
-            ' ' +
-            values?.applicants?.[activeIndex]?.applicant_details.last_name}
-        </p>
-        <p className='text-xs text-primary-black font-normal mt-0.5'>Salesforce ID: 1234567</p>
-        <div className='flex justify-between text-primary-black font-medium mt-1'>
-          {!bre201 ? <h3>Verification in progress</h3> : <h3>Application submitted</h3>}
-          <h3>
-            {progress}/{finalApi}
-          </h3>
+        <div className='flex items-start gap-2'>
+          <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
+          <p className='text-xs not-italic font-normal text-dark-grey'>
+            The eligibilty provides information regarding the status of all the verification and
+            lead eligibility.
+          </p>
         </div>
 
-        <div className='mt-3 bg-primary-black rounded-lg p-4'>
-          {!bre201 ? (
-            <div className='flex justify-center items-center gap-3'>
-              <div className='ml-auto'>
-                <img
-                  src={loading}
-                  alt='loading'
-                  className='h-8 w-12 animate-spin duration-300 ease-out'
-                />
-              </div>
+        <div className='mt-4'>
+          <p className='text-xs text-primary-black font-normal'>
+            Applicant name:
+            {' ' +
+              values?.applicants?.[activeIndex]?.applicant_details.first_name +
+              ' ' +
+              values?.applicants?.[activeIndex]?.applicant_details.middle_name +
+              ' ' +
+              values?.applicants?.[activeIndex]?.applicant_details.last_name}
+          </p>
+          <p className='text-xs text-primary-black font-normal mt-0.5'>Salesforce ID: 1234567</p>
+          <div className='flex justify-between text-primary-black font-medium mt-1'>
+            {!bre201 ? <h3>Verification in progress</h3> : <h3>Application submitted</h3>}
+            <h3>
+              {progress}/{finalApi}
+            </h3>
+          </div>
 
+          <div className='mt-3 bg-primary-black rounded-lg p-4'>
+            {!bre201 ? (
+              <div className='flex justify-center items-center gap-3'>
+                <div className='ml-auto'>
+                  <img
+                    src={loading}
+                    alt='loading'
+                    className='h-8 w-12 animate-spin duration-300 ease-out'
+                  />
+                </div>
+
+                <p className='text-white text-xs'>
+                  Thank you for your patience while the verification process is completed.
+                </p>
+              </div>
+            ) : (
               <p className='text-white text-xs'>
-                Thank you for your patience while the verification process is completed.
+                Lorem ipsum <br /> Lorem ipsum <br /> Lorem ipsum
               </p>
-            </div>
-          ) : (
-            <p className='text-white text-xs'>
-              Lorem ipsum <br /> Lorem ipsum <br /> Lorem ipsum
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div className='mt-4 flex flex-col gap-2 h-[265px] overflow-auto'>
-        {PAN.status === 'Error' || PAN.status === 'In-Valid' || PAN.status === 'Valid No Match' ? (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!PAN.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>PAN card</p>
-            </div>
-            {PAN.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {PAN.res && <span className='text-xs font-normal text-light-grey'>{PAN.res}</span>}
-          </div>
-        ) : null}
-
-        {DL.status === 'Error' || DL.status === 'In-Valid' || DL.status === 'Valid No Match' ? (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!DL.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>Driving license</p>
-            </div>
-            {DL.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {DL.res && <span className='text-xs font-normal text-light-grey'>{DL.res}</span>}
-          </div>
-        ) : null}
-
-        {voterID.status === 'Error' ||
-        voterID.status === 'In-Valid' ||
-        voterID.status === 'Valid No Match' ? (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!voterID.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>Voter ID</p>
-            </div>
-            {voterID.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {voterID.res && (
-              <span className='text-xs font-normal text-light-grey'>{voterID.res}</span>
-            )}
-          </div>
-        ) : null}
-
-        {pfUAN.status === 'Error' ||
-        pfUAN.status === 'In-Valid' ||
-        pfUAN.status === 'Valid No Match' ? (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!pfUAN.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>PF UAN</p>
-            </div>
-            <div>
-              {pfUAN.loader ? (
-                <div className='ml-auto'>
-                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-                </div>
-              ) : null}
-              {pfUAN.res && (
-                <span className='text-xs font-normal text-light-grey'>{pfUAN.res}</span>
-              )}
-            </div>
-          </div>
-        ) : null}
-
-        {GST.status === 'Error' || GST.status === 'In-Valid' || GST.status === 'Valid No Match' ? (
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!GST.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>GST</p>
-            </div>
-            <div>
-              {GST.loader ? (
-                <div className='ml-auto'>
-                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-                </div>
-              ) : null}
-              {GST.res && <span className='text-xs font-normal text-light-grey'>{GST.res}</span>}
-            </div>
-          </div>
-        ) : null}
-
-        <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-          <div className='flex items-center gap-1'>
-            {!faceMatch.ran ? (
-              <svg
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                  stroke='#EC7739'
-                  strokeWidth='1.5'
-                />
-              </svg>
-            ) : (
-              <svg
-                width='24'
-                height='13'
-                viewBox='0 0 18 13'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M17 1L6 12L1 7'
-                  stroke='#147257'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            )}
-
-            <p className='text-sm text-primary-black'>Face Match</p>
-          </div>
-          <div>
-            {faceMatch.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {faceMatch.res && (
-              <span className='text-xs font-normal text-light-grey'>{faceMatch.res}</span>
             )}
           </div>
         </div>
 
-        <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-          <div className='flex items-center gap-1'>
-            {!upiName.ran ? (
-              <svg
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                  stroke='#EC7739'
-                  strokeWidth='1.5'
-                />
-              </svg>
-            ) : (
-              <svg
-                width='24'
-                height='13'
-                viewBox='0 0 18 13'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M17 1L6 12L1 7'
-                  stroke='#147257'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            )}
-
-            <p className='text-sm text-primary-black'>UPI Name</p>
-          </div>
-          <div>
-            {upiName.loader ? (
-              <div className='ml-auto'>
-                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-              </div>
-            ) : null}
-            {upiName.res && (
-              <span className='text-xs font-normal text-light-grey'>{upiName.res}</span>
-            )}
-          </div>
-        </div>
-
-        {display ? (
-          <>
+        <div className='mt-4 flex flex-col gap-2'>
+          {PAN.status === 'Error' ||
+          PAN.status === 'In-Valid' ||
+          PAN.status === 'Valid No Match' ? (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!bre99.ran ? (
+                {!PAN.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -1054,27 +731,21 @@ const Eligibility = () => {
                   </svg>
                 )}
 
-                <p className='text-sm text-primary-black'>BRE 99</p>
+                <p className='text-sm text-primary-black'>PAN card</p>
               </div>
-              <div>
-                {bre99.loader ? (
-                  <div className='ml-auto'>
-                    <img
-                      src={loading}
-                      alt='loading'
-                      className='animate-spin duration-300 ease-out'
-                    />
-                  </div>
-                ) : null}
-                {bre99.res && (
-                  <span className='text-xs font-normal text-light-grey'>{bre99.res}</span>
-                )}
-              </div>
+              {PAN.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {PAN.res && <span className='text-xs font-normal text-light-grey'>{PAN.res}</span>}
             </div>
+          ) : null}
 
+          {DL.status === 'Error' || DL.status === 'In-Valid' || DL.status === 'Valid No Match' ? (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!bureau.ran ? (
+                {!DL.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -1106,10 +777,108 @@ const Eligibility = () => {
                   </svg>
                 )}
 
-                <p className='text-sm text-primary-black'>Bureau</p>
+                <p className='text-sm text-primary-black'>Driving license</p>
+              </div>
+              {DL.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {DL.res && <span className='text-xs font-normal text-light-grey'>{DL.res}</span>}
+            </div>
+          ) : null}
+
+          {voterID.status === 'Error' ||
+          voterID.status === 'In-Valid' ||
+          voterID.status === 'Valid No Match' ? (
+            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex items-center gap-1'>
+                {!voterID.ran ? (
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                      stroke='#EC7739'
+                      strokeWidth='1.5'
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width='24'
+                    height='13'
+                    viewBox='0 0 18 13'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M17 1L6 12L1 7'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                )}
+
+                <p className='text-sm text-primary-black'>Voter ID</p>
+              </div>
+              {voterID.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {voterID.res && (
+                <span className='text-xs font-normal text-light-grey'>{voterID.res}</span>
+              )}
+            </div>
+          ) : null}
+
+          {pfUAN.status === 'Error' ||
+          pfUAN.status === 'In-Valid' ||
+          pfUAN.status === 'Valid No Match' ? (
+            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex items-center gap-1'>
+                {!pfUAN.ran ? (
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                      stroke='#EC7739'
+                      strokeWidth='1.5'
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width='24'
+                    height='13'
+                    viewBox='0 0 18 13'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M17 1L6 12L1 7'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                )}
+
+                <p className='text-sm text-primary-black'>PF UAN</p>
               </div>
               <div>
-                {bureau.loader ? (
+                {pfUAN.loader ? (
                   <div className='ml-auto'>
                     <img
                       src={loading}
@@ -1118,21 +887,279 @@ const Eligibility = () => {
                     />
                   </div>
                 ) : null}
-                {bureau.res && (
-                  <span className='text-xs font-normal text-light-grey'>{bureau.res}</span>
+                {pfUAN.res && (
+                  <span className='text-xs font-normal text-light-grey'>{pfUAN.res}</span>
                 )}
               </div>
             </div>
-          </>
-        ) : null}
+          ) : null}
+
+          {GST.status === 'Error' ||
+          GST.status === 'In-Valid' ||
+          GST.status === 'Valid No Match' ? (
+            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex items-center gap-1'>
+                {!GST.ran ? (
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                      stroke='#EC7739'
+                      strokeWidth='1.5'
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width='24'
+                    height='13'
+                    viewBox='0 0 18 13'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M17 1L6 12L1 7'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                )}
+
+                <p className='text-sm text-primary-black'>GST</p>
+              </div>
+              <div>
+                {GST.loader ? (
+                  <div className='ml-auto'>
+                    <img
+                      src={loading}
+                      alt='loading'
+                      className='animate-spin duration-300 ease-out'
+                    />
+                  </div>
+                ) : null}
+                {GST.res && <span className='text-xs font-normal text-light-grey'>{GST.res}</span>}
+              </div>
+            </div>
+          ) : null}
+
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!faceMatch.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>Face Match</p>
+            </div>
+            <div>
+              {faceMatch.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {faceMatch.res && (
+                <span className='text-xs font-normal text-light-grey'>{faceMatch.res}</span>
+              )}
+            </div>
+          </div>
+
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!upiName.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>UPI Name</p>
+            </div>
+            <div>
+              {upiName.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {upiName.res && (
+                <span className='text-xs font-normal text-light-grey'>{upiName.res}</span>
+              )}
+            </div>
+          </div>
+
+          {display ? (
+            <>
+              <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+                <div className='flex items-center gap-1'>
+                  {!bre99.ran ? (
+                    <svg
+                      width='24'
+                      height='24'
+                      viewBox='0 0 24 24'
+                      fill='none'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path
+                        d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                        stroke='#EC7739'
+                        strokeWidth='1.5'
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      width='24'
+                      height='13'
+                      viewBox='0 0 18 13'
+                      fill='none'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path
+                        d='M17 1L6 12L1 7'
+                        stroke='#147257'
+                        strokeWidth='1.5'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                      />
+                    </svg>
+                  )}
+
+                  <p className='text-sm text-primary-black'>BRE 99</p>
+                </div>
+                <div>
+                  {bre99.loader ? (
+                    <div className='ml-auto'>
+                      <img
+                        src={loading}
+                        alt='loading'
+                        className='animate-spin duration-300 ease-out'
+                      />
+                    </div>
+                  ) : null}
+                  {bre99.res && (
+                    <span className='text-xs font-normal text-light-grey'>{bre99.res}</span>
+                  )}
+                </div>
+              </div>
+
+              <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+                <div className='flex items-center gap-1'>
+                  {!bureau.ran ? (
+                    <svg
+                      width='24'
+                      height='24'
+                      viewBox='0 0 24 24'
+                      fill='none'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path
+                        d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                        stroke='#EC7739'
+                        strokeWidth='1.5'
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      width='24'
+                      height='13'
+                      viewBox='0 0 18 13'
+                      fill='none'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path
+                        d='M17 1L6 12L1 7'
+                        stroke='#147257'
+                        strokeWidth='1.5'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                      />
+                    </svg>
+                  )}
+
+                  <p className='text-sm text-primary-black'>Bureau</p>
+                </div>
+                <div>
+                  {bureau.loader ? (
+                    <div className='ml-auto'>
+                      <img
+                        src={loading}
+                        alt='loading'
+                        className='animate-spin duration-300 ease-out'
+                      />
+                    </div>
+                  ) : null}
+                  {bureau.res && (
+                    <span className='text-xs font-normal text-light-grey'>{bureau.res}</span>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : null}
+        </div>
+
+        <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center w-full '>
+          Do not close the app or go back. Please wait for ID <br /> verification as it may take
+          some time. We are validating these checks as per your consent
+        </p>
       </div>
 
-      <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center absolute bottom-20 w-full p-4 left-2/4 -translate-x-2/4'>
-        Do not close the app or go back. Please wait for ID <br /> verification as it may take some
-        time. We are validating these checks as per your consent
-      </p>
-
-      <div className='flex flex-col gap-[18px] absolute bottom-0 border-t-[1px] w-full p-4 left-2/4 -translate-x-2/4'>
+      <div className='flex flex-col gap-[18px] fixed bottom-0 border-t-[1px] w-full p-4'>
         <Button
           disabled={!bre201}
           inputClasses={`w-full h-12 ${bre201 ? 'font-semibold' : 'font-normal'}`}
@@ -1142,7 +1169,7 @@ const Eligibility = () => {
           Go to Dashboard
         </Button>
       </div>
-    </div>
+    </>
   );
 };
 export default Eligibility;
