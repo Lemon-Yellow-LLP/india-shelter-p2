@@ -40,11 +40,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
     ) {
       setFieldError('work_income_detail.gst_number', 'Inavlid gst number');
     }
-  }, [
-    values?.applicants?.[activeIndex]?.work_income_detail?.gst_number,
-    setFieldError,
-    errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number,
-  ]);
+  }, [values?.applicants?.[activeIndex]?.work_income_detail?.gst_number, setFieldError]);
 
   return (
     <>
@@ -159,25 +155,26 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
       <TextInput
         label='GST number'
         placeholder='Eg: 06AAAPB2117A1ZI'
-        // required
+        className='uppercase'
         name={`applicants[${activeIndex}].work_income_detail.gst_number`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
         onBlur={(e) => {
-          const gstPattern =
-            /^([0-9]{2}[a-zA-Z]{4}([a-zA-Z]{1}|[0-9]{1})[0-9]{4}[a-zA-Z]{1}([a-zA-Z]|[0-9]){3}){0,15}$/;
-          const cleanedGSTNumber = values?.applicants?.[
-            activeIndex
-          ]?.work_income_detail?.gst_number.replace(/\s/g, '');
-          if (
-            !gstPattern.test(cleanedGSTNumber) &&
-            values?.applicants?.[activeIndex]?.work_income_detail?.gst_number
-          ) {
-            setFieldError('work_income_detail.gst_number', 'Inavlid gst number');
-          } else {
-            handleBlur(e);
-          }
+          // const gstPattern =
+          //   /^([0-9]{2}[a-zA-Z]{4}([a-zA-Z]{1}|[0-9]{1})[0-9]{4}[a-zA-Z]{1}([a-zA-Z]|[0-9]){3}){0,15}$/;
+          // const cleanedGSTNumber = values?.applicants?.[
+          //   activeIndex
+          // ]?.work_income_detail?.gst_number.replace(/\s/g, '');
+          // if (
+          //   !gstPattern.test(cleanedGSTNumber) &&
+          //   values?.applicants?.[activeIndex]?.work_income_detail?.gst_number
+          // ) {
+          //   setFieldError('work_income_detail.gst_number', 'Inavlid gst number');
+          // } else {
+          //   handleBlur(e);
+          // }
+          handleBlur(e);
 
           if (
             !errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number &&
