@@ -26,11 +26,6 @@ import UploadSteps from './UplodSteps';
 
 const drawerBleeding = 0;
 
-const Root = styled('div')(({ theme }) => ({
-  height: '100%',
-  backgroundColor: theme.palette.mode === 'light' ? grey[100] : theme.palette.background.default,
-}));
-
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'light' ? '#fff' : grey[800],
 }));
@@ -573,14 +568,14 @@ export default function SwipeableDrawerComponent() {
                               stepIndex={4}
                               noProgress={true}
                               lock={
-                                values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                                  ?.progress !== 100 ||
-                                values?.applicants?.[primaryIndex]?.personal_details?.extra_params
-                                  ?.progress !== 100 ||
-                                values?.applicants?.[primaryIndex]?.address_detail?.extra_params
-                                  ?.progress !== 100 ||
-                                values?.applicants?.[primaryIndex]?.work_income_detail?.extra_params
-                                  ?.progress !== 100
+                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.extra_params?.progress !== 100 ||
+                                values?.applicants?.[activeCoApplicantIndex]?.personal_details
+                                  ?.extra_params?.progress !== 100 ||
+                                values?.applicants?.[activeCoApplicantIndex]?.address_detail
+                                  ?.extra_params?.progress !== 100 ||
+                                values?.applicants?.[activeCoApplicantIndex]?.work_income_detail
+                                  ?.extra_params?.progress !== 100
                               }
                             />
                             <DrawerStepBanking

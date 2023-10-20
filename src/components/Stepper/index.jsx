@@ -34,9 +34,9 @@ const Stepper = ({ steps, activeStep }) => {
   );
 };
 
-export default Stepper;
-
 Stepper.propTypes = {
   steps: PropTypes.arrayOf(PropTypes.object),
   activeStep: PropTypes.number,
 };
+
+export default Stepper;

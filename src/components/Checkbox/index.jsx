@@ -55,10 +55,10 @@ const Checkbox = forwardRef(function Checkbox({ name, checked, setChecked, ...pr
   );
 });
 
-export default Checkbox;
-
 Checkbox.propTypes = {
   name: PropTypes.string.isRequired,
   checked: PropTypes.bool,
   onChange: PropTypes.func,
 };
+
+export default Checkbox;

@@ -13,7 +13,6 @@ export const defaultValues = {
   last_name: '',
   address: '',
   mobile_number: '',
-  mobile_number: '',
   alternate_number: '',
   comments: '',
   extra_params: '',
@@ -26,6 +25,7 @@ const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loData, setLoData] = useState(null);
+  const [phoneNumberList, setPhoneNumberList] = useState({});
   const [otpFailCount, setOtpFailCount] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
   const [isQaulifierActivated, setIsQaulifierActivated] = useState(null);
@@ -34,6 +34,8 @@ const AuthContextProvider = ({ children }) => {
     initialValues: { ...defaultValues },
     validationSchema: signInSchema,
   });
+
+  // console.log(formik.values);
 
   return (
     <AuthContext.Provider
@@ -51,6 +53,8 @@ const AuthContextProvider = ({ children }) => {
         setIsQaulifierActivated,
         loData,
         setLoData,
+        phoneNumberList,
+        setPhoneNumberList,
       }}
     >
       {children}

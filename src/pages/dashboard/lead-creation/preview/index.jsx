@@ -1,41 +1,22 @@
-import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { useContext, useEffect, useState } from 'react';
 import ArrowRightIcon2 from '../../../../assets/icons/arrow-right-2';
-import { fieldLabels, nonRequiredFields, pages } from '../../../../utils';
+import { fieldLabels, pages } from '../../../../utils';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../../../components';
 import StepCompletedIllustration from '../../../../assets/step-completed';
-import { validationSchemaLead } from '../../../../schemas';
 import { Snackbar } from '@mui/material';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
-
-const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
+import PropTypes from 'prop-types';
 
 const steps = ['', '', '', '', ''];
 
 export default function Preview() {
-  const {
-    inputDisabled,
-    values,
-    currentLeadId,
-    errors,
-    touched,
-    handleBlur,
-    handleChange,
-    setFieldError,
-    setFieldValue,
-    updateProgress,
-    activeIndex,
-    setValues,
-    setActiveIndex,
-    handleSubmit,
-  } = useContext(LeadContext);
+  const { values, errors, activeIndex, setActiveIndex, handleSubmit } = useContext(LeadContext);
 
   const navigate = useNavigate();
 
@@ -66,29 +47,213 @@ export default function Preview() {
     return flattenExtraParamsHelper(obj);
   }
 
-  function removePropertiesByKeys(obj, keysToRemove) {
-    if (Array.isArray(obj)) {
-      // If it's an array, recursively call the function for each element
-      obj.forEach((item, index) => {
-        removePropertiesByKeys(item, keysToRemove);
-      });
-    } else if (typeof obj === 'object') {
-      for (const key in obj) {
-        if (keysToRemove.includes(key)) {
-          delete obj[key];
-        } else {
-          removePropertiesByKeys(obj[key], keysToRemove);
-        }
-      }
-    }
-  }
-
   useEffect(() => {
-    // removePropertiesByKeys(errors, nonRequiredFields);
-    console.log('-------------');
-    console.log(flattenExtraParams(errors));
-    setFlattedErrors(flattenExtraParams(errors));
-  }, []);
+    let _errors = Object.assign({}, errors);
+    // console.error(errors);
+    errors?.applicants?.map((applicant, idx) => {
+      let work_income_detail = {};
+      let value = values?.applicants?.[idx]?.work_income_detail?.profession;
+
+      if (value === 'Salaried') {
+        work_income_detail = {
+          ...(errors?.applicants?.[idx]?.work_income_detail?.company_name && {
+            company_name: errors?.applicants?.[idx]?.work_income_detail?.company_name,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.extra_params?.extra_company_name &&
+            values?.applicants?.[idx]?.work_income_detail?.company_name == 'Others' && {
+              extra_company_name:
+                errors?.applicants?.[idx]?.work_income_detail?.extra_params?.extra_company_name,
+            }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.total_income && {
+            total_income: errors?.applicants?.[idx]?.work_income_detail?.total_income,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
+            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.working_since && {
+            working_since: errors?.applicants?.[idx]?.work_income_detail?.working_since,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.mode_of_salary && {
+            mode_of_salary: errors?.applicants?.[idx]?.work_income_detail?.mode_of_salary,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi &&
+            values?.applicants?.[idx]?.work_income_detail?.no_current_loan > 0 && {
+              ongoing_emi: errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi,
+            }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.flat_no_building_name && {
+            flat_no_building_name:
+              errors?.applicants?.[idx]?.work_income_detail?.flat_no_building_name,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.street_area_locality && {
+            street_area_locality:
+              errors?.applicants?.[idx]?.work_income_detail?.street_area_locality,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.town && {
+            town: errors?.applicants?.[idx]?.work_income_detail?.town,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.landmark && {
+            landmark: errors?.applicants?.[idx]?.work_income_detail?.landmark,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.pincode && {
+            pincode: errors?.applicants?.[idx]?.work_income_detail?.pincode,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
+            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.total_family_number && {
+            total_family_number: errors?.applicants?.[idx]?.work_income_detail?.total_family_number,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.total_household_income && {
+            total_household_income:
+              errors?.applicants?.[idx]?.work_income_detail?.total_household_income,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents && {
+            no_of_dependents: errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents,
+          }),
+        };
+      } else if (value === 'Self-employed') {
+        work_income_detail = {
+          ...(errors?.applicants?.[idx]?.work_income_detail?.business_name && {
+            business_name: errors?.applicants?.[idx]?.work_income_detail?.business_name,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.industries && {
+            industries: errors?.applicants?.[idx]?.work_income_detail?.industries,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
+            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi &&
+            values?.applicants?.[idx]?.work_income_detail?.no_current_loan > 0 && {
+              ongoing_emi: errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi,
+            }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.flat_no_building_name && {
+            flat_no_building_name:
+              errors?.applicants?.[idx]?.work_income_detail?.flat_no_building_name,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.street_area_locality && {
+            street_area_locality:
+              errors?.applicants?.[idx]?.work_income_detail?.street_area_locality,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.town && {
+            town: errors?.applicants?.[idx]?.work_income_detail?.town,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.landmark && {
+            landmark: errors?.applicants?.[idx]?.work_income_detail?.landmark,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.pincode && {
+            pincode: errors?.applicants?.[idx]?.work_income_detail?.pincode,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
+            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.total_family_number && {
+            total_family_number: errors?.applicants?.[idx]?.work_income_detail?.total_family_number,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.total_household_income && {
+            total_household_income:
+              errors?.applicants?.[idx]?.work_income_detail?.total_household_income,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents && {
+            no_of_dependents: errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents,
+          }),
+        };
+      } else if (value === 'Unemployed') {
+        work_income_detail = {
+          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
+            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi &&
+            values?.applicants?.[idx]?.work_income_detail?.no_current_loan > 0 && {
+              ongoing_emi: errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi,
+            }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.total_family_number && {
+            total_family_number: errors?.applicants?.[idx]?.work_income_detail?.total_family_number,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.total_household_income && {
+            total_household_income:
+              errors?.applicants?.[idx]?.work_income_detail?.total_household_income,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents && {
+            no_of_dependents: errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents,
+          }),
+        };
+      } else if (value === 'Retired') {
+        work_income_detail = {
+          ...(errors?.applicants?.[idx]?.work_income_detail?.pention_amount && {
+            pention_amount: errors?.applicants?.[idx]?.work_income_detail?.pention_amount,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
+            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
+          }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi &&
+            values?.applicants?.[idx]?.work_income_detail?.no_current_loan > 0 && {
+              ongoing_emi: errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi,
+            }),
+
+          ...(errors?.applicants?.[idx]?.work_income_detail?.total_family_number && {
+            total_family_number: errors?.applicants?.[idx]?.work_income_detail?.total_family_number,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.total_household_income && {
+            total_household_income:
+              errors?.applicants?.[idx]?.work_income_detail?.total_household_income,
+          }),
+          ...(errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents && {
+            no_of_dependents: errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents,
+          }),
+        };
+      } else {
+        work_income_detail = applicant?.work_income_detail;
+      }
+
+      if (_errors?.applicants?.[idx]?.work_income_detail) {
+        _errors.applicants[idx].work_income_detail = work_income_detail;
+      }
+
+      if (
+        _errors?.applicants?.[idx]?.work_income_detail &&
+        Object.keys(_errors?.applicants?.[idx]?.work_income_detail)?.length == 0
+      ) {
+        delete _errors.applicants[idx].work_income_detail;
+      }
+
+      if (_errors?.applicants?.[idx] && Object.keys(_errors?.applicants?.[idx])?.length == 0) {
+        delete _errors.applicants[idx];
+      }
+    });
+
+    if (
+      _errors?.property_details &&
+      values?.property_details?.property_identification_is == 'not-yet'
+    ) {
+      _errors.property_details = {};
+    }
+
+    setFlattedErrors(flattenExtraParams(_errors));
+  }, [errors]);
 
   useEffect(() => {
     const _primaryIndex = values?.applicants?.findIndex(
@@ -112,6 +277,10 @@ export default function Preview() {
   useEffect(() => {
     setCoApplicantIndex(activeStep ? activeStep - 1 : 0);
   }, [activeStep]);
+
+  useEffect(() => {
+    setActiveIndex(coApplicantIndexes[coApplicantIndex]);
+  }, [coApplicantIndex]);
 
   const previousStep = () => {
     setActiveStep((prev) => {
@@ -573,7 +742,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
-              hide={!errors?.[pages.property_details.name]}
+              hide={!flattedErrors?.[pages.property_details.name]}
               title={pages.property_details.title}
               link={pages.property_details.url + '?preview=' + pages.property_details.url}
               count={
@@ -851,4 +1020,12 @@ function StepCompleted() {
 
 const Separator = () => {
   return <div className='border-t-2 border-b-0 w-full'></div>;
+};
+
+PreviewCard.propTypes = {
+  title: PropTypes.string,
+  link: PropTypes.any,
+  count: PropTypes.any,
+  hide: PropTypes.any,
+  children: PropTypes.any,
 };

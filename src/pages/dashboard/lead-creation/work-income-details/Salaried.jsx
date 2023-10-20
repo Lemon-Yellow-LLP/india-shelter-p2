@@ -19,7 +19,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
       const new_name = name.split('.')[2];
 
       editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-        [new_name]: value?.label,
+        [new_name]: value?.value,
       });
 
       if (!requiredFieldsStatus[new_name]) {
@@ -73,6 +73,8 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
     },
     [requiredFieldsStatus, setRequiredFieldsStatus],
   );
+
+  const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
   return (
     <>
@@ -221,6 +223,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         label='PF UAN'
         placeholder='Eg: 100563503285'
         type='number'
+        pattern='\d*'
         name={`applicants[${activeIndex}].work_income_detail.pf_uan`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
@@ -242,11 +245,20 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
           }
         }}
         onChange={(e) => {
-          const value = e.currentTarget.value;
+          let value = e.currentTarget.value;
           if (value.length > 12) {
             return;
           }
-          const address_pattern = /^[0-9]+$/;
+
+          if (value < 0) {
+            value = '';
+          }
+
+          const address_pattern = /^\d+$/;
+          if (!address_pattern.test(value) && value.length > 0) {
+            return;
+          }
+
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
@@ -261,6 +273,10 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               ),
             );
           }
+          if (DISALLOW_CHAR.includes(e.key)) {
+            e.preventDefault();
+            return;
+          }
         }}
       />
 
@@ -268,6 +284,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         type='number'
         label='No. of current loan(s)'
         placeholder='Eg: 1'
+        pattern='\d*'
         required
         name={`applicants[${activeIndex}].work_income_detail.no_current_loan`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
@@ -373,6 +390,9 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
         disabled={
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
+        }
+        labelDisabled={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
         }
       />

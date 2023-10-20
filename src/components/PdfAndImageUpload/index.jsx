@@ -37,8 +37,13 @@ function PdfAndImageUpload({
       const validImageTypes = ['image/jpeg', 'application/pdf'];
 
       if (validImageTypes.includes(fileType)) {
-        setSingleFile(file[i]);
-        setFile([...files, file[i]]);
+        if (file[i].size <= 5000000) {
+          setSingleFile(file[i]);
+          setFile([...files, file[i]]);
+        } else {
+          setLoader(false);
+          setMessage('File size should be less than 5MB');
+        }
       } else {
         setLoader(false);
         setMessage('File format not supported');
@@ -83,11 +88,16 @@ function PdfAndImageUpload({
       const validImageTypes = ['image/jpeg'];
 
       if (validImageTypes.includes(fileType)) {
-        setEdit({
-          file: file[i],
-          id: id,
-        });
-        setFile([...files, file[i]]);
+        if (file[i].size <= 5000000) {
+          setEdit({
+            file: file[i],
+            id: id,
+          });
+          setFile([...files, file[i]]);
+        } else {
+          setLoader(false);
+          setMessage('File size should be less than 5MB');
+        }
       } else {
         setLoader(false);
         setMessage('File format not supported');

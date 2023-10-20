@@ -14,6 +14,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
         type='number'
         label='No. of current loan(s)'
         placeholder='Eg: 1'
+        pattern='\d*'
         required
         name={`applicants[${activeIndex}].work_income_detail.no_current_loan`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
@@ -119,6 +120,9 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
         disabled={
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
+        }
+        labelDisabled={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
         }
       />

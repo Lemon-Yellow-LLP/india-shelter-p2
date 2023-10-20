@@ -14,6 +14,15 @@ import moment from 'moment';
 import { parseISO } from 'date-fns';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { defaultValuesLead } from '../../context/defaultValuesLead';
+import PropTypes from 'prop-types';
+
+LeadCard.propTypes = {
+  title: PropTypes.string,
+  progress: PropTypes.number,
+  id: PropTypes.any,
+  mobile: PropTypes.any,
+  created: PropTypes.any,
+};
 
 export default function Dashboard() {
   const { setValues } = useContext(LeadContext);
@@ -58,7 +67,6 @@ export default function Dashboard() {
         toDate: moment(selectionRange.endDate).add(1, 'day'),
       });
       const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
-      console.log(formatted.length);
       setLeadList(formatted);
     })();
   }, [selectionRange]);
@@ -139,7 +147,8 @@ export default function Dashboard() {
       </div>
       <button
         onClick={() => {
-          setValues(defaultValuesLead);
+          let newDefaultValues = structuredClone(defaultValuesLead);
+          setValues(newDefaultValues);
           navigate('/lead/applicant-details');
         }}
         className='fixed bottom-4 right-6 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'
@@ -194,118 +203,6 @@ function LeadCard({ title, progress, id, mobile, created }) {
     </Link>
   );
 }
-
-export const DashboardTest = () => {
-  const { token, setIsAuthenticated } = useContext(AuthContext);
-  const [activeLoginRes, setActiveLoginRes] = useState(null);
-
-  const handleActiveLogin = async () => {
-    try {
-      const res = await testLogout({
-        headers: {
-          Authorization: token,
-        },
-      });
-      if (!res) return;
-
-      setActiveLoginRes('SUCCESS, LOGGED IN');
-    } catch (err) {
-      console.log(err);
-      setActiveLoginRes('FAILED, LOGGED OUT');
-      window.location.reload();
-    }
-  };
-
-  return (
-    <div className='flex flex-col gap-5'>
-      <h1>Dashboard</h1>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/reference-details'
-      >
-        go-to-reference-details-page
-      </Link>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/personal-details'
-      >
-        go-to-personal-details-page
-      </Link>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/property-details'
-      >
-        go-to-property-details-page
-      </Link>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/address-details'
-      >
-        go-to-address-details-page
-      </Link>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/work-income-details'
-      >
-        go-to-work-income-page
-      </Link>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/applicant-details'
-      >
-        go-to-applicant-details-page
-      </Link>
-      <div></div>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/lnt-charges'
-      >
-        go-to-L&T-charges-page
-      </Link>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/dashboard'
-      >
-        go-to-Dashboard-page
-      </Link>
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/preview'
-      >
-        go-to-Preview-page
-      </Link>
-
-      <button
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        onClick={handleActiveLogin}
-      >
-        Test active login
-      </button>
-
-      {activeLoginRes ? (
-        <span>{activeLoginRes}</span>
-      ) : (
-        <span>ACTIVE LOGIN STATUS WILL BE SHOWN HERE</span>
-      )}
-
-      <Link
-        style={{ borderRadius: '10px', border: '1px solid gray', padding: '20px', width: '300px' }}
-        to='/lead/qualifier'
-      >
-        go-to-qualifier-page
-      </Link>
-    </div>
-  );
-};
 
 const Separator = () => {
   return <div className='border-t-2 border-b-0 my-2 w-full'></div>;

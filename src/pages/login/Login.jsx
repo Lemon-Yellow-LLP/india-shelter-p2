@@ -27,7 +27,7 @@ export default function Login() {
     token,
     setToken,
   } = useContext(AuthContext);
-  const { toastMessage, setToastMessage, setLoData } = useContext(AuthContext);
+  const { toastMessage, setToastMessage, setLoData, setPhoneNumberList } = useContext(AuthContext);
 
   const [showOTPInput, setShowOTPInput] = useState(false);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
@@ -59,6 +59,9 @@ export default function Login() {
     setShowOTPInput(false);
 
     setFieldValue('username', phoneNumber);
+    setPhoneNumberList((prev) => {
+      return { ...prev, lo: phoneNumber };
+    });
 
     if (phoneNumber.length === 10) {
       setHasSentOTPOnce(false);
@@ -190,9 +193,8 @@ export default function Login() {
 
   return (
     <>
-      <Header />
-
-      <div className='bg-[#CCE2BE] overflow-hidden'>
+      <div className='bg-[#CCE2BE] overflow-hidden h-[100vh]'>
+        <Header />
         <div>
           <img src='./IS-Login-Logo.png' alt='login-logo' />
         </div>

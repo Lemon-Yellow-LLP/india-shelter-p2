@@ -43,7 +43,10 @@ const PersonalDetails = () => {
   }, [activeIndex]);
 
   const updateFields = async (name, value) => {
-    let newData = {};
+    let newData = {
+      date_of_birth: values?.applicants[activeIndex]?.personal_details?.date_of_birth,
+      mobile_number: values?.applicants[activeIndex]?.personal_details?.mobile_number,
+    };
     newData[name] = value;
 
     if (!name) {
@@ -60,7 +63,8 @@ const PersonalDetails = () => {
           newData,
         );
       } else {
-        let addData = { ...newCoApplicantValues.personal_details, [name]: value };
+        let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
+        let addData = { ...clonedCoApplicantValues.personal_details, [name]: value };
         await addApi('personal', {
           ...addData,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
@@ -98,7 +102,7 @@ const PersonalDetails = () => {
 
   const handleNextClick = () => {
     setCurrentStepIndex(2);
-    updateFields();
+    // updateFields();
   };
 
   const handleAutofill = async () => {

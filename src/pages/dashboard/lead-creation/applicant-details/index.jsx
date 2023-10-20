@@ -51,7 +51,7 @@ const ApplicantDetails = () => {
     setCurrentStepIndex,
   } = useContext(LeadContext);
 
-  const { setOtpFailCount } = useContext(AuthContext);
+  const { setOtpFailCount, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
 
   const { lo_id } = useContext(AuthContext);
 
@@ -251,6 +251,18 @@ const ApplicantDetails = () => {
       if (phoneNumber.length === 10) {
         setHasSentOTPOnce(false);
         updateFieldsApplicant('mobile_number', phoneNumber);
+        if (values?.applicants[activeIndex]?.applicant_details?.id) {
+          await editFieldsById(
+            values?.applicants[activeIndex]?.applicant_details?.id,
+            'applicant',
+            {
+              otp: null,
+              otp_send_on: null,
+              otp_fail_count: 0,
+              otp_fail_release: null,
+            },
+          );
+        }
       }
     },
     [requiredFieldsStatus, values],
@@ -453,7 +465,38 @@ const ApplicantDetails = () => {
     );
   }, [activeIndex]);
 
-  // console.log('values', values.applicants[activeIndex]?.applicant_details);
+  // For unique phone numbers
+  useEffect(() => {
+    const _phoneNumberList = Object.assign({}, phoneNumberList);
+    if (_phoneNumberList?.[`applicant_${activeIndex}`]) {
+      delete _phoneNumberList?.[[`applicant_${activeIndex}`]];
+    }
+
+    if (
+      values?.applicants?.[activeIndex]?.applicant_details?.mobile_number &&
+      _phoneNumberList &&
+      Object.values(_phoneNumberList)?.includes(
+        values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
+      )
+    ) {
+      setFieldError(
+        `applicants[${activeIndex}].applicant_details.mobile_number`,
+        'Phone number must be unique',
+      );
+    } else {
+      setPhoneNumberList((prev) => {
+        return {
+          ...prev,
+          [`applicant_${activeIndex}`]:
+            values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
+        };
+      });
+    }
+  }, [
+    values?.applicants?.[activeIndex]?.applicant_details,
+    errors?.applicants?.[activeIndex]?.applicant_details,
+  ]);
+
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
 
@@ -672,6 +715,7 @@ const ApplicantDetails = () => {
             onBlur={(e) => {
               handleBlur(e);
               const name = e.target.name.split('.')[1];
+
               if (
                 !errors?.applicants?.[activeIndex]?.applicant_details?.[name] &&
                 values?.applicants?.[activeIndex]?.applicant_details?.[name]
@@ -680,6 +724,13 @@ const ApplicantDetails = () => {
                   name,
                   values.applicants?.[activeIndex]?.applicant_details?.[name],
                 );
+                setPhoneNumberList((prev) => {
+                  return {
+                    ...prev,
+                    [`applicant_${activeIndex}`]:
+                      values.applicants?.[activeIndex]?.applicant_details?.[name],
+                  };
+                });
               }
             }}
             pattern='\d*'
@@ -758,14 +809,11 @@ const ApplicantDetails = () => {
             disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
           />
         </div>
-        {console.log(errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details)}
-        {console.log(errors.lead)}
         <PreviousNextButtons
           disablePrevious={true}
           disableNext={
             !values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
-            (errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details) ||
-            Object.values(errors?.lead || {}).some((value) => value !== null)
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !== 100
           }
           onNextClick={() => {
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&

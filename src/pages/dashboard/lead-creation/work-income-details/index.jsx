@@ -53,109 +53,104 @@ const WorkIncomeDetails = () => {
 
   const handleRadioChange = useCallback(
     async (e) => {
-      setFieldValue(e.name, e.value);
       const name = e.name.split('.')[2];
 
-      if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
-        if (name === 'profession') {
-          let _requiredFieldStatus = {};
+      if (name === 'profession') {
+        let _requiredFieldStatus = {};
 
-          if (e.value === 'Salaried') {
-            _requiredFieldStatus = {
-              profession: true,
-              flat_no_building_name: false,
-              street_area_locality: false,
-              landmark: false,
-              pincode: false,
-              no_current_loan: false,
-              ongoing_emi: false,
-              total_family_number: false,
-              total_household_income: false,
-              no_of_dependents: false,
-            };
-            setRequiredFieldsStatus(_requiredFieldStatus);
-          }
-
-          if (e.value === 'Self-employed') {
-            _requiredFieldStatus = {
-              profession: true,
-              flat_no_building_name: false,
-              street_area_locality: false,
-              landmark: false,
-              pincode: false,
-              no_current_loan: false,
-              ongoing_emi: false,
-              total_family_number: false,
-              total_household_income: false,
-              no_of_dependents: false,
-              business_name: false,
-              industries: false,
-            };
-            setRequiredFieldsStatus(_requiredFieldStatus);
-          }
-
-          if (e.value === 'Unemployed') {
-            _requiredFieldStatus = {
-              profession: true,
-              no_current_loan: false,
-              ongoing_emi: false,
-              total_family_number: false,
-              total_household_income: false,
-              no_of_dependents: false,
-            };
-            setRequiredFieldsStatus(_requiredFieldStatus);
-          }
-
-          if (e.value === 'Retired') {
-            _requiredFieldStatus = {
-              profession: true,
-              no_current_loan: false,
-              ongoing_emi: false,
-              total_family_number: false,
-              total_household_income: false,
-              no_of_dependents: false,
-              pention_amount: false,
-            };
-            setRequiredFieldsStatus(_requiredFieldStatus);
-          }
-
-          const newData = { ...values };
-
-          newData.applicants[activeIndex].work_income_detail = {
-            id: values?.applicants[activeIndex].work_income_detail.id,
-            applicant_id: values?.applicants[activeIndex].work_income_detail.applicant_id,
-            profession: e.value,
-            company_name: '',
-            total_income: '',
-            pf_uan: '',
-            no_current_loan: null,
-            ongoing_emi: '',
-            working_since: '',
-            mode_of_salary: '',
-            flat_no_building_name: '',
-            street_area_locality: '',
-            town: '',
-            landmark: '',
-            pincode: '',
-            city: '',
-            state: '',
-            total_family_number: '',
-            total_household_income: '',
-            no_of_dependents: '',
-            business_name: '',
-            industries: '',
-            gst_number: '',
-            pention_amount: '',
-            extra_params: {
-              extra_company_name: '',
-              extra_industries: '',
-              progress: 0,
-              required_fields_status: _requiredFieldStatus,
-            },
+        if (e.value === 'Salaried') {
+          _requiredFieldStatus = {
+            profession: true,
+            company_name: false,
+            total_income: false,
+            working_since: false,
+            mode_of_salary: false,
+            flat_no_building_name: false,
+            street_area_locality: false,
+            town: false,
+            landmark: false,
+            pincode: false,
+            no_current_loan: false,
+            ongoing_emi: false,
+            total_family_number: false,
+            total_household_income: false,
+            no_of_dependents: false,
           };
+        } else if (e.value === 'Self-employed') {
+          _requiredFieldStatus = {
+            profession: true,
+            business_name: false,
+            industries: false,
+            flat_no_building_name: false,
+            street_area_locality: false,
+            town: false,
+            landmark: false,
+            pincode: false,
+            no_current_loan: false,
+            ongoing_emi: false,
+            total_family_number: false,
+            total_household_income: false,
+            no_of_dependents: false,
+          };
+        } else if (e.value === 'Unemployed') {
+          _requiredFieldStatus = {
+            profession: true,
+            no_current_loan: false,
+            ongoing_emi: false,
+            total_family_number: false,
+            total_household_income: false,
+            no_of_dependents: false,
+          };
+        } else if (e.value === 'Retired') {
+          _requiredFieldStatus = {
+            profession: true,
+            no_current_loan: false,
+            ongoing_emi: false,
+            total_family_number: false,
+            total_household_income: false,
+            no_of_dependents: false,
+            pention_amount: false,
+          };
+        }
 
-          setValues(newData);
+        const newData = structuredClone(values);
 
+        newData.applicants[activeIndex].work_income_detail = {
+          ...newData.applicants[activeIndex].work_income_detail,
+          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+          profession: e.value,
+          company_name: '',
+          total_income: '',
+          pf_uan: '',
+          no_current_loan: null,
+          ongoing_emi: '',
+          working_since: '',
+          mode_of_salary: '',
+          flat_no_building_name: '',
+          street_area_locality: '',
+          town: '',
+          landmark: '',
+          pincode: '',
+          city: '',
+          state: '',
+          total_family_number: '',
+          total_household_income: '',
+          no_of_dependents: '',
+          business_name: '',
+          industries: '',
+          gst_number: '',
+          pention_amount: '',
+          extra_params: {
+            extra_company_name: '',
+            extra_industries: '',
+            progress: 15,
+            required_fields_status: _requiredFieldStatus,
+          },
+        };
+
+        setValues(newData);
+
+        if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
           editFieldsById(
             newData.applicants[activeIndex].work_income_detail.id,
             'work-income',
@@ -163,39 +158,59 @@ const WorkIncomeDetails = () => {
           );
 
           return;
+        } else {
+          await addApi('work-income', newData.applicants[activeIndex].work_income_detail)
+            .then(async (res) => {
+              setFieldValue(`applicants[${activeIndex}].work_income_detail.id`, res.id);
+              await editFieldsById(
+                values?.applicants?.[activeIndex]?.applicant_details?.id,
+                'applicant',
+                { work_income_detail: res.id },
+              );
+              return res;
+            })
+            .catch((err) => {
+              console.log(err);
+              return err;
+            });
         }
+      }
 
+      setFieldValue(e.name, e.value);
+
+      if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
         editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
           [name]: e.value,
         });
         if (!requiredFieldsStatus[name]) {
           setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
         }
-      } else {
-        let addData = { ...newCoApplicantValues.work_income_detail, [name]: e.value };
-
-        if (requiredFieldsStatus && !requiredFieldsStatus[name]) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-        }
-
-        await addApi('work-income', {
-          ...addData,
-          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
-        })
-          .then(async (res) => {
-            setFieldValue(`applicants[${activeIndex}].work_income_detail.id`, res.id);
-            await editFieldsById(
-              values?.applicants?.[activeIndex]?.applicant_details?.id,
-              'applicant',
-              { work_income_detail: res.id },
-            );
-            return res;
-          })
-          .catch((err) => {
-            console.log(err);
-            return err;
-          });
       }
+      // else {
+      //   let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
+      //   let addData = { ...clonedCoApplicantValues.work_income_detail, [name]: e.value };
+      //   if (requiredFieldsStatus && !requiredFieldsStatus[name]) {
+      //     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+      //   }
+
+      //   await addApi('work-income', {
+      //     ...addData,
+      //     applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+      //   })
+      //     .then(async (res) => {
+      //       setFieldValue(`applicants[${activeIndex}].work_income_detail.id`, res.id);
+      //       await editFieldsById(
+      //         values?.applicants?.[activeIndex]?.applicant_details?.id,
+      //         'applicant',
+      //         { work_income_detail: res.id },
+      //       );
+      //       return res;
+      //     })
+      //     .catch((err) => {
+      //       console.log(err);
+      //       return err;
+      //     });
+      // }
     },
     [values, requiredFieldsStatus, setRequiredFieldsStatus],
   );
@@ -250,7 +265,7 @@ const WorkIncomeDetails = () => {
         ) : (
           <Topbar
             title='Adding Co-applicant'
-            id={values?.lead?.id}
+            id={values?.applicants?.[activeIndex]?.applicant_details?.id}
             showClose={false}
             showBack={true}
             coApplicant={true}
@@ -354,7 +369,7 @@ const WorkIncomeDetails = () => {
                 }}
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -409,7 +424,7 @@ const WorkIncomeDetails = () => {
                 }}
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -621,7 +636,7 @@ const WorkIncomeDetails = () => {
                 onBlur={handleBlur}
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
                       e.currentTarget.name,
@@ -629,6 +644,7 @@ const WorkIncomeDetails = () => {
                     );
                   }
                 }}
+                labelDisabled={!values?.applicants?.[activeIndex]?.work_income_detail?.city}
               />
 
               <TextInput
@@ -642,7 +658,7 @@ const WorkIncomeDetails = () => {
                 onBlur={handleBlur}
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
                       e.currentTarget.name,
@@ -650,6 +666,7 @@ const WorkIncomeDetails = () => {
                     );
                   }
                 }}
+                labelDisabled={!values?.applicants?.[activeIndex]?.work_income_detail?.state}
               />
             </>
           ) : null}
@@ -720,7 +737,7 @@ const WorkIncomeDetails = () => {
                 }}
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z0-9\/-\s,.]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (address_pattern.exec(value[value.length - 1])) {
                     setFieldValue(
                       e.currentTarget.name,

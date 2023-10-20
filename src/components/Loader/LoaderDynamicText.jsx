@@ -13,8 +13,10 @@ const LoaderDynamicText = ({ extraClasses, text, textColor }) => {
   );
 };
 
-export default LoaderDynamicText;
-
 LoaderDynamicText.propTypes = {
   extraClasses: PropTypes.string,
+  text: PropTypes.any,
+  textColor: PropTypes.any,
 };
+
+export default LoaderDynamicText;

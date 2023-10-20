@@ -12,6 +12,7 @@ import { referenceDropdownOneOptions, referenceDropdownTwoOptions } from './Refe
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
@@ -31,6 +32,9 @@ const ReferenceDetails = () => {
     updateProgress,
     updateProgressApplicantSteps,
   } = useContext(LeadContext);
+
+  const { phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
+
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.reference_details?.extra_params?.required_fields_status,
   });
@@ -46,7 +50,8 @@ const ReferenceDetails = () => {
     if (values?.reference_details?.id) {
       await editFieldsById(values?.reference_details?.id, 'reference', newData);
     } else {
-      let addData = { ...defaultValuesLead.reference_details, [name]: value };
+      let newDefaultValues = structuredClone(defaultValuesLead);
+      let addData = { ...newDefaultValues.reference_details, [name]: value };
       await addApi('reference', {
         ...addData,
         lead_id: values?.lead?.id,
@@ -200,15 +205,32 @@ const ReferenceDetails = () => {
   ]);
 
   useEffect(() => {
+    const _phoneNumberList = Object.assign({}, phoneNumberList);
+    if (_phoneNumberList?.reference_1) {
+      delete _phoneNumberList.reference_1;
+    }
+
     if (
-      values?.reference_details?.reference_1_phone_number ===
+      (values?.reference_details?.reference_1_phone_number ===
         values?.reference_details?.reference_2_phone_number &&
-      values?.reference_details?.reference_2_phone_number
+        values?.reference_details?.reference_2_phone_number) ||
+      (values?.reference_details?.reference_1_phone_number &&
+        _phoneNumberList &&
+        Object.values(_phoneNumberList)?.includes(
+          values?.reference_details?.reference_1_phone_number,
+        ))
     ) {
       setFieldError(
         'reference_details.reference_1_phone_number',
         'Reference phone number must be unique',
       );
+    } else {
+      setPhoneNumberList((prev) => {
+        return {
+          ...prev,
+          reference_1: values?.reference_details?.reference_1_phone_number,
+        };
+      });
     }
   }, [
     values?.reference_details?.reference_1_phone_number,
@@ -217,15 +239,32 @@ const ReferenceDetails = () => {
   ]);
 
   useEffect(() => {
+    const _phoneNumberList = Object.assign({}, phoneNumberList);
+    if (_phoneNumberList?.reference_2) {
+      delete _phoneNumberList.reference_2;
+    }
+
     if (
-      values?.reference_details?.reference_2_phone_number ===
+      (values?.reference_details?.reference_2_phone_number ===
         values?.reference_details?.reference_1_phone_number &&
-      values?.reference_details?.reference_1_phone_number
+        values?.reference_details?.reference_1_phone_number) ||
+      (values?.reference_details?.reference_2_phone_number &&
+        _phoneNumberList &&
+        Object.values(_phoneNumberList)?.includes(
+          values?.reference_details?.reference_2_phone_number,
+        ))
     ) {
       setFieldError(
         'reference_details.reference_2_phone_number',
         'Reference phone number must be unique',
       );
+    } else {
+      setPhoneNumberList((prev) => {
+        return {
+          ...prev,
+          reference_2: values?.reference_details?.reference_2_phone_number,
+        };
+      });
     }
   }, [
     values?.reference_details?.reference_2_phone_number,
@@ -326,6 +365,12 @@ const ReferenceDetails = () => {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 } else {
+                  setPhoneNumberList((prev) => {
+                    return {
+                      ...prev,
+                      reference_1: '',
+                    };
+                  });
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
@@ -543,7 +588,7 @@ const ReferenceDetails = () => {
                 const value = e.currentTarget.value;
                 const email_pattern = /^[a-zA-Z0-9\s,@\.\/]+$/;
 
-                if (!email_pattern.test(value)) {
+                if (!email_pattern.test(value) && value.length > 0) {
                   return;
                 }
 
@@ -641,6 +686,13 @@ const ReferenceDetails = () => {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 } else {
+                  setPhoneNumberList((prev) => {
+                    return {
+                      ...prev,
+                      reference_2: '',
+                    };
+                  });
+
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
@@ -859,7 +911,7 @@ const ReferenceDetails = () => {
                 const value = e.currentTarget.value;
                 const email_pattern = /^[a-zA-Z0-9\s,@\.\/]+$/;
 
-                if (!email_pattern.test(value)) {
+                if (!email_pattern.test(value) && value.length > 0) {
                   return;
                 }
 

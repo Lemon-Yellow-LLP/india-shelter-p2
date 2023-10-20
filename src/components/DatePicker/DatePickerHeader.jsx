@@ -56,8 +56,6 @@ const DatePickerHeader = ({ date, changeYear, changeMonth }) => {
   );
 };
 
-export default DatePickerHeader;
-
 DatePickerHeader.propTypes = {
   date: PropTypes.any,
   changeYear: PropTypes.func,
@@ -67,3 +65,5 @@ DatePickerHeader.propTypes = {
   prevMonthButtonDisabled: PropTypes.bool,
   nextMonthButtonDisabled: PropTypes.bool,
 };
+
+export default DatePickerHeader;

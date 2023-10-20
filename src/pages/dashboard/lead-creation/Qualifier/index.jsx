@@ -419,8 +419,6 @@ const Qualifier = () => {
     }
   }
 
-  console.log(progress);
-
   useEffect(() => {
     if (SpeedoMeterAnimationRef.current && bre101.res);
     create({
@@ -447,7 +445,10 @@ const Qualifier = () => {
       </div>
 
       <div className='mt-4'>
-        <p className='text-xs text-primary-black font-normal'>Applicant name: Santosh Yadav</p>
+        <p className='text-xs text-primary-black font-normal truncate'>
+          Applicant name:
+          {` ${values.applicants?.[activeIndex]?.applicant_details?.first_name} ${values.applicants?.[activeIndex]?.applicant_details?.middle_name} ${values.applicants?.[activeIndex]?.applicant_details?.last_name}`}
+        </p>
         <div className='flex justify-between text-primary-black font-medium'>
           <h3>Verification in progress</h3>
           <h3>
@@ -885,7 +886,11 @@ const Qualifier = () => {
           disabled={!bre101.res}
           inputClasses='w-full h-14'
           primary={true}
-          link='/lead/lnt-charges'
+          link={
+            values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+              ? '/lead/lnt-charges'
+              : '/lead/banking-details'
+          }
         >
           Next
         </Button>
