@@ -568,14 +568,14 @@ export default function SwipeableDrawerComponent() {
                               stepIndex={4}
                               noProgress={true}
                               lock={
-                                values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                                  ?.progress !== 100 ||
-                                values?.applicants?.[primaryIndex]?.personal_details?.extra_params
-                                  ?.progress !== 100 ||
-                                values?.applicants?.[primaryIndex]?.address_detail?.extra_params
-                                  ?.progress !== 100 ||
-                                values?.applicants?.[primaryIndex]?.work_income_detail?.extra_params
-                                  ?.progress !== 100
+                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.extra_params?.progress !== 100 ||
+                                values?.applicants?.[activeCoApplicantIndex]?.personal_details
+                                  ?.extra_params?.progress !== 100 ||
+                                values?.applicants?.[activeCoApplicantIndex]?.address_detail
+                                  ?.extra_params?.progress !== 100 ||
+                                values?.applicants?.[activeCoApplicantIndex]?.work_income_detail
+                                  ?.extra_params?.progress !== 100
                               }
                             />
                             <DrawerStepBanking
