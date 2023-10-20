@@ -174,19 +174,6 @@ const UploadDocuments = () => {
         }
 
         setIsQaulifierActivated(res.bre_101_response);
-
-        const extra_params = res.extra_params;
-
-        editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
-          extra_params: {
-            ...extra_params,
-            previous_id_number: values?.applicants?.[activeIndex]?.personal_details?.id_number,
-            previous_address_proof_number:
-              values?.applicants?.[activeIndex]?.personal_details?.address_proof_number,
-            previous_pf_uan: null,
-            previous_gst_number: null,
-          },
-        });
       }
     }
     getQualifierResponse();
