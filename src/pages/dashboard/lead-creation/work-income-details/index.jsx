@@ -629,6 +629,7 @@ const WorkIncomeDetails = () => {
                     );
                   }
                 }}
+                labelDisabled={!values?.applicants?.[activeIndex]?.work_income_detail?.city}
               />
 
               <TextInput
@@ -650,6 +651,7 @@ const WorkIncomeDetails = () => {
                     );
                   }
                 }}
+                labelDisabled={!values?.applicants?.[activeIndex]?.work_income_detail?.state}
               />
             </>
           ) : null}

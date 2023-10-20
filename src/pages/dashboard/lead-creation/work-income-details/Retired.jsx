@@ -160,6 +160,9 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
         disabled={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
         }
+        labelDisabled={
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
+        }
       />
     </>
   );

@@ -74,6 +74,8 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
     [requiredFieldsStatus, setRequiredFieldsStatus],
   );
 
+  const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
+
   return (
     <>
       <SearchableTextInput
@@ -221,6 +223,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         label='PF UAN'
         placeholder='Eg: 100563503285'
         type='number'
+        pattern='\d*'
         name={`applicants[${activeIndex}].work_income_detail.pf_uan`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
@@ -242,11 +245,20 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
           }
         }}
         onChange={(e) => {
-          const value = e.currentTarget.value;
+          let value = e.currentTarget.value;
           if (value.length > 12) {
             return;
           }
-          const address_pattern = /^[0-9]+$/;
+
+          if (value < 0) {
+            value = '';
+          }
+
+          const address_pattern = /^\d+$/;
+          if (!address_pattern.test(value) && value.length > 0) {
+            return;
+          }
+
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
@@ -260,6 +272,10 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                 values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan.length - 1,
               ),
             );
+          }
+          if (DISALLOW_CHAR.includes(e.key)) {
+            e.preventDefault();
+            return;
           }
         }}
       />
@@ -374,6 +390,9 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
         disabled={
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
+        }
+        labelDisabled={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
         }
       />
