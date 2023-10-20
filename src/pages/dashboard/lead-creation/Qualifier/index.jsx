@@ -20,10 +20,9 @@ import {
 } from '../../../../global';
 import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
-import LeadContextProvider, { LeadContext } from '../../../../context/LeadContextProvider';
+import { LeadContext } from '../../../../context/LeadContextProvider';
 
 const Qualifier = () => {
-  const addApplicant = useContext(LeadContextProvider);
   const { activeIndex, values, setFieldValue } = useContext(LeadContext);
 
   const SpeedoMeterAnimationRef = useRef(null);
@@ -90,42 +89,51 @@ const Qualifier = () => {
 
         setDL((prev) => ({
           ...prev,
-          loader: false,
           ran: true,
           res: bre_101_response.body.Display.DL_Status,
         }));
 
         setVoterID((prev) => ({
           ...prev,
-          loader: false,
           ran: true,
           res: bre_101_response.body.Display.Voter_Status,
         }));
 
         setPfUAN((prev) => ({
           ...prev,
-          loader: false,
           ran: true,
           res: bre_101_response.body.Display.UAN_Status,
         }));
 
         setGST((prev) => ({
           ...prev,
-          loader: false,
           ran: true,
           res: bre_101_response.body.Display.GST_Status,
         }));
 
         setPAN((prev) => ({
           ...prev,
-          loader: false,
           ran: true,
           res: bre_101_response.body.Display.PAN_status,
         }));
 
-        setDedupe((prev) => ({ ...prev, ran: true }));
-        setBre99((prev) => ({ ...prev, ran: true }));
-        setBureau((prev) => ({ ...prev, ran: true }));
+        setDedupe((prev) => ({
+          ...prev,
+          ran: true,
+          res: bre_101_response.body.Display.Dedupe_Status,
+        }));
+
+        setBre99((prev) => ({
+          ...prev,
+          ran: true,
+          res: bre_101_response.body.Display.Bre99_Status,
+        }));
+
+        setBureau((prev) => ({
+          ...prev,
+          ran: true,
+          res: bre_101_response.body.Display.Bureau_Status,
+        }));
 
         if (bre_101_response.body.Display.red_amber_green === 'Red') {
           setBre101((prev) => ({ ...prev, red: true, res: true }));
@@ -149,7 +157,9 @@ const Qualifier = () => {
           ran: true,
         }));
 
-        final_api.push(verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+        final_api.push(
+          verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, { type: 'id' }, {}),
+        );
       } else if (values.applicants[activeIndex]?.personal_details.id_type === 'Driving license') {
         setDL((prev) => ({
           ...prev,
@@ -157,7 +167,9 @@ const Qualifier = () => {
           ran: true,
         }));
 
-        final_api.push(verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+        final_api.push(
+          verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, { type: 'id' }, {}),
+        );
       } else if (values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID') {
         setVoterID((prev) => ({
           ...prev,
@@ -165,7 +177,13 @@ const Qualifier = () => {
           ran: true,
         }));
 
-        final_api.push(verifyVoterID(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+        final_api.push(
+          verifyVoterID(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            { type: 'id' },
+            {},
+          ),
+        );
       }
 
       if (!values.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
@@ -179,7 +197,13 @@ const Qualifier = () => {
             ran: true,
           }));
 
-          final_api.push(verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+          final_api.push(
+            verifyDL(
+              values?.applicants?.[activeIndex]?.applicant_details.id,
+              { type: 'address' },
+              {},
+            ),
+          );
         } else if (
           values.applicants[activeIndex]?.personal_details.selected_address_proof === 'Voter ID'
         ) {
@@ -190,7 +214,11 @@ const Qualifier = () => {
           }));
 
           final_api.push(
-            verifyVoterID(values?.applicants?.[activeIndex]?.applicant_details.id, {}),
+            verifyVoterID(
+              values?.applicants?.[activeIndex]?.applicant_details.id,
+              { type: 'address' },
+              {},
+            ),
           );
         }
       }
@@ -311,6 +339,16 @@ const Qualifier = () => {
           ...extra_parmas,
           qualifier: true,
           qualifier_api_progress: final_api.length + 2,
+          previous_id_number: values?.applicants?.[activeIndex]?.personal_details?.id_number,
+          previous_address_proof_number:
+            values?.applicants?.[activeIndex]?.personal_details?.address_proof_number,
+          previous_pf_uan: values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan,
+          previous_gst_number: values?.applicants?.[activeIndex]?.work_income_detail?.gst_number,
+          PAN_status: bre_res.bre_101_response.body.Display.PAN_status,
+          DL_Status: bre_res.bre_101_response.body.Display.DL_Status,
+          Voter_Status: bre_res.bre_101_response.body.Display.Voter_Status,
+          UAN_Status: bre_res.bre_101_response.body.Display.UAN_Status,
+          GST_Status: bre_res.bre_101_response.body.Display.GST_Status,
         };
 
         await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
