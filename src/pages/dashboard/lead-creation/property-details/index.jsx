@@ -63,7 +63,7 @@ const PropertyDetails = () => {
           lead_id: values?.lead?.id,
         })
           .then(async (res) => {
-            setFieldValue(`property_details.id`, res.id);
+            setFieldValue('property_details', { ...addData, id: res.id });
           })
           .catch((err) => {
             console.log(err);
