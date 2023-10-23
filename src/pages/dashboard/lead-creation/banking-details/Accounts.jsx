@@ -111,7 +111,7 @@ export default function Accounts({
                 onChange={(e) => handlePrimaryChange(data.id, e.currentTarget.checked)}
               />
             </div>
-            {data?.penny_drop_response?.result?.active === 'no' ? (
+            {!data?.penny_drop_response || data?.penny_drop_response?.result?.active === 'no' ? (
               <div className='flex gap-[10px] mt-[10px]'>
                 <Button inputClasses='w-full h-[46px]' onClick={() => handleDelete(data.id)}>
                   Delete

@@ -27,13 +27,12 @@ const selectedLoanType = 'LAP';
 const PropertyDetails = () => {
   const {
     values,
-    updateProgress,
     errors,
     touched,
     setFieldValue,
-    handleSubmit,
     setValues,
     updateProgressApplicantSteps,
+    activeIndex,
   } = useContext(LeadContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
@@ -167,7 +166,16 @@ const PropertyDetails = () => {
 
         {/* <button onClick={handleSubmit}>submit</button> */}
 
-        <PreviousNextButtons linkPrevious='/lead/lnt-charges' linkNext='/lead/banking-details' />
+        <PreviousNextButtons
+          linkPrevious='/lead/lnt-charges'
+          linkNext='/lead/banking-details'
+          disablePrevious={
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          }
+          disableNext={
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          }
+        />
 
         <SwipeableDrawerComponent />
       </div>

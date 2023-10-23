@@ -64,13 +64,22 @@ const PersonalDetails = () => {
         );
       } else {
         let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
+
         let addData = { ...clonedCoApplicantValues.personal_details, [name]: value };
         await addApi('personal', {
           ...addData,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
         })
           .then(async (res) => {
-            setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
+            setFieldValue(`applicants[${activeIndex}].personal_details`, {
+              ...addData,
+              applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+              id: res.id,
+            });
+            setRequiredFieldsStatus(() => ({
+              ...addData.extra_params.required_fields_status,
+              [name]: true,
+            }));
             await editFieldsById(
               values?.applicants[activeIndex]?.applicant_details?.id,
               'applicant',

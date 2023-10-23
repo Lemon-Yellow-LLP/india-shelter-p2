@@ -70,7 +70,15 @@ export default function AddressDetails() {
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
         })
           .then(async (res) => {
-            setFieldValue(`applicants[${activeIndex}].address_detail.id`, res.id);
+            setFieldValue(`applicants[${activeIndex}].address_detail`, {
+              ...addData,
+              applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+              id: res.id,
+            });
+            setRequiredFieldsStatus(() => ({
+              ...addData.extra_params.required_fields_status,
+              [name]: true,
+            }));
             await editFieldsById(
               values?.applicants[activeIndex]?.applicant_details?.id,
               'applicant',

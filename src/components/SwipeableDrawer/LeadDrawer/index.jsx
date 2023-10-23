@@ -473,11 +473,17 @@ export default function SwipeableDrawerComponent() {
                               addApplicant();
                             }}
                             className={
-                              values?.applicants.length >= 5
+                              values?.applicants.length >= 5 ||
+                              values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                                ?.progress !== 100
                                 ? 'text-[#96989A] font-medium text-[16px]'
                                 : 'text-primary-red font-medium text-[16px]'
                             }
-                            disabled={values?.applicants.length >= 5}
+                            disabled={
+                              values?.applicants.length >= 5 ||
+                              values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                                ?.progress !== 100
+                            }
                           >
                             + Add
                           </button>
@@ -606,11 +612,21 @@ export default function SwipeableDrawerComponent() {
                         </div>
                       ) : (
                         <button
+                          disabled={
+                            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                              ?.progress !== 100
+                          }
                           onClick={() => {
                             setActiveCoApplicantIndex(values?.applicants?.length);
                             addApplicant();
                           }}
-                          className='w-[100%] h-[48px] border bg-[#E33439] rounded-[4px] flex items-center justify-center text-[16px] text-[white] font-normal'
+                          className={`w-[100%] h-[48px] border rounded-[4px] flex items-center justify-center text-[16px] font-normal
+                          ${
+                            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                              ?.progress !== 100
+                              ? 'text-[#96989A] border-[#96989A]'
+                              : 'text-white bg-[#E33439]'
+                          }`}
                         >
                           Add Co-applicant
                         </button>
