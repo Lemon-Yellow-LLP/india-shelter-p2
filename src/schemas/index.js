@@ -135,7 +135,7 @@ const applicantSchema = Yup.object().shape({
       .min(2, 'Mother Name must be atleast 2 characters long')
       .max(90, 'Mother Name can be max 90 characters long')
       .required('Mother Name is required')
-      .matches(/^[a-zA-Z]+$/, 'Invalid characters'),
+      .matches(/^[a-zA-Z\s]*$/, 'Invalid characters'),
     marital_status: Yup.string().required('This field is mandatory.'),
     religion: Yup.string().required('Religion is required'),
     preferred_language: Yup.string().required('Preferred Language is required'),
