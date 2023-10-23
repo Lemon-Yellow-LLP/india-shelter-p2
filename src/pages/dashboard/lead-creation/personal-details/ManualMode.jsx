@@ -421,7 +421,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             (e.key === 'ArrowUp' ||
               e.key === 'ArrowDown' ||
               e.key === 'ArrowLeft' ||
-              e.key === 'ArrowRight')
+              e.key === 'ArrowRight' ||
+              e.key === ' ' ||
+              e.keyCode === 32)
           ) {
             e.preventDefault();
           }
