@@ -112,6 +112,7 @@ const WorkIncomeDetails = () => {
             pention_amount: false,
           };
         }
+        setRequiredFieldsStatus(_requiredFieldStatus);
 
         const newData = structuredClone(values);
 
