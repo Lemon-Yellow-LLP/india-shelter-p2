@@ -142,8 +142,6 @@ const Eligibility = () => {
 
         setUpiName((prev) => ({ ...prev, ran: true }));
 
-        setBre201(true);
-
         // setFaceMatch((prev) => ({ ...prev, ran: true, res: res.bre_101_response.body.Display }));
         // setUpiName((prev) => ({ ...prev, ran: true, res: res.bre_101_response.body.Display }));
         // setBre99((prev) => ({ ...prev, ran: true, res: res.bre_101_response.body.Display }));
@@ -171,6 +169,8 @@ const Eligibility = () => {
             res: res.bre_101_response.body.Display.Bureau_Status,
           }));
         }
+
+        setBre201(true);
 
         return;
       }
@@ -354,7 +354,11 @@ const Eligibility = () => {
         }
       }
 
-      if (res.bre_101_response.body.Display.UAN_Status === 'Error') {
+      if (
+        res.bre_101_response.body.Display.UAN_Status === 'Error' ||
+        res.bre_101_response.body.Display.UAN_Status === 'In-Valid' ||
+        res.bre_101_response.body.Display.UAN_Status === 'Valid No Match'
+      ) {
         setPfUAN((prev) => ({
           ...prev,
           loader: true,
@@ -382,7 +386,11 @@ const Eligibility = () => {
         }
       }
 
-      if (res.bre_101_response.body.Display.GST_Status === 'Error') {
+      if (
+        res.bre_101_response.body.Display.GST_Status === 'Error' ||
+        res.bre_101_response.body.Display.GST_Status === 'In-Valid' ||
+        res.bre_101_response.body.Display.GST_Status === 'Valid No Match'
+      ) {
         setGST((prev) => ({
           ...prev,
           loader: true,
@@ -554,8 +562,6 @@ const Eligibility = () => {
         }
       }
 
-      console.log(edited_bre);
-
       try {
         const bre_res = await checkBre201(
           values?.applicants?.[activeIndex]?.applicant_details.lead_id,
@@ -566,6 +572,10 @@ const Eligibility = () => {
 
         setBre201(true);
 
+        //Facematch and upi response should be set her
+        //If salesforce flag is success then toast message should be set here
+        //If salesforce flag is failed then push to salesforce will be enabled
+        //and push to salesforce api call will be done from frontend
         setFaceMatch((prev) => ({ ...prev, loader: false }));
 
         setUpiName((prev) => ({ ...prev, loader: false }));
@@ -630,7 +640,7 @@ const Eligibility = () => {
   return (
     <>
       {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
-        <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        <Topbar title='Eligibility' id={values?.lead?.id} showClose={true} />
       ) : (
         <Topbar
           title='Adding Co-applicant'

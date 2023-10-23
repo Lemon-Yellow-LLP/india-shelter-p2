@@ -438,7 +438,7 @@ const Qualifier = () => {
   return (
     <>
       {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
-        <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        <Topbar title='Qualifier' id={values?.lead?.id} showClose={true} />
       ) : (
         <Topbar
           title='Adding Co-applicant'
