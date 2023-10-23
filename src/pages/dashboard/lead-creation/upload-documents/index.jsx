@@ -1324,7 +1324,7 @@ const UploadDocuments = () => {
         setDocUploads({ type: 'other_docs', data: active_uploads });
       }
 
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: true }));
+      // setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: true }));
     }
     docs.length > 0 && addOtherDocPhotos();
   }, [docsFile]);
@@ -1375,18 +1375,18 @@ const UploadDocuments = () => {
     editDoc.id && editOtherDocPhotos();
   }, [editDoc]);
 
-  useEffect(() => {
-    async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.other_docs.find((data) => {
-        return data.active === true;
-      });
-      if (!active_uploads) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: false }));
-      }
-    }
-    removeProgress();
-  }, [docUploads]);
+  // useEffect(() => {
+  //   async function removeProgress() {
+  //     const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+  //     const active_uploads = res.document_meta.other_docs.find((data) => {
+  //       return data.active === true;
+  //     });
+  //     if (!active_uploads) {
+  //       setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: false }));
+  //     }
+  //   }
+  //   removeProgress();
+  // }, [docUploads]);
 
   useEffect(() => {
     async function getPreviousUploads() {
@@ -1997,17 +1997,19 @@ const UploadDocuments = () => {
           setSingleFile={setPropertyPapersFile}
         />
 
-        <ImageUpload
-          files={salarySlipPhotos}
-          setFile={setSalarySlipPhotos}
-          uploads={salarySlipUploads}
-          setUploads={setSalarySlipUploads}
-          setEdit={setEditSalarySlip}
-          label='Salary slip'
-          required
-          hint='File size should be less than 5MB'
-          setSingleFile={setSalarySlipPhotosFile}
-        />
+        {values.applicants[activeIndex]?.work_income_detail.profession === 'Salaried' && (
+          <ImageUpload
+            files={salarySlipPhotos}
+            setFile={setSalarySlipPhotos}
+            uploads={salarySlipUploads}
+            setUploads={setSalarySlipUploads}
+            setEdit={setEditSalarySlip}
+            label='Salary slip'
+            required
+            hint='File size should be less than 5MB'
+            setSingleFile={setSalarySlipPhotosFile}
+          />
+        )}
 
         <ImageUpload
           files={form60photos}
@@ -2080,7 +2082,6 @@ const UploadDocuments = () => {
           setUploads={setDocUploads}
           setEdit={setEditDoc}
           label='Other documents'
-          required
           hint='File size should be less than 5MB'
           setSingleFile={setDocsFile}
         />
