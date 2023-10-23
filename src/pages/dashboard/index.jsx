@@ -40,15 +40,14 @@ export default function Dashboard() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    let value = query.trim().toLowerCase();
+    let value = query.replace(/ /g, '').toLowerCase();
     setFilteredList(
       primaryApplicantList.filter((lead) => {
         const applicant = lead?.applicants?.find((applicant) => applicant?.is_primary);
+        const fullName = String(applicant.first_name + applicant.middle_name + applicant.last_name);
         return (
           String(applicant.lead_id).includes(value) ||
-          String(applicant.first_name).toLowerCase().includes(value) ||
-          String(applicant.middle_name).toLowerCase().includes(value) ||
-          String(applicant.last_name).toLowerCase().includes(value) ||
+          fullName.toLowerCase().includes(value) ||
           String(applicant.mobile_number).toLowerCase().includes(value)
         );
       }),
