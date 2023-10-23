@@ -141,41 +141,43 @@ const UploadDocuments = () => {
     async function getQualifierResponse() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
 
-      const bre_Display_body = res.bre_101_response.body.Display;
+      if (res.bre_101_response) {
+        const bre_Display_body = res.bre_101_response.body.Display;
 
-      const id_type = values?.applicants?.[activeIndex]?.personal_details?.id_type;
-      const address_type =
-        values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof;
+        const id_type = values?.applicants?.[activeIndex]?.personal_details?.id_type;
+        const address_type =
+          values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof;
 
-      let check_id_type = null;
-      let check_address_type = null;
+        let check_id_type = null;
+        let check_address_type = null;
 
-      if (id_type === 'PAN') {
-        check_id_type = 'PAN_status';
-      } else if (id_type === 'Driving license') {
-        check_id_type = 'DL_Status';
-      } else if (id_type === 'Voter ID') {
-        check_id_type = 'Voter_Status';
-      }
-
-      if (address_type === 'PAN') {
-        check_address_type = 'PAN_status';
-      } else if (address_type === 'Driving license') {
-        check_address_type = 'DL_Status';
-      } else if (address_type === 'Voter ID') {
-        check_address_type = 'Voter_Status';
-      }
-
-      for (let i in bre_Display_body) {
-        if (i === check_id_type) {
-          setIdSatus(bre_Display_body[i]);
+        if (id_type === 'PAN') {
+          check_id_type = 'PAN_status';
+        } else if (id_type === 'Driving license') {
+          check_id_type = 'DL_Status';
+        } else if (id_type === 'Voter ID') {
+          check_id_type = 'Voter_Status';
         }
-        if (i === check_address_type) {
-          setAddressSatus(bre_Display_body[i]);
-        }
-      }
 
-      setIsQaulifierActivated(res.bre_101_response);
+        if (address_type === 'PAN') {
+          check_address_type = 'PAN_status';
+        } else if (address_type === 'Driving license') {
+          check_address_type = 'DL_Status';
+        } else if (address_type === 'Voter ID') {
+          check_address_type = 'Voter_Status';
+        }
+
+        for (let i in bre_Display_body) {
+          if (i === check_id_type) {
+            setIdSatus(bre_Display_body[i]);
+          }
+          if (i === check_address_type) {
+            setAddressSatus(bre_Display_body[i]);
+          }
+        }
+
+        setIsQaulifierActivated(res.bre_101_response);
+      }
     }
     getQualifierResponse();
   }, []);
