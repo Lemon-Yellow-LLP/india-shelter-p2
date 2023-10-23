@@ -1053,7 +1053,7 @@ export default function DashboardApplicant() {
 }
 
 const Titlebar = ({ title, id }) => {
-  const { values, setValues } = useContext(LeadContext);
+  const { setValues, setActiveIndex } = useContext(LeadContext);
   const { setPhoneNumberList } = useContext(AuthContext);
 
   const [totalProgress, setTotalProgress] = useState(0);
@@ -1096,6 +1096,14 @@ const Titlebar = ({ title, id }) => {
     });
 
     setValues({ ...data, applicants: newApplicants });
+
+    let primaryIndex = newApplicants.map((applicant, index) => {
+      if (applicant.applicant_details.is_primary) {
+        return index;
+      }
+    });
+
+    setActiveIndex(primaryIndex[0] ?? 0);
 
     navigate('/lead/applicant-details');
   };

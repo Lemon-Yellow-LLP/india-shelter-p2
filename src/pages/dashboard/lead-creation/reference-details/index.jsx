@@ -29,7 +29,7 @@ const ReferenceDetails = () => {
     inputDisabled,
     setFieldValue,
     setFieldError,
-    updateProgress,
+    activeIndex,
     updateProgressApplicantSteps,
   } = useContext(LeadContext);
 
@@ -57,7 +57,15 @@ const ReferenceDetails = () => {
         lead_id: values?.lead?.id,
       })
         .then(async (res) => {
-          setFieldValue(`reference_details.id`, res.id);
+          setFieldValue(`reference_details`, {
+            ...addData,
+            lead_id: values?.lead?.id,
+            id: res.id,
+          });
+          setRequiredFieldsStatus(() => ({
+            ...addData.extra_params.required_fields_status,
+            [name]: true,
+          }));
         })
         .catch((err) => {
           console.log(err);
@@ -929,6 +937,9 @@ const ReferenceDetails = () => {
         <PreviousNextButtons
           linkPrevious='/lead/banking-details'
           linkNext='/lead/upload-documents'
+          disablePrevious={
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          }
         />
         <SwipeableDrawerComponent />
       </div>

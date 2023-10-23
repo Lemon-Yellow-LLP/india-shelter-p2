@@ -24,7 +24,7 @@ import { LeadContext } from '../../../../context/LeadContextProvider';
 import Topbar from '../../../../components/Topbar';
 
 const Qualifier = () => {
-  const { activeIndex, values, setFieldValue } = useContext(LeadContext);
+  const { activeIndex, values, setFieldValue, addApplicant } = useContext(LeadContext);
 
   const SpeedoMeterAnimationRef = useRef(null);
 
@@ -441,7 +441,7 @@ const Qualifier = () => {
         <Topbar title='Qualifier' id={values?.lead?.id} showClose={true} />
       ) : (
         <Topbar
-          title='Adding Co-applicant'
+          title='Qualifier'
           id={values?.lead?.id}
           showClose={false}
           showBack={true}
@@ -901,7 +901,10 @@ const Qualifier = () => {
               className={`underline ${
                 !bre101.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
               }`}
-              link='/lead/applicant-details'
+              onClick={(e) => {
+                e.preventDefault();
+                addApplicant();
+              }}
             >
               Add now
             </Button>
