@@ -259,18 +259,13 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
             return;
           }
 
-          if (address_pattern.exec(value[value.length - 1])) {
-            setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-          }
+          setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
         }}
         onKeyDown={(e) => {
           if (e.key === 'Backspace') {
             setFieldValue(
               `applicants[${activeIndex}].work_income_detail.pf_uan`,
-              values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan.slice(
-                0,
-                values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan.length - 1,
-              ),
+              values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan.slice(0),
             );
           }
           if (DISALLOW_CHAR.includes(e.key)) {
@@ -292,20 +287,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
         onBlur={(e) => {
           handleBlur(e);
-          if (values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0) {
-            setFieldValue(`applicants[${activeIndex}].work_income_detail.ongoing_emi`, '');
-            editFieldsById(
-              values?.applicants?.[activeIndex]?.work_income_detail?.id,
-              'work-income',
-              {
-                ongoing_emi: null,
-              },
-            );
-          }
 
           if (
             !errors?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan &&
-            values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan
+            (values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan ||
+              values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0)
           ) {
             editFieldsById(
               values?.applicants?.[activeIndex]?.work_income_detail?.id,
@@ -316,6 +302,38 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                 ),
               },
             );
+
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              no_current_loan: true,
+            }));
+
+            if (e.target.value == 0) {
+              setFieldValue(`applicants[${activeIndex}].work_income_detail.ongoing_emi`, '');
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                'work-income',
+                {
+                  ongoing_emi: null,
+                },
+              );
+
+              setRequiredFieldsStatus((prev) => {
+                return {
+                  ...prev,
+                  no_current_loan: true,
+                  ongoing_emi: true,
+                };
+              });
+            } else if (
+              errors?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi ||
+              !values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi
+            ) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ongoing_emi: false,
+              }));
+            }
           } else {
             setRequiredFieldsStatus((prev) => ({
               ...prev,
@@ -332,12 +350,10 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
 
           setFieldValue(e.currentTarget.name, value && parseInt(value));
 
-          if (!requiredFieldsStatus['no_current_loan']) {
-            setRequiredFieldsStatus((prev) => ({
-              ...prev,
-              ['no_current_loan']: true,
-            }));
-          }
+          setRequiredFieldsStatus((prev) => ({
+            ...prev,
+            no_current_loan: false,
+          }));
         }}
       />
 
