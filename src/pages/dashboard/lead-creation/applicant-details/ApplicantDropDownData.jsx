@@ -61,10 +61,6 @@ export const loanOptions = {
       label: 'Owned Plot',
       value: 'Owned Plot',
     },
-    {
-      label: 'Plot + Construction',
-      value: 'Plot + Construction',
-    },
   ],
 };
 
