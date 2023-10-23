@@ -278,10 +278,6 @@ export default function Preview() {
     setCoApplicantIndex(activeStep ? activeStep - 1 : 0);
   }, [activeStep]);
 
-  useEffect(() => {
-    setActiveIndex(coApplicantIndexes[coApplicantIndex]);
-  }, [coApplicantIndex]);
-
   const previousStep = () => {
     setActiveStep((prev) => {
       if (prev === 0) {
@@ -299,9 +295,6 @@ export default function Preview() {
       return;
     }
     setActiveStep((prev) => {
-      if (prev === 0) {
-        setActiveIndex(coApplicantIndexes[coApplicantIndex]);
-      }
       return prev + 1;
     });
   };
@@ -345,6 +338,7 @@ export default function Preview() {
               </p>
             </div>
             <PreviewCard
+              index={coApplicantIndexes[coApplicantIndex]}
               hide={
                 !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.applicant_details.name
@@ -381,6 +375,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={coApplicantIndexes[coApplicantIndex]}
               hide={
                 !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.personal_details.name
@@ -422,6 +417,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={coApplicantIndexes[coApplicantIndex]}
               title={pages.address_detail.title}
               hide={
                 !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
@@ -463,6 +459,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={coApplicantIndexes[coApplicantIndex]}
               hide={
                 !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.work_income_detail.name
@@ -504,6 +501,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={coApplicantIndexes[coApplicantIndex]}
               hide={
                 !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.banking_details.name
@@ -545,6 +543,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={coApplicantIndexes[coApplicantIndex]}
               hide={
                 !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.upload_documents.name
@@ -631,6 +630,7 @@ export default function Preview() {
               </p>
             </div>
             <PreviewCard
+              index={primaryIndex}
               hide={!errors?.applicants?.[primaryIndex]?.[pages.applicant_details.name]}
               title={pages.applicant_details.title}
               link={pages.applicant_details.url + '?preview=' + pages.applicant_details.url}
@@ -655,6 +655,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={primaryIndex}
               hide={!errors?.applicants?.[primaryIndex]?.[pages.personal_details.name]}
               title={pages.personal_details.title}
               link={pages.personal_details.url + '?preview=' + pages.personal_details.url}
@@ -684,6 +685,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={primaryIndex}
               hide={!errors?.applicants?.[primaryIndex]?.[pages.address_detail.name]}
               title={pages.address_detail.title}
               link={pages.address_detail.url + '?preview=' + pages.address_detail.url}
@@ -713,6 +715,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={primaryIndex}
               hide={!errors?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]}
               title={pages.work_income_detail.title}
               link={pages.work_income_detail.url + '?preview=' + pages.work_income_detail.url}
@@ -742,6 +745,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={primaryIndex}
               hide={!flattedErrors?.[pages.property_details.name]}
               title={pages.property_details.title}
               link={pages.property_details.url + '?preview=' + pages.property_details.url}
@@ -766,6 +770,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={primaryIndex}
               hide={!errors?.applicants?.[primaryIndex]?.[pages.banking_details.name]}
               title={pages.banking_details.title}
               link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
@@ -795,6 +800,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={primaryIndex}
               hide={!errors?.[pages.reference_details.name]}
               title={pages.reference_details.title}
               link={pages.reference_details.url + '?preview=' + pages.reference_details.url}
@@ -819,6 +825,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
+              index={primaryIndex}
               hide={!errors?.applicants?.[primaryIndex]?.[pages.upload_documents.name]}
               title={pages.upload_documents.title}
               link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
@@ -979,9 +986,12 @@ export default function Preview() {
   );
 }
 
-function PreviewCard({ title, count, link, hide, children }) {
+function PreviewCard({ index, title, count, link, hide, children }) {
+  const { setActiveIndex } = useContext(LeadContext);
+  const handleClick = () => setActiveIndex(index);
+
   return (
-    <>
+    <div role='banner' onClick={handleClick}>
       {hide || count == 0 ? null : (
         <Link
           to={link}
@@ -1006,7 +1016,7 @@ function PreviewCard({ title, count, link, hide, children }) {
           {children}
         </Link>
       )}
-    </>
+    </div>
   );
 }
 

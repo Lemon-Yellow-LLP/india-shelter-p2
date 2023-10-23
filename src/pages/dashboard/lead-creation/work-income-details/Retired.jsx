@@ -65,19 +65,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
         onBlur={(e) => {
           handleBlur(e);
-          if (values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0) {
-            setFieldValue(`applicants[${activeIndex}].work_income_detail.ongoing_emi`, null);
-            editFieldsById(
-              values?.applicants?.[activeIndex]?.work_income_detail?.id,
-              'work-income',
-              {
-                ongoing_emi: null,
-              },
-            );
-          }
+
           if (
             !errors?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan &&
-            values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan
+            (values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan ||
+              values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0)
           ) {
             editFieldsById(
               values?.applicants?.[activeIndex]?.work_income_detail?.id,
@@ -88,6 +80,38 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
                 ),
               },
             );
+
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              no_current_loan: true,
+            }));
+
+            if (e.target.value == 0) {
+              setFieldValue(`applicants[${activeIndex}].work_income_detail.ongoing_emi`, '');
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                'work-income',
+                {
+                  ongoing_emi: null,
+                },
+              );
+
+              setRequiredFieldsStatus((prev) => {
+                return {
+                  ...prev,
+                  no_current_loan: true,
+                  ongoing_emi: true,
+                };
+              });
+            } else if (
+              errors?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi ||
+              !values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi
+            ) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ongoing_emi: false,
+              }));
+            }
           } else {
             setRequiredFieldsStatus((prev) => ({
               ...prev,
@@ -103,12 +127,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
           }
 
           setFieldValue(e.currentTarget.name, value && parseInt(value));
-          if (!requiredFieldsStatus['no_current_loan']) {
-            setRequiredFieldsStatus((prev) => ({
-              ...prev,
-              ['no_current_loan']: true,
-            }));
-          }
+
+          setRequiredFieldsStatus((prev) => ({
+            ...prev,
+            no_current_loan: false,
+          }));
         }}
       />
 
