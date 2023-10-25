@@ -24,6 +24,7 @@ import imageCompression from 'browser-image-compression';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import Topbar from '../../../../components/Topbar';
+import otpVerified from '../../../../assets/icons/otp-verified.svg';
 
 const UploadDocuments = () => {
   const {
@@ -150,6 +151,11 @@ const UploadDocuments = () => {
     async function getQualifierResponse() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
 
+      // if (res.extra_params.is_upload_otp_verified) {
+      //   setMobileVerified(true);
+      //   setDisablePhoneNumber(false);
+      // }
+
       if (res.bre_101_response) {
         const bre_Display_body = res.bre_101_response.body.Display;
 
@@ -190,6 +196,18 @@ const UploadDocuments = () => {
     }
     getQualifierResponse();
   }, []);
+
+  // useEffect(() => {
+  //   if (selfie.length === 0) {
+  //     setMobileVerified(true);
+
+  //     const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
+
+  //     editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
+  //       extra_params: { ...extra_params, is_upload_otp_verified: false },
+  //     });
+  //   }
+  // }, [selfie]);
 
   const updateFields = async (name, value) => {
     let newData = {};
@@ -319,6 +337,12 @@ const UploadDocuments = () => {
         const res = await verifyUploadOtp(loData.session.user_id, otp);
 
         if (!res) return;
+
+        const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
+
+        await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
+          extra_params: { ...extra_params, is_upload_otp_verified: true },
+        });
 
         setDisablePhoneNumber(false);
         setMobileVerified(true);
@@ -2078,32 +2102,41 @@ const UploadDocuments = () => {
           setLatLong={setPropertyLatLong}
         />
 
-        <div className='flex justify-between gap-2'>
-          <div className={selfieUploads ? 'w-[65%]' : 'w-full'}>
-            <PhotoUpload
-              files={selfie}
-              setFile={setSelfie}
-              setSingleFile={setSelfieFile}
-              uploads={selfieUploads}
-              setUploads={setSelfieUploads}
-              setLatLong={setLoSelfieLatLong}
-              label='Upload selfie'
-              required
-            />
+        <div>
+          <div className='flex justify-between gap-2'>
+            <div className={selfieUploads ? 'w-[65%]' : 'w-full'}>
+              <PhotoUpload
+                files={selfie}
+                setFile={setSelfie}
+                setSingleFile={setSelfieFile}
+                uploads={selfieUploads}
+                setUploads={setSelfieUploads}
+                setLatLong={setLoSelfieLatLong}
+                label='Upload selfie'
+                required
+              />
+            </div>
+
+            {selfieUploads && (
+              <button
+                className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
+                  mobileVerified || hasSentOTPOnce || selfie.length === 0
+                    ? 'text-dark-grey bg-stroke pointer-events-none'
+                    : 'bg-primary-red text-white'
+                }`}
+                disabled={disablePhoneNumber || mobileVerified}
+                onClick={sendMobileOtp}
+              >
+                Send OTP
+              </button>
+            )}
           </div>
 
-          {selfieUploads && (
-            <button
-              className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
-                mobileVerified || hasSentOTPOnce || selfie.length === 0
-                  ? 'text-dark-grey bg-stroke pointer-events-none'
-                  : 'bg-primary-red text-white'
-              }`}
-              disabled={disablePhoneNumber || mobileVerified}
-              onClick={sendMobileOtp}
-            >
-              Send OTP
-            </button>
+          {mobileVerified && !showOTPInput && selfie.length >= 1 && (
+            <span className='flex text-primary-black text-xs leading-[18px] mt-2'>
+              OTP Verified
+              <img src={otpVerified} alt='Otp Verified' role='presentation' />
+            </span>
           )}
         </div>
 
