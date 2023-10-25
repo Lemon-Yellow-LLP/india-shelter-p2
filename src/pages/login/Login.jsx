@@ -124,6 +124,7 @@ export default function Login() {
             setFieldError('username', undefined);
             setShowOTPInput(false);
             setIsAuthenticated(true);
+            setLoData(res);
             return true;
           }
 
