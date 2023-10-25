@@ -37,7 +37,7 @@ const LnTCharges = ({ amount = 1500 }) => {
   const [mobile_number, setMobileNumber] = useState('');
 
   const navigate = useNavigate();
-  const [activeItem, setActiveItem] = useState('');
+  const [activeItem, setActiveItem] = useState('UPI Payment');
   const [checkingStatus, setCheckingStatus] = useState('');
   const [isConfirmPaymentVisible, setConfirmPaymentVisibility] = useState(false);
   const [isConfirmSkipVisible, setConfirmSkipVisibility] = useState(false);
@@ -88,7 +88,7 @@ const LnTCharges = ({ amount = 1500 }) => {
         // Reset
         setHasSentOTPOnce(false);
         setShowResendLink(false);
-        setActiveItem('');
+        setActiveItem('UPI Payment');
       }
     })();
   }, []);
@@ -258,33 +258,27 @@ const LnTCharges = ({ amount = 1500 }) => {
                       defaultOption
                     >
                       <div className='mb-4'>
-                        {activeItem == '' || activeItem == 'UPI Payment' ? (
-                          <div className='flex justify-center items-center py-2'>
-                            {loadingQr ? (
-                              <div className='w-[180px] h-[180px] flex justify-center items-center'>
-                                <LoaderIcon className='w-12 h-12' />
-                              </div>
-                            ) : (
-                              <QRCode title='GeeksForGeeks' value={qrCode} size={180} />
-                            )}
-                          </div>
-                        ) : null}
+                        <div className='flex justify-center items-center py-2'>
+                          {loadingQr ? (
+                            <div className='w-[180px] h-[180px] flex justify-center items-center'>
+                              <LoaderIcon className='w-12 h-12' />
+                            </div>
+                          ) : (
+                            <QRCode title='GeeksForGeeks' value={qrCode} size={180} />
+                          )}
+                        </div>
 
-                        {activeItem == 'UPI Payment' ? (
-                          <>
-                            <p className='text-black text-center text-sm not-italic font-normal mb-4'>
-                              QR code will get changed in
-                              <span className='text-black text-sm not-italic font-semibold'>
-                                {` ${secondsToMinSecFormat(qrTime)}s`}
-                              </span>
-                            </p>
+                        <p className='text-black text-center text-sm not-italic font-normal mb-4'>
+                          QR code will get changed in
+                          <span className='text-black text-sm not-italic font-semibold'>
+                            {` ${secondsToMinSecFormat(qrTime)}s`}
+                          </span>
+                        </p>
 
-                            <StatusButton
-                              onClick={() => handleCheckingStatus('UPI Payment')}
-                              isLoading={checkingStatus === 'UPI Payment'}
-                            />
-                          </>
-                        ) : null}
+                        <StatusButton
+                          onClick={() => handleCheckingStatus('UPI Payment')}
+                          isLoading={checkingStatus === 'UPI Payment'}
+                        />
                       </div>
                     </AccordionItem>
                     <Separator />
