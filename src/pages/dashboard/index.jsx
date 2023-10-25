@@ -150,7 +150,7 @@ export default function Dashboard() {
         </div>
       ) : (
         <div className='absolute w-full h-[100%] bg-white'>
-          <LoaderDynamicText text='Loading...' textColor='black' extraClasses='h-[60%]' />
+          <LoaderDynamicText text='Loading...' textColor='black' height='60%' />
         </div>
       )}
       <button

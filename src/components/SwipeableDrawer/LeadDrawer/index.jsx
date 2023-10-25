@@ -69,21 +69,20 @@ export default function SwipeableDrawerComponent() {
     setActiveIndex,
     coApplicantStepsProgress,
     setValues,
+    drawerTabIndex,
+    setDrawerTabIndex,
+    primaryIndex,
+    setPrimaryIndex,
+    activeCoApplicantIndex,
+    setActiveCoApplicantIndex,
+    coApplicants,
   } = useContext(LeadContext);
 
   const theme = useTheme();
 
-  const [value, setValue] = useState(0);
-
   const [open, setOpen] = useState(false);
 
   const [toggle, setToggle] = useState(false);
-
-  const [primaryIndex, setPrimaryIndex] = useState(0);
-
-  const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
-
-  const [coApplicants, setCoApplicants] = useState([]);
 
   const [changePrimaryAlert, setChangePrimaryAlert] = useState(false);
 
@@ -98,39 +97,16 @@ export default function SwipeableDrawerComponent() {
   };
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setDrawerTabIndex(newValue);
   };
 
   const handleChangeIndex = useCallback((index) => {
-    setValue(index);
+    setDrawerTabIndex(index);
   }, []);
 
   const toggleDrawer = () => {
     setDrawerOpen((prev) => !prev);
   };
-
-  useEffect(() => {
-    let newData = [];
-
-    values.applicants.map((e, index) => {
-      if (!e.applicant_details.is_primary) {
-        newData.push({
-          label: e.applicant_details.first_name,
-          value: index,
-        });
-      }
-    });
-
-    setCoApplicants(newData);
-
-    setActiveCoApplicantIndex(newData?.[0]?.value);
-
-    values.applicants.map((e, index) => {
-      if (e.applicant_details.is_primary) {
-        setPrimaryIndex(index);
-      }
-    });
-  }, [values.applicants]);
 
   const handleMakePrimary = async () => {
     setToggle(true);
@@ -257,7 +233,7 @@ export default function SwipeableDrawerComponent() {
             }}
           >
             <Tabs
-              value={value}
+              value={drawerTabIndex}
               onChange={handleChange}
               textColor='inherit'
               variant='fullWidth'
@@ -271,13 +247,13 @@ export default function SwipeableDrawerComponent() {
 
             <SwipeableViews
               axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-              index={value}
+              index={drawerTabIndex}
               onChangeIndex={handleChangeIndex}
             >
               <TabPanel
                 className='tabPanel'
                 style={{ maxHeight: `calc(100vh - 175px)`, overflow: 'auto' }}
-                value={value}
+                value={drawerTabIndex}
                 index={0}
                 dir={theme.direction}
               >
@@ -426,7 +402,7 @@ export default function SwipeableDrawerComponent() {
               <TabPanel
                 className='tabPanel'
                 style={{ height: `calc(100vh - 175px)`, overflow: 'auto' }}
-                value={value}
+                value={drawerTabIndex}
                 index={1}
                 dir={theme.direction}
               >
@@ -638,7 +614,7 @@ export default function SwipeableDrawerComponent() {
               <TabPanel
                 className='tabPanel p-0'
                 style={{ height: `calc(80vh - 65px)`, overflow: 'auto' }}
-                value={value}
+                value={drawerTabIndex}
                 index={2}
                 dir={theme.direction}
               >
