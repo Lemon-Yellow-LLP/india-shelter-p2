@@ -52,7 +52,11 @@ export default function AddressDetails() {
 
   const handleRadioChange = useCallback(
     async (e) => {
-      if (e.value === 'Rented') {
+      if (
+        e.value === 'Rented' &&
+        values?.applicants?.[activeIndex]?.address_detail?.extra_params
+          ?.permanent_address_same_as_current
+      ) {
         handlePermanentSameAsCurrentAddress(false, e.value);
       }
 
