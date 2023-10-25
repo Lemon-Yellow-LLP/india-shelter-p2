@@ -112,6 +112,7 @@ const WorkIncomeDetails = () => {
             pention_amount: false,
           };
         }
+        setRequiredFieldsStatus(_requiredFieldStatus);
 
         const newData = structuredClone(values);
 
@@ -161,7 +162,17 @@ const WorkIncomeDetails = () => {
         } else {
           await addApi('work-income', newData.applicants[activeIndex].work_income_detail)
             .then(async (res) => {
-              setFieldValue(`applicants[${activeIndex}].work_income_detail.id`, res.id);
+              setFieldValue(`applicants[${activeIndex}].work_income_detail`, {
+                ...newData.applicants[activeIndex].work_income_detail,
+                id: res.id,
+              });
+
+              setRequiredFieldsStatus(() => ({
+                ...newData.applicants[activeIndex].work_income_detail.extra_params
+                  .required_fields_status,
+                [name]: true,
+              }));
+
               await editFieldsById(
                 values?.applicants?.[activeIndex]?.applicant_details?.id,
                 'applicant',
