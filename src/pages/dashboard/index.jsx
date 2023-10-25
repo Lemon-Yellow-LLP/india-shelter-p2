@@ -31,7 +31,7 @@ export default function Dashboard() {
   const [primaryApplicantList, setPrimaryApplicantList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [query, setQuery] = useState('');
   const [selectionRange, setSelectionRange] = useState({
@@ -75,7 +75,7 @@ export default function Dashboard() {
       } catch (err) {
         console.error(err);
       } finally {
-        // setLoading(false);
+        setLoading(false);
       }
     })();
   }, [selectionRange]);
