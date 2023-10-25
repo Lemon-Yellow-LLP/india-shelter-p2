@@ -34,7 +34,7 @@ const UploadDocsModal = ({
         <div className='w-[328px] flex absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4 rounded-lg shadow-lg flex-col outline-none focus:outline-none'>
           <div className='flex items-start justify-between bg-transparent'>
             <button className='ml-auto' onClick={() => setShowPopUp(false)}>
-              <IconClose />
+              <IconClose color={'#FEFEFE'} />
             </button>
           </div>
 

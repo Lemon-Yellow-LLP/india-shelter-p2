@@ -57,6 +57,14 @@ const PropertyDetails = () => {
       } else {
         let newDefaultValues = structuredClone(defaultValuesLead);
         let addData = { ...newDefaultValues.property_details, [name]: e.value };
+        if (e.value === 'not-yet') {
+          addData.extra_params = {
+            ...addData.extra_params,
+            required_fields_status: {
+              property_identification_is: true,
+            },
+          };
+        }
         await addApi('property', {
           ...addData,
           lead_id: values?.lead?.id,
@@ -78,6 +86,12 @@ const PropertyDetails = () => {
           pincode: null,
           city: '',
           state: '',
+          extra_params: {
+            ...values?.property_details?.extra_params,
+            required_fields_status: {
+              property_identification_is: true,
+            },
+          },
         });
 
         setValues({
@@ -92,6 +106,12 @@ const PropertyDetails = () => {
             pincode: null,
             city: '',
             state: '',
+            extra_params: {
+              ...values?.property_details?.extra_params,
+              required_fields_status: {
+                property_identification_is: true,
+              },
+            },
           },
         });
 

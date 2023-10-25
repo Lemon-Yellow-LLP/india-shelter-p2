@@ -340,9 +340,9 @@ export default function Preview() {
             <PreviewCard
               index={coApplicantIndexes[coApplicantIndex]}
               hide={
-                !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.applicant_details.name
-                ]
+                ]?.extra_params?.progress == 100
               }
               title={pages.applicant_details.title}
               link={pages.applicant_details.url + '?preview=' + pages.applicant_details.url}
@@ -350,7 +350,13 @@ export default function Preview() {
                 flattedErrors &&
                 flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.applicant_details.name
-                ]
+                ] &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.applicant_details.name
+                ] &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.applicant_details.name
+                ]?.extra_params?.progress != 0
                   ? Object.keys(
                       flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                         pages.applicant_details.name
@@ -377,9 +383,9 @@ export default function Preview() {
             <PreviewCard
               index={coApplicantIndexes[coApplicantIndex]}
               hide={
-                !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.personal_details.name
-                ]
+                ]?.extra_params?.progress == 100
               }
               title={pages.personal_details.title}
               link={pages.personal_details.url + '?preview=' + pages.personal_details.url}
@@ -387,7 +393,13 @@ export default function Preview() {
                 flattedErrors &&
                 flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.personal_details.name
-                ]
+                ] &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.personal_details.name
+                ] &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.personal_details.name
+                ]?.extra_params?.progress != 0
                   ? Object.keys(
                       flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                         pages.personal_details.name
@@ -420,16 +432,22 @@ export default function Preview() {
               index={coApplicantIndexes[coApplicantIndex]}
               title={pages.address_detail.title}
               hide={
-                !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.address_detail.name
-                ]
+                ]?.extra_params?.progress == 100
               }
               link={pages.address_detail.url + '?preview=' + pages.address_detail.url}
               count={
                 flattedErrors &&
                 flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.address_detail.name
-                ]
+                ] &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.address_detail.name
+                ] &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.address_detail.name
+                ]?.extra_params?.progress != 0
                   ? Object.keys(
                       flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                         pages.address_detail.name
@@ -461,9 +479,9 @@ export default function Preview() {
             <PreviewCard
               index={coApplicantIndexes[coApplicantIndex]}
               hide={
-                !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.work_income_detail.name
-                ]
+                ]?.extra_params?.progress == 100
               }
               title={pages.work_income_detail.title}
               link={pages.work_income_detail.url + '?preview=' + pages.work_income_detail.url}
@@ -471,7 +489,13 @@ export default function Preview() {
                 flattedErrors &&
                 flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.work_income_detail.name
-                ]
+                ] &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.work_income_detail.name
+                ] &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.work_income_detail.name
+                ]?.extra_params?.progress != 0
                   ? Object.keys(
                       flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                         pages.work_income_detail.name
@@ -503,9 +527,9 @@ export default function Preview() {
             <PreviewCard
               index={coApplicantIndexes[coApplicantIndex]}
               hide={
-                !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.banking_details.name
-                ]
+                ]?.extra_params?.progress == 100
               }
               title={pages.banking_details.title}
               link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
@@ -513,7 +537,13 @@ export default function Preview() {
                 flattedErrors &&
                 flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.banking_details.name
-                ]
+                ] &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.banking_details.name
+                ] &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.banking_details.name
+                ]?.extra_params?.progress != 0
                   ? Object.keys(
                       flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                         pages.banking_details.name
@@ -545,16 +575,22 @@ export default function Preview() {
             <PreviewCard
               index={coApplicantIndexes[coApplicantIndex]}
               hide={
-                !errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.upload_documents.name
-                ]
+                ]?.extra_params?.progress == 100
               }
               title={pages.upload_documents.title}
               link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
               count={
                 flattedErrors &&
                 flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.upload_documents.name
+                  pages.upload_documents.name &&
+                    values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                      pages.upload_documents.name
+                    ] &&
+                    values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                      pages.upload_documents.name
+                    ]?.extra_params?.progress != 0
                 ]
                   ? Object.keys(
                       flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
@@ -593,8 +629,8 @@ export default function Preview() {
     return (
       <>
         {!errors?.applicants?.[primaryIndex] &&
-        !errors?.propertySchema &&
-        !errors?.referenceSchema ? (
+        values?.property_details?.extra_params?.progress == 100 &&
+        values?.reference_details?.extra_params?.progress == 100 ? (
           <StepCompleted />
         ) : (
           <div className='flex-1 flex flex-col gap-4 p-4 pb-[200px] overflow-auto bg-[##F9F9F9]'>
@@ -631,12 +667,18 @@ export default function Preview() {
             </div>
             <PreviewCard
               index={primaryIndex}
-              hide={!errors?.applicants?.[primaryIndex]?.[pages.applicant_details.name]}
+              hide={
+                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                  ?.progress == 100
+              }
               title={pages.applicant_details.title}
               link={pages.applicant_details.url + '?preview=' + pages.applicant_details.url}
               count={
                 flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
+                flattedErrors?.applicants?.[primaryIndex]?.[pages.applicant_details.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                  ?.progress != 0
                   ? Object.keys(
                       flattedErrors?.applicants?.[primaryIndex]?.[pages.applicant_details.name],
                     ).length
@@ -656,12 +698,18 @@ export default function Preview() {
 
             <PreviewCard
               index={primaryIndex}
-              hide={!errors?.applicants?.[primaryIndex]?.[pages.personal_details.name]}
+              hide={
+                values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
+                  ?.progress == 100
+              }
               title={pages.personal_details.title}
               link={pages.personal_details.url + '?preview=' + pages.personal_details.url}
               count={
                 flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.personal_details.name]
+                flattedErrors?.applicants?.[primaryIndex]?.[pages.personal_details.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.personal_details.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
+                  ?.progress != 0
                   ? Object.keys(
                       flattedErrors?.applicants?.[primaryIndex]?.[pages.personal_details.name],
                     ).length
@@ -686,12 +734,18 @@ export default function Preview() {
 
             <PreviewCard
               index={primaryIndex}
-              hide={!errors?.applicants?.[primaryIndex]?.[pages.address_detail.name]}
+              hide={
+                values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
+                  ?.progress == 100
+              }
               title={pages.address_detail.title}
               link={pages.address_detail.url + '?preview=' + pages.address_detail.url}
               count={
                 flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.address_detail.name]
+                flattedErrors?.applicants?.[primaryIndex]?.[pages.address_detail.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.address_detail.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
+                  ?.progress != 0
                   ? Object.keys(
                       flattedErrors?.applicants?.[primaryIndex]?.[pages.address_detail.name],
                     ).length
@@ -716,12 +770,18 @@ export default function Preview() {
 
             <PreviewCard
               index={primaryIndex}
-              hide={!errors?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]}
+              hide={
+                values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
+                  ?.progress == 100
+              }
               title={pages.work_income_detail.title}
               link={pages.work_income_detail.url + '?preview=' + pages.work_income_detail.url}
               count={
                 flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]
+                flattedErrors?.applicants?.[primaryIndex]?.[pages.work_income_detail.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
+                  ?.progress != 0
                   ? Object.keys(
                       flattedErrors?.applicants?.[primaryIndex]?.[pages.work_income_detail.name],
                     ).length
@@ -746,11 +806,14 @@ export default function Preview() {
 
             <PreviewCard
               index={primaryIndex}
-              hide={!flattedErrors?.[pages.property_details.name]}
+              hide={values?.[pages.property_details.name]?.extra_params?.progress == 100}
               title={pages.property_details.title}
               link={pages.property_details.url + '?preview=' + pages.property_details.url}
               count={
-                flattedErrors && flattedErrors?.[pages.property_details.name]
+                flattedErrors &&
+                flattedErrors?.[pages.property_details.name] &&
+                values?.[pages.property_details.name] &&
+                values?.[pages.property_details.name]?.extra_params?.progress != 0
                   ? Object.keys(flattedErrors?.[pages.property_details.name]).length
                   : 'ALL'
               }
@@ -771,12 +834,18 @@ export default function Preview() {
 
             <PreviewCard
               index={primaryIndex}
-              hide={!errors?.applicants?.[primaryIndex]?.[pages.banking_details.name]}
+              hide={
+                values?.applicants?.[primaryIndex]?.[pages.banking_details.name]?.extra_params
+                  ?.progress == 100
+              }
               title={pages.banking_details.title}
               link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
               count={
                 flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.banking_details.name]
+                flattedErrors?.applicants?.[primaryIndex]?.[pages.banking_details.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.banking_details.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.banking_details.name]?.extra_params
+                  ?.progress != 0
                   ? Object.keys(
                       flattedErrors?.applicants?.[primaryIndex]?.[pages.banking_details.name],
                     ).length
@@ -801,11 +870,14 @@ export default function Preview() {
 
             <PreviewCard
               index={primaryIndex}
-              hide={!errors?.[pages.reference_details.name]}
+              hide={values?.[pages.reference_details.name]?.extra_params?.progress == 100}
               title={pages.reference_details.title}
               link={pages.reference_details.url + '?preview=' + pages.reference_details.url}
               count={
-                flattedErrors && flattedErrors?.[pages.reference_details.name]
+                flattedErrors &&
+                flattedErrors?.[pages.reference_details.name] &&
+                values?.[pages.reference_details.name] &&
+                values?.[pages.reference_details.name]?.extra_params?.progress != 0
                   ? Object.keys(flattedErrors?.[pages.reference_details.name]).length
                   : 'ALL'
               }
@@ -826,12 +898,18 @@ export default function Preview() {
 
             <PreviewCard
               index={primaryIndex}
-              hide={!errors?.applicants?.[primaryIndex]?.[pages.upload_documents.name]}
+              hide={
+                values?.applicants?.[primaryIndex]?.[pages.upload_documents.name]?.extra_params
+                  ?.progress == 100
+              }
               title={pages.upload_documents.title}
               link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
               count={
                 flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.upload_documents.name]
+                flattedErrors?.applicants?.[primaryIndex]?.[pages.upload_documents.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.upload_documents.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.upload_documents.name]?.extra_params
+                  ?.progress == 100
                   ? Object.keys(
                       flattedErrors?.applicants?.[primaryIndex]?.[pages.upload_documents.name],
                     ).length
@@ -941,8 +1019,8 @@ export default function Preview() {
             disabled={
               activeStep === 0
                 ? errors?.applicants?.[primaryIndex] ||
-                  errors?.propertySchema ||
-                  errors?.referenceSchema
+                  values?.property_details?.extra_params?.progress != 100 ||
+                  values?.reference_details?.extra_params?.progress != 100
                 : errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]
             }
             inputClasses='w-1/2 h-[46px]'
@@ -991,32 +1069,34 @@ function PreviewCard({ index, title, count, link, hide, children }) {
   const handleClick = () => setActiveIndex(index);
 
   return (
-    <div role='banner' onClick={handleClick}>
+    <>
       {hide || count == 0 ? null : (
-        <Link
-          to={link}
-          className='rounded-lg border border-[#EBEBEB] bg-white p-3 flex flex-col gap-2 active:opacity-90'
-        >
-          <div className='flex justify-between'>
-            <h4 className='overflow-hidden text-sm not-italic font-medium text-primary-black'>
-              {title || '-'}
-            </h4>
-            <ArrowRightIcon2 />
-          </div>
+        <div onClick={handleClick}>
+          <Link
+            to={link}
+            className='rounded-lg border border-[#EBEBEB] bg-white p-3 flex flex-col gap-2 active:opacity-90'
+          >
+            <div className='flex justify-between'>
+              <h4 className='overflow-hidden text-sm not-italic font-medium text-primary-black'>
+                {title || '-'}
+              </h4>
+              <ArrowRightIcon2 />
+            </div>
 
-          <Separator />
-          <div className='flex justify-start gap-[6px]'>
-            <p className='not-italic font-medium text-[10px] text-light-grey'>
-              INCOMPLETE FIELDS:{' '}
-            </p>
-            <span className='not-italic font-medium text-[10px] text-dark-grey leading-loose'>
-              {count}
-            </span>
-          </div>
-          {children}
-        </Link>
+            <Separator />
+            <div className='flex justify-start gap-[6px]'>
+              <p className='not-italic font-medium text-[10px] text-light-grey'>
+                INCOMPLETE FIELDS:{' '}
+              </p>
+              <span className='not-italic font-medium text-[10px] text-dark-grey leading-loose'>
+                {count}
+              </span>
+            </div>
+            {count === 'ALL' ? null : children}
+          </Link>
+        </div>
       )}
-    </div>
+    </>
   );
 }
 

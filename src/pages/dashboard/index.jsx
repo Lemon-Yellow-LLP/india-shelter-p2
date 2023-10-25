@@ -64,14 +64,19 @@ export default function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      setLoading(true);
-      const data = await getDashboardLeadList({
-        fromDate: selectionRange.startDate,
-        toDate: moment(selectionRange.endDate).add(1, 'day'),
-      });
-      const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
-      setLeadList(formatted);
-      setLoading(false);
+      try {
+        setLoading(true);
+        const data = await getDashboardLeadList({
+          fromDate: selectionRange.startDate,
+          toDate: moment(selectionRange.endDate).add(1, 'day'),
+        });
+        const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
+        setLeadList(formatted);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [selectionRange]);
 
