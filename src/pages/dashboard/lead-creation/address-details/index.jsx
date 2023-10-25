@@ -52,7 +52,11 @@ export default function AddressDetails() {
 
   const handleRadioChange = useCallback(
     async (e) => {
-      if (e.value === 'Rented') {
+      if (
+        e.value === 'Rented' &&
+        values?.applicants?.[activeIndex]?.address_detail?.extra_params
+          ?.permanent_address_same_as_current
+      ) {
         handlePermanentSameAsCurrentAddress(false, e.value);
       }
 
@@ -132,6 +136,7 @@ export default function AddressDetails() {
     }
 
     editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+      current_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
       current_city: res.city,
       current_state: res.state,
     });
@@ -144,6 +149,7 @@ export default function AddressDetails() {
         ?.permanent_address_same_as_current
     ) {
       editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+        permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
         permanent_city: res.city,
         permanent_state: res.state,
       });
@@ -265,6 +271,7 @@ export default function AddressDetails() {
     }
 
     editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+      permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode,
       permanent_city: res.city,
       permanent_state: res.state,
     });

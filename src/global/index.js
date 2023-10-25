@@ -274,6 +274,11 @@ async function uploadDoc(data, options) {
   return res.data;
 }
 
+async function editDoc(id, data, options) {
+  const res = await axios.patch(`${API_URL}/doc/edit/${id}`, data, options);
+  return res.data;
+}
+
 async function getApplicantById(id) {
   const res = await axios.get(`${API_URL}/applicant/${id}`);
   return res.data;
@@ -292,6 +297,11 @@ async function getUploadOtp(id) {
 async function verifyUploadOtp(id, otp) {
   const res = await axios.post(`${API_URL}/account/verify-sms/${id}`, { otp }, requestOptions);
   return res;
+}
+
+async function getUserById(id) {
+  const res = await axios.get(`${API_URL}/account/${id}`, {}, requestOptions);
+  return res.data;
 }
 
 function NaNorNull(value, toReturn = null) {
@@ -514,4 +524,6 @@ export {
   getUploadOtp,
   verifyUploadOtp,
   reUploadDoc,
+  getUserById,
+  editDoc,
 };

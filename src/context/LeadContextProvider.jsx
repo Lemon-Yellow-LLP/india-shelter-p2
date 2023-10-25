@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
 import { validationSchemaLead } from '../schemas/index';
@@ -22,6 +22,10 @@ const LeadContextProvider = ({ children }) => {
   const [coApplicantStepsProgress, setCoApplicantSetpsProgress] = useState([...coApplicantSteps]);
   const [bankSuccessTost, setBankSuccessTost] = useState('');
   const [bankErrorTost, setBankErrorTost] = useState('');
+  const [drawerTabIndex, setDrawerTabIndex] = useState(0);
+  const [primaryIndex, setPrimaryIndex] = useState(0);
+  const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
+  const [coApplicants, setCoApplicants] = useState([]);
 
   const formik = useFormik({
     initialValues: structuredClone(defaultValuesLead),
@@ -136,6 +140,29 @@ const LeadContextProvider = ({ children }) => {
     setDrawerOpen(false);
   };
 
+  useEffect(() => {
+    let newData = [];
+
+    formik.values.applicants.map((e, index) => {
+      if (!e.applicant_details.is_primary) {
+        newData.push({
+          label: e.applicant_details.first_name,
+          value: index,
+        });
+      }
+    });
+
+    setCoApplicants(newData);
+
+    setActiveCoApplicantIndex(newData?.[0]?.value);
+
+    formik.values.applicants.map((e, index) => {
+      if (e.applicant_details.is_primary) {
+        setPrimaryIndex(index);
+      }
+    });
+  }, [formik.values.applicants]);
+
   return (
     <LeadContext.Provider
       value={{
@@ -161,6 +188,14 @@ const LeadContextProvider = ({ children }) => {
         setBankSuccessTost,
         bankErrorTost,
         setBankErrorTost,
+        drawerTabIndex,
+        setDrawerTabIndex,
+        primaryIndex,
+        setPrimaryIndex,
+        activeCoApplicantIndex,
+        setActiveCoApplicantIndex,
+        coApplicants,
+        setCoApplicants,
       }}
     >
       {children}

@@ -43,6 +43,7 @@ const UploadDocuments = () => {
   const [customerPhotos, setCustomerPhotos] = useState([]);
   const [customerPhotosFile, setCustomerPhotosFile] = useState(null);
   const [customerUploads, setCustomerUploads] = useState(null);
+  const [customerLatLong, setCustomerLatLong] = useState(null);
 
   const [idProofPhotos, setIdProofPhotos] = useState([]);
   const [idProofPhotosFile, setIdProofPhotosFile] = useState(null);
@@ -51,6 +52,7 @@ const UploadDocuments = () => {
     file: {},
     id: null,
   });
+  const [idProofLatLong, setIdProofLatLong] = useState(null);
 
   const [addressProofPhotos, setAddressProofPhotos] = useState([]);
   const [addressProofPhotosFile, setAddressProofPhotosFile] = useState(null);
@@ -59,6 +61,7 @@ const UploadDocuments = () => {
     file: {},
     id: null,
   });
+  const [addressProofLatLong, setAddressProofLatLong] = useState(null);
 
   const [propertyPapers, setPropertyPapers] = useState([]);
   const [propertyPapersFile, setPropertyPapersFile] = useState(null);
@@ -68,6 +71,7 @@ const UploadDocuments = () => {
     file: {},
     id: null,
   });
+  const [propertyPapersLatLong, setPropertyPapersLatLong] = useState(null);
 
   const [salarySlipPhotos, setSalarySlipPhotos] = useState([]);
   const [salarySlipPhotosFile, setSalarySlipPhotosFile] = useState(null);
@@ -76,6 +80,7 @@ const UploadDocuments = () => {
     file: {},
     id: null,
   });
+  const [salarySlipLatLong, setSalarySlipLatLong] = useState(null);
 
   const [form60photos, setForm60photos] = useState([]);
   const [form60photosFile, setForm60photosFile] = useState(null);
@@ -84,6 +89,7 @@ const UploadDocuments = () => {
     file: {},
     id: null,
   });
+  const [form60LatLong, setForm60LatLong] = useState(null);
 
   const [propertyPhotos, setPropertyPhotos] = useState([]);
   const [propertyPhotosFile, setPropertyPhotosFile] = useState(null);
@@ -92,10 +98,12 @@ const UploadDocuments = () => {
     file: {},
     id: null,
   });
+  const [propertyLatLong, setPropertyLatLong] = useState(null);
 
   const [selfie, setSelfie] = useState([]);
   const [selfieFile, setSelfieFile] = useState(null);
   const [selfieUploads, setSelfieUploads] = useState(null);
+  const [loSelfieLatLong, setLoSelfieLatLong] = useState(null);
 
   const [docs, setDocs] = useState([]);
   const [docsFile, setDocsFile] = useState(null);
@@ -104,6 +112,7 @@ const UploadDocuments = () => {
     file: {},
     id: null,
   });
+  const [otherDocsLatLong, setOtherDocsLatLong] = useState(null);
 
   const [editIdNumber, setEditIdNumber] = useState(false);
   const [editAddressNumber, setEditAddressNumber] = useState(false);
@@ -299,9 +308,6 @@ const UploadDocuments = () => {
     const res = await getUploadOtp(loData.session.user_id);
     if (!res) return;
 
-    // const res = await getUploadOtp(1);
-    // if (!res) return;
-
     setToastMessage('OTP has been sent to the mobile number');
   };
 
@@ -313,10 +319,6 @@ const UploadDocuments = () => {
         const res = await verifyUploadOtp(loData.session.user_id, otp);
 
         if (!res) return;
-
-        // const res = await verifyUploadOtp(1, otp);
-
-        // if (!res) return;
 
         setDisablePhoneNumber(false);
         setMobileVerified(true);
@@ -341,6 +343,8 @@ const UploadDocuments = () => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'property_paper_photos');
       data.append('document_name', filename);
+      data.append('geo_lat', propertyPapersLatLong.lat);
+      data.append('geo_long', propertyPapersLatLong.long);
 
       if (propertyPapersFile.type === 'image/jpeg') {
         const options = {
@@ -418,6 +422,8 @@ const UploadDocuments = () => {
       const filename = editPropertyPaper.file.name;
       data.append('document_type', 'property_paper_photos');
       data.append('document_name', filename);
+      data.append('geo_lat', propertyPapersLatLong.lat);
+      data.append('geo_long', propertyPapersLatLong.long);
 
       if (editPropertyPaper.file.type === 'image/jpeg') {
         const options = {
@@ -484,6 +490,8 @@ const UploadDocuments = () => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'customer_photos');
       data.append('document_name', filename);
+      data.append('geo_lat', customerLatLong.lat);
+      data.append('geo_long', customerLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -563,6 +571,8 @@ const UploadDocuments = () => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', values?.applicants?.[activeIndex]?.personal_details?.id_type);
       data.append('document_name', filename);
+      data.append('geo_lat', idProofLatLong.lat);
+      data.append('geo_long', idProofLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -628,6 +638,8 @@ const UploadDocuments = () => {
       const filename = editIdProof.file.name;
       data.append('document_type', values?.applicants?.[activeIndex]?.personal_details?.id_type);
       data.append('document_name', filename);
+      data.append('geo_lat', idProofLatLong.lat);
+      data.append('geo_long', idProofLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -695,6 +707,8 @@ const UploadDocuments = () => {
         values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof,
       );
       data.append('document_name', filename);
+      data.append('geo_lat', addressProofLatLong.lat);
+      data.append('geo_long', addressProofLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -766,6 +780,8 @@ const UploadDocuments = () => {
         values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof,
       );
       data.append('document_name', filename);
+      data.append('geo_lat', addressProofLatLong.lat);
+      data.append('geo_long', addressProofLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -831,6 +847,8 @@ const UploadDocuments = () => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'salary_slip_photos');
       data.append('document_name', filename);
+      data.append('geo_lat', salarySlipLatLong.lat);
+      data.append('geo_long', salarySlipLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -893,6 +911,8 @@ const UploadDocuments = () => {
       const filename = editSalarySlip.file.name;
       data.append('document_type', 'salary_slip_photos');
       data.append('document_name', filename);
+      data.append('geo_lat', salarySlipLatLong.lat);
+      data.append('geo_long', salarySlipLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -954,6 +974,8 @@ const UploadDocuments = () => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'form_60_photos');
       data.append('document_name', filename);
+      data.append('geo_lat', form60LatLong.lat);
+      data.append('geo_long', form60LatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1015,6 +1037,8 @@ const UploadDocuments = () => {
       const filename = editForm60.file.name;
       data.append('document_type', 'form_60_photos');
       data.append('document_name', filename);
+      data.append('geo_lat', form60LatLong.lat);
+      data.append('geo_long', form60LatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1076,6 +1100,8 @@ const UploadDocuments = () => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'property_photos');
       data.append('document_name', filename);
+      data.append('geo_lat', propertyLatLong.lat);
+      data.append('geo_long', propertyLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1137,6 +1163,8 @@ const UploadDocuments = () => {
       const filename = editProperty.file.name;
       data.append('document_type', 'property_photos');
       data.append('document_name', filename);
+      data.append('geo_lat', propertyLatLong.lat);
+      data.append('geo_long', propertyLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1198,6 +1226,8 @@ const UploadDocuments = () => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'lo_selfie');
       data.append('document_name', filename);
+      data.append('geo_lat', loSelfieLatLong.lat);
+      data.append('geo_long', loSelfieLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1274,6 +1304,8 @@ const UploadDocuments = () => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
       data.append('document_type', 'other_docs');
       data.append('document_name', filename);
+      data.append('geo_lat', otherDocsLatLong.lat);
+      data.append('geo_long', otherDocsLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1324,7 +1356,7 @@ const UploadDocuments = () => {
         setDocUploads({ type: 'other_docs', data: active_uploads });
       }
 
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: true }));
+      // setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: true }));
     }
     docs.length > 0 && addOtherDocPhotos();
   }, [docsFile]);
@@ -1335,6 +1367,8 @@ const UploadDocuments = () => {
       const filename = editDoc.file.name;
       data.append('document_type', 'other_docs');
       data.append('document_name', filename);
+      data.append('geo_lat', otherDocsLatLong.lat);
+      data.append('geo_long', otherDocsLatLong.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1375,18 +1409,18 @@ const UploadDocuments = () => {
     editDoc.id && editOtherDocPhotos();
   }, [editDoc]);
 
-  useEffect(() => {
-    async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.other_docs.find((data) => {
-        return data.active === true;
-      });
-      if (!active_uploads) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: false }));
-      }
-    }
-    removeProgress();
-  }, [docUploads]);
+  // useEffect(() => {
+  //   async function removeProgress() {
+  //     const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+  //     const active_uploads = res.document_meta.other_docs.find((data) => {
+  //       return data.active === true;
+  //     });
+  //     if (!active_uploads) {
+  //       setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: false }));
+  //     }
+  //   }
+  //   removeProgress();
+  // }, [docUploads]);
 
   useEffect(() => {
     async function getPreviousUploads() {
@@ -1551,6 +1585,7 @@ const UploadDocuments = () => {
           setSingleFile={setCustomerPhotosFile}
           uploads={customerUploads}
           setUploads={setCustomerUploads}
+          setLatLong={setCustomerLatLong}
           label='Customer photo'
           required
         />
@@ -1599,6 +1634,7 @@ const UploadDocuments = () => {
                   setUploads={setIdProofUploads}
                   noBorder={true}
                   setEdit={setEditIdProof}
+                  setLatLong={setIdProofLatLong}
                 />
 
                 <div
@@ -1752,6 +1788,7 @@ const UploadDocuments = () => {
                 uploads={idProofUploads}
                 setUploads={setIdProofUploads}
                 setEdit={setEditIdProof}
+                setLatLong={setIdProofLatLong}
               />
             )}
 
@@ -1811,6 +1848,7 @@ const UploadDocuments = () => {
                   setEdit={setEditAddressProof}
                   uploads={addressProofUploads}
                   setUploads={setAddressProofUploads}
+                  setLatLong={setAddressProofLatLong}
                   noBorder={true}
                 />
 
@@ -1972,6 +2010,7 @@ const UploadDocuments = () => {
                 setEdit={setEditAddressProof}
                 uploads={addressProofUploads}
                 setUploads={setAddressProofUploads}
+                setLatLong={setAddressProofLatLong}
               />
             )}
 
@@ -1995,19 +2034,23 @@ const UploadDocuments = () => {
           required
           hint='File size should be less than 5MB'
           setSingleFile={setPropertyPapersFile}
+          setLatLong={setPropertyPapersLatLong}
         />
 
-        <ImageUpload
-          files={salarySlipPhotos}
-          setFile={setSalarySlipPhotos}
-          uploads={salarySlipUploads}
-          setUploads={setSalarySlipUploads}
-          setEdit={setEditSalarySlip}
-          label='Salary slip'
-          required
-          hint='File size should be less than 5MB'
-          setSingleFile={setSalarySlipPhotosFile}
-        />
+        {values.applicants[activeIndex]?.work_income_detail.profession === 'Salaried' && (
+          <ImageUpload
+            files={salarySlipPhotos}
+            setFile={setSalarySlipPhotos}
+            uploads={salarySlipUploads}
+            setUploads={setSalarySlipUploads}
+            setEdit={setEditSalarySlip}
+            label='Salary slip'
+            required
+            hint='File size should be less than 5MB'
+            setSingleFile={setSalarySlipPhotosFile}
+            setLatLong={setSalarySlipLatLong}
+          />
+        )}
 
         <ImageUpload
           files={form60photos}
@@ -2019,6 +2062,7 @@ const UploadDocuments = () => {
           required
           hint='File size should be less than 5MB'
           setSingleFile={setForm60photosFile}
+          setLatLong={setForm60LatLong}
         />
 
         <ImageUpload
@@ -2031,32 +2075,36 @@ const UploadDocuments = () => {
           required
           hint='File size should be less than 5MB'
           setSingleFile={setPropertyPhotosFile}
+          setLatLong={setPropertyLatLong}
         />
 
         <div className='flex justify-between gap-2'>
-          <div className='w-[65%]'>
+          <div className={selfieUploads ? 'w-[65%]' : 'w-full'}>
             <PhotoUpload
               files={selfie}
               setFile={setSelfie}
               setSingleFile={setSelfieFile}
               uploads={selfieUploads}
               setUploads={setSelfieUploads}
+              setLatLong={setLoSelfieLatLong}
               label='Upload selfie'
               required
             />
           </div>
 
-          <button
-            className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
-              mobileVerified || hasSentOTPOnce || selfie.length === 0
-                ? 'text-dark-grey bg-stroke pointer-events-none'
-                : 'bg-primary-red text-white'
-            }`}
-            disabled={disablePhoneNumber || mobileVerified}
-            onClick={sendMobileOtp}
-          >
-            Send OTP
-          </button>
+          {selfieUploads && (
+            <button
+              className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
+                mobileVerified || hasSentOTPOnce || selfie.length === 0
+                  ? 'text-dark-grey bg-stroke pointer-events-none'
+                  : 'bg-primary-red text-white'
+              }`}
+              disabled={disablePhoneNumber || mobileVerified}
+              onClick={sendMobileOtp}
+            >
+              Send OTP
+            </button>
+          )}
         </div>
 
         {showOTPInput && selfie.length >= 1 ? (
@@ -2080,13 +2128,20 @@ const UploadDocuments = () => {
           setUploads={setDocUploads}
           setEdit={setEditDoc}
           label='Other documents'
-          required
           hint='File size should be less than 5MB'
           setSingleFile={setDocsFile}
+          setLatLong={setOtherDocsLatLong}
         />
       </div>
 
-      <PreviousNextButtons linkPrevious='/lead/reference-details' linkNext='/lead/preview' />
+      <PreviousNextButtons
+        linkPrevious={
+          values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+            ? '/lead/reference-details'
+            : '/lead/banking-details'
+        }
+        linkNext='/lead/preview'
+      />
       <SwipeableDrawerComponent />
     </div>
   );

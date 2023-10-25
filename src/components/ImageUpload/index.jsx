@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
-import { editFieldsById, getApplicantById } from '../../global';
+import { editDoc, editFieldsById, getApplicantById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
 
 function ImageUpload({
@@ -14,6 +14,7 @@ function ImageUpload({
   label,
   hint,
   noBorder,
+  setLatLong,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
@@ -50,22 +51,6 @@ function ImageUpload({
 
     setLoader(true);
 
-    let userLocation = navigator.geolocation;
-
-    if (userLocation) {
-      userLocation.getCurrentPosition(success);
-    } else {
-      ('The geolocation API is not supported by your browser.');
-    }
-
-    function success(data) {
-      let lat = data.coords.latitude;
-      let long = data.coords.longitude;
-
-      setLat(lat);
-      setLong(long);
-    }
-
     let file = e.target.files;
 
     for (let i = 0; i < file.length; i++) {
@@ -90,6 +75,8 @@ function ImageUpload({
     const type = uploads.type;
 
     setFile(files.filter((x) => x.name !== id));
+
+    await editDoc(id, { active: false });
 
     const applicant = await getApplicantById(
       values?.applicants?.[activeIndex]?.applicant_details.id,
@@ -167,6 +154,26 @@ function ImageUpload({
   useEffect(() => {
     uploads && setLoader(false);
   }, [uploads]);
+
+  useEffect(() => {
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      ('The geolocation API is not supported by your browser.');
+    }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+
+      setLatLong({
+        lat: lat,
+        long: long,
+      });
+    }
+  }, []);
 
   return (
     <div className='w-full'>
