@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
-import { editFieldsById, getApplicantById } from '../../global';
+import { editDoc, editFieldsById, getApplicantById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
 
 function PdfAndImageUpload({
@@ -15,6 +15,7 @@ function PdfAndImageUpload({
   setSingleFile,
   label,
   hint,
+  setLatLong,
   ...props
 }) {
   const { activeIndex, values } = useContext(LeadContext);
@@ -31,23 +32,27 @@ function PdfAndImageUpload({
 
     let file = e.target.files;
 
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
+    if (file) {
+      for (let i = 0; i < file.length; i++) {
+        const fileType = file[i]['type'];
 
-      const validImageTypes = ['image/jpeg', 'application/pdf'];
+        const validImageTypes = ['image/jpeg', 'application/pdf'];
 
-      if (validImageTypes.includes(fileType)) {
-        if (file[i].size <= 5000000) {
-          setSingleFile(file[i]);
-          setFile([...files, file[i]]);
+        if (validImageTypes.includes(fileType)) {
+          if (file[i].size <= 5000000) {
+            setSingleFile(file[i]);
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File size should be less than 5MB');
+          }
         } else {
           setLoader(false);
-          setMessage('File size should be less than 5MB');
+          setMessage('File format not supported');
         }
-      } else {
-        setLoader(false);
-        setMessage('File format not supported');
       }
+    } else {
+      setLoader(false);
     }
   };
 
@@ -63,22 +68,6 @@ function PdfAndImageUpload({
     setMessage('');
 
     setLoader(true);
-
-    let userLocation = navigator.geolocation;
-
-    if (userLocation) {
-      userLocation.getCurrentPosition(success);
-    } else {
-      ('The geolocation API is not supported by your browser.');
-    }
-
-    function success(data) {
-      let lat = data.coords.latitude;
-      let long = data.coords.longitude;
-
-      setLat(lat);
-      setLong(long);
-    }
 
     let file = e.target.files;
 
@@ -107,6 +96,8 @@ function PdfAndImageUpload({
 
   async function removeImage(id) {
     setFile(files.filter((x) => x.name !== id));
+
+    await editDoc(id, { active: false });
 
     const applicant = await getApplicantById(
       values?.applicants?.[activeIndex]?.applicant_details.id,
@@ -150,6 +141,8 @@ function PdfAndImageUpload({
   }
 
   async function deletePDF(id) {
+    await editDoc(id, { active: false });
+
     const applicant = await getApplicantById(
       values?.applicants?.[activeIndex]?.applicant_details.id,
     );
@@ -191,6 +184,26 @@ function PdfAndImageUpload({
     }
     setPdf(null);
   }
+
+  useEffect(() => {
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      ('The geolocation API is not supported by your browser.');
+    }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+
+      setLatLong({
+        lat: lat,
+        long: long,
+      });
+    }
+  }, []);
 
   return (
     <div className='w-full'>

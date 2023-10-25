@@ -1,23 +1,28 @@
 import { createPortal } from 'react-dom';
-import { IconClose } from '../../assets/icons';
 import PropTypes from 'prop-types';
 import Button from '../Button';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../../context/AuthContextProvider';
+import { getUserById } from '../../global';
 
-const UploadDocsModal = ({
-  showpopup,
-  setShowPopUp,
-  index,
-  callback,
-  lat,
-  long,
-  photos,
-  singlePhoto,
-}) => {
+const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, singlePhoto }) => {
+  const { loData } = useContext(AuthContext);
   const [activeStep, setActiveStep] = useState(0);
+  const [Timestamp, setTimeStamp] = useState(null);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     setActiveStep(index);
+
+    const timestamp = new Date();
+    setTimeStamp(timestamp);
+
+    async function getUserData() {
+      const lo_info = await getUserById(loData.session.user_id);
+
+      setUserData(lo_info);
+    }
+    loData && getUserData();
   }, [index]);
 
   if (showpopup)
@@ -34,7 +39,28 @@ const UploadDocsModal = ({
         <div className='w-[328px] flex absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4 rounded-lg shadow-lg flex-col outline-none focus:outline-none'>
           <div className='flex items-start justify-between bg-transparent'>
             <button className='ml-auto' onClick={() => setShowPopUp(false)}>
-              <IconClose color={'#FEFEFE'} />
+              <svg
+                width='32'
+                height='32'
+                viewBox='0 0 32 32'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M22.6693 9.3335L9.33594 22.6668'
+                  stroke='#FEFEFE'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+                <path
+                  d='M9.33594 9.3335L22.6693 22.6668'
+                  stroke='#FEFEFE'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
             </button>
           </div>
 
@@ -49,11 +75,10 @@ const UploadDocsModal = ({
                           alt={photo.document_fetch_url}
                           className='h-full w-full object-cover object-center rounded-t-lg'
                         />
-                        {lat && long ? (
-                          <p className='absolute bottom-0 left-0 text-white p-3'>
-                            Lat: {lat}, Long: {long}
-                          </p>
-                        ) : null}
+
+                        <p className='absolute bottom-0 left-0 text-white p-3'>
+                          Lat: {photo.geo_lat}, Long: {photo.geo_long}
+                        </p>
                       </div>
                     ),
                 )
@@ -67,7 +92,10 @@ const UploadDocsModal = ({
                   className='h-full w-full object-cover object-center rounded-t-lg'
                 />
                 <p className='absolute bottom-0 left-0 text-white p-3'>
-                  Lat: {lat}, Long: {long}
+                  CAF: {}; Lat: {singlePhoto.geo_lat}; Long: {singlePhoto.geo_long}; EMP code:{' '}
+                  {userData?.employee_code}; Timestamp: {Timestamp?.toLocaleString()}; LO Name:{' '}
+                  {userData?.first_name + ' ' + userData?.middle_name + ' ' + userData?.last_name}
+                  {}
                 </p>
               </div>
             )}

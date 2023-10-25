@@ -114,7 +114,6 @@ export const defaultValuesLead = {
             form_60: false,
             property_image: false,
             upload_selfie: false,
-            other_doc: false,
           },
           required_fields_status: {
             loan_type: false,
