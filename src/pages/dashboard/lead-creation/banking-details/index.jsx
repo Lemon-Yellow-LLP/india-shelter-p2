@@ -241,7 +241,11 @@ const BankingDetails = () => {
         </div>
 
         <PreviousNextButtons
-          linkPrevious='/lead/property-details'
+          linkPrevious={
+            values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+              ? '/lead/property-details'
+              : '/lead/qualifier'
+          }
           linkNext={
             values?.applicants?.[activeIndex]?.applicant_details?.is_primary
               ? '/lead/reference-details'
@@ -252,7 +256,11 @@ const BankingDetails = () => {
 
         {loading ? (
           <div className='absolute w-full h-full bg-[#00000080] z-[9000]'>
-            <LoaderDynamicText text='Verifying your bank account' textColor='white' />
+            <LoaderDynamicText
+              text='Verifying your bank account'
+              textColor='white'
+              height='100vh'
+            />
           </div>
         ) : null}
       </div>

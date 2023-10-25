@@ -27,13 +27,12 @@ const selectedLoanType = 'LAP';
 const PropertyDetails = () => {
   const {
     values,
-    updateProgress,
     errors,
     touched,
     setFieldValue,
-    handleSubmit,
     setValues,
     updateProgressApplicantSteps,
+    activeIndex,
   } = useContext(LeadContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
@@ -58,12 +57,20 @@ const PropertyDetails = () => {
       } else {
         let newDefaultValues = structuredClone(defaultValuesLead);
         let addData = { ...newDefaultValues.property_details, [name]: e.value };
+        if (e.value === 'not-yet') {
+          addData.extra_params = {
+            ...addData.extra_params,
+            required_fields_status: {
+              property_identification_is: true,
+            },
+          };
+        }
         await addApi('property', {
           ...addData,
           lead_id: values?.lead?.id,
         })
           .then(async (res) => {
-            setFieldValue(`property_details.id`, res.id);
+            setFieldValue('property_details', { ...addData, id: res.id });
           })
           .catch((err) => {
             console.log(err);
@@ -79,6 +86,12 @@ const PropertyDetails = () => {
           pincode: null,
           city: '',
           state: '',
+          extra_params: {
+            ...values?.property_details?.extra_params,
+            required_fields_status: {
+              property_identification_is: true,
+            },
+          },
         });
 
         setValues({
@@ -93,6 +106,12 @@ const PropertyDetails = () => {
             pincode: null,
             city: '',
             state: '',
+            extra_params: {
+              ...values?.property_details?.extra_params,
+              required_fields_status: {
+                property_identification_is: true,
+              },
+            },
           },
         });
 
@@ -167,7 +186,16 @@ const PropertyDetails = () => {
 
         {/* <button onClick={handleSubmit}>submit</button> */}
 
-        <PreviousNextButtons linkPrevious='/lead/lnt-charges' linkNext='/lead/banking-details' />
+        <PreviousNextButtons
+          linkPrevious='/lead/lnt-charges'
+          linkNext='/lead/banking-details'
+          disablePrevious={
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          }
+          disableNext={
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          }
+        />
 
         <SwipeableDrawerComponent />
       </div>

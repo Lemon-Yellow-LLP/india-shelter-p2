@@ -2134,7 +2134,14 @@ const UploadDocuments = () => {
         />
       </div>
 
-      <PreviousNextButtons linkPrevious='/lead/reference-details' linkNext='/lead/preview' />
+      <PreviousNextButtons
+        linkPrevious={
+          values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+            ? '/lead/reference-details'
+            : '/lead/banking-details'
+        }
+        linkNext='/lead/preview'
+      />
       <SwipeableDrawerComponent />
     </div>
   );

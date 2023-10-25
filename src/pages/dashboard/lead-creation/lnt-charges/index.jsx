@@ -77,7 +77,6 @@ const LnTCharges = ({ amount = 1500 }) => {
         // check whether LnT exists
         if (values?.lead?.id) {
           const resp = await checkIfLntExists(values?.lead?.id);
-          console.log('----- ', resp);
           setFieldValue('lt_charges', resp);
           setPaymentStatus('success');
         }
@@ -229,7 +228,7 @@ const LnTCharges = ({ amount = 1500 }) => {
       {!paymentStatus ? (
         <>
           <div className='overflow-hidden flex flex-col h-[100vh] bg-medium-grey'>
-            <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+            <Topbar title='L&T Charges' id={values?.lead?.id} showClose={true} />
 
             <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
               <div className='flex flex-col'>
@@ -467,9 +466,9 @@ const PaymentSuccess = ({ amount, method }) => {
   const { values } = useContext(LeadContext);
   return (
     <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
-      <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
-      <div className='h-screen bg-[#EEF0DD] flex flex-col w-full'>
-        <div className='flex-1 flex-col flex items-center z-0 overflow-auto'>
+      <Topbar title='L&T Charges' id={values?.lead?.id} showClose={true} />
+      <div className='h-screen bg-[#EEF0DD] flex flex-col w-full overflow-x-hidden'>
+        <div className='flex-1 flex-col flex items-center z-0 overflow-auto overflow-x-hidden'>
           {/* <div className='w-full relative z-0'> */}
           <div className='flex justify-center pointer-events-none'>
             <PaymentSuccessIllustration />
@@ -489,7 +488,7 @@ const PaymentSuccess = ({ amount, method }) => {
           {/* </div> */}
         </div>
       </div>
-      <div className='mt-auto w-full p-4 bg-[#EEF0DD]'>
+      <div className='mt-auto w-full p-4 fixed bottom-0'>
         <Button primary={true} inputClasses='h-12' link='/lead/property-details'>
           Next
         </Button>
@@ -502,7 +501,7 @@ const PaymentFailure = ({ back, skip }) => {
   const { values } = useContext(LeadContext);
   return (
     <div className='overflow-hidden flex flex-col h-[100vh]'>
-      <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+      <Topbar title='L&T Charges' id={values?.lead?.id} showClose={true} />
       <div className='h-screen bg-medium-grey flex flex-col w-full'>
         <div className='flex-1 flex items-center z-0'>
           <div className='w-full relative z-0'>

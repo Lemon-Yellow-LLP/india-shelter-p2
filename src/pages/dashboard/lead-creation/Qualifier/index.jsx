@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { create } from '@lottiefiles/lottie-interactivity';
-
 import InfoIcon from '../../../../assets/icons/info.svg';
 import loading from '../../../../assets/icons/loading.svg';
 import {
@@ -24,7 +23,7 @@ import { LeadContext } from '../../../../context/LeadContextProvider';
 import Topbar from '../../../../components/Topbar';
 
 const Qualifier = () => {
-  const { activeIndex, values, setFieldValue } = useContext(LeadContext);
+  const { activeIndex, values, setFieldValue, addApplicant } = useContext(LeadContext);
 
   const SpeedoMeterAnimationRef = useRef(null);
 
@@ -441,7 +440,7 @@ const Qualifier = () => {
         <Topbar title='Qualifier' id={values?.lead?.id} showClose={true} />
       ) : (
         <Topbar
-          title='Adding Co-applicant'
+          title='Qualifier'
           id={values?.lead?.id}
           showClose={false}
           showBack={true}
@@ -449,7 +448,7 @@ const Qualifier = () => {
         />
       )}
 
-      <div className='p-4 relative h-screen'>
+      <div className='p-4 overflow-auto' style={{ height: 'calc(100vh - 211px)' }}>
         <div className='flex items-start gap-2'>
           <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
           <p className='text-xs not-italic font-normal text-dark-grey'>
@@ -885,23 +884,27 @@ const Qualifier = () => {
             </div>
           </div>
         </div>
-
-        <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center'>
-          Do not close the app or go back. Please wait for ID <br /> verification as it may take
-          some time. We are validating these checks as per your consent
-        </p>
+        <div>
+          <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center'>
+            Do not close the app or go back. Please wait for ID <br /> verification as it may take
+            some time. We are validating these checks as per your consent
+          </p>
+        </div>
       </div>
 
-      <div className='flex flex-col gap-[18px] bottom-0 fixed w-full p-4 justify-center'>
+      <div className='flex flex-col gap-[18px] bottom-0 fixed w-full p-4 justify-center bg-white'>
         <div className='flex items-start gap-2'>
           <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
           <p className='text-sm not-italic font-normal text-dark-grey'>
-            Eligibility can be increased by adding Co-applicant{' '}
+            Eligibility can be increased by adding Co-applicant
             <Button
               className={`underline ${
                 !bre101.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
               }`}
-              link='/lead/applicant-details'
+              onClick={(e) => {
+                e.preventDefault();
+                addApplicant();
+              }}
             >
               Add now
             </Button>

@@ -639,17 +639,7 @@ const Eligibility = () => {
 
   return (
     <>
-      {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
-        <Topbar title='Eligibility' id={values?.lead?.id} showClose={true} />
-      ) : (
-        <Topbar
-          title='Adding Co-applicant'
-          id={values?.lead?.id}
-          showClose={false}
-          showBack={true}
-          coApplicant={true}
-        />
-      )}
+      <Topbar title='Eligibility' id={values?.lead?.id} showClose={true} />
 
       <div className='p-4 h-screen'>
         <ToastMessage message={toastMessage} setMessage={setToastMessage} />

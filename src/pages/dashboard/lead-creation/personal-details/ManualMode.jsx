@@ -147,7 +147,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
       if (
         pattern2.test(value) &&
-        e.target.name == `applicants[${activeIndex}].personal_details.father_husband_name`
+        (e.target.name == `applicants[${activeIndex}].personal_details.father_husband_name` ||
+          e.target.name == `applicants[${activeIndex}].personal_details.mother_name`)
       ) {
         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
@@ -331,8 +332,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       `applicants[${activeIndex}].personal_details.mobile_number`,
       values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
     );
-    if (values?.applicants[activeIndex]?.personal_details?.id)
-      updateFields('mobile_number', values.applicant_details?.mobile_number);
+    updateFields('mobile_number', values.applicant_details?.mobile_number);
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
   useEffect(() => {
@@ -421,7 +421,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             (e.key === 'ArrowUp' ||
               e.key === 'ArrowDown' ||
               e.key === 'ArrowLeft' ||
-              e.key === 'ArrowRight')
+              e.key === 'ArrowRight' ||
+              e.key === ' ' ||
+              e.keyCode === 32)
           ) {
             e.preventDefault();
           }

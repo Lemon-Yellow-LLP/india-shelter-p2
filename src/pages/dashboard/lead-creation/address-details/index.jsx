@@ -52,7 +52,11 @@ export default function AddressDetails() {
 
   const handleRadioChange = useCallback(
     async (e) => {
-      if (e.value === 'Rented') {
+      if (
+        e.value === 'Rented' &&
+        values?.applicants?.[activeIndex]?.address_detail?.extra_params
+          ?.permanent_address_same_as_current
+      ) {
         handlePermanentSameAsCurrentAddress(false, e.value);
       }
 
@@ -70,7 +74,15 @@ export default function AddressDetails() {
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
         })
           .then(async (res) => {
-            setFieldValue(`applicants[${activeIndex}].address_detail.id`, res.id);
+            setFieldValue(`applicants[${activeIndex}].address_detail`, {
+              ...addData,
+              applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+              id: res.id,
+            });
+            setRequiredFieldsStatus(() => ({
+              ...addData.extra_params.required_fields_status,
+              [name]: true,
+            }));
             await editFieldsById(
               values?.applicants[activeIndex]?.applicant_details?.id,
               'applicant',
@@ -124,6 +136,7 @@ export default function AddressDetails() {
     }
 
     editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+      current_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
       current_city: res.city,
       current_state: res.state,
     });
@@ -136,6 +149,7 @@ export default function AddressDetails() {
         ?.permanent_address_same_as_current
     ) {
       editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+        permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
         permanent_city: res.city,
         permanent_state: res.state,
       });
@@ -257,6 +271,7 @@ export default function AddressDetails() {
     }
 
     editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+      permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode,
       permanent_city: res.city,
       permanent_state: res.state,
     });
