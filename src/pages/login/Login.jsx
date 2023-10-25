@@ -193,7 +193,7 @@ export default function Login() {
 
   return (
     <>
-      <div className='bg-[#CCE2BE] overflow-hidden h-[100vh]'>
+      <div className='bg-[#CCE2BE] overflow-hidden h-[100vh] relative'>
         <Header />
         <div>
           <img src='./IS-Login-Logo.png' alt='login-logo' />
@@ -203,7 +203,7 @@ export default function Login() {
           style={{
             height: 'calc(100vh - 290px)',
           }}
-          className='flex flex-col gap-5 px-4 pb-4 pt-3 rounded-t-2xl bg-white overflow-auto no-scrollbar'
+          className='absolute bottom-0 w-full flex flex-col gap-5 px-4 pb-4 pt-3 rounded-t-2xl bg-white overflow-auto no-scrollbar'
         >
           <div>
             <h2 className='text-primary-black font-semibold'>Welcome!</h2>
