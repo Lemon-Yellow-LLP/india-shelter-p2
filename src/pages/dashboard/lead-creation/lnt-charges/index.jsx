@@ -25,6 +25,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import Topbar from '../../../../components/Topbar';
 import PropTypes from 'prop-types';
+import { CircularProgress } from '@mui/material';
 
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
@@ -261,7 +262,7 @@ const LnTCharges = ({ amount = 1500 }) => {
                         <div className='flex justify-center items-center py-2'>
                           {loadingQr ? (
                             <div className='w-[180px] h-[180px] flex justify-center items-center'>
-                              <LoaderIcon className='w-12 h-12' />
+                              <CircularProgress color='error' />
                             </div>
                           ) : (
                             <QRCode title='GeeksForGeeks' value={qrCode} size={180} />
