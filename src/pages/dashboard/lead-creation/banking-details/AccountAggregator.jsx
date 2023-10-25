@@ -114,7 +114,7 @@ export default function AccountAggregator() {
             message={aaInitiated ? 'In Process' : null}
             name='aa_mobile_no'
             label='Mobile number'
-            placeholder='Eg: 123456789'
+            placeholder='Eg: 1234567890'
             required
             type='tel'
             value={mobileNo}
