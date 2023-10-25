@@ -304,8 +304,8 @@ function ImageUpload({
               <div className='flex gap-2 h-[85px]'>
                 {uploads.data.map((upload, index) => {
                   return (
-                    <div key={index} className='overflow-hidden rounded-lg relative w-[68px]'>
-                      <button className='absolute right-0 top-0 z-20 w-4 h-4'>
+                    <div key={index} className='rounded-lg relative w-[68px]'>
+                      <button className='absolute right-[-4px] top-[-4px] z-20 w-4 h-4'>
                         <svg
                           width='16'
                           height='16'
@@ -333,7 +333,7 @@ function ImageUpload({
                       </button>
 
                       <div className='relative rounded-md h-full w-full'>
-                        <div className='absolute h-full w-full bg-black opacity-40'></div>
+                        <div className='absolute h-full w-full bg-black opacity-40 rounded-lg'></div>
                         <button
                           className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
                           onClick={() => {
@@ -361,7 +361,7 @@ function ImageUpload({
                         <img
                           src={upload.document_fetch_url}
                           alt='Gigs'
-                          className='object-cover object-center h-full w-full'
+                          className='object-cover object-center h-full w-full rounded-lg'
                         />
                       </div>
                     </div>
