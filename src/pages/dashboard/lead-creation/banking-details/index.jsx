@@ -241,7 +241,11 @@ const BankingDetails = () => {
         </div>
 
         <PreviousNextButtons
-          linkPrevious='/lead/property-details'
+          linkPrevious={
+            values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+              ? '/lead/property-details'
+              : '/lead/qualifier'
+          }
           linkNext={
             values?.applicants?.[activeIndex]?.applicant_details?.is_primary
               ? '/lead/reference-details'

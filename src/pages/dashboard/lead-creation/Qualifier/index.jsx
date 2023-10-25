@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { create } from '@lottiefiles/lottie-interactivity';
-
 import InfoIcon from '../../../../assets/icons/info.svg';
 import loading from '../../../../assets/icons/loading.svg';
 import {
@@ -896,7 +895,7 @@ const Qualifier = () => {
         <div className='flex items-start gap-2'>
           <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
           <p className='text-sm not-italic font-normal text-dark-grey'>
-            Eligibility can be increased by adding Co-applicant{' '}
+            Eligibility can be increased by adding Co-applicant
             <Button
               className={`underline ${
                 !bre101.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'

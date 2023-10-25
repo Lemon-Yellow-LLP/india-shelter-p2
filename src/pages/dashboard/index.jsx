@@ -15,6 +15,7 @@ import { parseISO } from 'date-fns';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { defaultValuesLead } from '../../context/defaultValuesLead';
 import PropTypes from 'prop-types';
+import LoaderDynamicText from '../../components/Loader/LoaderDynamicText';
 
 LeadCard.propTypes = {
   title: PropTypes.string,
@@ -25,10 +26,12 @@ LeadCard.propTypes = {
 };
 
 export default function Dashboard() {
-  const { setValues } = useContext(LeadContext);
+  const { setValues, setActiveIndex } = useContext(LeadContext);
   const [leadList, setLeadList] = useState([]);
   const [primaryApplicantList, setPrimaryApplicantList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
+
+  const [loading, setLoading] = useState(false);
 
   const [query, setQuery] = useState('');
   const [selectionRange, setSelectionRange] = useState({
@@ -61,12 +64,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       const data = await getDashboardLeadList({
         fromDate: selectionRange.startDate,
         toDate: moment(selectionRange.endDate).add(1, 'day'),
       });
       const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
       setLeadList(formatted);
+      setLoading(false);
     })();
   }, [selectionRange]);
 
@@ -105,49 +110,54 @@ export default function Dashboard() {
           />
         </div>
       </div>
-
-      <div className='px-4 h-full bg-[#FAFAFA] overflow-auto'>
-        {/* List of leads */}
-
-        {leadList?.applicants?.length === 0 ? (
-          <div className='relative flex-1 flex h-full justify-center translate-y-20'>
-            <NoLeadIllustration />
-          </div>
-        ) : filteredList?.length ? (
-          <div className='relative flex-1 flex flex-col gap-2'>
-            {filteredList.map((lead, i) => {
-              const applicant = lead?.applicants?.find((applicant) => applicant?.is_primary);
-              return (
-                <LeadCard
-                  key={i}
-                  id={applicant?.lead_id ?? '-'}
-                  title={`${
-                    applicant
-                      ? applicant.first_name +
-                        ' ' +
-                        applicant?.middle_name +
-                        ' ' +
-                        applicant?.last_name
-                      : '-'
-                  }`}
-                  progress={lead?.extra_params?.progress ?? 0}
-                  created={moment(applicant?.created_at).format('DD/MM/YYYY')}
-                  mobile={applicant?.mobile_number ?? '-'}
-                />
-              );
-            })}
-            <div className='h-[250px]'></div>
-          </div>
-        ) : (
-          <div className='relative flex-1 flex h-full justify-center translate-y-20'>
-            <NoSearchResultIllustration />
-          </div>
-        )}
-      </div>
+      {!loading ? (
+        <div className='px-4 h-full bg-[#FAFAFA] overflow-auto'>
+          {/* List of leads */}
+          {leadList?.applicants?.length === 0 ? (
+            <div className='relative flex-1 flex h-full justify-center translate-y-20'>
+              <NoLeadIllustration />
+            </div>
+          ) : filteredList?.length ? (
+            <div className='relative flex-1 flex flex-col gap-2'>
+              {filteredList.map((lead, i) => {
+                const applicant = lead?.applicants?.find((applicant) => applicant?.is_primary);
+                return (
+                  <LeadCard
+                    key={i}
+                    id={applicant?.lead_id ?? '-'}
+                    title={`${
+                      applicant
+                        ? applicant.first_name +
+                          ' ' +
+                          applicant?.middle_name +
+                          ' ' +
+                          applicant?.last_name
+                        : '-'
+                    }`}
+                    progress={lead?.extra_params?.progress ?? 0}
+                    created={moment(applicant?.created_at).format('DD/MM/YYYY')}
+                    mobile={applicant?.mobile_number ?? '-'}
+                  />
+                );
+              })}
+              <div className='h-[250px]'></div>
+            </div>
+          ) : (
+            <div className='relative flex-1 flex h-full justify-center translate-y-20'>
+              <NoSearchResultIllustration />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className='absolute w-full h-[100%] bg-white'>
+          <LoaderDynamicText text='Loading...' textColor='black' extraClasses='h-[60%]' />
+        </div>
+      )}
       <button
         onClick={() => {
           let newDefaultValues = structuredClone(defaultValuesLead);
           setValues(newDefaultValues);
+          setActiveIndex(0);
           navigate('/lead/applicant-details');
         }}
         className='fixed bottom-4 right-6 z-50 w-fit inline-flex items-center gap-1 p-3 bg-primary-red rounded-full'
