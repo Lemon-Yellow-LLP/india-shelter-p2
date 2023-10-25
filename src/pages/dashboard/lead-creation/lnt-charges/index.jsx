@@ -467,8 +467,8 @@ const PaymentSuccess = ({ amount, method }) => {
   return (
     <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
       <Topbar title='L&T Charges' id={values?.lead?.id} showClose={true} />
-      <div className='h-screen bg-[#EEF0DD] flex flex-col w-full'>
-        <div className='flex-1 flex-col flex items-center z-0 overflow-auto'>
+      <div className='h-screen bg-[#EEF0DD] flex flex-col w-full overflow-x-hidden'>
+        <div className='flex-1 flex-col flex items-center z-0 overflow-auto overflow-x-hidden'>
           {/* <div className='w-full relative z-0'> */}
           <div className='flex justify-center pointer-events-none'>
             <PaymentSuccessIllustration />
@@ -488,7 +488,7 @@ const PaymentSuccess = ({ amount, method }) => {
           {/* </div> */}
         </div>
       </div>
-      <div className='mt-auto w-full p-4 bg-[#EEF0DD]'>
+      <div className='mt-auto w-full p-4 fixed bottom-0'>
         <Button primary={true} inputClasses='h-12' link='/lead/property-details'>
           Next
         </Button>

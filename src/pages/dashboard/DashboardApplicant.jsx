@@ -509,8 +509,12 @@ export default function DashboardApplicant() {
           <FormDetails
             title='QUALIFIER'
             ref={primarySelectedStep == 'qualifier' ? primarySelectedStepRef : null}
-            progress={0}
             data={[]}
+            message={
+              primaryApplicant?.applicant_details?.extra_params?.qualifier
+                ? 'Qualifier completed'
+                : 'Qualifier incomplete'
+            }
           />
           <Separator />
 
@@ -1026,6 +1030,7 @@ export default function DashboardApplicant() {
             title='BANKING DETAILS'
             progress={activeCoApplicant?.applicant_details?.extra_params?.banking_progress}
             data={[]}
+            message={'Will fill this once Banking details is done'}
           />
           <Separator />
 
@@ -1041,8 +1046,12 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={coApplicantSelectedStep == 'qualifier' ? coApplicantSelectedStepRef : null}
             title='QUALIFIER'
-            progress={null}
             data={[]}
+            message={
+              activeCoApplicant?.applicant_details?.extra_params?.qualifier
+                ? 'Qualifier completed'
+                : 'Qualifier incomplete'
+            }
           />
 
           <div className='h-[500px] w-full'></div>
@@ -1097,11 +1106,9 @@ const Titlebar = ({ title, id }) => {
 
     setValues({ ...data, applicants: newApplicants });
 
-    let primaryIndex = newApplicants.map((applicant, index) => {
-      if (applicant.applicant_details.is_primary) {
-        return index;
-      }
-    });
+    let primaryIndex = newApplicants
+      .map((applicant, index) => (applicant.applicant_details.is_primary ? index : -1))
+      .filter((index) => index !== -1);
 
     setActiveIndex(primaryIndex[0] ?? 0);
 
@@ -1113,7 +1120,7 @@ const Titlebar = ({ title, id }) => {
       id='titlebar'
       className='sticky inset-0 bg-neutral-white h-fit flex items-start px-4 py-3 border border-[#ECECEC]'
     >
-      <button classes={{ padding: '0' }} onClick={() => navigate('/dashboard')} className='mr-3'>
+      <button className='p-0 mr-3' onClick={() => navigate('/dashboard')}>
         <BackIcon2 />
       </button>
       <div className='flex-1'>
