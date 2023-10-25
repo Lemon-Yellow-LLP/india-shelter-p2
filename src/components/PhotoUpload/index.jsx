@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
-import { editFieldsById, getApplicantById } from '../../global';
+import { editDoc, editFieldsById, getApplicantById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
 
 function PhotoUpload({
@@ -12,35 +12,18 @@ function PhotoUpload({
   setUploads,
   label,
   hint,
+  setLatLong,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
   const [message, setMessage] = useState();
   const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
-  const [lat, setLat] = useState('');
-  const [long, setLong] = useState('');
 
   const handleFile = async (e) => {
     setMessage('');
 
     setLoader(true);
-
-    let userLocation = navigator.geolocation;
-
-    if (userLocation) {
-      userLocation.getCurrentPosition(success);
-    } else {
-      ('The geolocation API is not supported by your browser.');
-    }
-
-    function success(data) {
-      let lat = data.coords.latitude;
-      let long = data.coords.longitude;
-
-      setLat(lat);
-      setLong(long);
-    }
 
     let file = e.target.files;
 
@@ -62,6 +45,8 @@ function PhotoUpload({
     const type = uploads.type;
 
     setFile(files.filter((x) => x.name !== id));
+
+    await editDoc(id, { active: false });
 
     const applicant = await getApplicantById(
       values?.applicants?.[activeIndex]?.applicant_details.id,
@@ -107,6 +92,26 @@ function PhotoUpload({
   useEffect(() => {
     uploads && setLoader(false);
   }, [uploads]);
+
+  useEffect(() => {
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      ('The geolocation API is not supported by your browser.');
+    }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+
+      setLatLong({
+        lat: lat,
+        long: long,
+      });
+    }
+  }, []);
 
   return (
     <div className='w-full'>
@@ -217,8 +222,6 @@ function PhotoUpload({
                 index={0}
                 singlePhoto={uploads.data}
                 callback={removeImage}
-                lat={lat}
-                long={long}
               />
 
               <div>
@@ -235,7 +238,7 @@ function PhotoUpload({
             >
               <svg
                 width='24'
-                height='24'
+                height='40'
                 viewBox='0 0 24 24'
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'

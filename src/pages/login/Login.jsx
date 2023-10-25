@@ -124,6 +124,7 @@ export default function Login() {
             setFieldError('username', undefined);
             setShowOTPInput(false);
             setIsAuthenticated(true);
+            setLoData(res);
             return true;
           }
 
@@ -193,6 +194,8 @@ export default function Login() {
 
   return (
     <>
+      <ToastMessage message={toastMessage} setMessage={setToastMessage} />
+
       <div className='bg-[#CCE2BE] overflow-hidden h-[100vh] relative'>
         <Header />
         <div>
@@ -209,8 +212,6 @@ export default function Login() {
             <h2 className='text-primary-black font-semibold'>Welcome!</h2>
             <p className='text-dark-grey font-normal'>Login to continue</p>
           </div>
-
-          <ToastMessage message={toastMessage} setMessage={setToastMessage} />
 
           <TextInputWithSendOtp
             type='tel'
