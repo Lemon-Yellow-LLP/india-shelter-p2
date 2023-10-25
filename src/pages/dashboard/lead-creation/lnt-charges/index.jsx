@@ -77,7 +77,6 @@ const LnTCharges = ({ amount = 1500 }) => {
         // check whether LnT exists
         if (values?.lead?.id) {
           const resp = await checkIfLntExists(values?.lead?.id);
-          console.log('----- ', resp);
           setFieldValue('lt_charges', resp);
           setPaymentStatus('success');
         }
