@@ -15,6 +15,7 @@ import { parseISO } from 'date-fns';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { defaultValuesLead } from '../../context/defaultValuesLead';
 import PropTypes from 'prop-types';
+import { CircularProgress } from '@mui/material';
 
 LeadCard.propTypes = {
   title: PropTypes.string,
@@ -29,7 +30,7 @@ export default function Dashboard() {
   const [leadList, setLeadList] = useState([]);
   const [primaryApplicantList, setPrimaryApplicantList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [query, setQuery] = useState('');
   const [selectionRange, setSelectionRange] = useState({
     startDate: parseISO(moment().subtract(30, 'days').format()),
@@ -61,12 +62,19 @@ export default function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      const data = await getDashboardLeadList({
-        fromDate: selectionRange.startDate,
-        toDate: moment(selectionRange.endDate).add(1, 'day'),
-      });
-      const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
-      setLeadList(formatted);
+      try {
+        setIsLoading(true);
+        const data = await getDashboardLeadList({
+          fromDate: selectionRange.startDate,
+          toDate: moment(selectionRange.endDate).add(1, 'day'),
+        });
+        const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
+        setLeadList(formatted);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
     })();
   }, [selectionRange]);
 
@@ -109,7 +117,11 @@ export default function Dashboard() {
       <div className='px-4 h-full bg-[#FAFAFA] overflow-auto'>
         {/* List of leads */}
 
-        {leadList?.applicants?.length === 0 ? (
+        {isLoading ? (
+          <div className='flex w-full mt-10 justify-center'>
+            <CircularProgress color='error' />
+          </div>
+        ) : leadList?.applicants?.length === 0 ? (
           <div className='relative flex-1 flex h-full justify-center translate-y-20'>
             <NoLeadIllustration />
           </div>
