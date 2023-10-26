@@ -29,6 +29,7 @@
         "caughtErrorsIgnorePattern": "^_"
       }
     ],
+    "no-redeclare": "error", // Add this line to detect duplicate variables
 
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",

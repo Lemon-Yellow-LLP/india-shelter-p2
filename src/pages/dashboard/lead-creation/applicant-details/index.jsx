@@ -535,7 +535,10 @@ const ApplicantDetails = () => {
                   current={values.lead?.loan_type}
                   onChange={onLoanTypeChange}
                   containerClasses='flex-1'
-                  disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+                  disabled={
+                    !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  }
                 >
                   {data.icon}
                 </CardRadio>
@@ -552,7 +555,10 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
             onChange={handleLoanAmountChange}
             displayError={false}
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
             inputClasses='font-semibold'
           />
 
@@ -563,7 +569,10 @@ const ApplicantDetails = () => {
             initialValue={values.lead?.applied_amount}
             min={100000}
             max={5000000}
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
             step={50000}
           />
 
@@ -601,7 +610,10 @@ const ApplicantDetails = () => {
                 }
               }
             }}
-            disabled={inputDisabled}
+            disabled={
+              inputDisabled ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
             onChange={handleFirstNameChange}
             inputClasses='capitalize'
           />
@@ -618,7 +630,10 @@ const ApplicantDetails = () => {
                   touched.applicants &&
                   touched?.applicants[activeIndex]?.applicant_details?.middle_name
                 }
-                disabled={inputDisabled}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
                 onBlur={(e) => {
                   handleBlur(e);
                   const name = e.currentTarget.name.split('.')[2];
@@ -643,7 +658,10 @@ const ApplicantDetails = () => {
                   touched?.applicants[activeIndex]?.applicant_details?.last_name
                 }
                 placeholder='Eg: Swami, Singh'
-                disabled={inputDisabled}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
                 name={`applicants[${activeIndex}].applicant_details.last_name`}
                 onChange={handleTextInputChange}
                 inputClasses='capitalize'
@@ -680,6 +698,7 @@ const ApplicantDetails = () => {
               checkDate(e.target.value);
             }}
             reference={dateInputRef}
+            disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
           />
 
           <TextInputWithSendOtp
@@ -705,7 +724,8 @@ const ApplicantDetails = () => {
             }
             disabled={
               disablePhoneNumber ||
-              values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified
+              values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
             }
             message={
               values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified
@@ -778,7 +798,10 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
             defaultSelected={values.lead?.purpose_of_loan}
             inputClasses='mt-2'
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
           />
 
           <DropDown
@@ -806,7 +829,10 @@ const ApplicantDetails = () => {
             touched={touched && touched?.lead?.property_type}
             error={errors && errors?.lead?.property_type}
             onBlur={handleBlur}
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
           />
         </div>
         <PreviousNextButtons

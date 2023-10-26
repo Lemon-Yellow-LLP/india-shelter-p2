@@ -298,6 +298,9 @@ const WorkIncomeDetails = () => {
                     current={values?.applicants?.[activeIndex]?.work_income_detail?.profession}
                     onChange={handleRadioChange}
                     containerClasses='flex-1'
+                    disabled={
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                    }
                   >
                     {option.icon}
                   </CardRadio>
@@ -398,6 +401,9 @@ const WorkIncomeDetails = () => {
                     }
                   }
                 }}
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <TextInput
@@ -453,6 +459,9 @@ const WorkIncomeDetails = () => {
                     }
                   }
                 }}
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <TextInput
@@ -504,6 +513,9 @@ const WorkIncomeDetails = () => {
                     }
                   }
                 }}
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <TextInput
@@ -555,6 +567,9 @@ const WorkIncomeDetails = () => {
                     }
                   }
                 }}
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <TextInput
@@ -634,12 +649,15 @@ const WorkIncomeDetails = () => {
                   );
                 }}
                 inputClasses='hidearrow'
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <TextInput
                 label='City'
                 placeholder='Eg: Nashik'
-                disabled
+                disabled={true}
                 name={`applicants[${activeIndex}].work_income_detail.city`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.city}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.city}
@@ -661,7 +679,7 @@ const WorkIncomeDetails = () => {
               <TextInput
                 label='State'
                 placeholder='Eg: Maharashtra'
-                disabled
+                disabled={true}
                 name={`applicants[${activeIndex}].work_income_detail.state`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.state}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.state}
@@ -702,6 +720,10 @@ const WorkIncomeDetails = () => {
                         }
                         onChange={handleRadioChange}
                         containerClasses='flex-1'
+                        disabled={
+                          values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                            ?.qualifier
+                        }
                       ></CardRadioWithoutIcon>
                     );
                   })}
@@ -763,6 +785,9 @@ const WorkIncomeDetails = () => {
                     }
                   }
                 }}
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <div className='flex flex-col gap-2'>
@@ -782,6 +807,10 @@ const WorkIncomeDetails = () => {
                         }
                         onChange={handleRadioChange}
                         containerClasses='flex-1'
+                        disabled={
+                          values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                            ?.qualifier
+                        }
                       ></CardRadioWithoutIcon>
                     );
                   })}
