@@ -25,6 +25,7 @@ export default function Topbar({
   showBack = false,
   showClose = true,
   coApplicant,
+  handleBack,
 }) {
   const navigate = useNavigate();
 
@@ -38,7 +39,13 @@ export default function Topbar({
         className='sticky inset-0 bg-white h-fit flex items-start px-4 py-3 border border-[#ECECEC] z-[200]'
       >
         {showBack ? (
-          <button onClick={() => navigate(-1)} className='mt-2 mr-3'>
+          <button
+            onClick={() => {
+              navigate(-1);
+              handleBack();
+            }}
+            className='mt-2 mr-3'
+          >
             <svg
               xmlns='http://www.w3.org/2000/svg'
               width='14'

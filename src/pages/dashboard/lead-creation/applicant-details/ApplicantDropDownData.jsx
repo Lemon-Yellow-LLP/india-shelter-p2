@@ -93,8 +93,8 @@ export const loanPurposeDataLap = [
     value: 'Personal usage',
   },
   {
-    label: 'Personal usage BT+Top-up',
-    value: 'Personal usage BT+Top-up',
+    label: 'BT+Top-up',
+    value: 'BT+Top-up',
   },
 ];
 
