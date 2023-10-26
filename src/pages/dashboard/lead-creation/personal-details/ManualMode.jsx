@@ -137,6 +137,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const handleTextInputChange = useCallback(
     (e) => {
+      if (e.target.value === ' ') {
+        return;
+      }
       const value = e.target.value;
       const pattern = /^[A-Za-z]+$/;
       const pattern2 = /^[a-zA-Z\s]*$/;
