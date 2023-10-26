@@ -417,6 +417,9 @@ export default function AddressDetails() {
                     values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence
                   }
                   onChange={handleRadioChange}
+                  disabled={
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  }
                 >
                   {residence.icon}
                 </CardRadio>
@@ -481,7 +484,10 @@ export default function AddressDetails() {
                     }
                   }
                 }}
-                disabled={inputDisabled}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
@@ -552,7 +558,10 @@ export default function AddressDetails() {
                     }
                   }
                 }}
-                disabled={inputDisabled}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
@@ -612,7 +621,10 @@ export default function AddressDetails() {
                     }
                   }
                 }}
-                disabled={inputDisabled}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const pattern = /^[A-Za-z\s]+$/;
@@ -670,7 +682,10 @@ export default function AddressDetails() {
                     }
                   }
                 }}
-                disabled={inputDisabled}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
                   const pattern = /^[A-Za-z\s]+$/;
@@ -702,7 +717,10 @@ export default function AddressDetails() {
                 value={values?.applicants?.[activeIndex]?.address_detail?.current_pincode}
                 error={errors?.applicants?.[activeIndex]?.address_detail?.current_pincode}
                 touched={touched?.applicants?.[activeIndex]?.address_detail?.current_pincode}
-                disabled={inputDisabled}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
                 onBlur={(e) => {
                   handleBlur(e);
                   handleCurrentPincodeChange();
@@ -809,6 +827,10 @@ export default function AddressDetails() {
                           ?.current_no_of_year_residing
                       }
                       onChange={handleRadioChange}
+                      disabled={
+                        values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                          ?.qualifier
+                      }
                     >
                       <span
                         className={`${
@@ -845,7 +867,8 @@ export default function AddressDetails() {
                     }}
                     disabled={
                       values?.applicants?.[activeIndex]?.address_detail
-                        ?.current_type_of_residence !== 'Self owned'
+                        ?.current_type_of_residence !== 'Self owned' ||
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                     }
                   />
 
@@ -896,7 +919,8 @@ export default function AddressDetails() {
                 disabled={
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    ?.permanent_address_same_as_current
+                    ?.permanent_address_same_as_current ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
@@ -951,7 +975,8 @@ export default function AddressDetails() {
                 disabled={
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    ?.permanent_address_same_as_current
+                    ?.permanent_address_same_as_current ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
@@ -997,7 +1022,8 @@ export default function AddressDetails() {
                 disabled={
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    ?.permanent_address_same_as_current
+                    ?.permanent_address_same_as_current ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
@@ -1043,7 +1069,8 @@ export default function AddressDetails() {
                 disabled={
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    ?.permanent_address_same_as_current
+                    ?.permanent_address_same_as_current ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
                   const value = e.currentTarget.value;
@@ -1079,7 +1106,8 @@ export default function AddressDetails() {
                 disabled={
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                    ?.permanent_address_same_as_current
+                    ?.permanent_address_same_as_current ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onBlur={(e) => {
                   handleBlur(e);
@@ -1189,7 +1217,9 @@ export default function AddressDetails() {
                       onChange={handleRadioChange}
                       disabled={
                         values?.applicants?.[activeIndex]?.address_detail?.extra_params
-                          ?.permanent_address_same_as_current
+                          ?.permanent_address_same_as_current ||
+                        values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                          ?.qualifier
                       }
                     >
                       <span
