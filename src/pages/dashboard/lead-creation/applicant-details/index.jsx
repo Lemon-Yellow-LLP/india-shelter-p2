@@ -158,7 +158,8 @@ const ApplicantDetails = () => {
 
   const handleFirstNameChange = useCallback(
     (e) => {
-      const value = e.currentTarget.value;
+      let value = e.currentTarget.value;
+      value = value.trimStart().replace(/\s\s+/g, ' ');
       const pattern = /^[A-Za-z][A-Za-z\s]*$/;
       if (pattern.exec(value)) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
