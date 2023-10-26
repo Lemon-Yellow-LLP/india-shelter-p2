@@ -2042,7 +2042,7 @@ const UploadDocuments = () => {
           imageArrayBorder={true}
         />
 
-        {values.applicants[activeIndex]?.work_income_detail.profession === 'Salaried' && (
+        {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' && (
           <ImageUpload
             files={salarySlipPhotos}
             setFile={setSalarySlipPhotos}

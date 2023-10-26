@@ -88,6 +88,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
             }
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <DropDown
@@ -104,6 +105,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.industries}
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.industries}
         onBlur={handleBlur}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       {values?.applicants?.[activeIndex]?.work_income_detail?.industries === 'Others' && (
@@ -149,6 +151,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
             }
           }}
+          disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
         />
       )}
 
@@ -196,6 +199,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInput
@@ -278,6 +282,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
             no_current_loan: false,
           }));
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
       <CurrencyInput
         label='Ongoing EMI(s)'
@@ -328,7 +333,9 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
         disabled={
-          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0
+            ? true
+            : false || values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
         }
         labelDisabled={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
