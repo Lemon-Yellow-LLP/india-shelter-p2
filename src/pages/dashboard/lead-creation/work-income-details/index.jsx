@@ -14,6 +14,7 @@ import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Popup from '../../../../components/Popup';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -40,6 +41,12 @@ const WorkIncomeDetails = () => {
   const [openExistingPopup, setOpenExistingPopup] = useState(
     values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing || false,
   );
+
+  const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(false);
+
+  const handleCloseQualifierNotActivePopup = () => {
+    setOpenQualifierNotActivePopup(false);
+  };
 
   useEffect(() => {
     setRequiredFieldsStatus(
@@ -270,6 +277,13 @@ const WorkIncomeDetails = () => {
 
   return (
     <>
+      <Popup
+        handleClose={handleCloseQualifierNotActivePopup}
+        open={openQualifierNotActivePopup}
+        setOpen={setOpenQualifierNotActivePopup}
+        title='Qualifier is not activated'
+        description='Complete Applicant, Personal, Address and Work & Income details to activate'
+      />
       <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
           <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
@@ -822,15 +836,23 @@ const WorkIncomeDetails = () => {
 
         <PreviousNextButtons
           linkPrevious='/lead/address-details'
-          linkNext='/lead/qualifier'
-          onNextClick={handleNextClick}
-          onPreviousClick={() => setCurrentStepIndex(2)}
-          disableNext={
+          linkNext={
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !== 100 ||
             values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
             values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
             values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
+              ? null
+              : '/lead/qualifier'
           }
+          onNextClick={() =>
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !== 100 ||
+            values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
+            values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
+            values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
+              ? setOpenQualifierNotActivePopup(true)
+              : handleNextClick()
+          }
+          onPreviousClick={() => setCurrentStepIndex(2)}
         />
 
         <SwipeableDrawerComponent />
