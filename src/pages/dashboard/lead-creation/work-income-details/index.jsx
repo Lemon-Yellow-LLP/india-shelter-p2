@@ -495,7 +495,7 @@ const WorkIncomeDetails = () => {
                 }}
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z\s]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -549,7 +549,7 @@ const WorkIncomeDetails = () => {
                 }}
                 onChange={(e) => {
                   const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z\s]+$/;
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
