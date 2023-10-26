@@ -1147,6 +1147,19 @@ export default function DashboardApplicant() {
               },
             ]}
           />
+
+          <Separator />
+
+          <FormDetails
+            ref={coApplicantSelectedStep == 'qualifier' ? coApplicantSelectedStepRef : null}
+            title='QUALIFIER'
+            data={[]}
+            message={
+              activeCoApplicant?.applicant_details?.extra_params?.qualifier
+                ? 'Qualifier completed'
+                : 'Qualifier incomplete'
+            }
+          />
           <Separator />
 
           <FormDetails
@@ -1246,18 +1259,6 @@ export default function DashboardApplicant() {
                   : '-',
               },
             ]}
-          />
-          <Separator />
-
-          <FormDetails
-            ref={coApplicantSelectedStep == 'qualifier' ? coApplicantSelectedStepRef : null}
-            title='QUALIFIER'
-            data={[]}
-            message={
-              activeCoApplicant?.applicant_details?.extra_params?.qualifier
-                ? 'Qualifier completed'
-                : 'Qualifier incomplete'
-            }
           />
 
           <div className='h-[500px] w-full'></div>
