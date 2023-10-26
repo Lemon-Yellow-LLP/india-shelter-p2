@@ -21,6 +21,7 @@ import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import Topbar from '../../../../components/Topbar';
+import { useLocation } from 'react-router';
 
 const Qualifier = () => {
   const { activeIndex, values, setFieldValue, addApplicant } = useContext(LeadContext);
@@ -76,6 +77,8 @@ const Qualifier = () => {
     green: false,
   });
   const [finalApi, setFinalApi] = useState([]);
+
+  const location = useLocation();
 
   useEffect(() => {
     async function breOne() {
@@ -403,7 +406,7 @@ const Qualifier = () => {
     }
 
     breOne();
-  }, []);
+  }, [location]);
 
   function checkELigibilty() {
     if (bre101.red) {

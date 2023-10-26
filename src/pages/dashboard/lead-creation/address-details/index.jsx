@@ -390,7 +390,7 @@ export default function AddressDetails() {
         ) : (
           <Topbar
             title='Adding Co-applicant'
-            id={values?.lead?.id}
+            id={values?.applicants?.[activeIndex]?.applicant_details?.id}
             showClose={false}
             showBack={true}
             coApplicant={true}
@@ -630,7 +630,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   let value = e.currentTarget.value;
                   value = value?.trimStart()?.replace(/\s\s+/g, ' ');
-                  const pattern = /^[A-Za-z\s]+$/;
+                  const pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -692,7 +692,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   let value = e.currentTarget.value;
                   value = value?.trimStart()?.replace(/\s\s+/g, ' ');
-                  const pattern = /^[A-Za-z\s]+$/;
+                  const pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -1034,7 +1034,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   let value = e.currentTarget.value;
                   value = value?.trimStart()?.replace(/\s\s+/g, ' ');
-                  const pattern = /^[A-Za-z\s]+$/;
+                  const pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -1082,7 +1082,7 @@ export default function AddressDetails() {
                 onChange={(e) => {
                   let value = e.currentTarget.value;
                   value = value?.trimStart()?.replace(/\s\s+/g, ' ');
-                  const pattern = /^[A-Za-z\s]+$/;
+                  const pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!pattern.test(value) && value.length != 0) {
                     return;
                   }

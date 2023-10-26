@@ -130,6 +130,43 @@ export default function DashboardApplicant() {
     }
   }, [coApplicantSelectedStep, activeTab]);
 
+  const bankingDetailsArr = (applicant) => {
+    let arr = [];
+    applicant?.banking_details?.map(
+      (b, i) =>
+        (arr = [
+          ...arr,
+
+          {
+            subtitle: `ACCOUNT ${i + 1}`,
+            label: 'Bank name',
+            value: b?.bank_name,
+          },
+          {
+            label: 'Account number',
+            value: b?.account_number,
+          },
+          {
+            label: 'Penny drop',
+            value: b?.penny_drop_response?.result?.active === 'yes' ? 'Success' : 'Failed',
+          },
+          {
+            label: 'IFSC Code',
+            value: b?.ifsc_code,
+          },
+          {
+            label: 'Branch',
+            value: b?.branch_name,
+          },
+          {
+            label: 'Account type',
+            value: b?.account_type,
+          },
+        ]),
+    );
+    return arr;
+  };
+
   return (
     <div className='relative overflow-hidden h-screen'>
       <Titlebar
@@ -577,7 +614,7 @@ export default function DashboardApplicant() {
             title='BANKING DETAILS'
             ref={primarySelectedStep == 'banking_details' ? primarySelectedStepRef : null}
             progress={primaryApplicant?.applicant_details?.extra_params?.banking_progress}
-            data={[]}
+            data={bankingDetailsArr(primaryApplicant)}
           />
           <Separator />
 
@@ -659,8 +696,92 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={primarySelectedStep == 'upload_documents' ? primarySelectedStepRef : null}
             title='UPLOAD DOCUMENTS'
-            data={[]}
-            message={'Will fill this once Banking details is done'}
+            progress={primaryApplicant?.applicant_details?.extra_params?.upload_progress}
+            data={[
+              {
+                label: 'Customer photo',
+                value: primaryApplicant?.applicant_details?.document_meta?.customer_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'ID Type',
+                value: primaryApplicant?.personal_details?.id_type,
+              },
+              {
+                label: 'ID proof',
+                value: primaryApplicant?.applicant_details?.document_meta?.id_proof_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Address type',
+                value: primaryApplicant?.personal_details?.selected_address_proof,
+              },
+              {
+                label: 'Address proof',
+                value:
+                  primaryApplicant?.applicant_details?.document_meta?.address_proof_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Property papers',
+                value:
+                  primaryApplicant?.applicant_details?.document_meta?.property_paper_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Salary slip',
+                value:
+                  primaryApplicant?.applicant_details?.document_meta?.salary_slip_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Form 60',
+                value: primaryApplicant?.applicant_details?.document_meta?.form_60_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Property image',
+                value: primaryApplicant?.applicant_details?.document_meta?.property_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Upload selfie',
+                value: primaryApplicant?.applicant_details?.document_meta?.lo_selfie?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Other documents',
+                value: primaryApplicant?.applicant_details?.document_meta?.other_docs?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+            ]}
           />
           <Separator />
 
@@ -675,8 +796,11 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={primarySelectedStep == 'eligibility' ? primarySelectedStepRef : null}
             title='ELIGIBILITY'
-            data={[]}
-            message={'Will fill this once Banking details is done'}
+            message={
+              activeCoApplicant?.applicant_details?.extra_params?.eligibility
+                ? 'Eligibility completed'
+                : 'Eligibility incomplete'
+            }
           />
 
           <div className='h-[500px] w-full'></div>
@@ -1023,24 +1147,7 @@ export default function DashboardApplicant() {
               },
             ]}
           />
-          <Separator />
 
-          <FormDetails
-            ref={coApplicantSelectedStep == 'banking_details' ? coApplicantSelectedStepRef : null}
-            title='BANKING DETAILS'
-            progress={activeCoApplicant?.applicant_details?.extra_params?.banking_progress}
-            data={[]}
-            message={'Will fill this once Banking details is done'}
-          />
-          <Separator />
-
-          <FormDetails
-            ref={coApplicantSelectedStep == 'upload_documents' ? coApplicantSelectedStepRef : null}
-            title='UPLOAD DOCUMENTS'
-            progress={0}
-            data={[]}
-            message={'Will fill this once Banking details is done'}
-          />
           <Separator />
 
           <FormDetails
@@ -1052,6 +1159,106 @@ export default function DashboardApplicant() {
                 ? 'Qualifier completed'
                 : 'Qualifier incomplete'
             }
+          />
+          <Separator />
+
+          <FormDetails
+            ref={coApplicantSelectedStep == 'banking_details' ? coApplicantSelectedStepRef : null}
+            title='BANKING DETAILS'
+            progress={activeCoApplicant?.applicant_details?.extra_params?.banking_progress}
+            data={bankingDetailsArr(activeCoApplicant)}
+          />
+          <Separator />
+
+          <FormDetails
+            ref={coApplicantSelectedStep == 'upload_documents' ? coApplicantSelectedStepRef : null}
+            title='UPLOAD DOCUMENTS'
+            progress={activeCoApplicant?.applicant_details?.extra_params?.upload_progress}
+            data={[
+              {
+                label: 'Customer photo',
+                value: activeCoApplicant?.applicant_details?.document_meta?.customer_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'ID Type',
+                value: activeCoApplicant?.personal_details?.id_type,
+              },
+              {
+                label: 'ID proof',
+                value: activeCoApplicant?.applicant_details?.document_meta?.id_proof_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Address type',
+                value: activeCoApplicant?.personal_details?.selected_address_proof,
+              },
+              {
+                label: 'Address proof',
+                value:
+                  activeCoApplicant?.applicant_details?.document_meta?.address_proof_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Property papers',
+                value:
+                  activeCoApplicant?.applicant_details?.document_meta?.property_paper_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Salary slip',
+                value:
+                  activeCoApplicant?.applicant_details?.document_meta?.salary_slip_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Form 60',
+                value: activeCoApplicant?.applicant_details?.document_meta?.form_60_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Property image',
+                value: activeCoApplicant?.applicant_details?.document_meta?.property_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Upload selfie',
+                value: activeCoApplicant?.applicant_details?.document_meta?.lo_selfie?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Other documents',
+                value: activeCoApplicant?.applicant_details?.document_meta?.other_docs?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+            ]}
           />
 
           <div className='h-[500px] w-full'></div>

@@ -45,11 +45,11 @@ const DashboardRoutes = () => {
       };
 
       // Attach an event listener to track user activity
-      window.addEventListener('touchstart', resetSessionTimer);
+      window.addEventListener('touchmove', resetSessionTimer);
 
       // Clean up the event listener when the component unmounts
       return () => {
-        window.removeEventListener('touchstart', resetSessionTimer);
+        window.removeEventListener('touchmove', resetSessionTimer);
       };
     }, []);
 

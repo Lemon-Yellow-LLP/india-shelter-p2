@@ -13,6 +13,7 @@ import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import Popup from '../../../../components/Popup';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
@@ -38,6 +39,12 @@ const ReferenceDetails = () => {
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.reference_details?.extra_params?.required_fields_status,
   });
+
+  const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(false);
+
+  const handleCloseQualifierNotActivePopup = () => {
+    setOpenQualifierNotActivePopup(false);
+  };
 
   useEffect(() => {
     updateProgressApplicantSteps('reference_details', requiredFieldsStatus, 'reference');
@@ -282,6 +289,13 @@ const ReferenceDetails = () => {
 
   return (
     <>
+      <Popup
+        handleClose={handleCloseQualifierNotActivePopup}
+        open={openQualifierNotActivePopup}
+        setOpen={setOpenQualifierNotActivePopup}
+        title='Step is lock.'
+        description='Complete Qualifier to Unlock.'
+      />
       <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
         <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
@@ -935,10 +949,16 @@ const ReferenceDetails = () => {
         </div>
 
         <PreviousNextButtons
-          linkPrevious='/lead/banking-details'
+          linkPrevious={
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              ? '/lead/banking-details'
+              : null
+          }
           linkNext='/lead/upload-documents'
-          disablePrevious={
+          onPreviousClick={() =>
             !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              ? setOpenQualifierNotActivePopup(true)
+              : null
           }
         />
         <SwipeableDrawerComponent />
