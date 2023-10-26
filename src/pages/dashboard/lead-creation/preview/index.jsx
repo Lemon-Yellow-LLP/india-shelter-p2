@@ -528,28 +528,18 @@ export default function Preview() {
               index={coApplicantIndexes[coApplicantIndex]}
               hide={
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.banking_details.name
-                ]?.extra_params?.progress == 100
+                  pages.applicant_details.name
+                ]?.extra_params?.banking_progress == 100
               }
               title={pages.banking_details.title}
               link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
+              hideLabel={true}
               count={
-                flattedErrors &&
-                flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.banking_details.name
-                ] &&
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.banking_details.name
-                ] &&
-                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.banking_details.name
-                ]?.extra_params?.progress != 0
-                  ? Object.keys(
-                      flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                        pages.banking_details.name
-                      ],
-                    ).length
-                  : 'ALL'
+                  pages.applicant_details.name
+                ]?.extra_params?.banking_progress == 100
+                  ? 'Banking completed'
+                  : 'No bank added'
               }
             >
               {flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
@@ -576,28 +566,18 @@ export default function Preview() {
               index={coApplicantIndexes[coApplicantIndex]}
               hide={
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.upload_documents.name
-                ]?.extra_params?.progress == 100
+                  pages.applicant_details.name
+                ]?.extra_params?.upload_progress == 100
               }
               title={pages.upload_documents.title}
               link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
+              hideLabel={true}
               count={
-                flattedErrors &&
-                flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.upload_documents.name &&
-                    values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                      pages.upload_documents.name
-                    ] &&
-                    values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                      pages.upload_documents.name
-                    ]?.extra_params?.progress != 0
-                ]
-                  ? Object.keys(
-                      flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                        pages.upload_documents.name
-                      ],
-                    ).length
-                  : 'ALL'
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.applicant_details.name
+                ]?.extra_params?.upload_progress != 0
+                  ? 'Upload incomplete'
+                  : 'Upload completed'
               }
             >
               {flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
@@ -630,7 +610,11 @@ export default function Preview() {
       <>
         {!errors?.applicants?.[primaryIndex] &&
         values?.property_details?.extra_params?.progress == 100 &&
-        values?.reference_details?.extra_params?.progress == 100 ? (
+        values?.reference_details?.extra_params?.progress == 100 &&
+        values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.upload_progress ==
+          100 &&
+        values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.banking_progress ==
+          100 ? (
           <StepCompleted />
         ) : (
           <div className='flex-1 flex flex-col gap-4 p-4 pb-[200px] overflow-auto bg-[##F9F9F9]'>
@@ -835,21 +819,17 @@ export default function Preview() {
             <PreviewCard
               index={primaryIndex}
               hide={
-                values?.applicants?.[primaryIndex]?.[pages.banking_details.name]?.extra_params
-                  ?.progress == 100
+                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                  ?.banking_progress == 100
               }
               title={pages.banking_details.title}
               link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
+              hideLabel={true}
               count={
-                flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.banking_details.name] &&
-                values?.applicants?.[primaryIndex]?.[pages.banking_details.name] &&
-                values?.applicants?.[primaryIndex]?.[pages.banking_details.name]?.extra_params
-                  ?.progress != 0
-                  ? Object.keys(
-                      flattedErrors?.applicants?.[primaryIndex]?.[pages.banking_details.name],
-                    ).length
-                  : 'ALL'
+                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                  ?.banking_progress == 100
+                  ? 'Banking completed'
+                  : 'No bank added'
               }
             >
               {flattedErrors?.applicants?.[primaryIndex]?.[pages.banking_details.name] &&
@@ -899,21 +879,17 @@ export default function Preview() {
             <PreviewCard
               index={primaryIndex}
               hide={
-                values?.applicants?.[primaryIndex]?.[pages.upload_documents.name]?.extra_params
-                  ?.progress == 100
+                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                  ?.upload_progress == 100
               }
               title={pages.upload_documents.title}
               link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
+              hideLabel={true}
               count={
-                flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.upload_documents.name] &&
-                values?.applicants?.[primaryIndex]?.[pages.upload_documents.name] &&
-                values?.applicants?.[primaryIndex]?.[pages.upload_documents.name]?.extra_params
-                  ?.progress == 100
-                  ? Object.keys(
-                      flattedErrors?.applicants?.[primaryIndex]?.[pages.upload_documents.name],
-                    ).length
-                  : 'ALL'
+                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                  ?.upload_progress == 100
+                  ? 'Upload completed'
+                  : 'Upload incomplete'
               }
             >
               {flattedErrors?.applicants?.[primaryIndex]?.[pages.upload_documents.name] &&
@@ -1064,7 +1040,7 @@ export default function Preview() {
   );
 }
 
-function PreviewCard({ index, title, count, link, hide, children }) {
+function PreviewCard({ index, title, count, link, hide, children, hideLabel }) {
   const { setActiveIndex } = useContext(LeadContext);
   const handleClick = () => setActiveIndex(index);
 
@@ -1085,9 +1061,11 @@ function PreviewCard({ index, title, count, link, hide, children }) {
 
             <Separator />
             <div className='flex justify-start gap-[6px]'>
-              <p className='not-italic font-medium text-[10px] text-light-grey'>
-                INCOMPLETE FIELDS:{' '}
-              </p>
+              {!hideLabel && (
+                <p className='not-italic font-medium text-[10px] text-light-grey'>
+                  INCOMPLETE FIELDS:{' '}
+                </p>
+              )}
               <span className='not-italic font-medium text-[10px] text-dark-grey leading-loose'>
                 {count}
               </span>

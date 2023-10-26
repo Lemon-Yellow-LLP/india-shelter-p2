@@ -137,6 +137,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const handleTextInputChange = useCallback(
     (e) => {
+      if (e.target.value === ' ') {
+        return;
+      }
       const value = e.target.value;
       const pattern = /^[A-Za-z]+$/;
       const pattern2 = /^[a-zA-Z\s]*$/;
@@ -427,7 +430,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               e.key === 'ArrowLeft' ||
               e.key === 'ArrowRight' ||
               e.key === ' ' ||
-              e.keyCode === 32)
+              e.keyCode === 32 ||
+              (e.keyCode >= 65 && e.keyCode <= 90))
           ) {
             e.preventDefault();
           }

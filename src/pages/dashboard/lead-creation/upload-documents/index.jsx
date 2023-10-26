@@ -271,6 +271,10 @@ const UploadDocuments = () => {
           e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
           values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR'
         ) {
+          if (e.target.selectionStart !== value.length) {
+            e.target.selectionStart = e.target.selectionEnd = value.length;
+            return;
+          }
           let aadharPattern = /^\d$/;
           if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
             const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
@@ -2059,9 +2063,10 @@ const UploadDocuments = () => {
             hint='File size should be less than 5MB'
             setSingleFile={setPropertyPapersFile}
             setLatLong={setPropertyPapersLatLong}
+            imageArrayBorder={true}
           />
 
-          {values.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' && (
+          {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' && (
             <ImageUpload
               files={salarySlipPhotos}
               setFile={setSalarySlipPhotos}
@@ -2073,6 +2078,7 @@ const UploadDocuments = () => {
               hint='File size should be less than 5MB'
               setSingleFile={setSalarySlipPhotosFile}
               setLatLong={setSalarySlipLatLong}
+              imageArrayBorder={true}
             />
           )}
 
@@ -2087,6 +2093,7 @@ const UploadDocuments = () => {
             hint='File size should be less than 5MB'
             setSingleFile={setForm60photosFile}
             setLatLong={setForm60LatLong}
+            imageArrayBorder={true}
           />
 
           <ImageUpload
@@ -2100,6 +2107,7 @@ const UploadDocuments = () => {
             hint='File size should be less than 5MB'
             setSingleFile={setPropertyPhotosFile}
             setLatLong={setPropertyLatLong}
+            imageArrayBorder={true}
           />
 
           <div className='flex justify-between gap-2'>
@@ -2155,6 +2163,7 @@ const UploadDocuments = () => {
             hint='File size should be less than 5MB'
             setSingleFile={setDocsFile}
             setLatLong={setOtherDocsLatLong}
+            imageArrayBorder={true}
           />
         </div>
 
