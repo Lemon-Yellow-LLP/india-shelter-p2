@@ -356,7 +356,15 @@ const Qualifier = () => {
           extra_params: edited_extra_params,
         });
 
-        setFieldValue(`applicants[${activeIndex}].applicant_details.extra_params.qualifier`, true);
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.extra_params`,
+          edited_extra_params,
+        );
+
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.bre_101_response`,
+          bre_res.bre_101_response,
+        );
 
         setDL((prev) => ({
           ...prev,
