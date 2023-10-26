@@ -430,7 +430,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               e.key === 'ArrowLeft' ||
               e.key === 'ArrowRight' ||
               e.key === ' ' ||
-              e.keyCode === 32)
+              e.keyCode === 32 ||
+              (e.keyCode >= 65 && e.keyCode <= 90))
           ) {
             e.preventDefault();
           }
