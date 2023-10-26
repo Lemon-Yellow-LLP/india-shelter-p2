@@ -27,6 +27,11 @@ export const newCoApplicantValues = {
       Voter_Status: null,
       UAN_Status: null,
       GST_Status: null,
+      pan_ran: null,
+      dl_ran: null,
+      voter_ran: null,
+      pf_ran: null,
+      gst_ran: null,
       upload_required_fields_status: {
         customer_photo: false,
         id_proof: false,
