@@ -489,7 +489,8 @@ export default function AddressDetails() {
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
@@ -563,7 +564,8 @@ export default function AddressDetails() {
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
@@ -626,7 +628,8 @@ export default function AddressDetails() {
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const pattern = /^[A-Za-z\s]+$/;
                   if (!pattern.test(value) && value.length != 0) {
                     return;
@@ -687,7 +690,8 @@ export default function AddressDetails() {
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const pattern = /^[A-Za-z\s]+$/;
                   if (!pattern.test(value) && value.length != 0) {
                     return;
@@ -923,7 +927,8 @@ export default function AddressDetails() {
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
@@ -979,7 +984,8 @@ export default function AddressDetails() {
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
@@ -1026,7 +1032,8 @@ export default function AddressDetails() {
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const pattern = /^[A-Za-z\s]+$/;
                   if (!pattern.test(value) && value.length != 0) {
                     return;
@@ -1073,7 +1080,8 @@ export default function AddressDetails() {
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const pattern = /^[A-Za-z\s]+$/;
                   if (!pattern.test(value) && value.length != 0) {
                     return;
