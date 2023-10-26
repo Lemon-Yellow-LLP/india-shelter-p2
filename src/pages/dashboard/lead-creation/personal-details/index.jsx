@@ -231,6 +231,9 @@ const PersonalDetails = () => {
                     }
                     onChange={handleRadioChange}
                     containerClasses='flex-1'
+                    disabled={
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                    }
                   >
                     {option.icon}
                   </CardRadio>

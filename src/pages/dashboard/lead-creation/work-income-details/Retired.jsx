@@ -51,6 +51,7 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
             }
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInput
@@ -133,6 +134,7 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
             no_current_loan: false,
           }));
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <CurrencyInput
@@ -181,7 +183,9 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
         disabled={
-          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0
+            ? true
+            : false || values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
         }
         labelDisabled={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
