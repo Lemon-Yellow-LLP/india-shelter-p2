@@ -15,6 +15,7 @@ function ImageUpload({
   hint,
   noBorder,
   setLatLong,
+  imageArrayBorder, //in address proof of upload page there is no border for immage array but in salary slip there is border so when you want to add border to immage array just pass true to this prop
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
@@ -264,7 +265,13 @@ function ImageUpload({
 
       {uploads && !loader ? (
         <>
-          <div className='flex justify-start overflow-auto'>
+          <div
+            className={
+              imageArrayBorder
+                ? 'flex justify-start overflow-auto p-2 border border-[#D9D9D9] rounded-lg'
+                : 'flex justify-start overflow-auto'
+            }
+          >
             <div className='flex gap-2 my-2'>
               <div
                 style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}

@@ -21,6 +21,7 @@ import { Button } from '../../../../components';
 import SpeedoMeterAnimation from '../../../../components/speedometer';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import Topbar from '../../../../components/Topbar';
+import { useLocation } from 'react-router';
 
 const Qualifier = () => {
   const { activeIndex, values, setFieldValue, addApplicant } = useContext(LeadContext);
@@ -76,6 +77,8 @@ const Qualifier = () => {
     green: false,
   });
   const [finalApi, setFinalApi] = useState([]);
+
+  const location = useLocation();
 
   useEffect(() => {
     async function breOne() {
@@ -403,7 +406,7 @@ const Qualifier = () => {
     }
 
     breOne();
-  }, []);
+  }, [location]);
 
   function checkELigibilty() {
     if (bre101.red) {
@@ -896,7 +899,7 @@ const Qualifier = () => {
         <div className='flex items-start gap-2'>
           <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
           <p className='text-sm not-italic font-normal text-dark-grey'>
-            Eligibility can be increased by adding Co-applicant
+            Eligibility can be increased by adding Co-applicant{` `}
             <Button
               className={`underline ${
                 !bre101.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'

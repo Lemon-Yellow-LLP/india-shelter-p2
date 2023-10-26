@@ -464,9 +464,9 @@ export default function SwipeableDrawerComponent() {
                             + Add
                           </button>
                         </div>
-                        <span className='font-normal text-[12px] leading-[18px] text-[#727376]'>
+                        {/* <span className='font-normal text-[12px] leading-[18px] text-[#727376]'>
                           After the qualifier is complete, co-applicants can be made primary
-                        </span>
+                        </span> */}
                       </div>
 
                       {values?.applicants && values.applicants.length >= 2 ? (
@@ -489,12 +489,28 @@ export default function SwipeableDrawerComponent() {
                                 onChange={(e) => setChangePrimaryAlert(true)}
                               />
                             </div>
+                            {console.log(values?.applicants?.[activeCoApplicantIndex])}
                             <div className='flex justify-end gap-2 items-center'>
                               <span className='text-[#727376] text-[12px] font-normal'>
                                 Qualifier:
-                                <span className='text-[#FF9D4A] text-[12px] font-semibold ml-[5px]'>
-                                  Amber
-                                </span>
+                                {values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.bre_101_response?.body?.Display?.red_amber_green === 'Red' ? (
+                                  <span className='text-[#E33439] text-[12px] font-semibold ml-[5px]'>
+                                    Red
+                                  </span>
+                                ) : values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                    ?.bre_101_response?.body?.Display?.red_amber_green ===
+                                  'Amber' ? (
+                                  <span className='text-[#FF9D4A] text-[12px] font-semibold ml-[5px]'>
+                                    Amber
+                                  </span>
+                                ) : values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                    ?.bre_101_response?.body?.Display?.red_amber_green ===
+                                  'Green' ? (
+                                  <span className='text-[#147257] text-[12px] font-semibold ml-[5px]'>
+                                    Green
+                                  </span>
+                                ) : null}
                               </span>
                               <button onClick={() => setDeleteAlert(true)}>
                                 <DustbinIcon />

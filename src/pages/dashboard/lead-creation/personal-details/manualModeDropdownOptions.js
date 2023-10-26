@@ -132,8 +132,8 @@ export const manualModeDropdownOptions = [
       },
 
       {
-        label: 'Illetrate',
-        value: 'Illetrate',
+        label: 'Illiterate',
+        value: 'Illiterate',
       },
       {
         label: 'Matriculate',

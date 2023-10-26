@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { validationSchemaLead } from '../schemas/index';
 import { defaultErrorsLead } from './defaultErrorsLead';
 import { defaultValuesLead } from './defaultValuesLead';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { applicantSteps, coApplicantSteps } from './Steps';
 import { editFieldsById, getApplicantById } from '../global';
 import { newCoApplicantValues } from './NewCoApplicant';
@@ -26,6 +26,8 @@ const LeadContextProvider = ({ children }) => {
   const [primaryIndex, setPrimaryIndex] = useState(0);
   const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
   const [coApplicants, setCoApplicants] = useState([]);
+
+  const location = useLocation();
 
   const formik = useFormik({
     initialValues: structuredClone(defaultValuesLead),
@@ -140,6 +142,28 @@ const LeadContextProvider = ({ children }) => {
     setDrawerOpen(false);
   };
 
+  const removeCoApplicant = (activeIndex) => {
+    formik.setValues((prev) => {
+      let newData = { ...prev };
+      newData.applicants.splice(activeIndex, 1);
+      return newData;
+    });
+
+    setActiveIndex(0);
+
+    navigate('/lead/applicant-details');
+
+    setDrawerOpen(false);
+  };
+
+  // useEffect(() => {
+  //   let newApplicants = formik.values.applicants.filter(
+  //     (e) => e.applicant_details.is_mobile_verified,
+  //   );
+
+  //   formik.setFieldValue('applicants', newApplicants);
+  // }, [location]);
+
   useEffect(() => {
     let newData = [];
 
@@ -167,6 +191,7 @@ const LeadContextProvider = ({ children }) => {
     <LeadContext.Provider
       value={{
         ...formik,
+        removeCoApplicant,
         applicantStepsProgress,
         setApplicantSetpsProgress,
         updateProgressApplicantSteps,
