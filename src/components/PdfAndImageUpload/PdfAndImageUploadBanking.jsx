@@ -209,7 +209,7 @@ function PdfAndImageUploadBanking({
 
       {files?.length && files?.length !== 0 && uploads && !pdf && !loader ? (
         <>
-          <div className='flex justify-start overflow-auto'>
+          <div className='flex justify-start overflow-auto p-2 border border-[#D9D9D9] rounded-lg'>
             <div className='flex gap-2 my-2'>
               <div
                 style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}

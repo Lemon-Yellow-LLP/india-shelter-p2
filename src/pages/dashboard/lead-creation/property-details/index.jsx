@@ -8,6 +8,7 @@ import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Popup from '../../../../components/Popup';
 
 const propertyIdentificationOptions = [
   {
@@ -38,6 +39,12 @@ const PropertyDetails = () => {
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.property_details?.extra_params?.required_fields_status,
   });
+
+  const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(false);
+
+  const handleCloseQualifierNotActivePopup = () => {
+    setOpenQualifierNotActivePopup(false);
+  };
 
   useEffect(() => {
     updateProgressApplicantSteps('property_details', requiredFieldsStatus, 'property');
@@ -135,6 +142,13 @@ const PropertyDetails = () => {
 
   return (
     <>
+      <Popup
+        handleClose={handleCloseQualifierNotActivePopup}
+        open={openQualifierNotActivePopup}
+        setOpen={setOpenQualifierNotActivePopup}
+        title='Step is lock.'
+        description='Complete Qualifier to Unlock.'
+      />
       <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
         <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[160px] flex-1'>
@@ -187,14 +201,26 @@ const PropertyDetails = () => {
         {/* <button onClick={handleSubmit}>submit</button> */}
 
         <PreviousNextButtons
-          linkPrevious='/lead/lnt-charges'
-          linkNext='/lead/banking-details'
-          disablePrevious={
-            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          linkPrevious={
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              ? '/lead/lnt-charges'
+              : null
           }
-          disableNext={
-            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          linkNext={
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              ? '/lead/banking-details'
+              : null
           }
+          onNextClick={() => {
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              ? setOpenQualifierNotActivePopup(true)
+              : null;
+          }}
+          onPreviousClick={() => {
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              ? setOpenQualifierNotActivePopup(true)
+              : null;
+          }}
         />
 
         <SwipeableDrawerComponent />

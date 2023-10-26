@@ -90,6 +90,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
             no_current_loan: false,
           }));
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
       <CurrencyInput
         label='Ongoing EMI(s)'
@@ -140,7 +141,9 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
         disabled={
-          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0
+            ? true
+            : false || values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
         }
         labelDisabled={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false

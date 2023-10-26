@@ -1,12 +1,13 @@
+/* eslint-disable react/prop-types */
 import React, { useContext } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import OpenAccordian from '../../../../assets/icons/OpenAccordian';
-import DummyBankLogo from '../../../../assets/dummyBankLogo.png';
 import ToggleSwitch from '../../../../components/ToggleSwitch';
 import { Button } from '../../../../components';
+import GenericBankLogo from '../../../../assets/icons/generic_bank_logo.svg';
 
 export default function Accounts({
   data,
@@ -46,7 +47,7 @@ export default function Accounts({
         >
           <div className='flex flex-col w-[100%] gap-1'>
             <div className='flex flex-row items-center h-[46px] pr-[10px]'>
-              <img src={DummyBankLogo} alt='' className='mr-4 h-[32px] w-[32px]' />
+              <img src={GenericBankLogo} alt='' className='mr-4 h-[32px] w-[32px]' />
               <div className='flex flex-col gap-[4px]'>
                 <div className='flex gap-[8px] items-center'>
                   <span

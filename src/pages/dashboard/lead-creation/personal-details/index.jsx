@@ -206,7 +206,7 @@ const PersonalDetails = () => {
         ) : (
           <Topbar
             title='Adding Co-applicant'
-            id={values?.lead?.id}
+            id={values?.applicants?.[activeIndex]?.applicant_details?.id}
             showClose={false}
             showBack={true}
             coApplicant={true}
@@ -231,6 +231,9 @@ const PersonalDetails = () => {
                     }
                     onChange={handleRadioChange}
                     containerClasses='flex-1'
+                    disabled={
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                    }
                   >
                     {option.icon}
                   </CardRadio>

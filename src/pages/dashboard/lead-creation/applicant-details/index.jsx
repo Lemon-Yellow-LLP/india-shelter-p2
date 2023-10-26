@@ -49,6 +49,7 @@ const ApplicantDetails = () => {
     activeIndex,
     setValues,
     setCurrentStepIndex,
+    removeCoApplicant,
   } = useContext(LeadContext);
 
   const { setOtpFailCount, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
@@ -117,15 +118,18 @@ const ApplicantDetails = () => {
     }
   };
 
-  const updateFieldsLead = useCallback(async (name, value) => {
-    let newData = {};
-    newData[name] = value;
-    newData.lo_id = lo_id;
+  const updateFieldsLead = async (name, value) => {
     if (values?.lead?.id) {
+      let newData = {};
+      newData[name] = value;
+      newData.lo_id = lo_id;
       const res = await editFieldsById(values?.lead?.id, 'lead', newData);
       return res;
     } else {
-      await addApi('lead', values?.lead)
+      let newData = { ...values?.lead };
+      newData[name] = value;
+      newData.lo_id = lo_id;
+      await addApi('lead', newData)
         .then((res) => {
           setFieldValue('lead.id', res.id);
           return res;
@@ -134,7 +138,7 @@ const ApplicantDetails = () => {
           return err;
         });
     }
-  });
+  };
 
   useEffect(() => {
     updateProgressApplicantSteps('applicant_details', requiredFieldsStatus, 'applicant');
@@ -154,7 +158,8 @@ const ApplicantDetails = () => {
 
   const handleFirstNameChange = useCallback(
     (e) => {
-      const value = e.currentTarget.value;
+      let value = e.currentTarget.value;
+      value = value.trimStart().replace(/\s\s+/g, ' ');
       const pattern = /^[A-Za-z][A-Za-z\s]*$/;
       if (pattern.exec(value)) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
@@ -497,6 +502,12 @@ const ApplicantDetails = () => {
     errors?.applicants?.[activeIndex]?.applicant_details,
   ]);
 
+  const handleBack = () => {
+    if (!values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified) {
+      removeCoApplicant(activeIndex);
+    }
+  };
+
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
 
@@ -508,10 +519,11 @@ const ApplicantDetails = () => {
         ) : (
           <Topbar
             title='Adding Co-applicant'
-            id={values?.lead?.id}
+            id={values?.applicants?.[activeIndex]?.applicant_details?.id}
             showClose={false}
             showBack={true}
             coApplicant={true}
+            handleBack={handleBack}
           />
         )}
         <div
@@ -535,7 +547,10 @@ const ApplicantDetails = () => {
                   current={values.lead?.loan_type}
                   onChange={onLoanTypeChange}
                   containerClasses='flex-1'
-                  disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+                  disabled={
+                    !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  }
                 >
                   {data.icon}
                 </CardRadio>
@@ -552,7 +567,10 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
             onChange={handleLoanAmountChange}
             displayError={false}
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
             inputClasses='font-semibold'
           />
 
@@ -563,7 +581,10 @@ const ApplicantDetails = () => {
             initialValue={values.lead?.applied_amount}
             min={100000}
             max={5000000}
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
             step={50000}
           />
 
@@ -601,7 +622,10 @@ const ApplicantDetails = () => {
                 }
               }
             }}
-            disabled={inputDisabled}
+            disabled={
+              inputDisabled ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
             onChange={handleFirstNameChange}
             inputClasses='capitalize'
           />
@@ -618,7 +642,10 @@ const ApplicantDetails = () => {
                   touched.applicants &&
                   touched?.applicants[activeIndex]?.applicant_details?.middle_name
                 }
-                disabled={inputDisabled}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
                 onBlur={(e) => {
                   handleBlur(e);
                   const name = e.currentTarget.name.split('.')[2];
@@ -643,7 +670,10 @@ const ApplicantDetails = () => {
                   touched?.applicants[activeIndex]?.applicant_details?.last_name
                 }
                 placeholder='Eg: Swami, Singh'
-                disabled={inputDisabled}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
                 name={`applicants[${activeIndex}].applicant_details.last_name`}
                 onChange={handleTextInputChange}
                 inputClasses='capitalize'
@@ -680,6 +710,7 @@ const ApplicantDetails = () => {
               checkDate(e.target.value);
             }}
             reference={dateInputRef}
+            disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
           />
 
           <TextInputWithSendOtp
@@ -705,7 +736,8 @@ const ApplicantDetails = () => {
             }
             disabled={
               disablePhoneNumber ||
-              values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified
+              values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
             }
             message={
               values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified
@@ -778,7 +810,10 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
             defaultSelected={values.lead?.purpose_of_loan}
             inputClasses='mt-2'
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
           />
 
           <DropDown
@@ -806,7 +841,10 @@ const ApplicantDetails = () => {
             touched={touched && touched?.lead?.property_type}
             error={errors && errors?.lead?.property_type}
             onBlur={handleBlur}
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
           />
         </div>
         <PreviousNextButtons

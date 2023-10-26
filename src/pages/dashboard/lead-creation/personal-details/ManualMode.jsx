@@ -137,7 +137,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const handleTextInputChange = useCallback(
     (e) => {
-      const value = e.target.value;
+      if (e.target.value === ' ') {
+        return;
+      }
+      let value = e.target.value;
+      value = value.trimStart().replace(/\s\s+/g, ' ');
       const pattern = /^[A-Za-z]+$/;
       const pattern2 = /^[a-zA-Z\s]*$/;
 
@@ -366,6 +370,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             );
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInput
@@ -383,7 +388,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={
           touched?.applicants && touched?.applicants?.[activeIndex]?.personal_details?.id_number
         }
-        disabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
+        disabled={
+          !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+        }
         labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
           handleBlur(e);
@@ -423,7 +431,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               e.key === 'ArrowLeft' ||
               e.key === 'ArrowRight' ||
               e.key === ' ' ||
-              e.keyCode === 32)
+              e.keyCode === 32 ||
+              (e.keyCode >= 65 && e.keyCode <= 90))
           ) {
             e.preventDefault();
           }
@@ -494,7 +503,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               ? true
               : !values?.applicants?.[activeIndex]?.personal_details?.id_number
               ? true
-              : false
+              : false ||
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
           }
         />
         <span
@@ -526,7 +536,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           touched.applicants?.[activeIndex]?.personal_details?.selected_address_proof
         }
         disabled={
-          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
         }
         disableOption={values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
@@ -552,7 +563,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
-          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
         }
         labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
         onBlur={(e) => {
@@ -610,6 +622,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInput
@@ -629,6 +642,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
       <TextInput
         label='Last Name'
@@ -647,6 +661,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
@@ -661,6 +676,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               value={option.value}
               current={values?.applicants?.[activeIndex]?.personal_details?.gender}
               onChange={handleRadioChange}
+              disabled={
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              }
             >
               {option.icon}
             </CardRadio>
@@ -754,6 +772,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInput
@@ -782,6 +801,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <div className='flex flex-col gap-2'>
@@ -797,6 +817,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               value={option.value}
               current={values?.applicants?.[activeIndex]?.personal_details?.marital_status}
               onChange={handleRadioChange}
+              disabled={
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              }
             >
               {option.icon}
             </CardRadio>
@@ -834,6 +857,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <DropDown
@@ -854,6 +878,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <DropDown
@@ -873,6 +898,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInputWithSendOtp
@@ -890,7 +916,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           emailVerified ||
           hasSentOTPOnce
         }
-        disabled={disableEmailInput || emailVerified}
+        disabled={
+          disableEmailInput ||
+          emailVerified ||
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+        }
         message={
           emailVerified
             ? `OTP Verfied

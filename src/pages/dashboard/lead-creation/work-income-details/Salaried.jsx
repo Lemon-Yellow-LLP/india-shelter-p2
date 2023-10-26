@@ -110,6 +110,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         onChange={searchableTextInputChange}
         type='search'
         options={companyNameOptions}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       {values?.applicants?.[activeIndex]?.work_income_detail?.company_name === 'Others' && (
@@ -171,6 +172,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               }
             }
           }}
+          disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
         />
       )}
 
@@ -217,6 +219,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
             }
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInput
@@ -273,6 +276,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
             return;
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInput
@@ -355,6 +359,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
             no_current_loan: false,
           }));
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <CurrencyInput
@@ -406,7 +411,9 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
         disabled={
-          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0
+            ? true
+            : false || values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
         }
         labelDisabled={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
@@ -425,6 +432,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         onChange={searchableTextInputChange}
         type='search'
         options={workingSinceOptions}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <DropDown
@@ -439,6 +447,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.mode_of_salary}
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.mode_of_salary}
         onBlur={handleBlur}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
     </>
   );

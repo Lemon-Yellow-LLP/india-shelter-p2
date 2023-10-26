@@ -14,6 +14,7 @@ import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import Popup from '../../../../components/Popup';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -40,6 +41,12 @@ const WorkIncomeDetails = () => {
   const [openExistingPopup, setOpenExistingPopup] = useState(
     values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing || false,
   );
+
+  const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(false);
+
+  const handleCloseQualifierNotActivePopup = () => {
+    setOpenQualifierNotActivePopup(false);
+  };
 
   useEffect(() => {
     setRequiredFieldsStatus(
@@ -270,6 +277,13 @@ const WorkIncomeDetails = () => {
 
   return (
     <>
+      <Popup
+        handleClose={handleCloseQualifierNotActivePopup}
+        open={openQualifierNotActivePopup}
+        setOpen={setOpenQualifierNotActivePopup}
+        title='Qualifier is not activated'
+        description='Complete Applicant, Personal, Address and Work & Income details to activate'
+      />
       <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
           <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
@@ -298,6 +312,9 @@ const WorkIncomeDetails = () => {
                     current={values?.applicants?.[activeIndex]?.work_income_detail?.profession}
                     onChange={handleRadioChange}
                     containerClasses='flex-1'
+                    disabled={
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                    }
                   >
                     {option.icon}
                   </CardRadio>
@@ -379,7 +396,8 @@ const WorkIncomeDetails = () => {
                   }
                 }}
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
@@ -398,6 +416,9 @@ const WorkIncomeDetails = () => {
                     }
                   }
                 }}
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <TextInput
@@ -434,7 +455,8 @@ const WorkIncomeDetails = () => {
                   }
                 }}
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
@@ -453,6 +475,9 @@ const WorkIncomeDetails = () => {
                     }
                   }
                 }}
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <TextInput
@@ -485,8 +510,9 @@ const WorkIncomeDetails = () => {
                   }
                 }}
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z\s]+$/;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -504,6 +530,9 @@ const WorkIncomeDetails = () => {
                     }
                   }
                 }}
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <TextInput
@@ -536,8 +565,9 @@ const WorkIncomeDetails = () => {
                   }
                 }}
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
-                  const address_pattern = /^[a-zA-Z\s]+$/;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
+                  const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
                   }
@@ -555,6 +585,9 @@ const WorkIncomeDetails = () => {
                     }
                   }
                 }}
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <TextInput
@@ -634,12 +667,15 @@ const WorkIncomeDetails = () => {
                   );
                 }}
                 inputClasses='hidearrow'
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <TextInput
                 label='City'
                 placeholder='Eg: Nashik'
-                disabled
+                disabled={true}
                 name={`applicants[${activeIndex}].work_income_detail.city`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.city}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.city}
@@ -661,7 +697,7 @@ const WorkIncomeDetails = () => {
               <TextInput
                 label='State'
                 placeholder='Eg: Maharashtra'
-                disabled
+                disabled={true}
                 name={`applicants[${activeIndex}].work_income_detail.state`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.state}
                 error={errors?.applicants?.[activeIndex]?.work_income_detail?.state}
@@ -702,6 +738,10 @@ const WorkIncomeDetails = () => {
                         }
                         onChange={handleRadioChange}
                         containerClasses='flex-1'
+                        disabled={
+                          values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                            ?.qualifier
+                        }
                       ></CardRadioWithoutIcon>
                     );
                   })}
@@ -763,6 +803,9 @@ const WorkIncomeDetails = () => {
                     }
                   }
                 }}
+                disabled={
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
               />
 
               <div className='flex flex-col gap-2'>
@@ -782,6 +825,10 @@ const WorkIncomeDetails = () => {
                         }
                         onChange={handleRadioChange}
                         containerClasses='flex-1'
+                        disabled={
+                          values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                            ?.qualifier
+                        }
                       ></CardRadioWithoutIcon>
                     );
                   })}
@@ -793,15 +840,23 @@ const WorkIncomeDetails = () => {
 
         <PreviousNextButtons
           linkPrevious='/lead/address-details'
-          linkNext='/lead/qualifier'
-          onNextClick={handleNextClick}
-          onPreviousClick={() => setCurrentStepIndex(2)}
-          disableNext={
+          linkNext={
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !== 100 ||
             values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
             values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
             values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
+              ? null
+              : '/lead/qualifier'
           }
+          onNextClick={() =>
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !== 100 ||
+            values?.applicants?.[activeIndex]?.personal_details?.extra_params?.progress !== 100 ||
+            values?.applicants?.[activeIndex]?.address_detail?.extra_params?.progress !== 100 ||
+            values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.progress !== 100
+              ? setOpenQualifierNotActivePopup(true)
+              : handleNextClick()
+          }
+          onPreviousClick={() => setCurrentStepIndex(2)}
         />
 
         <SwipeableDrawerComponent />
