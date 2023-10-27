@@ -459,7 +459,7 @@ const Qualifier = () => {
         />
       )}
 
-      <div className='p-4 overflow-auto' style={{ height: 'calc(100vh - 211px)' }}>
+      <div className='p-4 overflow-auto pb-[60px]' style={{ height: 'calc(100vh - 211px)' }}>
         <div className='flex items-start gap-2'>
           <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
           <p className='text-xs not-italic font-normal text-dark-grey'>
