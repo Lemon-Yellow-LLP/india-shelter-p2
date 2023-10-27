@@ -34,7 +34,7 @@ const LeadContextProvider = ({ children }) => {
     initialErrors: structuredClone(defaultErrorsLead),
     validationSchema: validationSchemaLead,
     onSubmit: (_, action) => {
-      console.log(action);
+      // console.log(action);
       // action.resetForm(defaultValues);
     },
   });
@@ -126,8 +126,6 @@ const LeadContextProvider = ({ children }) => {
     formik.setValues(newData);
   };
 
-  console.log(formik.values);
-
   const addApplicant = () => {
     formik.setValues((prev) => {
       let newData = { ...prev };
@@ -156,21 +154,26 @@ const LeadContextProvider = ({ children }) => {
     setDrawerOpen(false);
   };
 
-  // useEffect(() => {
-  //   let newApplicants = formik.values.applicants.filter(
-  //     (e) => e.applicant_details.is_mobile_verified,
-  //   );
+  useEffect(() => {
+    if (location.pathname !== '/lead/applicant-details') {
+      let newApplicants = formik.values.applicants.filter(
+        (e) => e.applicant_details.is_mobile_verified,
+      );
+      formik.setFieldValue('applicants', newApplicants);
+    }
+  }, [location.pathname]);
 
-  //   formik.setFieldValue('applicants', newApplicants);
-  // }, [location]);
+  useEffect(() => {
+    console.log(formik.values);
+  }, [formik.values]);
 
   useEffect(() => {
     let newData = [];
 
     formik.values.applicants.map((e, index) => {
-      if (!e.applicant_details.is_primary) {
+      if (!e.applicant_details.is_primary && e.applicant_details.is_mobile_verified) {
         newData.push({
-          label: e.applicant_details.first_name,
+          label: e.applicant_details.first_name || e.applicant_details.mobile_number,
           value: index,
         });
       }

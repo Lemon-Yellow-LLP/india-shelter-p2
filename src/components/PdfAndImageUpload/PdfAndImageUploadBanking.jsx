@@ -77,7 +77,7 @@ function PdfAndImageUploadBanking({
   }, [pdf]);
 
   const editImage = (e, id) => {
-    console.log(id);
+    // console.log(id);
     setMessage('');
 
     setLoader(true);
