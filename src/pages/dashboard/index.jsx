@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getDashboardLeadList, testLogout } from '../../global';
-import { AuthContext } from '../../context/AuthContextProvider';
+import { getDashboardLeadList } from '../../global';
 import { Header } from '../../components';
 import AddLeadIcon from '../../assets/icons/add-lead';
 import Searchbox from '../../components/Searchbox.jsx/index.jsx';
@@ -81,9 +80,12 @@ export default function Dashboard() {
   }, [selectionRange]);
 
   useEffect(() => {
+    if (leadList.length === 0) return;
+    setLoading(true);
     const data = leadList;
     setPrimaryApplicantList(data);
     setFilteredList(data);
+    setLoading(false);
   }, [leadList]);
 
   return (
