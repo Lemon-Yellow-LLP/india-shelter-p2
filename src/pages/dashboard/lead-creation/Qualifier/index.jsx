@@ -459,7 +459,7 @@ const Qualifier = () => {
         />
       )}
 
-      <div className='p-4 overflow-auto' style={{ height: 'calc(100vh - 211px)' }}>
+      <div className='p-4 overflow-auto pb-[60px]' style={{ height: 'calc(100vh - 211px)' }}>
         <div className='flex items-start gap-2'>
           <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
           <p className='text-xs not-italic font-normal text-dark-grey'>
@@ -910,7 +910,10 @@ const Qualifier = () => {
             Eligibility can be increased by adding Co-applicant{` `}
             <Button
               className={`underline ${
-                !bre101.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
+                !bre101.res ||
+                values.applicants.filter((e) => e.applicant_details.is_mobile_verified).length >= 5
+                  ? 'text-light-grey pointer-events-none'
+                  : 'text-primary-red'
               }`}
               onClick={(e) => {
                 e.preventDefault();

@@ -665,7 +665,7 @@ const UploadDocuments = () => {
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
         );
-        console.log(applicant);
+        // console.log(applicant);
         const document_meta = applicant.document_meta;
         if ('customer_photos' in document_meta == false) {
           document_meta['customer_photos'] = [];
@@ -1697,11 +1697,44 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function getRequiredFields() {
-      const { extra_params } = await getApplicantById(
+      const { extra_params, document_meta } = await getApplicantById(
         values?.applicants?.[activeIndex]?.applicant_details?.id,
       );
 
       setRequiredFieldsStatus({ ...extra_params.upload_required_fields_status });
+      setRequiredFieldsStatus((prev) => {
+        let requiredFields = prev;
+        if (
+          values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
+          document_meta?.salary_slip_photos?.find((slip) => slip?.active)
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            salary_slip: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            salary_slip: false,
+          };
+        }
+
+        if (
+          values?.property_details?.property_identification_is === 'not-yet' ||
+          document_meta?.property_paper_photos?.find((slip) => slip?.active)
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            property_paper: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            property_paper: false,
+          };
+        }
+        return requiredFields;
+      });
     }
     getRequiredFields();
   }, []);
@@ -2214,21 +2247,23 @@ const UploadDocuments = () => {
             </div>
           </div>
 
-          <PdfAndImageUpload
-            files={propertyPapers}
-            setFile={setPropertyPapers}
-            uploads={propertyPaperUploads}
-            setUploads={setPropertyPaperUploads}
-            setEdit={setEditPropertyPaper}
-            pdf={propertyPdf}
-            setPdf={setPropertyPdf}
-            label='Property papers'
-            required
-            hint='File size should be less than 5MB'
-            setSingleFile={setPropertyPapersFile}
-            setLatLong={setPropertyPapersLatLong}
-            imageArrayBorder={true}
-          />
+          {values?.property_details?.property_identification_is !== 'not-yet' && (
+            <PdfAndImageUpload
+              files={propertyPapers}
+              setFile={setPropertyPapers}
+              uploads={propertyPaperUploads}
+              setUploads={setPropertyPaperUploads}
+              setEdit={setEditPropertyPaper}
+              pdf={propertyPdf}
+              setPdf={setPropertyPdf}
+              label='Property papers'
+              required
+              hint='File size should be less than 5MB'
+              setSingleFile={setPropertyPapersFile}
+              setLatLong={setPropertyPapersLatLong}
+              imageArrayBorder={true}
+            />
+          )}
 
           {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' && (
             <ImageUpload
