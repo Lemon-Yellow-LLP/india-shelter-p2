@@ -1609,7 +1609,10 @@ const UploadDocuments = () => {
           };
         }
 
-        if (values?.property_details?.property_identification_is === 'not-yet') {
+        if (
+          values?.property_details?.property_identification_is === 'not-yet' ||
+          document_meta?.property_paper_photos?.find((slip) => slip?.active)
+        ) {
           requiredFields = {
             ...requiredFields,
             property_paper: true,
