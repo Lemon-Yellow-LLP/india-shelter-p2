@@ -396,7 +396,8 @@ const WorkIncomeDetails = () => {
                   }
                 }}
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
@@ -454,7 +455,8 @@ const WorkIncomeDetails = () => {
                   }
                 }}
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
@@ -508,7 +510,8 @@ const WorkIncomeDetails = () => {
                   }
                 }}
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;
@@ -562,7 +565,8 @@ const WorkIncomeDetails = () => {
                   }
                 }}
                 onChange={(e) => {
-                  const value = e.currentTarget.value;
+                  let value = e.currentTarget.value;
+                  value = value?.trimStart()?.replace(/\s\s+/g, ' ');
                   const address_pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
                   if (!address_pattern.test(value) && value.length != 0) {
                     return;

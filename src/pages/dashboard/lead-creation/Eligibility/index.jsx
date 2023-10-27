@@ -80,15 +80,25 @@ const Eligibility = () => {
     loader: false,
     ran: false,
   });
+  const [bre101, setBre101] = useState(null);
   const [display, setDisplay] = useState(false);
   const [bre201, setBre201] = useState(false);
+  const [faceMatchResponse, setFaceMatchResponse] = useState(null);
+  const [edited_applicants, setEditedApplicants] = useState([]);
+
+  useEffect(() => {
+    setEditedApplicants(
+      values.applicants.filter((applicant) => !applicant.applicant_details.is_primary),
+    );
+  }, [values.applicants]);
 
   useEffect(() => {
     async function breTwo() {
       const lead = await getLeadById(values?.applicants?.[activeIndex]?.applicant_details.lead_id);
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
 
-      if (lead.bre_101_response && lead.bre_201_response) {
+      if (res.bre_101_response && lead.bre_201_response) {
+        setBre101(res);
         setProgress(
           values?.applicants?.[activeIndex]?.applicant_details.extra_params
             .eligibility_api_progress,
@@ -140,22 +150,21 @@ const Eligibility = () => {
 
         setFaceMatch((prev) => ({ ...prev, ran: true }));
 
-        setUpiName((prev) => ({ ...prev, ran: true }));
+        setUpiName((prev) => ({
+          ...prev,
+          ran: true,
+          res: lead.bre_201_response.body.UPI_Name.main_applicant[0]
+            .UPI_Name_Match_with_Applicant_Name,
+        }));
 
-        // setFaceMatch((prev) => ({ ...prev, ran: true, res: res.bre_101_response.body.Display }));
-        // setUpiName((prev) => ({ ...prev, ran: true, res: res.bre_101_response.body.Display }));
-        // setBre99((prev) => ({ ...prev, ran: true, res: res.bre_101_response.body.Display }));
-        // setBureau((prev) => ({ ...prev, ran: true, res: res.bre_101_response.body.Display }));
+        setFaceMatchResponse(lead.bre_201_response.body.Facematch);
 
         if (
-          values?.applicants?.[activeIndex]?.applicant_details.extra_params.PAN_status !==
-            'Valid' ||
-          values?.applicants?.[activeIndex]?.applicant_details.extra_params.DL_Status !== 'Valid' ||
-          values?.applicants?.[activeIndex]?.applicant_details.extra_params.Voter_Status !==
-            'Valid' ||
-          values?.applicants?.[activeIndex]?.applicant_details.extra_params.UAN_Status !==
-            'Valid' ||
-          values?.applicants?.[activeIndex]?.applicant_details.extra_params.GST_Status !== 'Valid'
+          res?.extra_params?.pan_ran ||
+          res?.extra_params?.dl_ran ||
+          res?.extra_params?.voter_ran ||
+          res?.extra_params?.pf_ran ||
+          res?.extra_params?.gst_ran
         ) {
           setDisplay(true);
           setBre99((prev) => ({
@@ -170,7 +179,7 @@ const Eligibility = () => {
           }));
         }
 
-        setBre201(true);
+        setBre201(lead);
 
         return;
       }
@@ -178,10 +187,11 @@ const Eligibility = () => {
       setFaceMatch((prev) => ({ ...prev, loader: true, ran: true }));
       setUpiName((prev) => ({ ...prev, loader: true, ran: true }));
 
-      setProgress(2);
-      setFinalApi(2);
+      setProgress(values.applicants.length + 1);
+      setFinalApi(values.applicants.length + 1);
 
       let final_api = [];
+      let test_api_ran = [];
       let edited_bre = null;
 
       if (res.bre_101_response.body.Display.PAN_status === 'Error') {
@@ -195,6 +205,8 @@ const Eligibility = () => {
         final_api.push(
           verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, { type: 'id' }, {}),
         );
+
+        test_api_ran.push('PAN');
       } else if (
         res.bre_101_response.body.Display.PAN_status === 'In-Valid' ||
         res.bre_101_response.body.Display.PAN_status === 'Valid No Match'
@@ -218,6 +230,8 @@ const Eligibility = () => {
                 {},
               ),
             );
+
+            test_api_ran.push('PAN');
           }
         }
       }
@@ -241,6 +255,8 @@ const Eligibility = () => {
         final_api.push(
           verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, { type: type }, {}),
         );
+
+        test_api_ran.push('Driving license');
       } else if (
         res.bre_101_response.body.Display.DL_Status === 'In-Valid' ||
         res.bre_101_response.body.Display.DL_Status === 'Valid No Match'
@@ -260,6 +276,8 @@ const Eligibility = () => {
             final_api.push(
               verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, { type: 'id' }, {}),
             );
+
+            test_api_ran.push('Driving license');
           }
         } else {
           if (
@@ -280,6 +298,8 @@ const Eligibility = () => {
                 {},
               ),
             );
+
+            test_api_ran.push('Driving license');
           }
         }
       }
@@ -307,6 +327,8 @@ const Eligibility = () => {
             {},
           ),
         );
+
+        test_api_ran.push('Voter ID');
       } else if (
         res.bre_101_response.body.Display.Voter_Status === 'In-Valid' ||
         res.bre_101_response.body.Display.Voter_Status === 'Valid No Match'
@@ -330,6 +352,8 @@ const Eligibility = () => {
                 {},
               ),
             );
+
+            test_api_ran.push('Voter ID');
           }
         } else {
           if (
@@ -350,6 +374,8 @@ const Eligibility = () => {
                 {},
               ),
             );
+
+            test_api_ran.push('Voter ID');
           }
         }
       }
@@ -367,6 +393,8 @@ const Eligibility = () => {
         }));
 
         final_api.push(verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+
+        test_api_ran.push('pf');
       } else if (
         res.bre_101_response.body.Display.UAN_Status === 'In-Valid' ||
         res.bre_101_response.body.Display.UAN_Status === 'Valid No Match'
@@ -383,6 +411,8 @@ const Eligibility = () => {
           }));
 
           final_api.push(verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+
+          test_api_ran.push('pf');
         }
       }
 
@@ -399,6 +429,8 @@ const Eligibility = () => {
         }));
 
         final_api.push(verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+
+        test_api_ran.push('gst');
       } else if (
         res.bre_101_response.body.Display.GST_Status === 'In-Valid' ||
         res.bre_101_response.body.Display.GST_Status === 'Valid No Match'
@@ -415,6 +447,8 @@ const Eligibility = () => {
           }));
 
           final_api.push(verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+
+          test_api_ran.push('gst');
         }
       }
 
@@ -422,8 +456,8 @@ const Eligibility = () => {
         setDisplay(true);
 
         try {
-          setProgress(final_api.length + 2);
-          setFinalApi(final_api.length + 4);
+          setProgress(final_api.length + values.applicants.length + 1);
+          setFinalApi(final_api.length + values.applicants.length + 3);
 
           await Promise.allSettled([...final_api]);
         } catch (err) {
@@ -434,7 +468,7 @@ const Eligibility = () => {
 
         try {
           setBre99((prev) => ({ ...prev, loader: true, ran: true }));
-          setProgress(final_api.length + 3);
+          setProgress(final_api.length + values.applicants.length + 2);
 
           const bre99_res = await checkBre99(
             values?.applicants?.[activeIndex]?.applicant_details.id,
@@ -452,7 +486,7 @@ const Eligibility = () => {
         }
 
         setBureau((prev) => ({ ...prev, loader: true, ran: true }));
-        setProgress(final_api.length + 4);
+        setProgress(final_api.length + values.applicants.length + 3);
 
         if (callCibilOrCrif.Rule_Value === 'CIBIL') {
           try {
@@ -528,6 +562,16 @@ const Eligibility = () => {
             },
           );
 
+          setFieldValue(
+            `applicants[${activeIndex}].applicant_details.extra_params`,
+            edited_extra_params,
+          );
+
+          setFieldValue(
+            `applicants[${activeIndex}].applicant_details.bre_101_response`,
+            bre_res.bre_101_response,
+          );
+
           setDL((prev) => ({
             ...prev,
             loader: false,
@@ -570,15 +614,16 @@ const Eligibility = () => {
 
         if (bre_res.bre_201_response.statusCode != 200) return;
 
-        setBre201(true);
+        setBre201(bre_res);
 
-        //Facematch and upi response should be set her
-        //If salesforce flag is success then toast message should be set here
-        //If salesforce flag is failed then push to salesforce will be enabled
-        //and push to salesforce api call will be done from frontend
         setFaceMatch((prev) => ({ ...prev, loader: false }));
-
-        setUpiName((prev) => ({ ...prev, loader: false }));
+        setFaceMatchResponse(bre_res.bre_201_response?.body.Facematch);
+        setUpiName((prev) => ({
+          ...prev,
+          loader: false,
+          res: bre_res.bre_201_response?.body.UPI_Name.main_applicant[0]
+            .UPI_Name_Match_with_Applicant_Name,
+        }));
 
         if (edited_bre) {
           const extra_parmas = edited_bre.extra_params;
@@ -586,7 +631,15 @@ const Eligibility = () => {
           const edited_extra_params = {
             ...extra_parmas,
             eligibility: true,
-            eligibility_api_progress: final_api.length !== 0 ? final_api.length + 4 : 2,
+            eligibility_api_progress:
+              final_api.length !== 0
+                ? final_api.length + values.applicants.length + 3
+                : values.applicants.length + 1,
+            pan_ran: test_api_ran.includes('PAN'),
+            dl_ran: test_api_ran.includes('Driving license'),
+            voter_ran: test_api_ran.includes('Voter ID'),
+            pf_ran: test_api_ran.includes('pf'),
+            gst_ran: test_api_ran.includes('gst'),
           };
 
           await editFieldsById(
@@ -596,6 +649,11 @@ const Eligibility = () => {
               extra_params: edited_extra_params,
             },
           );
+
+          setFieldValue(
+            `applicants[${activeIndex}].applicant_details.extra_params`,
+            edited_extra_params,
+          );
         } else {
           let new_data = { ...values };
 
@@ -604,7 +662,10 @@ const Eligibility = () => {
           const edited_extra_params = {
             ...extra_parmas,
             eligibility: true,
-            eligibility_api_progress: final_api.length !== 0 ? final_api.length + 4 : 2,
+            eligibility_api_progress:
+              final_api.length !== 0
+                ? final_api.length + values.applicants.length + 3
+                : values.applicants.length + 1,
           };
 
           await editFieldsById(
@@ -613,6 +674,11 @@ const Eligibility = () => {
             {
               extra_params: edited_extra_params,
             },
+          );
+
+          setFieldValue(
+            `applicants[${activeIndex}].applicant_details.extra_params`,
+            edited_extra_params,
           );
         }
       } catch (err) {
@@ -641,7 +707,7 @@ const Eligibility = () => {
     <>
       <Topbar title='Eligibility' id={values?.lead?.id} showClose={true} />
 
-      <div className='p-4 h-screen'>
+      <div className='p-4 h-full pb-28'>
         <ToastMessage message={toastMessage} setMessage={setToastMessage} />
 
         <div className='flex items-start gap-2'>
@@ -686,9 +752,7 @@ const Eligibility = () => {
                 </p>
               </div>
             ) : (
-              <p className='text-white text-xs'>
-                Lorem ipsum <br /> Lorem ipsum <br /> Lorem ipsum
-              </p>
+              <p className='text-white text-xs'>{bre201.bre_201_response.body.FinalRemarks}</p>
             )}
           </div>
         </div>
@@ -696,7 +760,8 @@ const Eligibility = () => {
         <div className='mt-4 flex flex-col gap-2'>
           {PAN.status === 'Error' ||
           PAN.status === 'In-Valid' ||
-          PAN.status === 'Valid No Match' ? (
+          PAN.status === 'Valid No Match' ||
+          bre101?.extra_params?.pan_ran ? (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
                 {!PAN.ran ? (
@@ -742,7 +807,10 @@ const Eligibility = () => {
             </div>
           ) : null}
 
-          {DL.status === 'Error' || DL.status === 'In-Valid' || DL.status === 'Valid No Match' ? (
+          {DL.status === 'Error' ||
+          DL.status === 'In-Valid' ||
+          DL.status === 'Valid No Match' ||
+          bre101?.extra_params?.dl_ran ? (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
                 {!DL.ran ? (
@@ -790,7 +858,8 @@ const Eligibility = () => {
 
           {voterID.status === 'Error' ||
           voterID.status === 'In-Valid' ||
-          voterID.status === 'Valid No Match' ? (
+          voterID.status === 'Valid No Match' ||
+          bre101?.extra_params?.voter_ran ? (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
                 {!voterID.ran ? (
@@ -840,7 +909,8 @@ const Eligibility = () => {
 
           {pfUAN.status === 'Error' ||
           pfUAN.status === 'In-Valid' ||
-          pfUAN.status === 'Valid No Match' ? (
+          pfUAN.status === 'Valid No Match' ||
+          bre101?.extra_params?.pf_ran ? (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
                 {!pfUAN.ran ? (
@@ -896,7 +966,8 @@ const Eligibility = () => {
 
           {GST.status === 'Error' ||
           GST.status === 'In-Valid' ||
-          GST.status === 'Valid No Match' ? (
+          GST.status === 'Valid No Match' ||
+          bre101?.extra_params?.gst_ran ? (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
                 {!GST.ran ? (
@@ -947,102 +1018,6 @@ const Eligibility = () => {
               </div>
             </div>
           ) : null}
-
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!faceMatch.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>Face Match</p>
-            </div>
-            <div>
-              {faceMatch.loader ? (
-                <div className='ml-auto'>
-                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-                </div>
-              ) : null}
-              {faceMatch.res && (
-                <span className='text-xs font-normal text-light-grey'>{faceMatch.res}</span>
-              )}
-            </div>
-          </div>
-
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
-            <div className='flex items-center gap-1'>
-              {!upiName.ran ? (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
-                    stroke='#EC7739'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width='24'
-                  height='13'
-                  viewBox='0 0 18 13'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M17 1L6 12L1 7'
-                    stroke='#147257'
-                    strokeWidth='1.5'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              )}
-
-              <p className='text-sm text-primary-black'>UPI Name</p>
-            </div>
-            <div>
-              {upiName.loader ? (
-                <div className='ml-auto'>
-                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-                </div>
-              ) : null}
-              {upiName.res && (
-                <span className='text-xs font-normal text-light-grey'>{upiName.res}</span>
-              )}
-            </div>
-          </div>
 
           {display ? (
             <>
@@ -1151,6 +1126,182 @@ const Eligibility = () => {
               </div>
             </>
           ) : null}
+
+          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex items-center gap-1'>
+              {!upiName.ran ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                    stroke='#EC7739'
+                    strokeWidth='1.5'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='13'
+                  viewBox='0 0 18 13'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M17 1L6 12L1 7'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              )}
+
+              <p className='text-sm text-primary-black'>UPI Name</p>
+            </div>
+            <div>
+              {upiName.loader ? (
+                <div className='ml-auto'>
+                  <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+                </div>
+              ) : null}
+              {upiName.res && (
+                <span className='text-xs font-normal text-light-grey'>{upiName.res}</span>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <p className='text-sm text-primary-black'>Primary applicant</p>
+
+            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5 mt-2'>
+              <div className='flex items-center gap-1'>
+                {!faceMatch.ran ? (
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                      stroke='#EC7739'
+                      strokeWidth='1.5'
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width='24'
+                    height='13'
+                    viewBox='0 0 18 13'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M17 1L6 12L1 7'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                )}
+
+                <p className='text-sm text-primary-black'>Face Match</p>
+              </div>
+              <div>
+                {faceMatch.loader ? (
+                  <div className='ml-auto'>
+                    <img
+                      src={loading}
+                      alt='loading'
+                      className='animate-spin duration-300 ease-out'
+                    />
+                  </div>
+                ) : null}
+
+                {faceMatchResponse && (
+                  <span className='text-xs font-normal text-light-grey'>
+                    {faceMatchResponse?.main_applicant?.[0]?.Face_match_with_ID_Proof}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {edited_applicants.map((data, index) =>
+            !data?.applicant_details?.is_primary ? (
+              <div key={index}>
+                <p className='text-sm text-primary-black'>
+                  {data?.applicant_details?.applicant_type}
+                </p>
+
+                <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5 mt-2'>
+                  <div className='flex items-center gap-1'>
+                    {!faceMatch.ran ? (
+                      <svg
+                        width='24'
+                        height='24'
+                        viewBox='0 0 24 24'
+                        fill='none'
+                        xmlns='http://www.w3.org/2000/svg'
+                      >
+                        <path
+                          d='M16.4 15.2C17.8833 17.1777 16.4721 20 14 20L10 20C7.52786 20 6.11672 17.1777 7.6 15.2L8.65 13.8C9.45 12.7333 9.45 11.2667 8.65 10.2L7.6 8.8C6.11672 6.82229 7.52786 4 10 4L14 4C16.4721 4 17.8833 6.82229 16.4 8.8L15.35 10.2C14.55 11.2667 14.55 12.7333 15.35 13.8L16.4 15.2Z'
+                          stroke='#EC7739'
+                          strokeWidth='1.5'
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        width='24'
+                        height='13'
+                        viewBox='0 0 18 13'
+                        fill='none'
+                        xmlns='http://www.w3.org/2000/svg'
+                      >
+                        <path
+                          d='M17 1L6 12L1 7'
+                          stroke='#147257'
+                          strokeWidth='1.5'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                        />
+                      </svg>
+                    )}
+
+                    <p className='text-sm text-primary-black'>Face Match</p>
+                  </div>
+                  <div>
+                    {faceMatch.loader ? (
+                      <div className='ml-auto'>
+                        <img
+                          src={loading}
+                          alt='loading'
+                          className='animate-spin duration-300 ease-out'
+                        />
+                      </div>
+                    ) : null}
+
+                    {console.log(index + 1)}
+                    {faceMatchResponse && (
+                      <span className='text-xs font-normal text-light-grey'>
+                        {
+                          faceMatchResponse?.[`co_applicant_${index + 1}`]?.[0]
+                            ?.Face_match_with_ID_Proof
+                        }
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : null,
+          )}
         </div>
 
         <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center w-full '>
@@ -1159,7 +1310,7 @@ const Eligibility = () => {
         </p>
       </div>
 
-      <div className='flex flex-col gap-[18px] fixed bottom-0 border-t-[1px] w-full p-4'>
+      <div className='flex flex-col gap-[18px] fixed bottom-0 border-t-[1px] w-full p-4 bg-white'>
         <Button
           disabled={!bre201}
           inputClasses={`w-full h-12 ${bre201 ? 'font-semibold' : 'font-normal'}`}

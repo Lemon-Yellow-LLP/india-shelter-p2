@@ -140,7 +140,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       if (e.target.value === ' ') {
         return;
       }
-      const value = e.target.value;
+      let value = e.target.value;
+      value = value.trimStart().replace(/\s\s+/g, ' ');
       const pattern = /^[A-Za-z]+$/;
       const pattern2 = /^[a-zA-Z\s]*$/;
 
