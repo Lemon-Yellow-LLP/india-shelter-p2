@@ -47,7 +47,6 @@ const ApplicantDetails = () => {
     setToastMessage,
     setFieldTouched,
     activeIndex,
-    setValues,
     setCurrentStepIndex,
     removeCoApplicant,
   } = useContext(LeadContext);
@@ -314,16 +313,6 @@ const ApplicantDetails = () => {
       ) {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['date_of_birth']: true }));
       }
-    }
-  };
-
-  // useEffect(() => {
-  //   checkDate();
-  // }, [date, values.applicants[activeIndex]?.applicant_details.date_of_birth]);
-
-  const datePickerScrollToTop = () => {
-    if (dateInputRef.current) {
-      dateInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
