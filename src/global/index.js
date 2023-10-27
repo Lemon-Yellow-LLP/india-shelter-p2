@@ -391,7 +391,18 @@ export async function getLnTChargesQRCode(leadId) {
 }
 
 export async function checkPaymentStatus(leadId) {
-  const { data } = await axios.post(`${API_URL}/lt-charges/payment-verify/${leadId}`);
+  const controller = new AbortController();
+  setTimeout(() => {
+    controller.abort();
+  }, 30000);
+  const { data } = await axios.post(
+    `${API_URL}/lt-charges/payment-verify/${leadId}`,
+    {},
+    {
+      signal: controller.signal,
+    },
+  );
+
   return data;
 }
 
