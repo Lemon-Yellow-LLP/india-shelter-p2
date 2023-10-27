@@ -74,9 +74,14 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
           }
         }}
         onChange={(e) => {
-          const value = e.currentTarget.value;
+          let value = e.currentTarget.value;
+          value = value.trimStart().replace(/\s\s+/g, ' ');
           const name = e.currentTarget.name;
-          const address_pattern = /^[a-zA-Z]+$/;
+          // const address_pattern = /^[a-zA-Z]+$/;
+          const address_pattern = /^[A-Za-z\s]+$/;
+          if (!address_pattern.test(value) && value.length > 0) {
+            return;
+          }
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
 
@@ -145,8 +150,12 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
             }
           }}
           onChange={(e) => {
-            const value = e.currentTarget.value;
-            const address_pattern = /^[a-zA-Z\s]+$/;
+            let value = e.currentTarget.value;
+            value = value.trimStart().replace(/\s\s+/g, ' ');
+            const address_pattern = /^[A-Za-z\s]+$/;
+            if (!address_pattern.test(value) && value.length > 0) {
+              return;
+            }
             if (address_pattern.exec(value[value.length - 1])) {
               setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
             }
@@ -195,6 +204,9 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
         onChange={(e) => {
           const value = e.currentTarget.value;
           const pattern = /^[a-zA-Z0-9]+$/;
+          if (!pattern.test(value) && value.length > 0) {
+            return;
+          }
           if (pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
