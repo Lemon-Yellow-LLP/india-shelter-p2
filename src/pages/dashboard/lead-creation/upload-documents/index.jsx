@@ -1620,7 +1620,6 @@ const UploadDocuments = () => {
             property_paper: false,
           };
         }
-        console.log(requiredFields, prev);
         return requiredFields;
       });
     }
