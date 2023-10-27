@@ -1288,7 +1288,7 @@ const Eligibility = () => {
                       </div>
                     ) : null}
 
-                    {console.log(index + 1)}
+                    {/* {console.log(index + 1)} */}
                     {faceMatchResponse && (
                       <span className='text-xs font-normal text-light-grey'>
                         {

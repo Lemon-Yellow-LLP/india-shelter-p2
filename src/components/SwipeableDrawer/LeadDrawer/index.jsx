@@ -436,8 +436,11 @@ export default function SwipeableDrawerComponent() {
 
                             <span className='font-semibold text-[16px] leading-[24px] text-[#373435]'>
                               {
-                                values.applicants.filter((e) => !e.applicant_details.is_primary)
-                                  .length
+                                values.applicants.filter(
+                                  (e) =>
+                                    !e.applicant_details.is_primary &&
+                                    e.applicant_details.is_mobile_verified,
+                                ).length
                               }
                               <span className='text-[#96989A]'>/4</span>
                             </span>
@@ -449,14 +452,18 @@ export default function SwipeableDrawerComponent() {
                               addApplicant();
                             }}
                             className={
-                              values?.applicants.length >= 5 ||
+                              values.applicants.filter(
+                                (e) => e.applicant_details.is_mobile_verified,
+                              ).length >= 5 ||
                               values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
                                 ?.progress !== 100
                                 ? 'text-[#96989A] font-medium text-[16px]'
                                 : 'text-primary-red font-medium text-[16px]'
                             }
                             disabled={
-                              values?.applicants.length >= 5 ||
+                              values.applicants.filter(
+                                (e) => e.applicant_details.is_mobile_verified,
+                              ).length >= 5 ||
                               values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
                                 ?.progress !== 100
                             }
@@ -489,7 +496,7 @@ export default function SwipeableDrawerComponent() {
                                 onChange={(e) => setChangePrimaryAlert(true)}
                               />
                             </div>
-                            {console.log(values?.applicants?.[activeCoApplicantIndex])}
+
                             <div className='flex justify-end gap-2 items-center'>
                               <span className='text-[#727376] text-[12px] font-normal'>
                                 Qualifier:

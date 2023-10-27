@@ -555,7 +555,7 @@ const UploadDocuments = () => {
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
         );
-        console.log(applicant);
+        // console.log(applicant);
         const document_meta = applicant.document_meta;
         if ('customer_photos' in document_meta == false) {
           document_meta['customer_photos'] = [];
