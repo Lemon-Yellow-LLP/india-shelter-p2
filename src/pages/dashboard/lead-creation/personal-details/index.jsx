@@ -65,7 +65,12 @@ const PersonalDetails = () => {
       } else {
         let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
 
-        let addData = { ...clonedCoApplicantValues.personal_details, [name]: value };
+        let addData = {
+          ...clonedCoApplicantValues.personal_details,
+          [name]: value,
+          date_of_birth: values?.applicants[activeIndex]?.personal_details?.date_of_birth,
+          mobile_number: values?.applicants[activeIndex]?.personal_details?.mobile_number,
+        };
         await addApi('personal', {
           ...addData,
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
