@@ -263,7 +263,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.personal_details?.id) {
-      console.log(errors?.applicants?.[activeIndex]);
+      // console.log(errors?.applicants?.[activeIndex]);
       if (
         !errors?.applicants?.[activeIndex]?.personal_details?.id_type &&
         !errors?.applicants?.[activeIndex]?.personal_details?.id_number

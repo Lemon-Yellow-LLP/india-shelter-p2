@@ -910,7 +910,10 @@ const Qualifier = () => {
             Eligibility can be increased by adding Co-applicant{` `}
             <Button
               className={`underline ${
-                !bre101.res ? 'text-light-grey pointer-events-none' : 'text-primary-red'
+                !bre101.res ||
+                values.applicants.filter((e) => e.applicant_details.is_mobile_verified).length >= 5
+                  ? 'text-light-grey pointer-events-none'
+                  : 'text-primary-red'
               }`}
               onClick={(e) => {
                 e.preventDefault();
