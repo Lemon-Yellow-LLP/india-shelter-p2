@@ -85,6 +85,7 @@ const Eligibility = () => {
   const [bre201, setBre201] = useState(false);
   const [faceMatchResponse, setFaceMatchResponse] = useState(null);
   const [edited_applicants, setEditedApplicants] = useState([]);
+  const [sdfcResponse, setSdfcResponse] = useState(false);
 
   useEffect(() => {
     setEditedApplicants(
@@ -99,6 +100,7 @@ const Eligibility = () => {
 
       if (res.bre_101_response && lead.bre_201_response) {
         setBre101(res);
+        setSdfcResponse(true);
         setProgress(
           values?.applicants?.[activeIndex]?.applicant_details.extra_params
             .eligibility_api_progress,
@@ -685,19 +687,19 @@ const Eligibility = () => {
         console.log(err);
       }
 
-      // try {
-      //   const bre_res = await pushToSalesforce(
-      //     values?.applicants?.[activeIndex]?.applicant_details.lead_id,
-      //     {},
-      //   );
-      //   if (bre_res.bre_201_response.statusCode != 200) return;
-      // } catch (err) {
-      //   console.log(err);
-      // }
+      try {
+        const sdfc_res = await pushToSalesforce(
+          values?.applicants?.[activeIndex]?.applicant_details.lead_id,
+          {},
+        );
 
-      // setTimeout(() => {
-      //   setToastMessage('Data has been successfully pushed to the Salesforce');
-      // }, 7000);
+        if (!sdfc_res) return;
+
+        setToastMessage('Data has been successfully pushed to the Salesforce');
+        setSdfcResponse(true);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     breTwo();
@@ -1234,7 +1236,7 @@ const Eligibility = () => {
             </div>
           </div>
 
-          {edited_applicants.map((data, index) =>
+          {edited_applicants?.map((data, index) =>
             !data?.applicant_details?.is_primary ? (
               <div key={index}>
                 <p className='text-sm text-primary-black'>
@@ -1312,8 +1314,8 @@ const Eligibility = () => {
 
       <div className='flex flex-col gap-[18px] fixed bottom-0 border-t-[1px] w-full p-4 bg-white'>
         <Button
-          disabled={!bre201}
-          inputClasses={`w-full h-12 ${bre201 ? 'font-semibold' : 'font-normal'}`}
+          disabled={!sdfcResponse}
+          inputClasses={`w-full h-12 ${sdfcResponse ? 'font-semibold' : 'font-normal'}`}
           primary={true}
           link='/'
         >
