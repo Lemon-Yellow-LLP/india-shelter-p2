@@ -225,7 +225,7 @@ const applicantSchema = Yup.object().shape({
     industries: Yup.string().required('This field is mandatory'),
 
     gst_number: Yup.string().matches(
-      /^([0-9]{2}[a-zA-Z]{4}([a-zA-Z]{1}|[0-9]{1})[0-9]{4}[a-zA-Z]{1}([a-zA-Z]|[0-9]){3}){0,15}$/,
+      /^([0][1-9]|[1-2][0-9]|[3][0-7])([a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[0-9]{1}[zZ]{1}[0-9a-zA-Z]{1})+$/,
       'Invalid GST Number Eg: 06AAAPB2117A1ZI ',
     ),
 

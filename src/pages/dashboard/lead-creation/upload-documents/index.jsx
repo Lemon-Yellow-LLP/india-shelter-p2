@@ -276,16 +276,122 @@ const UploadDocuments = () => {
   }, []);
 
   const handleTextInputChange = useCallback(
+    // (e) => {
+    //   const value = e.target.value;
+    //   const pattern = /^[A-Za-z]+$/;
+    //   if (
+    //     pattern.exec(value[value.length - 1]) &&
+    //     e.target.name !== `applicants[${activeIndex}].personal_details.email` &&
+    //     e.target.name !== `applicants[${activeIndex}].personal_details.id_number` &&
+    //     e.target.name !== `applicants[${activeIndex}].personal_details.address_proof_number`
+    //   ) {
+    //     setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+    //   }
+
+    //   if (
+    //     e.target.name === `applicants[${activeIndex}].personal_details.id_number` ||
+    //     e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number`
+    //   ) {
+    //     if (
+    //       e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
+    //       values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR'
+    //     ) {
+    //       if (e.target.selectionStart !== value.length) {
+    //         e.target.selectionStart = e.target.selectionEnd = value.length;
+    //         return;
+    //       }
+    //       let aadharPattern = /^\d$/;
+    //       if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
+    //         const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
+    //         const maskedAadhar = maskedPortion + value.slice(8);
+    //         setFieldValue(e.target.name, maskedAadhar);
+    //       } else if (
+    //         value.length < values?.applicants?.[activeIndex]?.personal_details?.id_number.length
+    //       ) {
+    //         setFieldValue(e.target.name, value);
+    //       }
+    //     } else if (
+    //       e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
+    //       values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR'
+    //     ) {
+    //       let aadharPattern = /^\d$/;
+    //       if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
+    //         const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
+    //         const maskedAadhar = maskedPortion + value.slice(8);
+    //         setFieldValue(e.target.name, maskedAadhar);
+    //       } else if (
+    //         value.length <
+    //         values?.applicants?.[activeIndex]?.personal_details?.address_proof_number.length
+    //       ) {
+    //         setFieldValue(e.target.name, value);
+    //       }
+    //     } else {
+    //       const pattern2 = /^[A-Za-z0-9]+$/;
+    //       if (pattern2.exec(value[value.length - 1])) {
+    //         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+    //       }
+    //     }
+    //   }
+    // },
     (e) => {
-      const value = e.target.value;
+      if (e.target.value === ' ') {
+        return;
+      }
+      let value = e.target.value;
+      value = value.trimStart().replace(/\s\s+/g, ' ');
       const pattern = /^[A-Za-z]+$/;
+      const pattern2 = /^[a-zA-Z\s]*$/;
+
+      if (value?.trim() == '') {
+        setFieldValue(e.target.name, value);
+      }
+
       if (
-        pattern.exec(value[value.length - 1]) &&
+        pattern2.test(value) &&
+        (e.target.name == `applicants[${activeIndex}].personal_details.father_husband_name` ||
+          e.target.name == `applicants[${activeIndex}].personal_details.mother_name`)
+      ) {
+        setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+      }
+
+      if (
+        pattern.test(value) &&
         e.target.name !== `applicants[${activeIndex}].personal_details.email` &&
         e.target.name !== `applicants[${activeIndex}].personal_details.id_number` &&
         e.target.name !== `applicants[${activeIndex}].personal_details.address_proof_number`
       ) {
         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
+      }
+
+      if (e.target.name === `applicants[${activeIndex}].personal_details.email`) {
+        const value = e.currentTarget.value;
+        const email_pattern = /^[a-zA-Z0-9\s,@\.\/]+$/;
+
+        if (!email_pattern.test(value)) {
+          return;
+        }
+
+        setFieldValue(e.target.name, value);
+        setHasSentOTPOnce(false);
+        setShowOTPInput(false);
+      }
+
+      if (
+        e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
+        values?.applicants?.[activeIndex]?.personal_details?.id_type === 'Passport'
+      ) {
+        if (value[0] === 'Q' || value[0] === 'X' || value[0] === 'Z') {
+          return;
+        }
+      }
+
+      if (
+        e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
+        values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'Passport'
+      ) {
+        if (value[0] === 'Q' || value[0] === 'X' || value[0] === 'Z') {
+          return;
+        }
       }
 
       if (
@@ -314,6 +420,10 @@ const UploadDocuments = () => {
           e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
           values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR'
         ) {
+          if (e.target.selectionStart !== value.length) {
+            e.target.selectionStart = e.target.selectionEnd = value.length;
+            return;
+          }
           let aadharPattern = /^\d$/;
           if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
             const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
@@ -327,7 +437,7 @@ const UploadDocuments = () => {
           }
         } else {
           const pattern2 = /^[A-Za-z0-9]+$/;
-          if (pattern2.exec(value[value.length - 1])) {
+          if (pattern2.test(value)) {
             setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
         }
@@ -560,7 +670,7 @@ const UploadDocuments = () => {
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
         );
-        console.log(applicant);
+        // console.log(applicant);
         const document_meta = applicant.document_meta;
         if ('customer_photos' in document_meta == false) {
           document_meta['customer_photos'] = [];
@@ -1590,11 +1700,44 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function getRequiredFields() {
-      const { extra_params } = await getApplicantById(
+      const { extra_params, document_meta } = await getApplicantById(
         values?.applicants?.[activeIndex]?.applicant_details?.id,
       );
 
       setRequiredFieldsStatus({ ...extra_params.upload_required_fields_status });
+      setRequiredFieldsStatus((prev) => {
+        let requiredFields = prev;
+        if (
+          values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
+          document_meta?.salary_slip_photos?.find((slip) => slip?.active)
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            salary_slip: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            salary_slip: false,
+          };
+        }
+
+        if (
+          values?.property_details?.property_identification_is === 'not-yet' ||
+          document_meta?.property_paper_photos?.find((slip) => slip?.active)
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            property_paper: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            property_paper: false,
+          };
+        }
+        return requiredFields;
+      });
     }
     getRequiredFields();
   }, []);
@@ -1725,6 +1868,21 @@ const UploadDocuments = () => {
                           }
                         }}
                         inputClasses='text-xs capitalize h-3'
+                        onKeyDown={(e) => {
+                          if (
+                            values?.applicants?.[activeIndex]?.personal_details?.id_type ===
+                              'AADHAR' &&
+                            (e.key === 'ArrowUp' ||
+                              e.key === 'ArrowDown' ||
+                              e.key === 'ArrowLeft' ||
+                              e.key === 'ArrowRight' ||
+                              e.key === ' ' ||
+                              e.keyCode === 32 ||
+                              (e.keyCode >= 65 && e.keyCode <= 90))
+                          ) {
+                            e.preventDefault();
+                          }
+                        }}
                       />
                     </div>
                     {idStatus !== 'Valid' &&
@@ -1953,6 +2111,21 @@ const UploadDocuments = () => {
                           }
                         }}
                         inputClasses='text-xs capitalize h-3'
+                        onKeyDown={(e) => {
+                          if (
+                            values?.applicants?.[activeIndex]?.personal_details?.id_type ===
+                              'AADHAR' &&
+                            (e.key === 'ArrowUp' ||
+                              e.key === 'ArrowDown' ||
+                              e.key === 'ArrowLeft' ||
+                              e.key === 'ArrowRight' ||
+                              e.key === ' ' ||
+                              e.keyCode === 32 ||
+                              (e.keyCode >= 65 && e.keyCode <= 90))
+                          ) {
+                            e.preventDefault();
+                          }
+                        }}
                       />
                     </div>
 
@@ -2082,21 +2255,23 @@ const UploadDocuments = () => {
             </div>
           </div>
 
-          <PdfAndImageUpload
-            files={propertyPapers}
-            setFile={setPropertyPapers}
-            uploads={propertyPaperUploads}
-            setUploads={setPropertyPaperUploads}
-            setEdit={setEditPropertyPaper}
-            pdf={propertyPdf}
-            setPdf={setPropertyPdf}
-            label='Property papers'
-            required
-            hint='File size should be less than 5MB'
-            setSingleFile={setPropertyPapersFile}
-            setLatLong={setPropertyPapersLatLong}
-            imageArrayBorder={true}
-          />
+          {values?.property_details?.property_identification_is !== 'not-yet' && (
+            <PdfAndImageUpload
+              files={propertyPapers}
+              setFile={setPropertyPapers}
+              uploads={propertyPaperUploads}
+              setUploads={setPropertyPaperUploads}
+              setEdit={setEditPropertyPaper}
+              pdf={propertyPdf}
+              setPdf={setPropertyPdf}
+              label='Property papers'
+              required
+              hint='File size should be less than 5MB'
+              setSingleFile={setPropertyPapersFile}
+              setLatLong={setPropertyPapersLatLong}
+              imageArrayBorder={true}
+            />
+          )}
 
           {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' && (
             <ImageUpload

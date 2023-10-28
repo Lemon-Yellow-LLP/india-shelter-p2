@@ -13,6 +13,7 @@ import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer'
 import { IconClose } from '../../../../assets/icons';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWithSendOtp';
+import loading from '../../../../assets/icons/loader_white.png';
 import QRCode from 'react-qr-code';
 import {
   addLnTCharges,
@@ -591,7 +592,10 @@ const StatusButton = ({ disabled, isLoading = false, ...props }) => {
        `}
       {...props}
     >
-      {isLoading ? <LoaderIcon className='animate-spin' /> : null}
+      {/* {isLoading ? <LoaderIcon className='animate-spin' /> : null} */}
+      {isLoading ? (
+        <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+      ) : null}
       <span className='text-center text-base not-italic font-semibold'>
         {isLoading && !disabled ? 'Checking Status' : 'Check Status'}
       </span>

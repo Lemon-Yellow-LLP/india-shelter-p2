@@ -1,8 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getDashboardLeadList, testLogout } from '../../global';
-import { AuthContext } from '../../context/AuthContextProvider';
-import { Header } from '../../components';
+import { getDashboardLeadList, logout } from '../../global';
+import { Button, Header } from '../../components';
 import AddLeadIcon from '../../assets/icons/add-lead';
 import Searchbox from '../../components/Searchbox.jsx/index.jsx';
 import ArrowRightIcon2 from '../../assets/icons/arrow-right-2';
@@ -16,6 +15,10 @@ import { LeadContext } from '../../context/LeadContextProvider';
 import { defaultValuesLead } from '../../context/defaultValuesLead';
 import PropTypes from 'prop-types';
 import LoaderDynamicText from '../../components/Loader/LoaderDynamicText';
+import LogoutIcon from '../../assets/icons/logout-icon';
+import DynamicDrawer from '../../components/SwipeableDrawer/DynamicDrawer';
+import { IconClose } from '../../assets/icons';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 LeadCard.propTypes = {
   title: PropTypes.string,
@@ -30,6 +33,7 @@ export default function Dashboard() {
   const [leadList, setLeadList] = useState([]);
   const [primaryApplicantList, setPrimaryApplicantList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
+  const [showLogout, setShowLogout] = useState();
 
   const [loading, setLoading] = useState(false);
 
@@ -40,6 +44,8 @@ export default function Dashboard() {
     key: 'selection',
   });
   const navigate = useNavigate();
+
+  const { token } = useContext(AuthContext);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -62,6 +68,27 @@ export default function Dashboard() {
     setFilteredList(primaryApplicantList);
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout(
+        {
+          status: 'no',
+          logout_via: 'New Login',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+
+      window.location.replace('/');
+    } catch (err) {
+      window.location.replace('/');
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -81,14 +108,21 @@ export default function Dashboard() {
   }, [selectionRange]);
 
   useEffect(() => {
+    if (leadList.length === 0) return;
+    setLoading(true);
     const data = leadList;
     setPrimaryApplicantList(data);
     setFilteredList(data);
+    setLoading(false);
   }, [leadList]);
 
   return (
     <div className='relative h-screen overflow-hidden'>
-      <Header />
+      <Header>
+        <button onClick={() => setShowLogout(true)} className='ml-auto'>
+          <LogoutIcon />
+        </button>
+      </Header>
 
       {/* Dashboard Title */}
       <div className='p-4 pb-5 bg-neutral-white space-y-4'>
@@ -159,6 +193,35 @@ export default function Dashboard() {
           <LoaderDynamicText text='Loading...' textColor='black' height='60%' />
         </div>
       )}
+
+      {/* Confirm skip for now */}
+      <DynamicDrawer open={showLogout} setOpen={setShowLogout} height='182px'>
+        <div className='flex gap-1 w-full'>
+          <div className=' w-full'>
+            <h4 className='text-center text-base not-italic font-semibold text-primary-black mb-2'>
+              Are you sure you want to log out?
+            </h4>
+            <p className='text-center text-xs not-italic font-normal text-primary-black'>
+              You can login back to access your content
+            </p>
+          </div>
+          <div className='mb-auto'>
+            <button onClick={() => setShowLogout(false)}>
+              <IconClose />
+            </button>
+          </div>
+        </div>
+
+        <div className='w-full flex gap-4 mt-6'>
+          <Button inputClasses='w-full h-[46px]' onClick={() => setShowLogout(false)}>
+            Cancel
+          </Button>
+          <Button primary={true} inputClasses=' w-full h-[46px]' onClick={handleLogout}>
+            Log out
+          </Button>
+        </div>
+      </DynamicDrawer>
+
       <button
         onClick={() => {
           let newDefaultValues = structuredClone(defaultValuesLead);
