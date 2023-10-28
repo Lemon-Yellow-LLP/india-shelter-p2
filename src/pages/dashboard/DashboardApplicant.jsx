@@ -172,6 +172,7 @@ export default function DashboardApplicant() {
       <Titlebar
         title={`${primaryApplicant?.applicant_details?.first_name} ${primaryApplicant?.applicant_details?.middle_name} ${primaryApplicant?.applicant_details?.last_name}`}
         id={id}
+        primaryApplicant={primaryApplicant}
       />
 
       <Box sx={{ width: '100%', background: '#FEFEFE' }}>
@@ -797,7 +798,7 @@ export default function DashboardApplicant() {
             ref={primarySelectedStep == 'eligibility' ? primarySelectedStepRef : null}
             title='ELIGIBILITY'
             message={
-              activeCoApplicant?.applicant_details?.extra_params?.eligibility
+              primaryApplicant?.applicant_details?.extra_params?.eligibility
                 ? 'Eligibility completed'
                 : 'Eligibility incomplete'
             }
@@ -1268,7 +1269,7 @@ export default function DashboardApplicant() {
   );
 }
 
-const Titlebar = ({ title, id }) => {
+const Titlebar = ({ title, id, primaryApplicant }) => {
   const { setValues, setActiveIndex } = useContext(LeadContext);
   const { setPhoneNumberList } = useContext(AuthContext);
 
@@ -1339,8 +1340,16 @@ const Titlebar = ({ title, id }) => {
           </span>
         </p>
       </div>
-      <button className='ml-4 ' onClick={() => handleOpenForm(id)} disabled={totalProgress === 100}>
-        {totalProgress === 100 ? <EditIcon /> : <EditLeadEnabled />}
+      <button
+        className='ml-4 '
+        onClick={() => handleOpenForm(id)}
+        disabled={primaryApplicant?.applicant_details?.extra_params?.eligibility}
+      >
+        {primaryApplicant?.applicant_details?.extra_params?.eligibility ? (
+          <EditIcon />
+        ) : (
+          <EditLeadEnabled />
+        )}
       </button>
     </div>
   );

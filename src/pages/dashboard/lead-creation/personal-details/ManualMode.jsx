@@ -50,26 +50,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     }
   }, [activeIndex, values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
 
-  const dobUpdate = useCallback(() => {
-    if (date && date.length) {
-      var dateParts = date?.split('/');
-      var day = parseInt(dateParts[0], 10);
-      var month = parseInt(dateParts[1], 10);
-      var year = parseInt(dateParts[2], 10);
-
-      const finalDate = `${year}-${month}-${day}`;
-
-      setFieldValue(`applicants[${activeIndex}].personal_details.date_of_birth`, finalDate);
-      if (values?.applicants[activeIndex]?.personal_details?.id) {
-        updateFields('date_of_birth', finalDate);
-      }
-    }
-  }, [date]);
-
-  useEffect(() => {
-    dobUpdate();
-  }, [date]);
-
   useEffect(() => {
     updateProgressApplicantSteps(1, requiredFieldsStatus);
   }, [requiredFieldsStatus]);
@@ -330,6 +310,26 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         return false;
       });
   };
+
+  const dobUpdate = useCallback(() => {
+    if (date && date.length) {
+      var dateParts = date?.split('/');
+      var day = parseInt(dateParts[0], 10);
+      var month = parseInt(dateParts[1], 10);
+      var year = parseInt(dateParts[2], 10);
+
+      const finalDate = `${year}-${month}-${day}`;
+
+      setFieldValue(`applicants[${activeIndex}].personal_details.date_of_birth`, finalDate);
+      if (values?.applicants[activeIndex]?.personal_details?.id) {
+        updateFields('date_of_birth', finalDate);
+      }
+    }
+  }, [date]);
+
+  useEffect(() => {
+    dobUpdate();
+  }, [date]);
 
   const mobileNumberUpdate = useCallback(() => {
     setFieldValue(

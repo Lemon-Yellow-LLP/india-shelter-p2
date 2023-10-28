@@ -290,10 +290,11 @@ const WorkIncomeDetails = () => {
         ) : (
           <Topbar
             title='Adding Co-applicant'
-            id={values?.applicants?.[activeIndex]?.applicant_details?.id}
+            id={values?.lead?.id}
             showClose={false}
             showBack={true}
             coApplicant={true}
+            coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
           />
         )}
         <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
