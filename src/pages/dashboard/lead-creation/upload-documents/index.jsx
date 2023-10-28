@@ -623,7 +623,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.property_paper_photos.find((data) => {
+      const active_uploads = res.document_meta.property_paper_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -702,7 +702,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.customer_photos.find((data) => {
+      const active_uploads = res.document_meta.customer_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -835,7 +835,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.id_proof_photos.find((data) => {
+      const active_uploads = res.document_meta.id_proof_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -978,7 +978,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.address_proof_photos.find((data) => {
+      const active_uploads = res.document_meta.address_proof_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -1105,7 +1105,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.salary_slip_photos.find((data) => {
+      const active_uploads = res.document_meta.salary_slip_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -1231,7 +1231,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.form_60_photos.find((data) => {
+      const active_uploads = res.document_meta.form_60_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -1357,7 +1357,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.property_photos.find((data) => {
+      const active_uploads = res.document_meta.property_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -1433,7 +1433,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.lo_selfie.find((data) => {
+      const active_uploads = res.document_meta.lo_selfie?.find((data) => {
         return data.active === true;
       });
 
