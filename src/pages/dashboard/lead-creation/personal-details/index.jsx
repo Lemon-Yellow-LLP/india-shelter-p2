@@ -19,8 +19,6 @@ const PersonalDetails = () => {
     touched,
     setFieldValue,
     activeIndex,
-    setActiveIndex,
-    existingData,
     setValues,
     setCurrentStepIndex,
   } = useContext(LeadContext);
@@ -44,8 +42,8 @@ const PersonalDetails = () => {
 
   const updateFields = async (name, value) => {
     let newData = {
-      date_of_birth: values?.applicants[activeIndex]?.personal_details?.date_of_birth,
-      mobile_number: values?.applicants[activeIndex]?.personal_details?.mobile_number,
+      date_of_birth: values?.applicants[activeIndex]?.applicant_details?.date_of_birth,
+      mobile_number: values?.applicants[activeIndex]?.applicant_details?.mobile_number,
     };
     newData[name] = value;
 
@@ -68,8 +66,8 @@ const PersonalDetails = () => {
         let addData = {
           ...clonedCoApplicantValues.personal_details,
           [name]: value,
-          date_of_birth: values?.applicants[activeIndex]?.personal_details?.date_of_birth,
-          mobile_number: values?.applicants[activeIndex]?.personal_details?.mobile_number,
+          date_of_birth: values?.applicants[activeIndex]?.applicant_details?.date_of_birth,
+          mobile_number: values?.applicants[activeIndex]?.applicant_details?.mobile_number,
         };
         await addApi('personal', {
           ...addData,
