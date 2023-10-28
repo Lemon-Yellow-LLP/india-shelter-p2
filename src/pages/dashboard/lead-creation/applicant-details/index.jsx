@@ -508,11 +508,12 @@ const ApplicantDetails = () => {
         ) : (
           <Topbar
             title='Adding Co-applicant'
-            id={values?.applicants?.[activeIndex]?.applicant_details?.id}
+            id={values?.lead?.id}
             showClose={false}
             showBack={true}
             coApplicant={true}
             handleBack={handleBack}
+            coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
           />
         )}
         <div

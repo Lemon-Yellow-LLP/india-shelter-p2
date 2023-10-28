@@ -26,6 +26,7 @@ export default function Topbar({
   showClose = true,
   coApplicant,
   handleBack,
+  coApplicantName,
 }) {
   const navigate = useNavigate();
 
@@ -68,9 +69,17 @@ export default function Topbar({
           <h3 className='truncate'>{title}</h3>
           <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
             {coApplicant ? 'CO-APPLICANT:' : 'APP ID:'}
-            <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey pl-1'>
+            <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey pl-1 pr-2'>
               {id}
             </span>
+            {coApplicant ? (
+              <>
+                <span className='text-[#D9D9D9]'>|</span>
+                <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey pl-2'>
+                  {coApplicantName}
+                </span>
+              </>
+            ) : null}
           </p>
         </div>
         {showClose ? (
