@@ -26,6 +26,7 @@ const LeadContextProvider = ({ children }) => {
   const [primaryIndex, setPrimaryIndex] = useState(0);
   const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
   const [coApplicants, setCoApplicants] = useState([]);
+  const [pincodeErr, setPincodeErr] = useState({});
 
   const location = useLocation();
 
@@ -224,6 +225,8 @@ const LeadContextProvider = ({ children }) => {
         setActiveCoApplicantIndex,
         coApplicants,
         setCoApplicants,
+        pincodeErr,
+        setPincodeErr,
       }}
     >
       {children}
