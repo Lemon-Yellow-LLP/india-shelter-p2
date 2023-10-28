@@ -785,13 +785,13 @@ export default function DashboardApplicant() {
           />
           <Separator />
 
-          <FormDetails
+          {/* <FormDetails
             ref={primarySelectedStep == 'preview' ? primarySelectedStepRef : null}
             title='PREVIEW'
             data={[]}
             message={'Will fill this once Banking details is done'}
           />
-          <Separator />
+          <Separator /> */}
 
           <FormDetails
             ref={primarySelectedStep == 'eligibility' ? primarySelectedStepRef : null}
