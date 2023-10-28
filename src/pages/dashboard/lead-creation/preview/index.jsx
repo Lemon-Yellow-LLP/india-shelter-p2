@@ -47,6 +47,17 @@ export default function Preview() {
     return flattenExtraParamsHelper(obj);
   }
 
+  function checkTotalProgress(applicant) {
+    return (
+      applicant?.applicant_details?.extra_params.progress == 100 &&
+      applicant?.personal_details?.extra_params.progress == 100 &&
+      applicant?.address_detail?.extra_params.progress == 100 &&
+      applicant?.work_income_detail?.extra_params.progress == 100 &&
+      applicant?.applicant_details?.extra_params.banking_progress == 100 &&
+      applicant?.applicant_details?.extra_params.upload_progress == 100
+    );
+  }
+
   useEffect(() => {
     let _errors = Object.assign({}, errors);
     // console.error(errors);
@@ -302,7 +313,7 @@ export default function Preview() {
   const CoApplicantDetails = () => {
     return (
       <>
-        {!errors?.applicants?.[coApplicantIndexes[coApplicantIndex]] ? (
+        {checkTotalProgress(values?.applicants?.[coApplicantIndexes[coApplicantIndex]]) ? (
           <StepCompleted />
         ) : (
           <div className='flex-1 flex flex-col gap-4 p-4 pb-[200px] overflow-auto bg-[##F9F9F9]'>
@@ -608,13 +619,9 @@ export default function Preview() {
   const PrimaryApplicantDetails = () => {
     return (
       <>
-        {!errors?.applicants?.[primaryIndex] &&
+        {checkTotalProgress(values?.applicants?.[primaryIndex]) &&
         values?.property_details?.extra_params?.progress == 100 &&
-        values?.reference_details?.extra_params?.progress == 100 &&
-        values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.upload_progress ==
-          100 &&
-        values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.banking_progress ==
-          100 ? (
+        values?.reference_details?.extra_params?.progress == 100 ? (
           <StepCompleted />
         ) : (
           <div className='flex-1 flex flex-col gap-4 p-4 pb-[200px] overflow-auto bg-[##F9F9F9]'>
@@ -994,10 +1001,10 @@ export default function Preview() {
             primary={true}
             disabled={
               activeStep === 0
-                ? errors?.applicants?.[primaryIndex] ||
+                ? !checkTotalProgress(values?.applicants?.[primaryIndex]) ||
                   values?.property_details?.extra_params?.progress != 100 ||
                   values?.reference_details?.extra_params?.progress != 100
-                : errors?.applicants?.[coApplicantIndexes[coApplicantIndex]]
+                : !checkTotalProgress(values?.applicants?.[coApplicantIndexes[coApplicantIndex]])
             }
             inputClasses='w-1/2 h-[46px]'
             onClick={nextStep}
