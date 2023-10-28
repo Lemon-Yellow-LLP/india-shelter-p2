@@ -39,10 +39,10 @@ export const PrimaryDropdownOptions = [
     label: 'Upload Documents',
     value: 'upload_documents',
   },
-  {
-    label: 'Preview',
-    value: 'preview',
-  },
+  // {
+  //   label: 'Preview',
+  //   value: 'preview',
+  // },
   {
     label: 'Eligibility',
     value: 'eligibility',
