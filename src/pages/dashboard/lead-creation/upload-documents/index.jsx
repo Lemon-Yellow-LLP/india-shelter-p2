@@ -471,6 +471,8 @@ const UploadDocuments = () => {
           extra_params: { ...extra_params, is_upload_otp_verified: true },
         });
 
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: true }));
+
         setDisablePhoneNumber(false);
         setMobileVerified(true);
       } catch (err) {
@@ -1424,8 +1426,6 @@ const UploadDocuments = () => {
 
         setSelfieUploads({ type: 'lo_selfie', data: active_upload });
       }
-
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: true }));
     }
     selfie.length > 0 && addSelfiePhoto();
   }, [selfieFile]);
@@ -1502,8 +1502,6 @@ const UploadDocuments = () => {
 
         setDocUploads({ type: 'other_docs', data: active_uploads });
       }
-
-      // setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: true }));
     }
     docs.length > 0 && addOtherDocPhotos();
   }, [docsFile]);
@@ -1555,19 +1553,6 @@ const UploadDocuments = () => {
     }
     editDoc.id && editOtherDocPhotos();
   }, [editDoc]);
-
-  // useEffect(() => {
-  //   async function removeProgress() {
-  //     const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-  //     const active_uploads = res.document_meta.other_docs.find((data) => {
-  //       return data.active === true;
-  //     });
-  //     if (!active_uploads) {
-  //       setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: false }));
-  //     }
-  //   }
-  //   removeProgress();
-  // }, [docUploads]);
 
   useEffect(() => {
     async function getPreviousUploads() {
@@ -1741,11 +1726,6 @@ const UploadDocuments = () => {
     }
     getRequiredFields();
   }, []);
-
-  console.log(mobileVerified);
-  console.log(selfie.length);
-  console.log(disablePhoneNumber);
-  console.log(hasSentOTPOnce);
 
   return (
     <>
