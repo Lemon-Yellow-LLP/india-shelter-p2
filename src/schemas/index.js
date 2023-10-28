@@ -264,12 +264,7 @@ const applicantSchema = Yup.object().shape({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Pincode a valid Pincode')
-      .max(6, 'Pincode a valid Pincode')
-      .test('address_current_pincode', 'Invalid Pincode', async (pincode) => {
-        if (pincode.length != 6) return false;
-        const res = await checkIsValidStatePincode(pincode);
-        return !!res;
-      }),
+      .max(6, 'Pincode a valid Pincode'),
     current_no_of_year_residing: Yup.string().required('This field is mandatory'),
 
     permanent_flat_no_building_name: Yup.string()
@@ -301,12 +296,7 @@ const applicantSchema = Yup.object().shape({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Pincode a valid Pincode')
-      .max(6, 'Pincode a valid Pincode')
-      .test('address_permanent_pincode', 'Invalid Pincode', async (pincode) => {
-        if (pincode.length != 6) return false;
-        const res = await checkIsValidStatePincode(pincode);
-        return !!res;
-      }),
+      .max(6, 'Pincode a valid Pincode'),
     permanent_no_of_year_residing: Yup.string().required('This field is mandatory'),
   }),
 });
@@ -338,12 +328,7 @@ export const validationSchemaLead = Yup.object().shape({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode')
-      .test('property_details_pincode', 'Invalid Pincode', async (pincode) => {
-        if (pincode.length != 6) return false;
-        const res = await checkIsValidStatePincode(pincode);
-        return !!res;
-      }),
+      .max(6, 'Enter a valid Pincode'),
   }),
   reference_details: Yup.object().shape({
     reference_1_type: Yup.string().trim().required('This field is mandatory'),
@@ -375,12 +360,7 @@ export const validationSchemaLead = Yup.object().shape({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode')
-      .test('reference_1_pincode', 'Invalid Pincode', async (pincode) => {
-        if (pincode.length != 6) return false;
-        const res = await checkIsValidStatePincode(pincode);
-        return !!res;
-      }),
+      .max(6, 'Enter a valid Pincode'),
     reference_1_email: Yup.string()
       .trim()
       .email('Enter a valid Email')
@@ -414,12 +394,7 @@ export const validationSchemaLead = Yup.object().shape({
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Enter a valid Pincode')
-      .max(6, 'Enter a valid Pincode')
-      .test('reference_2_pincode', 'Invalid Pincode', async (pincode) => {
-        if (pincode.length != 6) return false;
-        const res = await checkIsValidStatePincode(pincode);
-        return !!res;
-      }),
+      .max(6, 'Enter a valid Pincode'),
     reference_2_email: Yup.string()
       .trim()
       .email('Enter a valid Email')

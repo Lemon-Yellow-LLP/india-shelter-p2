@@ -32,6 +32,8 @@ const WorkIncomeDetails = () => {
     activeIndex,
     setCurrentStepIndex,
     updateProgressApplicantSteps,
+    pincodeErr,
+    setPincodeErr,
   } = useContext(LeadContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
@@ -241,6 +243,14 @@ const WorkIncomeDetails = () => {
     ) {
       setFieldValue(`applicants[${activeIndex}].work_income_detail.city`, '');
       setFieldValue(`applicants[${activeIndex}].work_income_detail.state`, '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: false }));
+
+      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
+        city: '',
+        state: '',
+        pincode: '',
+      });
+
       return;
     }
 
@@ -250,16 +260,32 @@ const WorkIncomeDetails = () => {
 
     if (!res) {
       setFieldError(`applicants[${activeIndex}].work_income_detail.pincode`, 'Invalid Pincode');
+      setPincodeErr((prev) => ({
+        ...prev,
+        [`work_income_detail_${activeIndex}`]: 'Invalid Pincode',
+      }));
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: false }));
+
+      setFieldValue(`applicants[${activeIndex}].work_income_detail.city`, '');
+      setFieldValue(`applicants[${activeIndex}].work_income_detail.state`, '');
+
+      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
+        city: '',
+        state: '',
+        pincode: '',
+      });
       return;
     }
 
     editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
       city: res.city,
       state: res.state,
+      pincode: values?.applicants?.[activeIndex]?.work_income_detail?.pincode,
     });
 
     setFieldValue(`applicants[${activeIndex}].work_income_detail.city`, res.city);
     setFieldValue(`applicants[${activeIndex}].work_income_detail.state`, res.state);
+    setPincodeErr((prev) => ({ ...prev, [`work_income_detail_${activeIndex}`]: '' }));
 
     if (!requiredFieldsStatus['pincode']) {
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: true }));
@@ -598,25 +624,15 @@ const WorkIncomeDetails = () => {
                 label='Pincode'
                 name={`applicants[${activeIndex}].work_income_detail.pincode`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.pincode}
-                error={errors?.applicants?.[activeIndex]?.work_income_detail?.pincode}
+                error={
+                  errors?.applicants?.[activeIndex]?.work_income_detail?.pincode ||
+                  pincodeErr?.[`work_income_detail_${activeIndex}`]
+                }
                 touched={touched?.applicants?.[activeIndex]?.work_income_detail?.pincode}
                 onBlur={(e) => {
                   handleBlur(e);
 
                   handleOnPincodeChange();
-
-                  if (
-                    !errors?.applicants?.[activeIndex]?.work_income_detail?.pincode &&
-                    values?.applicants?.[activeIndex]?.work_income_detail?.pincode
-                  ) {
-                    editFieldsById(
-                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
-                      'work-income',
-                      {
-                        pincode: values?.applicants?.[activeIndex]?.work_income_detail?.pincode,
-                      },
-                    );
-                  }
                 }}
                 min='0'
                 onInput={(e) => {
