@@ -176,6 +176,7 @@ export default function Dashboard() {
                     progress={lead?.extra_params?.progress ?? 0}
                     created={moment(applicant?.created_at).format('DD/MM/YYYY')}
                     mobile={applicant?.mobile_number ?? '-'}
+                    lead={lead}
                   />
                 );
               })}
@@ -237,7 +238,7 @@ export default function Dashboard() {
   );
 }
 
-function LeadCard({ title, progress, id, mobile, created }) {
+function LeadCard({ title, progress, id, mobile, created, lead }) {
   return (
     <Link
       to={'/dashboard/' + id}
@@ -277,6 +278,59 @@ function LeadCard({ title, progress, id, mobile, created }) {
           <ArrowRightIcon2 />
         </div>
       </div>
+
+      {lead.sfdc_count !== 0 &&
+        (lead.sfdc_status === 'Complete' ? (
+          <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-secondary-green'>
+            <svg
+              width='24'
+              height='24'
+              viewBox='0 0 24 24'
+              fill='none'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                d='M4.843 16.372C3.273 16.372 2 15.099 2 13.529C2 11.959 3.273 10.686 4.843 10.686C4.843 7.546 7.389 5 10.529 5C12.879 5 14.895 6.426 15.762 8.46C16.051 8.394 16.349 8.351 16.658 8.351C18.873 8.351 20.668 10.146 20.668 12.361C20.668 14.576 18.873 16.371 16.658 16.371'
+                stroke='#147257'
+                strokeMiterlimit='10'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+              <path
+                d='M15 13L10.1875 18L8 15.7273'
+                stroke='#147257'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+            </svg>
+            DATA PUSH IS SUCCESSFUL
+          </div>
+        ) : (
+          <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-primary-red'>
+            <svg
+              width='24'
+              height='24'
+              viewBox='0 0 24 24'
+              fill='none'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                d='M4.843 16.372C3.273 16.372 2 15.099 2 13.529C2 11.959 3.273 10.686 4.843 10.686C4.843 7.546 7.389 5 10.529 5C12.879 5 14.895 6.426 15.762 8.46C16.051 8.394 16.349 8.351 16.658 8.351C18.873 8.351 20.668 10.146 20.668 12.361C20.668 14.576 18.873 16.371 16.658 16.371'
+                stroke='#E33439'
+                strokeMiterlimit='10'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+              <path
+                d='M7 15C7 12.7909 8.79086 11 11 11C13.2091 11 15 12.7909 15 15C15 17.2091 13.2091 19 11 19C9.51944 19 8.22675 18.1956 7.53513 17M7.53513 17V19M7.53513 17H9.5'
+                stroke='#E33439'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+            </svg>
+            RETRY SALESFORCE PUSH
+          </div>
+        ))}
     </Link>
   );
 }
