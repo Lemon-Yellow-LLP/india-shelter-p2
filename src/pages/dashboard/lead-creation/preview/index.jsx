@@ -16,7 +16,12 @@ import PropTypes from 'prop-types';
 const steps = ['', '', '', '', ''];
 
 export default function Preview() {
-  const { values, errors, activeIndex, setActiveIndex, handleSubmit } = useContext(LeadContext);
+  const { values, errors, activeIndex, setActiveIndex, handleSubmit, pincodeErr } =
+    useContext(LeadContext);
+
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
 
   const navigate = useNavigate();
 
@@ -115,8 +120,11 @@ export default function Preview() {
             landmark: errors?.applicants?.[idx]?.work_income_detail?.landmark,
           }),
 
-          ...(errors?.applicants?.[idx]?.work_income_detail?.pincode && {
-            pincode: errors?.applicants?.[idx]?.work_income_detail?.pincode,
+          ...((errors?.applicants?.[idx]?.work_income_detail?.pincode ||
+            pincodeErr?.[`work_income_detail_${idx}`]) && {
+            pincode:
+              errors?.applicants?.[idx]?.work_income_detail?.pincode ||
+              pincodeErr?.[`work_income_detail_${idx}`],
           }),
 
           ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
@@ -170,10 +178,12 @@ export default function Preview() {
             landmark: errors?.applicants?.[idx]?.work_income_detail?.landmark,
           }),
 
-          ...(errors?.applicants?.[idx]?.work_income_detail?.pincode && {
-            pincode: errors?.applicants?.[idx]?.work_income_detail?.pincode,
+          ...((errors?.applicants?.[idx]?.work_income_detail?.pincode ||
+            pincodeErr?.[`work_income_detail_${idx}`]) && {
+            pincode:
+              errors?.applicants?.[idx]?.work_income_detail?.pincode ||
+              pincodeErr?.[`work_income_detail_${idx}`],
           }),
-
           ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
             no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
           }),
@@ -254,6 +264,19 @@ export default function Preview() {
       if (_errors?.applicants?.[idx] && Object.keys(_errors?.applicants?.[idx])?.length == 0) {
         delete _errors.applicants[idx];
       }
+
+      if (pincodeErr?.[`address_permanent_${idx}`] && _errors.applicants[idx]) {
+        _errors.applicants[idx].address_detail = {
+          ..._errors?.applicants[idx]?.address_detail,
+          permanent_pincode: true,
+        };
+      }
+      if (pincodeErr?.[`address_current_${idx}`] && _errors.applicants[idx]) {
+        _errors.applicants[idx].address_detail = {
+          ..._errors?.applicants[idx]?.address_detail,
+          current_pincode: true,
+        };
+      }
     });
 
     if (
@@ -261,6 +284,27 @@ export default function Preview() {
       values?.property_details?.property_identification_is == 'not-yet'
     ) {
       _errors.property_details = {};
+    }
+
+    if (pincodeErr?.property_details) {
+      _errors.property_details = {
+        ..._errors?.property_details,
+        pincode: true,
+      };
+    }
+
+    if (pincodeErr?.reference_1) {
+      _errors.reference_details = {
+        ..._errors?.reference_details,
+        reference_1_pincode: true,
+      };
+    }
+
+    if (pincodeErr?.reference_2) {
+      _errors.reference_details = {
+        ..._errors?.reference_details,
+        reference_2_pincode: true,
+      };
     }
 
     setFlattedErrors(flattenExtraParams(_errors));

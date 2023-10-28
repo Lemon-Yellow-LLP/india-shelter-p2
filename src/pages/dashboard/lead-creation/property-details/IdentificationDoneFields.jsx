@@ -21,6 +21,8 @@ const IdentificationDoneFields = ({
     setFieldError,
     updateProgress,
     activeIndex,
+    pincodeErr,
+    setPincodeErr,
   } = useContext(LeadContext);
 
   const [showMap, setShowMap] = useState(false);
@@ -54,13 +56,26 @@ const IdentificationDoneFields = ({
       setFieldValue('property_details.city', '');
       setFieldValue('property_details.state', '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: false }));
+
+      editPropertyById(values?.property_details?.id, {
+        city: '',
+        state: '',
+        pincode: null,
+      });
       return;
     }
 
     const res = await checkIsValidStatePincode(values?.property_details?.pincode);
     if (!res) {
       setFieldError('property_details.pincode', 'Invalid Pincode');
+      setPincodeErr((prev) => ({ ...prev, property_details: 'Invalid Pincode' }));
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: false }));
+
+      editPropertyById(values?.property_details?.id, {
+        city: '',
+        state: '',
+        pincode: null,
+      });
 
       return;
     }
@@ -73,6 +88,7 @@ const IdentificationDoneFields = ({
 
     setFieldValue('property_details.city', res.city);
     setFieldValue('property_details.state', res.state);
+    setPincodeErr((prev) => ({ ...prev, property_details: '' }));
 
     setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: true }));
   }, [
@@ -312,7 +328,7 @@ const IdentificationDoneFields = ({
         hint='City and State fields will get filled based on Pincode'
         placeholder='Eg: 123456'
         value={values?.property_details?.pincode}
-        error={errors?.property_details?.pincode}
+        error={errors?.property_details?.pincode || pincodeErr?.property_details}
         touched={touched.property_details?.pincode}
         onBlur={(e) => {
           handleBlur(e);

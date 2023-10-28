@@ -38,8 +38,14 @@ const UploadDocuments = () => {
     setFieldError,
     updateProgressUploadDocumentSteps,
   } = useContext(LeadContext);
-  const { toastMessage, setToastMessage, isQaulifierActivated, loData, setIsQaulifierActivated } =
-    useContext(AuthContext);
+  const {
+    toastMessage,
+    setToastMessage,
+    isQaulifierActivated,
+    loData,
+    setIsQaulifierActivated,
+    setOtpFailCount,
+  } = useContext(AuthContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
   const [customerPhotos, setCustomerPhotos] = useState([]);
@@ -157,10 +163,10 @@ const UploadDocuments = () => {
     async function getQualifierResponse() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
 
-      // if (res.extra_params.is_upload_otp_verified) {
-      //   setMobileVerified(true);
-      //   setDisablePhoneNumber(false);
-      // }
+      if (res.extra_params.is_upload_otp_verified) {
+        setMobileVerified(true);
+        setDisablePhoneNumber(false);
+      }
 
       if (res.bre_101_response) {
         const bre_Display_body = res.bre_101_response.body.Display;
@@ -203,17 +209,18 @@ const UploadDocuments = () => {
     getQualifierResponse();
   }, []);
 
-  // useEffect(() => {
-  //   if (selfie.length === 0) {
-  //     setMobileVerified(true);
+  useEffect(() => {
+    if (selfie.length === 0) {
+      setMobileVerified(false);
+      setDisablePhoneNumber(true);
 
-  //     const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
+      const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
 
-  //     editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
-  //       extra_params: { ...extra_params, is_upload_otp_verified: false },
-  //     });
-  //   }
-  // }, [selfie]);
+      editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
+        extra_params: { ...extra_params, is_upload_otp_verified: false },
+      });
+    }
+  }, [selfie]);
 
   const updateFields = async (name, value) => {
     let newData = {};
@@ -464,18 +471,18 @@ const UploadDocuments = () => {
           extra_params: { ...extra_params, is_upload_otp_verified: true },
         });
 
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: true }));
+
         setDisablePhoneNumber(false);
         setMobileVerified(true);
       } catch (err) {
         console.log(err);
 
         setMobileVerified(false);
-        // setOtpFailCount(err.response.data.fail_count);
-        // setIsAuthenticated(false);
+        setOtpFailCount(err.response.data.fail_count);
         return false;
       }
     },
-    //values.mobile_number
 
     [setFieldError, setMobileVerified],
   );
@@ -616,7 +623,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.property_paper_photos.find((data) => {
+      const active_uploads = res.document_meta.property_paper_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -688,8 +695,6 @@ const UploadDocuments = () => {
         setCustomerUploads({ type: 'customer_photos', data: active_upload });
       }
       setRequiredFieldsStatus((prev) => ({ ...prev, ['customer_photo']: true }));
-
-      // setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
     }
     customerPhotos.length > 0 && addCustomerPhotos();
   }, [customerPhotosFile]);
@@ -697,7 +702,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.customer_photos.find((data) => {
+      const active_uploads = res.document_meta.customer_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -830,7 +835,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.id_proof_photos.find((data) => {
+      const active_uploads = res.document_meta.id_proof_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -973,7 +978,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.address_proof_photos.find((data) => {
+      const active_uploads = res.document_meta.address_proof_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -1100,7 +1105,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.salary_slip_photos.find((data) => {
+      const active_uploads = res.document_meta.salary_slip_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -1226,7 +1231,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.form_60_photos.find((data) => {
+      const active_uploads = res.document_meta.form_60_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -1352,7 +1357,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.property_photos.find((data) => {
+      const active_uploads = res.document_meta.property_photos?.find((data) => {
         return data.active === true;
       });
 
@@ -1421,8 +1426,6 @@ const UploadDocuments = () => {
 
         setSelfieUploads({ type: 'lo_selfie', data: active_upload });
       }
-
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: true }));
     }
     selfie.length > 0 && addSelfiePhoto();
   }, [selfieFile]);
@@ -1430,7 +1433,7 @@ const UploadDocuments = () => {
   useEffect(() => {
     async function removeProgress() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-      const active_uploads = res.document_meta.lo_selfie.find((data) => {
+      const active_uploads = res.document_meta.lo_selfie?.find((data) => {
         return data.active === true;
       });
 
@@ -1499,8 +1502,6 @@ const UploadDocuments = () => {
 
         setDocUploads({ type: 'other_docs', data: active_uploads });
       }
-
-      // setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: true }));
     }
     docs.length > 0 && addOtherDocPhotos();
   }, [docsFile]);
@@ -1552,19 +1553,6 @@ const UploadDocuments = () => {
     }
     editDoc.id && editOtherDocPhotos();
   }, [editDoc]);
-
-  // useEffect(() => {
-  //   async function removeProgress() {
-  //     const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
-  //     const active_uploads = res.document_meta.other_docs.find((data) => {
-  //       return data.active === true;
-  //     });
-  //     if (!active_uploads) {
-  //       setRequiredFieldsStatus((prev) => ({ ...prev, ['other_doc']: false }));
-  //     }
-  //   }
-  //   removeProgress();
-  // }, [docUploads]);
 
   useEffect(() => {
     async function getPreviousUploads() {
@@ -1759,6 +1747,7 @@ const UploadDocuments = () => {
             showClose={false}
             showBack={true}
             coApplicant={true}
+            coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
           />
         )}
 
@@ -2331,7 +2320,6 @@ const UploadDocuments = () => {
                       ? 'text-dark-grey bg-stroke pointer-events-none'
                       : 'bg-primary-red text-white'
                   }`}
-                  disabled={disablePhoneNumber || mobileVerified}
                   onClick={sendMobileOtp}
                 >
                   Send OTP

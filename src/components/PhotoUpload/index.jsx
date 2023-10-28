@@ -33,8 +33,13 @@ function PhotoUpload({
       const validImageTypes = ['image/jpeg'];
 
       if (validImageTypes.includes(fileType)) {
-        setSingleFile(file[0]);
-        setFile([...files, file[i]]);
+        if (file[i].size <= 5000000) {
+          setSingleFile(file[i]);
+          setFile([...files, file[i]]);
+        } else {
+          setLoader(false);
+          setMessage('File size should be less than 5MB');
+        }
       } else {
         setMessage('File format not supported');
       }
@@ -232,9 +237,9 @@ function PhotoUpload({
             </div>
 
             <button
-              onClick={() => {
-                removeImage(uploads.data.id);
-              }}
+            // onClick={() => {
+            //   removeImage(uploads.data.id);
+            // }}
             >
               <svg
                 width='24'
@@ -242,6 +247,9 @@ function PhotoUpload({
                 viewBox='0 0 24 24'
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'
+                onClick={() => {
+                  removeImage(uploads.data.id);
+                }}
               >
                 <path
                   d='M6.61905 8.1V16.6C6.61905 18.4778 8.06879 20 9.85714 20H14.7143C16.5026 20 17.9524 18.4778 17.9524 16.6V8.1M13.9048 10.65V15.75M10.6667 10.65L10.6667 15.75M15.5238 5.55L14.3854 3.75701C14.0851 3.28407 13.5796 3 13.0383 3H11.5332C10.9918 3 10.4863 3.28407 10.186 3.75701L9.04762 5.55M15.5238 5.55H9.04762M15.5238 5.55H19.5714M9.04762 5.55H5'

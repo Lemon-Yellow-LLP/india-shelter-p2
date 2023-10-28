@@ -4,9 +4,11 @@ import Button from '../Button';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContextProvider';
 import { getUserById } from '../../global';
+import { LeadContext } from '../../context/LeadContextProvider';
 
 const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, singlePhoto }) => {
   const { loData } = useContext(AuthContext);
+  const { values, activeIndex } = useContext(LeadContext);
   const [activeStep, setActiveStep] = useState(0);
   const [Timestamp, setTimeStamp] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -92,7 +94,8 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, sin
                   className='h-full w-full object-cover object-center rounded-t-lg'
                 />
                 <p className='absolute bottom-0 left-0 text-white p-3'>
-                  CAF: {}; Lat: {singlePhoto.geo_lat}; Long: {singlePhoto.geo_long}; EMP code:{' '}
+                  CAF: {values.applicants?.[activeIndex]?.applicant_details?.lead_id}; Lat:{' '}
+                  {singlePhoto.geo_lat}; Long: {singlePhoto.geo_long}; EMP code:{' '}
                   {userData?.employee_code}; Timestamp: {Timestamp?.toLocaleString()}; LO Name:{' '}
                   {userData?.first_name + ' ' + userData?.middle_name + ' ' + userData?.last_name}
                   {}

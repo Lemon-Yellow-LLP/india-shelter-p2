@@ -30,6 +30,8 @@ export default function AddressDetails() {
     activeIndex,
     setValues,
     setCurrentStepIndex,
+    pincodeErr,
+    setPincodeErr,
   } = useContext(LeadContext);
 
   const [openExistingPopup, setOpenExistingPopup] = useState(
@@ -124,6 +126,31 @@ export default function AddressDetails() {
       !values?.applicants?.[activeIndex]?.address_detail?.current_pincode ||
       values?.applicants?.[activeIndex]?.address_detail?.current_pincode.toString().length < 5
     ) {
+      setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, '');
+      setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: false }));
+
+      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+        current_pincode: '',
+        current_city: '',
+        current_state: '',
+      });
+
+      if (
+        values?.applicants?.[activeIndex]?.address_detail?.extra_params
+          ?.permanent_address_same_as_current
+      ) {
+        setFieldValue(`applicants[${activeIndex}].address_detail.permanent_pincode`, '');
+        setFieldValue(`applicants[${activeIndex}].address_detail.permanent_city`, '');
+        setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, '');
+
+        editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+          permanent_pincode: '',
+          permanent_city: '',
+          permanent_state: '',
+        });
+      }
+
       return;
     }
 
@@ -132,6 +159,27 @@ export default function AddressDetails() {
     );
     if (!res) {
       setFieldError(`applicants[${activeIndex}].address_detail.current_pincode`, 'Invalid Pincode');
+      setPincodeErr((prev) => ({ ...prev, [`address_current_${activeIndex}`]: 'Invalid Pincode' }));
+
+      setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, '');
+      setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: false }));
+
+      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+        current_pincode: '',
+        current_city: '',
+        current_state: '',
+      });
+
+      if (
+        values?.applicants?.[activeIndex]?.address_detail?.extra_params
+          ?.permanent_address_same_as_current
+      ) {
+        setFieldValue(`applicants[${activeIndex}].address_detail.permanent_pincode`, '');
+        setFieldValue(`applicants[${activeIndex}].address_detail.permanent_city`, '');
+        setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, '');
+      }
+
       return;
     }
 
@@ -143,6 +191,7 @@ export default function AddressDetails() {
 
     setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, res.city);
     setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, res.state);
+    setPincodeErr((prev) => ({ ...prev, [`address_current_${activeIndex}`]: '' }));
 
     if (
       values?.applicants?.[activeIndex]?.address_detail?.extra_params
@@ -154,8 +203,14 @@ export default function AddressDetails() {
         permanent_state: res.state,
       });
 
+      setFieldValue(
+        `applicants[${activeIndex}].address_detail.permanent_pincode`,
+        values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+      );
       setFieldValue(`applicants[${activeIndex}].address_detail.permanent_city`, res.city);
       setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, res.state);
+
+      setPincodeErr((prev) => ({ ...prev, [`address_permanent_${activeIndex}`]: '' }));
     }
 
     if (!requiredFieldsStatus['current_pincode']) {
@@ -256,8 +311,18 @@ export default function AddressDetails() {
     if (
       !values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode ||
       values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode.toString().length < 5
-    )
+    ) {
+      setFieldValue(`applicants[${activeIndex}].address_detail.permanent_city`, '');
+      setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['permanent_pincode']: false }));
+
+      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+        permanent_pincode: '',
+        permanent_city: '',
+        permanent_state: '',
+      });
       return;
+    }
 
     const res = await checkIsValidStatePincode(
       values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode,
@@ -267,6 +332,21 @@ export default function AddressDetails() {
         `applicants[${activeIndex}].address_detail.permanent_pincode`,
         'Invalid Pincode',
       );
+
+      setPincodeErr((prev) => ({
+        ...prev,
+        [`address_permanent_${activeIndex}`]: 'Invalid Pincode',
+      }));
+
+      setFieldValue(`applicants[${activeIndex}].address_detail.permanent_city`, '');
+      setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['permanent_pincode']: false }));
+
+      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+        permanent_pincode: '',
+        permanent_city: '',
+        permanent_state: '',
+      });
       return;
     }
 
@@ -278,6 +358,7 @@ export default function AddressDetails() {
 
     setFieldValue(`applicants[${activeIndex}].address_detail.permanent_city`, res.city);
     setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, res.state);
+    setPincodeErr((prev) => ({ ...prev, [`address_permanent_${activeIndex}`]: '' }));
 
     if (!requiredFieldsStatus['permanent_pincode']) {
       setRequiredFieldsStatus((prev) => ({ ...prev, ['permanent_pincode']: true }));
@@ -390,10 +471,11 @@ export default function AddressDetails() {
         ) : (
           <Topbar
             title='Adding Co-applicant'
-            id={values?.applicants?.[activeIndex]?.applicant_details?.id}
+            id={values?.lead?.id}
             showClose={false}
             showBack={true}
             coApplicant={true}
+            coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
           />
         )}
         <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
@@ -719,7 +801,10 @@ export default function AddressDetails() {
                 type='tel'
                 // hint='City and State fields will get filled based on Pincode'
                 value={values?.applicants?.[activeIndex]?.address_detail?.current_pincode}
-                error={errors?.applicants?.[activeIndex]?.address_detail?.current_pincode}
+                error={
+                  errors?.applicants?.[activeIndex]?.address_detail?.current_pincode ||
+                  pincodeErr?.[`address_current_${activeIndex}`]
+                }
                 touched={touched?.applicants?.[activeIndex]?.address_detail?.current_pincode}
                 disabled={
                   inputDisabled ||
@@ -1109,7 +1194,10 @@ export default function AddressDetails() {
                 type='tel'
                 hint='City and State fields will get filled based on Pincode'
                 value={values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
-                error={errors?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
+                error={
+                  errors?.applicants?.[activeIndex]?.address_detail?.permanent_pincode ||
+                  pincodeErr?.[`address_permanent_${activeIndex}`]
+                }
                 touched={touched?.applicants?.[activeIndex]?.address_detail?.permanent_pincode}
                 disabled={
                   inputDisabled ||

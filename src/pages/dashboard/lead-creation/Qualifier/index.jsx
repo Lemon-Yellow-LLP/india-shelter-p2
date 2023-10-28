@@ -456,6 +456,7 @@ const Qualifier = () => {
           showClose={false}
           showBack={true}
           coApplicant={true}
+          coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
         />
       )}
 
