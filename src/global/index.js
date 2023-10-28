@@ -247,7 +247,7 @@ async function checkBre201(id, options) {
 }
 
 async function pushToSalesforce(id, options) {
-  const res = await axios.post(
+  const res = await axios.get(
     `${API_URL}/lead/salesforce-push/${id}`,
     {},
     {
