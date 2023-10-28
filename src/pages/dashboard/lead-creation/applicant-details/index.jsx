@@ -286,7 +286,7 @@ const ApplicantDetails = () => {
     [requiredFieldsStatus, values],
   );
 
-  const checkDate = (date) => {
+  const checkDate = async (date) => {
     if (!date) {
       return;
     }
@@ -313,6 +313,11 @@ const ApplicantDetails = () => {
         !requiredFieldsStatus['date_of_birth']
       ) {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['date_of_birth']: true }));
+      }
+      if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+        await editFieldsById(values?.applicants[activeIndex]?.personal_details?.id, 'personal', {
+          date_of_birth: finalDate,
+        });
       }
     }
   };
@@ -508,11 +513,12 @@ const ApplicantDetails = () => {
         ) : (
           <Topbar
             title='Adding Co-applicant'
-            id={values?.applicants?.[activeIndex]?.applicant_details?.id}
+            id={values?.lead?.id}
             showClose={false}
             showBack={true}
             coApplicant={true}
             handleBack={handleBack}
+            coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
           />
         )}
         <div

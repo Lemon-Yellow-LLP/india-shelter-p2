@@ -18,6 +18,10 @@ const steps = ['', '', '', '', ''];
 export default function Preview() {
   const { values, errors, activeIndex, setActiveIndex, handleSubmit } = useContext(LeadContext);
 
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
+
   const navigate = useNavigate();
 
   const [activeStep, setActiveStep] = useState(0);
