@@ -38,8 +38,14 @@ const UploadDocuments = () => {
     setFieldError,
     updateProgressUploadDocumentSteps,
   } = useContext(LeadContext);
-  const { toastMessage, setToastMessage, isQaulifierActivated, loData, setIsQaulifierActivated } =
-    useContext(AuthContext);
+  const {
+    toastMessage,
+    setToastMessage,
+    isQaulifierActivated,
+    loData,
+    setIsQaulifierActivated,
+    setOtpFailCount,
+  } = useContext(AuthContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
   const [customerPhotos, setCustomerPhotos] = useState([]);
@@ -157,10 +163,10 @@ const UploadDocuments = () => {
     async function getQualifierResponse() {
       const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
 
-      // if (res.extra_params.is_upload_otp_verified) {
-      //   setMobileVerified(true);
-      //   setDisablePhoneNumber(false);
-      // }
+      if (res.extra_params.is_upload_otp_verified) {
+        setMobileVerified(true);
+        setDisablePhoneNumber(false);
+      }
 
       if (res.bre_101_response) {
         const bre_Display_body = res.bre_101_response.body.Display;
@@ -203,17 +209,18 @@ const UploadDocuments = () => {
     getQualifierResponse();
   }, []);
 
-  // useEffect(() => {
-  //   if (selfie.length === 0) {
-  //     setMobileVerified(true);
+  useEffect(() => {
+    if (selfie.length === 0) {
+      setMobileVerified(false);
+      setDisablePhoneNumber(true);
 
-  //     const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
+      const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
 
-  //     editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
-  //       extra_params: { ...extra_params, is_upload_otp_verified: false },
-  //     });
-  //   }
-  // }, [selfie]);
+      editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
+        extra_params: { ...extra_params, is_upload_otp_verified: false },
+      });
+    }
+  }, [selfie]);
 
   const updateFields = async (name, value) => {
     let newData = {};
@@ -360,12 +367,10 @@ const UploadDocuments = () => {
         console.log(err);
 
         setMobileVerified(false);
-        // setOtpFailCount(err.response.data.fail_count);
-        // setIsAuthenticated(false);
+        setOtpFailCount(err.response.data.fail_count);
         return false;
       }
     },
-    //values.mobile_number
 
     [setFieldError, setMobileVerified],
   );
@@ -578,8 +583,6 @@ const UploadDocuments = () => {
         setCustomerUploads({ type: 'customer_photos', data: active_upload });
       }
       setRequiredFieldsStatus((prev) => ({ ...prev, ['customer_photo']: true }));
-
-      // setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
     }
     customerPhotos.length > 0 && addCustomerPhotos();
   }, [customerPhotosFile]);
@@ -1596,6 +1599,11 @@ const UploadDocuments = () => {
     getRequiredFields();
   }, []);
 
+  console.log(mobileVerified);
+  console.log(selfie.length);
+  console.log(disablePhoneNumber);
+  console.log(hasSentOTPOnce);
+
   return (
     <>
       <Popup
@@ -2156,7 +2164,6 @@ const UploadDocuments = () => {
                       ? 'text-dark-grey bg-stroke pointer-events-none'
                       : 'bg-primary-red text-white'
                   }`}
-                  disabled={disablePhoneNumber || mobileVerified}
                   onClick={sendMobileOtp}
                 >
                   Send OTP
