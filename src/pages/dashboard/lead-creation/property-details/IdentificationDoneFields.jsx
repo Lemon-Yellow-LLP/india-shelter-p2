@@ -70,7 +70,8 @@ const IdentificationDoneFields = ({
       setFieldError('property_details.pincode', 'Invalid Pincode');
       setPincodeErr((prev) => ({ ...prev, property_details: 'Invalid Pincode' }));
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: false }));
-
+      setFieldValue('property_details.city', '');
+      setFieldValue('property_details.state', '');
       editPropertyById(values?.property_details?.id, {
         city: '',
         state: '',
