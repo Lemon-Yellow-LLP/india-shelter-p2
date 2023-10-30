@@ -1041,14 +1041,21 @@ export default function Preview() {
             Previous
           </Button>
           <Button
-            link={activeStep === coApplicantIndexes.length ? '/lead/eligibility' : null}
+            link={
+              activeStep === coApplicantIndexes.length &&
+              values?.lead?.extra_params?.progress_without_eligibility === 100
+                ? '/lead/eligibility'
+                : null
+            }
             primary={true}
             disabled={
-              activeStep === 0
+              (activeStep === 0
                 ? !checkTotalProgress(values?.applicants?.[primaryIndex]) ||
                   values?.property_details?.extra_params?.progress != 100 ||
                   values?.reference_details?.extra_params?.progress != 100
-                : !checkTotalProgress(values?.applicants?.[coApplicantIndexes[coApplicantIndex]])
+                : !checkTotalProgress(
+                    values?.applicants?.[coApplicantIndexes[coApplicantIndex]],
+                  )) && values?.lead?.extra_params?.progress_without_eligibility !== 100
             }
             inputClasses='w-1/2 h-[46px]'
             onClick={nextStep}
