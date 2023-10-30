@@ -26,6 +26,7 @@ import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/Lea
 import Topbar from '../../../../components/Topbar';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import Popup from '../../../../components/Popup';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 const UploadDocuments = () => {
   const {
@@ -135,6 +136,16 @@ const UploadDocuments = () => {
 
   const idRef = useRef();
   const addressRef = useRef();
+
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const preview = searchParams.get('preview');
+
+  // useEffect(() => {
+  //   if (preview === location.pathname) {
+  //     console.log('show error');
+  //   }
+  // }, [preview]);
 
   const handleCloseQualifierNotActivePopup = () => {
     setOpenQualifierNotActivePopup(false);
@@ -1764,6 +1775,13 @@ const UploadDocuments = () => {
             setLatLong={setCustomerLatLong}
             label='Customer photo'
             required
+            errorMessage={
+              preview === location.pathname &&
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                ?.upload_required_fields_status?.customer_photo == false
+                ? 'This field is mandatory'
+                : ''
+            }
           />
 
           <div className='flex flex-col gap-5'>
@@ -1775,7 +1793,6 @@ const UploadDocuments = () => {
               placeholder='Choose ID type'
               onChange={changeIdType}
               defaultSelected={values?.applicants?.[activeIndex]?.personal_details?.id_type}
-              // error={errors.applicants?.[activeIndex]?.personal_details?.id_type}
               touched={
                 touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.id_type
               }
@@ -1801,7 +1818,15 @@ const UploadDocuments = () => {
               />
 
               {isQaulifierActivated ? (
-                <div className='bg-white mt-1 border-x border-y border-stroke rounded-lg px-2 pb-2'>
+                <div
+                  className={`bg-white mt-1 border-x border-y rounded-lg px-2 pb-2 ${
+                    preview === location.pathname &&
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                      ?.upload_required_fields_status?.id_proof == false
+                      ? 'border-primary-red border-2'
+                      : 'border-stroke  border-1'
+                  }`}
+                >
                   <ImageUpload
                     files={idProofPhotos}
                     setFile={setIdProofPhotos}
@@ -1811,6 +1836,13 @@ const UploadDocuments = () => {
                     noBorder={true}
                     setEdit={setEditIdProof}
                     setLatLong={setIdProofLatLong}
+                    error={
+                      preview === location.pathname &&
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                        ?.upload_required_fields_status?.id_proof == false
+                        ? 'This field is mandatory'
+                        : ''
+                    }
                   />
 
                   <div
@@ -1982,6 +2014,13 @@ const UploadDocuments = () => {
                   setUploads={setIdProofUploads}
                   setEdit={setEditIdProof}
                   setLatLong={setIdProofLatLong}
+                  error={
+                    preview === location.pathname &&
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                      ?.upload_required_fields_status?.id_proof == false
+                      ? 'This field is mandatory'
+                      : ''
+                  }
                 />
               )}
 
@@ -2033,7 +2072,15 @@ const UploadDocuments = () => {
               />
 
               {isQaulifierActivated ? (
-                <div className='bg-white mt-1 border-x border-y border-stroke rounded-lg px-2 pb-2'>
+                <div
+                  className={`bg-white mt-1 border-x border-y rounded-lg px-2 pb-2 ${
+                    preview === location.pathname &&
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                      ?.upload_required_fields_status?.address_proof == false
+                      ? 'border-primary-red border-2'
+                      : 'border-stroke border-1'
+                  }`}
+                >
                   <ImageUpload
                     files={addressProofPhotos}
                     setFile={setAddressProofPhotos}
@@ -2226,6 +2273,13 @@ const UploadDocuments = () => {
                   uploads={addressProofUploads}
                   setUploads={setAddressProofUploads}
                   setLatLong={setAddressProofLatLong}
+                  errorMessage={
+                    preview === location.pathname &&
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                      ?.upload_required_fields_status?.address_proof == false
+                      ? 'This field is mandatory'
+                      : ''
+                  }
                 />
               )}
 
@@ -2252,6 +2306,13 @@ const UploadDocuments = () => {
               setSingleFile={setPropertyPapersFile}
               setLatLong={setPropertyPapersLatLong}
               imageArrayBorder={true}
+              errorMessage={
+                preview === location.pathname &&
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                  ?.upload_required_fields_status?.property_paper == false
+                  ? 'This field is mandatory'
+                  : ''
+              }
             />
           )}
 
@@ -2268,6 +2329,13 @@ const UploadDocuments = () => {
               setSingleFile={setSalarySlipPhotosFile}
               setLatLong={setSalarySlipLatLong}
               imageArrayBorder={true}
+              errorMessage={
+                preview === location.pathname &&
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                  ?.upload_required_fields_status?.salary_slip == false
+                  ? 'This field is mandatory'
+                  : ''
+              }
             />
           )}
 
@@ -2283,6 +2351,13 @@ const UploadDocuments = () => {
             setSingleFile={setForm60photosFile}
             setLatLong={setForm60LatLong}
             imageArrayBorder={true}
+            errorMessage={
+              preview === location.pathname &&
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                ?.upload_required_fields_status?.form_60 == false
+                ? 'This field is mandatory'
+                : ''
+            }
           />
 
           <ImageUpload
@@ -2297,6 +2372,13 @@ const UploadDocuments = () => {
             setSingleFile={setPropertyPhotosFile}
             setLatLong={setPropertyLatLong}
             imageArrayBorder={true}
+            errorMessage={
+              preview === location.pathname &&
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                ?.upload_required_fields_status?.property_image == false
+                ? 'This field is mandatory'
+                : ''
+            }
           />
 
           <div>
@@ -2311,6 +2393,13 @@ const UploadDocuments = () => {
                   setLatLong={setLoSelfieLatLong}
                   label='Upload selfie'
                   required
+                  errorMessage={
+                    preview === location.pathname &&
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                      ?.upload_required_fields_status?.upload_selfie == false
+                      ? 'This field is mandatory'
+                      : ''
+                  }
                 />
               </div>
 

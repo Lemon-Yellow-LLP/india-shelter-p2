@@ -630,29 +630,45 @@ export default function Preview() {
               count={
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.applicant_details.name
-                ]?.extra_params?.upload_progress != 0
-                  ? 'Upload incomplete'
-                  : 'Upload completed'
+                ]?.extra_params?.upload_required_fields_status
+                  ? Object.keys(
+                      values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                        pages.applicant_details.name
+                      ]?.extra_params?.upload_required_fields_status,
+                    ).filter(
+                      (k) =>
+                        !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                          pages.applicant_details.name
+                        ]?.extra_params?.upload_required_fields_status[k],
+                    )?.length
+                  : 'All'
               }
             >
-              {flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                pages.upload_documents.name
-              ] &&
+              {values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                pages.applicant_details.name
+              ]?.extra_params?.upload_required_fields_status &&
                 Object.keys(
-                  flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                    pages.upload_documents.name
-                  ],
-                ).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
+                  values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                    pages.applicant_details.name
+                  ]?.extra_params?.upload_required_fields_status,
+                )
+                  .filter(
+                    (k) =>
+                      !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                        pages.applicant_details.name
+                      ]?.extra_params?.upload_required_fields_status[k],
+                  )
+                  .map((val, i) =>
+                    fieldLabels[val] ? (
+                      <p
+                        key={i}
+                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                      >
+                        {fieldLabels[val]}
+                        <span className='text-primary-red text-xs'>*</span>
+                      </p>
+                    ) : null,
+                  )}
             </PreviewCard>
           </div>
         )}
@@ -935,28 +951,42 @@ export default function Preview() {
               }
               title={pages.upload_documents.title}
               link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
-              hideLabel={true}
               count={
                 values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.upload_progress == 100
-                  ? 'Upload completed'
-                  : 'Upload incomplete'
+                  ?.upload_required_fields_status
+                  ? Object.keys(
+                      values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
+                        ?.extra_params?.upload_required_fields_status,
+                    ).filter(
+                      (k) =>
+                        !values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
+                          ?.extra_params?.upload_required_fields_status[k],
+                    )?.length
+                  : 'All'
               }
             >
-              {flattedErrors?.applicants?.[primaryIndex]?.[pages.upload_documents.name] &&
+              {values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                ?.upload_required_fields_status &&
                 Object.keys(
-                  flattedErrors?.applicants?.[primaryIndex]?.[pages.upload_documents.name],
-                ).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
+                  values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                    ?.upload_required_fields_status,
+                )
+                  .filter(
+                    (k) =>
+                      !values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
+                        ?.extra_params?.upload_required_fields_status[k],
+                  )
+                  .map((val, i) =>
+                    fieldLabels[val] ? (
+                      <p
+                        key={i}
+                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                      >
+                        {fieldLabels[val]}
+                        <span className='text-primary-red text-xs'>*</span>
+                      </p>
+                    ) : null,
+                  )}
             </PreviewCard>
           </div>
         )}

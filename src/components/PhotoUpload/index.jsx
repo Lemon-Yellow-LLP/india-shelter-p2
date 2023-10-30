@@ -13,10 +13,11 @@ function PhotoUpload({
   label,
   hint,
   setLatLong,
+  errorMessage,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
-  const [message, setMessage] = useState();
+  const [message, setMessage] = useState(errorMessage);
   const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
 
