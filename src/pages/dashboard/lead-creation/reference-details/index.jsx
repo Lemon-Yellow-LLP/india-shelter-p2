@@ -133,7 +133,14 @@ const ReferenceDetails = () => {
   const handleTextInputChange = useCallback(
     (e) => {
       let value = e.currentTarget.value;
-      const pattern = /^[a-zA-Z ]+$/;
+      value = value?.trimStart()?.replace(/\s\s+/g, ' ');
+      let pattern = /^[a-zA-Z ]+$/;
+      if (
+        e.currentTarget.name === 'reference_details.reference_1_address' ||
+        e.currentTarget.name === 'reference_details.reference_2_address'
+      ) {
+        pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
+      }
       if (pattern.test(value) || value.length == 0) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
