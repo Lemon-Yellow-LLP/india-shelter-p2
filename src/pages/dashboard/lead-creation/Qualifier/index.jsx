@@ -24,7 +24,8 @@ import Topbar from '../../../../components/Topbar';
 import { useLocation } from 'react-router';
 
 const Qualifier = () => {
-  const { activeIndex, values, setFieldValue, addApplicant } = useContext(LeadContext);
+  const { activeIndex, values, setFieldValue, addApplicant, setCurrentStepIndex } =
+    useContext(LeadContext);
 
   const SpeedoMeterAnimationRef = useRef(null);
 
@@ -934,6 +935,9 @@ const Qualifier = () => {
               ? '/lead/lnt-charges'
               : '/lead/banking-details'
           }
+          onClick={() => {
+            setCurrentStepIndex(5);
+          }}
         >
           Next
         </Button>

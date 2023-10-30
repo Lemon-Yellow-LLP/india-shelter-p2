@@ -68,7 +68,7 @@ export default function Topbar({
         <div className='flex-1'>
           <h3 className='truncate'>{title}</h3>
           <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
-            {coApplicant ? 'CO-APPLICANT:' : 'APP ID:'}
+            APP ID:
             <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey pl-1 pr-2'>
               {id}
             </span>

@@ -37,6 +37,7 @@ const UploadDocuments = () => {
     setFieldValue,
     setFieldError,
     updateProgressUploadDocumentSteps,
+    setCurrentStepIndex,
   } = useContext(LeadContext);
   const {
     toastMessage,
@@ -2372,11 +2373,19 @@ const UploadDocuments = () => {
               : null
           }
           linkNext='/lead/preview'
-          onPreviousClick={() =>
+          onPreviousClick={() => {
+            if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
+              setCurrentStepIndex(8);
+            } else {
+              setCurrentStepIndex(5);
+            }
             !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
               ? setOpenQualifierNotActivePopup(true)
-              : null
-          }
+              : null;
+          }}
+          onNextClick={() => {
+            setCurrentStepIndex(10);
+          }}
         />
         <SwipeableDrawerComponent />
       </div>

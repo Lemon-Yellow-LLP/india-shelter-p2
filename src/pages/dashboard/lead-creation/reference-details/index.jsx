@@ -32,6 +32,7 @@ const ReferenceDetails = () => {
     setFieldError,
     activeIndex,
     updateProgressApplicantSteps,
+    setCurrentStepIndex,
     pincodeErr,
     setPincodeErr,
   } = useContext(LeadContext);
@@ -387,6 +388,7 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+                  updateFields('reference_1_full_name', '');
                 }
               }}
               disabled={inputDisabled}
@@ -429,6 +431,7 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+                  updateFields('reference_1_phone_number', '');
                 }
               }}
               pattern='\d*'
@@ -502,6 +505,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_1_address', '');
                 }
               }}
               disabled={inputDisabled}
@@ -540,6 +545,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_1_pincode', '');
                 }
               }}
               min='0'
@@ -637,6 +644,8 @@ const ReferenceDetails = () => {
                   values?.reference_details?.reference_1_email
                 ) {
                   updateFields('reference_1_email', values?.reference_details?.reference_1_email);
+                } else {
+                  updateFields('reference_1_email', '');
                 }
               }}
               onChange={(e) => {
@@ -708,6 +717,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_2_full_name', '');
                 }
               }}
               disabled={inputDisabled}
@@ -751,6 +762,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_2_phone_number', '');
                 }
               }}
               pattern='\d*'
@@ -825,6 +838,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_2_address', '');
                 }
               }}
               disabled={inputDisabled}
@@ -863,6 +878,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_2_pincode', '');
                 }
               }}
               min='0'
@@ -960,6 +977,8 @@ const ReferenceDetails = () => {
                   values?.reference_details?.reference_2_email
                 ) {
                   updateFields('reference_2_email', values?.reference_details?.reference_2_email);
+                } else {
+                  updateFields('reference_2_email', '');
                 }
               }}
               onChange={(e) => {
@@ -988,11 +1007,15 @@ const ReferenceDetails = () => {
               : null
           }
           linkNext='/lead/upload-documents'
-          onPreviousClick={() =>
+          onPreviousClick={() => {
+            setCurrentStepIndex(7);
             !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
               ? setOpenQualifierNotActivePopup(true)
-              : null
-          }
+              : null;
+          }}
+          onNextClick={() => {
+            setCurrentStepIndex(9);
+          }}
         />
         <SwipeableDrawerComponent />
       </div>
