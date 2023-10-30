@@ -392,3 +392,7 @@ body {
 .MuiSnackbar-root {
   z-index: 30 !important;
 }
+
+.dashBoardLoaderHeight {
+  height: calc(100vh - 186px);
+}

@@ -24,7 +24,8 @@ import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
 
 const Eligibility = () => {
-  const { activeIndex, values, setFieldValue } = useContext(LeadContext);
+  const { activeIndex, values, setFieldValue, updateCompleteFormProgress } =
+    useContext(LeadContext);
   const { toastMessage, setToastMessage } = useContext(AuthContext);
 
   const [progress, setProgress] = useState(0);
@@ -1327,6 +1328,9 @@ const Eligibility = () => {
           inputClasses={`w-full h-12 ${sdfcResponse ? 'font-semibold' : 'font-normal'}`}
           primary={true}
           link='/'
+          onClick={() => {
+            updateCompleteFormProgress();
+          }}
         >
           Go to Dashboard
         </Button>

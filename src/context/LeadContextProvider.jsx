@@ -40,6 +40,97 @@ const LeadContextProvider = ({ children }) => {
     },
   });
 
+  // Function to recursively count keys and calculate the sum of values
+  const countKeysAndValues = (obj, result = { totalKeys: 0, valuesSum: 0 }) => {
+    for (const key in obj) {
+      if (typeof obj[key] === 'object') {
+        countKeysAndValues(obj[key], result);
+      } else {
+        result.totalKeys += 1;
+        result.valuesSum += obj[key];
+      }
+    }
+
+    return result;
+  };
+
+  const updateCompleteFormProgress = async () => {
+    if (formik?.values) {
+      let newData = structuredClone(formik.values);
+
+      const getProgress = (obj) => obj?.extra_params?.progress;
+
+      // Map over the keys of formData and get progress for each key
+      let progressMap = {};
+      let progressMapTemp = {};
+      Object.keys(newData).forEach((key) => {
+        if (key !== 'lead') {
+          progressMap[key] = getProgress(newData[key]);
+        }
+      });
+
+      progressMap.applicants = [];
+      progressMapTemp = structuredClone(progressMap);
+      progressMapTemp.applicants = [];
+
+      newData?.applicants.map((applicant, index) => {
+        progressMap.applicants[index] = {};
+        progressMapTemp.applicants[index] = {};
+        Object.keys(applicant).forEach((key) => {
+          if (key === 'banking_details') {
+            progressMap.applicants[index][key] = applicant?.applicant_details?.extra_params
+              ?.banking_progress
+              ? 100
+              : 0;
+          } else {
+            progressMap.applicants[index][key] = getProgress(applicant[key]);
+          }
+        });
+        progressMap.applicants[index].upload_progress =
+          applicant?.applicant_details?.extra_params?.upload_progress;
+
+        progressMap.applicants[index].qualifier = applicant?.applicant_details?.extra_params
+          ?.qualifier
+          ? 100
+          : 0;
+
+        progressMapTemp.applicants[index] = structuredClone(progressMap.applicants[index]);
+
+        if (applicant?.applicant_details?.is_primary) {
+          progressMap.applicants[index].eligibility = applicant?.applicant_details?.extra_params
+            ?.eligibility
+            ? 100
+            : 0;
+        }
+      });
+      progressMap.lt_charges = newData?.lt_charges?.find((e) => e.status === 'Completed') ? 100 : 0;
+
+      progressMapTemp.lt_charges = structuredClone(progressMap.lt_charges);
+
+      const { totalKeys, valuesSum } = countKeysAndValues(progressMap);
+
+      const resValues = countKeysAndValues(progressMapTemp);
+
+      let finalProgress = parseInt(parseInt(valuesSum) / parseInt(totalKeys));
+
+      let tempFinalProgress = parseInt(
+        parseInt(resValues.valuesSum) / parseInt(resValues.totalKeys),
+      );
+
+      formik.setFieldValue('lead.extra_params.progress', finalProgress);
+      formik.setFieldValue('lead.extra_params.progress_without_eligibility', tempFinalProgress);
+
+      if (formik?.values?.lead?.id) {
+        await editFieldsById(formik?.values?.lead?.id, 'lead', {
+          extra_params: {
+            progress: finalProgress,
+            progress_without_eligibility: tempFinalProgress,
+          },
+        });
+      }
+    }
+  };
+
   const updateProgressApplicantSteps = async (updateStep, requiredFieldsStatus, page) => {
     let trueCount = 0;
 
@@ -78,6 +169,8 @@ const LeadContextProvider = ({ children }) => {
       }
     }
     formik.setValues(newData);
+
+    updateCompleteFormProgress();
   };
 
   const updateProgressUploadDocumentSteps = async (requiredFieldsStatus) => {
@@ -125,6 +218,8 @@ const LeadContextProvider = ({ children }) => {
     });
 
     formik.setValues(newData);
+
+    updateCompleteFormProgress();
   };
 
   const addApplicant = () => {
@@ -139,6 +234,8 @@ const LeadContextProvider = ({ children }) => {
     navigate('/lead/applicant-details');
 
     setDrawerOpen(false);
+
+    updateCompleteFormProgress();
   };
 
   const removeCoApplicant = (activeIndex) => {
@@ -153,6 +250,8 @@ const LeadContextProvider = ({ children }) => {
     navigate('/lead/applicant-details');
 
     setDrawerOpen(false);
+
+    updateCompleteFormProgress();
   };
 
   useEffect(() => {
@@ -161,6 +260,7 @@ const LeadContextProvider = ({ children }) => {
         (e) => e.applicant_details.is_mobile_verified,
       );
       formik.setFieldValue('applicants', newApplicants);
+      updateCompleteFormProgress();
     }
   }, [location.pathname]);
 
@@ -195,6 +295,7 @@ const LeadContextProvider = ({ children }) => {
     <LeadContext.Provider
       value={{
         ...formik,
+        updateCompleteFormProgress,
         removeCoApplicant,
         applicantStepsProgress,
         setApplicantSetpsProgress,

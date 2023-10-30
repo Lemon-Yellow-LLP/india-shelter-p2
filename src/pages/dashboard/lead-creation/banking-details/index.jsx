@@ -37,6 +37,7 @@ const BankingDetails = () => {
     setBankSuccessTost,
     bankErrorTost,
     setBankErrorTost,
+    setCurrentStepIndex,
   } = useContext(LeadContext);
 
   const navigate = useNavigate();
@@ -252,6 +253,20 @@ const BankingDetails = () => {
               ? '/lead/reference-details'
               : '/lead/upload-documents'
           }
+          onPreviousClick={() => {
+            if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
+              setCurrentStepIndex(6);
+            } else {
+              setCurrentStepIndex(4);
+            }
+          }}
+          onNextClick={() => {
+            if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
+              setCurrentStepIndex(8);
+            } else {
+              setCurrentStepIndex(6);
+            }
+          }}
         />
         <SwipeableDrawerComponent />
 

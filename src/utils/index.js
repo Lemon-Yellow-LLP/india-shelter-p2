@@ -92,6 +92,16 @@ export const fieldLabels = {
   reference_2_pincode: 'Reference 2 pincode',
   reference_2_state: 'Reference 2 state',
   reference_2_type: 'Reference 2 type',
+
+  //upload
+  customer_photo: 'Customer photo',
+  id_proof: 'Id proof',
+  address_proof: 'Address proof',
+  property_paper: 'Property papers',
+  salary_slip: 'Salary slip',
+  form_60: 'Form 60',
+  property_image: 'Property image',
+  upload_selfie: 'Upload selfie',
 };
 
 export const nonRequiredFields = [

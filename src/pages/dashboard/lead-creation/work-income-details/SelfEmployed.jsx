@@ -71,6 +71,14 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               ...prev,
               ['business_name']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                business_name: '',
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -147,6 +155,17 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
                   },
                 },
               );
+            } else {
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                'work-income',
+                {
+                  industries: '',
+                  extra_params: {
+                    extra_industries: '',
+                  },
+                },
+              );
             }
           }}
           onChange={(e) => {
@@ -167,7 +186,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
       <TextInput
         label='GST number'
         placeholder='Eg: 06AAAPB2117A1ZI'
-        className='uppercase'
+        // className='uppercase'
         name={`applicants[${activeIndex}].work_income_detail.gst_number`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
@@ -199,9 +218,18 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
                 gst_number: values?.applicants?.[activeIndex]?.work_income_detail?.gst_number,
               },
             );
+          } else {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                gst_number: '',
+              },
+            );
           }
         }}
         onChange={(e) => {
+          e.target.value = e.target.value.toUpperCase();
           const value = e.currentTarget.value;
           const pattern = /^[a-zA-Z0-9]+$/;
           if (!pattern.test(value) && value.length > 0) {
@@ -278,6 +306,14 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               ...prev,
               ['no_current_loan']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                no_current_loan: 0,
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -327,6 +363,14 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               ...prev,
               ['ongoing_emi']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                ongoing_emi: '',
+              },
+            );
           }
         }}
         onChange={(e) => {

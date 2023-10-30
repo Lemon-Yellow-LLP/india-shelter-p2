@@ -32,6 +32,7 @@ const ReferenceDetails = () => {
     setFieldError,
     activeIndex,
     updateProgressApplicantSteps,
+    setCurrentStepIndex,
     pincodeErr,
     setPincodeErr,
   } = useContext(LeadContext);
@@ -132,7 +133,14 @@ const ReferenceDetails = () => {
   const handleTextInputChange = useCallback(
     (e) => {
       let value = e.currentTarget.value;
-      const pattern = /^[a-zA-Z ]+$/;
+      value = value?.trimStart()?.replace(/\s\s+/g, ' ');
+      let pattern = /^[a-zA-Z ]+$/;
+      if (
+        e.currentTarget.name === 'reference_details.reference_1_address' ||
+        e.currentTarget.name === 'reference_details.reference_2_address'
+      ) {
+        pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
+      }
       if (pattern.test(value) || value.length == 0) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
@@ -169,6 +177,8 @@ const ReferenceDetails = () => {
 
     const res = await checkIsValidStatePincode(values?.reference_details?.reference_1_pincode);
     if (!res) {
+      setFieldValue('reference_details.reference_1_city', '');
+      setFieldValue('reference_details.reference_1_state', '');
       setFieldError('reference_details.reference_1_pincode', 'Invalid Pincode');
       setPincodeErr((prev) => ({ ...prev, reference_1: 'Invalid Pincode' }));
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_pincode']: false }));
@@ -224,6 +234,8 @@ const ReferenceDetails = () => {
       setFieldError('reference_details.reference_2_pincode', 'Invalid Pincode');
       setPincodeErr((prev) => ({ ...prev, reference_2: 'Invalid Pincode' }));
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_pincode']: false }));
+      setFieldValue('reference_details.reference_2_city', '');
+      setFieldValue('reference_details.reference_2_state', '');
       editReferenceById(values?.reference_details?.id, {
         reference_2_city: '',
         reference_2_state: '',
@@ -387,6 +399,7 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+                  updateFields('reference_1_full_name', '');
                 }
               }}
               disabled={inputDisabled}
@@ -429,6 +442,7 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+                  updateFields('reference_1_phone_number', '');
                 }
               }}
               pattern='\d*'
@@ -502,6 +516,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_1_address', '');
                 }
               }}
               disabled={inputDisabled}
@@ -540,6 +556,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_1_pincode', '');
                 }
               }}
               min='0'
@@ -637,6 +655,8 @@ const ReferenceDetails = () => {
                   values?.reference_details?.reference_1_email
                 ) {
                   updateFields('reference_1_email', values?.reference_details?.reference_1_email);
+                } else {
+                  updateFields('reference_1_email', '');
                 }
               }}
               onChange={(e) => {
@@ -708,6 +728,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_2_full_name', '');
                 }
               }}
               disabled={inputDisabled}
@@ -751,6 +773,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_2_phone_number', '');
                 }
               }}
               pattern='\d*'
@@ -825,6 +849,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_2_address', '');
                 }
               }}
               disabled={inputDisabled}
@@ -863,6 +889,8 @@ const ReferenceDetails = () => {
                   if (requiredFieldsStatus[name] !== undefined) {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
+
+                  updateFields('reference_2_pincode', '');
                 }
               }}
               min='0'
@@ -960,6 +988,8 @@ const ReferenceDetails = () => {
                   values?.reference_details?.reference_2_email
                 ) {
                   updateFields('reference_2_email', values?.reference_details?.reference_2_email);
+                } else {
+                  updateFields('reference_2_email', '');
                 }
               }}
               onChange={(e) => {
@@ -988,11 +1018,15 @@ const ReferenceDetails = () => {
               : null
           }
           linkNext='/lead/upload-documents'
-          onPreviousClick={() =>
+          onPreviousClick={() => {
+            setCurrentStepIndex(7);
             !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
               ? setOpenQualifierNotActivePopup(true)
-              : null
-          }
+              : null;
+          }}
+          onNextClick={() => {
+            setCurrentStepIndex(9);
+          }}
         />
         <SwipeableDrawerComponent />
       </div>
