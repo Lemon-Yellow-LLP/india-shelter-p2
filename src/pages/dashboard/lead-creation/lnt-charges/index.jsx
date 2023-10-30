@@ -31,7 +31,7 @@ import { CircularProgress } from '@mui/material';
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
 
-const LnTCharges = ({ amount = 1500 }) => {
+const LnTCharges = () => {
   const {
     values,
     errors,
@@ -40,7 +40,13 @@ const LnTCharges = ({ amount = 1500 }) => {
     setFieldValue,
     setCurrentStepIndex,
     updateCompleteFormProgress,
+    activeIndex,
   } = useContext(LeadContext);
+
+  const amount =
+    values?.applicants?.[activeIndex]?.applicant_details?.bre_101_response?.body?.Display?.[
+      'L&T_Charges'
+    ] ?? 1500;
 
   const [toastMessage, setToastMessage] = useState('');
 
