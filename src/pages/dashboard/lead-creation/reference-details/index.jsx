@@ -33,6 +33,8 @@ const ReferenceDetails = () => {
     activeIndex,
     updateProgressApplicantSteps,
     setCurrentStepIndex,
+    pincodeErr,
+    setPincodeErr,
   } = useContext(LeadContext);
 
   const { phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
@@ -156,12 +158,27 @@ const ReferenceDetails = () => {
     ) {
       setFieldValue('reference_details.reference_1_city', '');
       setFieldValue('reference_details.reference_1_state', '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_pincode']: false }));
+
+      editReferenceById(values?.reference_details?.id, {
+        reference_1_city: '',
+        reference_1_state: '',
+        reference_1_pincode: '',
+      });
       return;
     }
 
     const res = await checkIsValidStatePincode(values?.reference_details?.reference_1_pincode);
     if (!res) {
       setFieldError('reference_details.reference_1_pincode', 'Invalid Pincode');
+      setPincodeErr((prev) => ({ ...prev, reference_1: 'Invalid Pincode' }));
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_pincode']: false }));
+
+      editReferenceById(values?.reference_details?.id, {
+        reference_1_city: '',
+        reference_1_state: '',
+        reference_1_pincode: '',
+      });
       return;
     }
 
@@ -172,6 +189,7 @@ const ReferenceDetails = () => {
 
     setFieldValue('reference_details.reference_1_city', res.city);
     setFieldValue('reference_details.reference_1_state', res.state);
+    setPincodeErr((prev) => ({ ...prev, reference_1: '' }));
 
     if (!requiredFieldsStatus['reference_1_pincode']) {
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_pincode']: true }));
@@ -192,12 +210,26 @@ const ReferenceDetails = () => {
     ) {
       setFieldValue('reference_details.reference_2_city', '');
       setFieldValue('reference_details.reference_2_state', '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_pincode']: false }));
+
+      editReferenceById(values?.reference_details?.id, {
+        reference_2_city: '',
+        reference_2_state: '',
+        reference_2_pincode: '',
+      });
       return;
     }
 
     const res = await checkIsValidStatePincode(values?.reference_details?.reference_2_pincode);
     if (!res) {
       setFieldError('reference_details.reference_2_pincode', 'Invalid Pincode');
+      setPincodeErr((prev) => ({ ...prev, reference_2: 'Invalid Pincode' }));
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_pincode']: false }));
+      editReferenceById(values?.reference_details?.id, {
+        reference_2_city: '',
+        reference_2_state: '',
+        reference_2_pincode: '',
+      });
       return;
     }
 
@@ -208,6 +240,7 @@ const ReferenceDetails = () => {
 
     setFieldValue('reference_details.reference_2_city', res.city);
     setFieldValue('reference_details.reference_2_state', res.state);
+    setPincodeErr((prev) => ({ ...prev, reference_2: '' }));
 
     if (!requiredFieldsStatus['reference_2_pincode']) {
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_pincode']: true }));
@@ -489,7 +522,7 @@ const ReferenceDetails = () => {
               type='tel'
               hint='City and State fields will get filled based on Pincode'
               value={values?.reference_details?.reference_1_pincode}
-              error={errors?.reference_details?.reference_1_pincode}
+              error={errors?.reference_details?.reference_1_pincode || pincodeErr?.reference_1}
               touched={touched?.reference_details?.reference_1_pincode}
               disabled={inputDisabled}
               onBlur={(e) => {
@@ -822,7 +855,7 @@ const ReferenceDetails = () => {
               type='tel'
               hint='City and State fields will get filled based on Pincode'
               value={values?.reference_details?.reference_2_pincode}
-              error={errors.reference_details?.reference_2_pincode}
+              error={errors.reference_details?.reference_2_pincode || pincodeErr?.reference_2}
               touched={touched.reference_details?.reference_2_pincode}
               disabled={inputDisabled}
               onBlur={(e) => {
