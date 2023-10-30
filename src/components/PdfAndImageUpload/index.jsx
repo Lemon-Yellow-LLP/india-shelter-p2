@@ -34,7 +34,7 @@ function PdfAndImageUpload({
 
     let file = e.target.files;
 
-    if (file) {
+    if (file.length !== 0) {
       for (let i = 0; i < file.length; i++) {
         const fileType = file[i]['type'];
 
@@ -73,26 +73,30 @@ function PdfAndImageUpload({
 
     let file = e.target.files;
 
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
+    if (file.length !== 0) {
+      for (let i = 0; i < file.length; i++) {
+        const fileType = file[i]['type'];
 
-      const validImageTypes = ['image/jpeg'];
+        const validImageTypes = ['image/jpeg'];
 
-      if (validImageTypes.includes(fileType)) {
-        if (file[i].size <= 5000000) {
-          setEdit({
-            file: file[i],
-            id: id,
-          });
-          setFile([...files, file[i]]);
+        if (validImageTypes.includes(fileType)) {
+          if (file[i].size <= 5000000) {
+            setEdit({
+              file: file[i],
+              id: id,
+            });
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File size should be less than 5MB');
+          }
         } else {
           setLoader(false);
-          setMessage('File size should be less than 5MB');
+          setMessage('File format not supported');
         }
-      } else {
-        setLoader(false);
-        setMessage('File format not supported');
       }
+    } else {
+      setLoader(false);
     }
   };
 

@@ -1283,8 +1283,8 @@ const UploadDocuments = () => {
         setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
       }
     }
-    form60photos.id && editForm60Photos();
-  }, [form60photos]);
+    editForm60.id && editForm60Photos();
+  }, [editForm60]);
 
   useEffect(() => {
     async function removeProgress() {

@@ -456,13 +456,13 @@ const Qualifier = () => {
   return (
     <>
       {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
-        <Topbar title='Qualifier' id={values?.lead?.id} showClose={true} />
+        <Topbar title='Qualifier' id={values?.lead?.id} showClose={!bre101.res ? false : true} />
       ) : (
         <Topbar
           title='Qualifier'
           id={values?.lead?.id}
           showClose={false}
-          showBack={true}
+          showBack={!bre101.res ? false : true}
           coApplicant={true}
           coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
         />
