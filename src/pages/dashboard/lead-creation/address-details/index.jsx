@@ -483,6 +483,15 @@ export default function AddressDetails() {
                             ?.current_flat_no_building_name,
                       });
                     }
+                  } else {
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_flat_no_building_name: false,
+                    }));
+
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      current_flat_no_building_name: '',
+                    });
                   }
                 }}
                 disabled={
@@ -558,6 +567,15 @@ export default function AddressDetails() {
                             ?.current_street_area_locality,
                       });
                     }
+                  } else {
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_street_area_locality: false,
+                    }));
+
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      current_street_area_locality: '',
+                    });
                   }
                 }}
                 disabled={
@@ -622,6 +640,15 @@ export default function AddressDetails() {
                           values?.applicants?.[activeIndex]?.address_detail?.current_town,
                       });
                     }
+                  } else {
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_town: false,
+                    }));
+
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      current_town: '',
+                    });
                   }
                 }}
                 disabled={
@@ -684,6 +711,15 @@ export default function AddressDetails() {
                           values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
                       });
                     }
+                  } else {
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_landmark: false,
+                    }));
+
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      current_landmark: '',
+                    });
                   }
                 }}
                 disabled={
@@ -729,6 +765,15 @@ export default function AddressDetails() {
                 onBlur={(e) => {
                   handleBlur(e);
                   handleCurrentPincodeChange();
+
+                  if (
+                    errors?.applicants?.[activeIndex]?.address_detail?.current_landmark ||
+                    !values?.applicants?.[activeIndex]?.address_detail?.current_landmark
+                  ) {
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      current_pincode: '',
+                    });
+                  }
                 }}
                 min='0'
                 onInput={(e) => {
@@ -919,6 +964,10 @@ export default function AddressDetails() {
                         values?.applicants?.[activeIndex]?.address_detail
                           ?.permanent_flat_no_building_name,
                     });
+                  } else {
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      permanent_flat_no_building_name: '',
+                    });
                   }
                 }}
                 disabled={
@@ -976,6 +1025,10 @@ export default function AddressDetails() {
                         values?.applicants?.[activeIndex]?.address_detail
                           ?.permanent_street_area_locality,
                     });
+                  } else {
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      permanent_street_area_locality: '',
+                    });
                   }
                 }}
                 disabled={
@@ -1024,6 +1077,10 @@ export default function AddressDetails() {
                       permanent_town:
                         values?.applicants?.[activeIndex]?.address_detail?.permanent_town,
                     });
+                  } else {
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      permanent_town: '',
+                    });
                   }
                 }}
                 disabled={
@@ -1071,6 +1128,10 @@ export default function AddressDetails() {
                     editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
                       permanent_landmark:
                         values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark,
+                    });
+                  } else {
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      permanent_landmark: '',
                     });
                   }
                 }}
@@ -1121,6 +1182,15 @@ export default function AddressDetails() {
                 onBlur={(e) => {
                   handleBlur(e);
                   handlePermanentPincodeChange();
+
+                  if (
+                    errors?.applicants?.[activeIndex]?.address_detail?.permanent_landmark ||
+                    !values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark
+                  ) {
+                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
+                      permanent_pincode: '',
+                    });
+                  }
                 }}
                 min='0'
                 onInput={(e) => {

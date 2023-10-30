@@ -615,6 +615,7 @@ const ApplicantDetails = () => {
                 if (requiredFieldsStatus[name] !== undefined) {
                   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                 }
+                updateFieldsApplicant(name, '');
               }
             }}
             disabled={
@@ -649,6 +650,8 @@ const ApplicantDetails = () => {
                       name,
                       values.applicants[activeIndex]?.applicant_details?.[name],
                     );
+                  } else {
+                    updateFieldsApplicant(name, '');
                   }
                 }}
                 onChange={handleTextInputChange}
@@ -681,6 +684,8 @@ const ApplicantDetails = () => {
                       name,
                       values.applicants[activeIndex]?.applicant_details?.[name],
                     );
+                  } else {
+                    updateFieldsApplicant(name, '');
                   }
                 }}
               />
@@ -758,6 +763,8 @@ const ApplicantDetails = () => {
                       values.applicants?.[activeIndex]?.applicant_details?.[name],
                   };
                 });
+              } else {
+                updateFieldsApplicant(name, '');
               }
             }}
             pattern='\d*'

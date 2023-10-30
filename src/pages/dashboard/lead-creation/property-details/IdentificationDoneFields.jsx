@@ -180,6 +180,9 @@ const IdentificationDoneFields = ({
             if (requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
             }
+            editPropertyById(values?.property_details?.id, {
+              owner_name: '',
+            });
           }
         }}
         inputClasses='capitalize'
@@ -226,6 +229,9 @@ const IdentificationDoneFields = ({
             if (requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
             }
+            editPropertyById(values?.property_details?.id, {
+              plot_house_flat: '',
+            });
           }
         }}
       />
@@ -273,6 +279,9 @@ const IdentificationDoneFields = ({
             if (requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
             }
+            editPropertyById(values?.property_details?.id, {
+              project_society_colony: '',
+            });
           }
         }}
       />
@@ -317,6 +326,18 @@ const IdentificationDoneFields = ({
         onBlur={(e) => {
           handleBlur(e);
           handleOnPincodeChange();
+          if (
+            errors?.applicants?.[activeIndex]?.work_income_detail?.pincode ||
+            !values?.applicants?.[activeIndex]?.work_income_detail?.pincode
+          ) {
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              ['pincode']: false,
+            }));
+            editPropertyById(values?.property_details?.id, {
+              pincode: '',
+            });
+          }
         }}
         min='0'
         onInput={(e) => {

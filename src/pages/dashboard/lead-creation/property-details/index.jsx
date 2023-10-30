@@ -34,6 +34,7 @@ const PropertyDetails = () => {
     setValues,
     updateProgressApplicantSteps,
     activeIndex,
+    setCurrentStepIndex,
   } = useContext(LeadContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
@@ -212,11 +213,13 @@ const PropertyDetails = () => {
               : null
           }
           onNextClick={() => {
+            setCurrentStepIndex(7);
             !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
               ? setOpenQualifierNotActivePopup(true)
               : null;
           }}
           onPreviousClick={() => {
+            setCurrentStepIndex(5);
             !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
               ? setOpenQualifierNotActivePopup(true)
               : null;
