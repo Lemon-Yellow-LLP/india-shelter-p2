@@ -59,15 +59,70 @@ const PropertyDetails = () => {
       setFieldValue('property_details.property_identification_is', e.value);
 
       if (values?.property_details?.id) {
-        editPropertyById(values?.property_details?.id, {
-          property_identification_is: e.value,
-        });
+        if (e.value === 'not-yet') {
+          editPropertyById(values?.property_details?.id, {
+            property_value_estimate: '',
+            owner_name: '',
+            plot_house_flat: '',
+            project_society_colony: '',
+            pincode: null,
+            city: '',
+            state: '',
+            extra_params: {
+              ...values?.property_details?.extra_params,
+              progress: 100,
+              required_fields_status: {
+                property_identification_is: true,
+              },
+            },
+          });
+
+          setValues({
+            ...values,
+            property_details: {
+              ...values.property_details,
+              property_identification_is: e.value,
+              property_value_estimate: '',
+              owner_name: '',
+              plot_house_flat: '',
+              project_society_colony: '',
+              pincode: null,
+              city: '',
+              state: '',
+              extra_params: {
+                ...values?.property_details?.extra_params,
+                progress: 100,
+                required_fields_status: {
+                  property_identification_is: true,
+                },
+              },
+            },
+          });
+
+          setRequiredFieldsStatus({
+            property_identification_is: true,
+          });
+        } else {
+          editPropertyById(values?.property_details?.id, {
+            property_identification_is: e.value,
+          });
+          setRequiredFieldsStatus((prev) => ({
+            ...prev,
+            owner_name: false,
+            pincode: false,
+            plot_house_flat: false,
+            project_society_colony: false,
+            property_identification_is: true,
+            property_value_estimate: false,
+          }));
+        }
       } else {
         let newDefaultValues = structuredClone(defaultValuesLead);
         let addData = { ...newDefaultValues.property_details, [name]: e.value };
         if (e.value === 'not-yet') {
           addData.extra_params = {
             ...addData.extra_params,
+            progress: 100,
             required_fields_status: {
               property_identification_is: true,
             },
@@ -83,59 +138,6 @@ const PropertyDetails = () => {
           .catch((err) => {
             console.log(err);
           });
-      }
-
-      if (e.value === 'not-yet') {
-        editPropertyById(values?.property_details?.id, {
-          property_value_estimate: '',
-          owner_name: '',
-          plot_house_flat: '',
-          project_society_colony: '',
-          pincode: null,
-          city: '',
-          state: '',
-          extra_params: {
-            ...values?.property_details?.extra_params,
-            required_fields_status: {
-              property_identification_is: true,
-            },
-          },
-        });
-
-        setValues({
-          ...values,
-          property_details: {
-            ...values.property_details,
-            property_identification_is: e.value,
-            property_value_estimate: '',
-            owner_name: '',
-            plot_house_flat: '',
-            project_society_colony: '',
-            pincode: null,
-            city: '',
-            state: '',
-            extra_params: {
-              ...values?.property_details?.extra_params,
-              required_fields_status: {
-                property_identification_is: true,
-              },
-            },
-          },
-        });
-
-        setRequiredFieldsStatus({
-          property_identification_is: true,
-        });
-      } else {
-        setRequiredFieldsStatus((prev) => ({
-          ...prev,
-          owner_name: false,
-          pincode: false,
-          plot_house_flat: false,
-          project_society_colony: false,
-          property_identification_is: true,
-          property_value_estimate: false,
-        }));
       }
     },
     [requiredFieldsStatus, setFieldValue],
