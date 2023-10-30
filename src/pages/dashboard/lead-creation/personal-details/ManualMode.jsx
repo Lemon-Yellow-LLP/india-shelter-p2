@@ -421,6 +421,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            updateFields(name, '');
           }
         }}
         onKeyDown={(e) => {
@@ -580,6 +581,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            updateFields(name, '');
           }
         }}
         onKeyDown={(e) => {
@@ -620,6 +622,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            updateFields(name, '');
           }
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
@@ -640,6 +643,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           const name = e.target.name.split('.')[2];
           if (!errors.applicants?.[activeIndex]?.personal_details?.[name]) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+          } else {
+            updateFields(name, '');
           }
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
@@ -659,6 +664,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           const name = e.target.name.split('.')[2];
           if (!errors.applicants?.[activeIndex]?.personal_details?.[name]) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+          } else {
+            updateFields(name, '');
           }
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
@@ -741,6 +748,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.[name]
           ) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+          } else {
+            updateFields(name, '');
           }
         }}
       />
@@ -770,6 +779,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            updateFields(name, '');
           }
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
@@ -799,6 +809,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            updateFields(name, '');
           }
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
@@ -936,6 +947,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.[name]
           ) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+          } else {
+            updateFields(name, '');
           }
         }}
       />

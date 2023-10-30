@@ -23,9 +23,14 @@ export default function DrawerFooter() {
     <div className='flex justify-between p-4 pt-3 rounded-t-2xl bg-white w-full border-solid border relative z-[1000]'>
       <div className='flex flex-col'>
         <span style={{ fontSize: '10px', fontWeight: '500', lineHeight: '15px', color: '#E33439' }}>
-          {!values.applicants?.[activeIndex]?.applicant_details?.is_primary ? 'CO-APPLICANT' : null}
+          {!values.applicants?.[activeIndex]?.applicant_details?.is_primary &&
+          location?.pathname !== '/lead/preview'
+            ? 'CO-APPLICANT '
+            : null}
           STEP: {currentStepIndex + 1}/
           {values.applicants?.[activeIndex]?.applicant_details?.is_primary
+            ? applicantStepsProgress.length
+            : location?.pathname === '/lead/preview'
             ? applicantStepsProgress.length
             : coApplicantStepsProgress.length}
         </span>

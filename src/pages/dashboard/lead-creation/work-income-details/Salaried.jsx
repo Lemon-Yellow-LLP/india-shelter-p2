@@ -105,6 +105,14 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               ...prev,
               ['company_name']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                company_name: '',
+              },
+            );
           }
         }}
         onChange={searchableTextInputChange}
@@ -153,6 +161,17 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                 ...prev,
                 ['company_name']: false,
               }));
+
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                'work-income',
+                {
+                  company_name: '',
+                  extra_params: {
+                    extra_company_name: '',
+                  },
+                },
+              );
             }
           }}
           onChange={(e) => {
@@ -203,6 +222,14 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               ...prev,
               ['total_income']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                total_income: 0,
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -243,6 +270,14 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               'work-income',
               {
                 pf_uan: values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan,
+              },
+            );
+          } else {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                pf_uan: '',
               },
             );
           }
@@ -343,6 +378,14 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               ...prev,
               ['no_current_loan']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                no_current_loan: 0,
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -393,6 +436,14 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               ...prev,
               ['ongoing_emi']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                ongoing_emi: 0,
+              },
+            );
           }
         }}
         onChange={(e) => {

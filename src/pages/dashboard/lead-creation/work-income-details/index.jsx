@@ -27,8 +27,6 @@ const WorkIncomeDetails = () => {
     handleBlur,
     setFieldValue,
     setFieldError,
-    handleChange,
-    handleSubmit,
     activeIndex,
     setCurrentStepIndex,
     updateProgressApplicantSteps,
@@ -420,6 +418,13 @@ const WorkIncomeDetails = () => {
                       ...prev,
                       ['flat_no_building_name']: false,
                     }));
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        flat_no_building_name: '',
+                      },
+                    );
                   }
                 }}
                 onChange={(e) => {
@@ -479,6 +484,14 @@ const WorkIncomeDetails = () => {
                       ...prev,
                       ['street_area_locality']: false,
                     }));
+
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        street_area_locality: '',
+                      },
+                    );
                   }
                 }}
                 onChange={(e) => {
@@ -534,6 +547,14 @@ const WorkIncomeDetails = () => {
                       ...prev,
                       ['town']: false,
                     }));
+
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        town: '',
+                      },
+                    );
                   }
                 }}
                 onChange={(e) => {
@@ -589,6 +610,13 @@ const WorkIncomeDetails = () => {
                       ...prev,
                       ['landmark']: false,
                     }));
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        landmark: '',
+                      },
+                    );
                   }
                 }}
                 onChange={(e) => {
@@ -633,6 +661,31 @@ const WorkIncomeDetails = () => {
                   handleBlur(e);
 
                   handleOnPincodeChange();
+
+                  if (
+                    !errors?.applicants?.[activeIndex]?.work_income_detail?.pincode &&
+                    values?.applicants?.[activeIndex]?.work_income_detail?.pincode
+                  ) {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        pincode: values?.applicants?.[activeIndex]?.work_income_detail?.pincode,
+                      },
+                    );
+                  } else {
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      ['pincode']: false,
+                    }));
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        pincode: '',
+                      },
+                    );
+                  }
                 }}
                 min='0'
                 onInput={(e) => {
@@ -801,6 +854,14 @@ const WorkIncomeDetails = () => {
                       ...prev,
                       ['total_household_income']: false,
                     }));
+
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        total_household_income: '',
+                      },
+                    );
                   }
                 }}
                 onChange={(e) => {

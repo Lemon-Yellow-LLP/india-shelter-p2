@@ -38,6 +38,14 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
               ...prev,
               ['pention_amount']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                pention_amount: '',
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -118,6 +126,14 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
               ...prev,
               ['no_current_loan']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                no_current_loan: 0,
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -168,6 +184,14 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
               ...prev,
               ['ongoing_emi']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                ongoing_emi: '',
+              },
+            );
           }
         }}
         onChange={(e) => {
