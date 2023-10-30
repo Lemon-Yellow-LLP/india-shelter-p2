@@ -5,8 +5,8 @@ import BackIcon2 from '../../assets/icons/back-2';
 import { AuthContext } from '../../context/AuthContextProvider';
 import { Box, Button, Tabs, Tab } from '@mui/material';
 import ProgressBadge from '../../components/ProgressBadge';
-import { getDashboardLeadById } from '../../global';
-import { CheckBox, DropDown } from '../../components';
+import { getDashboardLeadById, pushToSalesforce } from '../../global';
+import { CheckBox, DropDown, ToastMessage } from '../../components';
 import moment from 'moment';
 import { PrimaryDropdownOptions, CoApplicantDropdownOptions } from './DashboardDropdowns';
 import { LeadContext } from '../../context/LeadContextProvider';
@@ -1272,7 +1272,7 @@ export default function DashboardApplicant() {
 
 const Titlebar = ({ title, id, primaryApplicant }) => {
   const { setValues, setActiveIndex } = useContext(LeadContext);
-  const { setPhoneNumberList } = useContext(AuthContext);
+  const { setPhoneNumberList, toastMessage, setToastMessage } = useContext(AuthContext);
 
   const [totalProgress, setTotalProgress] = useState(0);
   const [leadData, setLeadData] = useState(null);
@@ -1333,9 +1333,18 @@ const Titlebar = ({ title, id, primaryApplicant }) => {
   const sfdcPUSH = async () => {
     setSfdcPush({ ...sfdcPush, loader: true });
 
-    setTimeout(() => {
-      setSfdcPush({ ...sfdcPush, loader: false, status: 'Complete' });
-    }, 5000);
+    try {
+      const sfdc_res = await pushToSalesforce(leadData.lead.id, {});
+
+      if (sfdc_res) {
+        setToastMessage('Data has been successfully pushed to the Salesforce');
+        setSfdcPush({ ...sfdcPush, loader: false, status: sfdc_res.lead.sfdc_status });
+      }
+    } catch (err) {
+      console.log(err);
+      setToastMessage('The data push to Salesforce has failed');
+      setSfdcPush({ ...sfdcPush, loader: false, status: 'Error' });
+    }
   };
 
   useEffect(() => {
@@ -1343,28 +1352,176 @@ const Titlebar = ({ title, id, primaryApplicant }) => {
   }, [leadData]);
 
   return (
-    <div
-      id='titlebar'
-      className='sticky inset-0 bg-neutral-white h-fit flex items-start px-4 py-3 border border-[#ECECEC]'
-    >
-      <button className='p-0 mr-3' onClick={() => navigate('/dashboard')}>
-        <BackIcon2 />
-      </button>
-      <div className='flex-1'>
-        <h3 className='w-[200px] truncate'>{title}</h3>
-        <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
-          LEAD ID:
-          <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey'>
-            {id}
-          </span>
-        </p>
-      </div>
+    <>
+      <ToastMessage
+        message={toastMessage}
+        setMessage={setToastMessage}
+        error={sfdcPush.status !== 'Complete' ? true : false}
+      />
 
-      {leadData && (
-        <button>
-          {!sfdcPush.loader &&
-            leadData?.lead.sfdc_count !== 0 &&
-            (sfdcPush.status === 'Complete' ? (
+      <div
+        id='titlebar'
+        className='sticky inset-0 bg-neutral-white h-fit flex items-start px-4 py-3 border border-[#ECECEC]'
+      >
+        <button
+          className='p-0 mr-3'
+          onClick={() => navigate('/dashboard')}
+          disabled={sfdcPush.loader}
+        >
+          {sfdcPush.loader ? (
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='24'
+              height='24'
+              fill='none'
+              viewBox='0 0 24 24'
+            >
+              <g>
+                <rect
+                  width='24'
+                  height='24'
+                  fill='#FEFEFE'
+                  rx='12'
+                  transform='matrix(1 0 0 -1 0 24)'
+                ></rect>
+                <path
+                  stroke='#96989A'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='1.5'
+                  d='M15 18l-6-6 6-6'
+                ></path>
+              </g>
+            </svg>
+          ) : (
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='24'
+              height='24'
+              fill='none'
+              viewBox='0 0 24 24'
+            >
+              <g>
+                <rect
+                  width='24'
+                  height='24'
+                  fill='#FEFEFE'
+                  rx='12'
+                  transform='matrix(1 0 0 -1 0 24)'
+                ></rect>
+                <path
+                  stroke='#373435'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='1.5'
+                  d='M15 18l-6-6 6-6'
+                ></path>
+              </g>
+            </svg>
+          )}
+        </button>
+        <div className='flex-1'>
+          <h3 className='w-[200px] truncate'>{title}</h3>
+          <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
+            LEAD ID:
+            <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey'>
+              {id}
+            </span>
+          </p>
+        </div>
+
+        {leadData && (
+          <button>
+            {!sfdcPush.loader &&
+              leadData?.lead.sfdc_count !== 0 &&
+              leadData?.lead.sfdc_count <= 4 &&
+              (sfdcPush.status === 'Complete' ? (
+                <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-secondary-green'>
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M5.843 17.372C4.273 17.372 3 16.099 3 14.529C3 12.959 4.273 11.686 5.843 11.686C5.843 8.546 8.389 6 11.529 6C13.879 6 15.895 7.426 16.762 9.46C17.051 9.394 17.349 9.351 17.658 9.351C19.873 9.351 21.668 11.146 21.668 13.361C21.668 15.576 19.873 17.371 17.658 17.371'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeMiterlimit='10'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                    <path
+                      d='M16 14L11.1875 19L9 16.7273'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                </div>
+              ) : (
+                <div
+                  onClick={() => sfdcPUSH()}
+                  className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-primary-red'
+                >
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M5.843 16.372C4.273 16.372 3 15.099 3 13.529C3 11.959 4.273 10.686 5.843 10.686C5.843 7.546 8.389 5 11.529 5C13.879 5 15.895 6.426 16.762 8.46C17.051 8.394 17.349 8.351 17.658 8.351C19.873 8.351 21.668 10.146 21.668 12.361C21.668 14.576 19.873 16.371 17.658 16.371'
+                      stroke='#E33439'
+                      strokeWidth='1.5'
+                      strokeMiterlimit='10'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                    <path
+                      d='M8 15C8 12.7909 9.79086 11 12 11C14.2091 11 16 12.7909 16 15C16 17.2091 14.2091 19 12 19C10.5194 19 9.22675 18.1956 8.53513 17M8.53513 17V19M8.53513 17H10.5'
+                      stroke='#E33439'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                </div>
+              ))}
+
+            {sfdcPush.loader ? (
+              <div className='ml-auto'>
+                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+              </div>
+            ) : null}
+
+            {leadData.lead.sfdc_count > 4 && leadData.lead.sfdc_status !== 'Complete' && (
+              <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4'>
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <g opacity='0.6'>
+                    <path
+                      d='M17.658 15.371C19.873 15.371 21.668 13.576 21.668 11.361C21.668 9.146 19.873 7.351 17.658 7.351C17.349 7.351 17.051 7.393 16.762 7.46C15.896 5.426 13.879 4 11.529 4C8.389 4 5.843 6.546 5.843 9.686C4.273 9.686 3 10.959 3 12.529C3 14.099 4.273 15.372 5.843 15.372M14.355 13.022L9.368 18.009M15.387 15.516C15.387 17.4634 13.8084 19.042 11.861 19.042C9.91364 19.042 8.335 17.4634 8.335 15.516C8.335 13.5686 9.91364 11.99 11.861 11.99C13.8084 11.99 15.387 13.5686 15.387 15.516Z'
+                      stroke='#96989A'
+                      strokeWidth='1.5'
+                      strokeMiterlimit='10'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </g>
+                </svg>
+              </div>
+            )}
+
+            {leadData.lead.sfdc_count > 4 && leadData.lead.sfdc_status === 'Complete' ? (
               <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-secondary-green'>
                 <svg
                   width='24'
@@ -1374,69 +1531,39 @@ const Titlebar = ({ title, id, primaryApplicant }) => {
                   xmlns='http://www.w3.org/2000/svg'
                 >
                   <path
-                    d='M4.843 16.372C3.273 16.372 2 15.099 2 13.529C2 11.959 3.273 10.686 4.843 10.686C4.843 7.546 7.389 5 10.529 5C12.879 5 14.895 6.426 15.762 8.46C16.051 8.394 16.349 8.351 16.658 8.351C18.873 8.351 20.668 10.146 20.668 12.361C20.668 14.576 18.873 16.371 16.658 16.371'
+                    d='M5.843 17.372C4.273 17.372 3 16.099 3 14.529C3 12.959 4.273 11.686 5.843 11.686C5.843 8.546 8.389 6 11.529 6C13.879 6 15.895 7.426 16.762 9.46C17.051 9.394 17.349 9.351 17.658 9.351C19.873 9.351 21.668 11.146 21.668 13.361C21.668 15.576 19.873 17.371 17.658 17.371'
                     stroke='#147257'
+                    strokeWidth='1.5'
                     strokeMiterlimit='10'
                     strokeLinecap='round'
                     strokeLinejoin='round'
                   />
                   <path
-                    d='M15 13L10.1875 18L8 15.7273'
+                    d='M16 14L11.1875 19L9 16.7273'
                     stroke='#147257'
+                    strokeWidth='1.5'
                     strokeLinecap='round'
                     strokeLinejoin='round'
                   />
                 </svg>
               </div>
-            ) : (
-              <div
-                onClick={() => sfdcPUSH()}
-                className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-primary-red'
-              >
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M4.843 16.372C3.273 16.372 2 15.099 2 13.529C2 11.959 3.273 10.686 4.843 10.686C4.843 7.546 7.389 5 10.529 5C12.879 5 14.895 6.426 15.762 8.46C16.051 8.394 16.349 8.351 16.658 8.351C18.873 8.351 20.668 10.146 20.668 12.361C20.668 14.576 18.873 16.371 16.658 16.371'
-                    stroke='#E33439'
-                    strokeMiterlimit='10'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                  <path
-                    d='M7 15C7 12.7909 8.79086 11 11 11C13.2091 11 15 12.7909 15 15C15 17.2091 13.2091 19 11 19C9.51944 19 8.22675 18.1956 7.53513 17M7.53513 17V19M7.53513 17H9.5'
-                    stroke='#E33439'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              </div>
-            ))}
-
-          {sfdcPush.loader ? (
-            <div className='ml-auto'>
-              <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
-            </div>
-          ) : null}
-        </button>
-      )}
-
-      <button
-        className='ml-4 '
-        onClick={() => handleOpenForm(id)}
-        disabled={primaryApplicant?.applicant_details?.extra_params?.eligibility}
-      >
-        {primaryApplicant?.applicant_details?.extra_params?.eligibility ? (
-          <EditIcon />
-        ) : (
-          <EditLeadEnabled />
+            ) : null}
+          </button>
         )}
-      </button>
-    </div>
+
+        <button
+          className='ml-4 '
+          onClick={() => handleOpenForm(id)}
+          disabled={primaryApplicant?.applicant_details?.extra_params?.eligibility}
+        >
+          {primaryApplicant?.applicant_details?.extra_params?.eligibility ? (
+            <EditIcon />
+          ) : (
+            <EditLeadEnabled />
+          )}
+        </button>
+      </div>
+    </>
   );
 };
 
