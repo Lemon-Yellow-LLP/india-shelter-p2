@@ -71,6 +71,14 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               ...prev,
               ['business_name']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                business_name: '',
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -147,6 +155,17 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
                   },
                 },
               );
+            } else {
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                'work-income',
+                {
+                  industries: '',
+                  extra_params: {
+                    extra_industries: '',
+                  },
+                },
+              );
             }
           }}
           onChange={(e) => {
@@ -197,6 +216,14 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               'work-income',
               {
                 gst_number: values?.applicants?.[activeIndex]?.work_income_detail?.gst_number,
+              },
+            );
+          } else {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                gst_number: '',
               },
             );
           }
@@ -279,6 +306,14 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               ...prev,
               ['no_current_loan']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                no_current_loan: 0,
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -328,6 +363,14 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               ...prev,
               ['ongoing_emi']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                ongoing_emi: '',
+              },
+            );
           }
         }}
         onChange={(e) => {

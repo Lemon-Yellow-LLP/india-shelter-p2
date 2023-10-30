@@ -32,7 +32,8 @@ const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
 
 const LnTCharges = ({ amount = 1500 }) => {
-  const { values, errors, touched, handleBlur, setFieldValue } = useContext(LeadContext);
+  const { values, errors, touched, handleBlur, setFieldValue, setCurrentStepIndex } =
+    useContext(LeadContext);
 
   const [toastMessage, setToastMessage] = useState('');
 
@@ -218,7 +219,10 @@ const LnTCharges = ({ amount = 1500 }) => {
   const showConfirmPayment = () => setConfirmPaymentVisibility(true);
   const hideConfirmPayment = () => setConfirmPaymentVisibility(false);
 
-  const showConfirmSkip = () => setConfirmSkipVisibility(true);
+  const showConfirmSkip = () => {
+    setConfirmSkipVisibility(true);
+    setCurrentStepIndex(6);
+  };
   const hideConfirmSkip = () => setConfirmSkipVisibility(false);
 
   const handleSkipPayment = () => {
@@ -445,6 +449,7 @@ const LnTCharges = ({ amount = 1500 }) => {
             inputClasses=' w-full h-[46px]'
             onClick={() => {
               hideConfirmSkip();
+              setCurrentStepIndex(6);
             }}
             link='/lead/property-details'
           >
@@ -459,7 +464,7 @@ const LnTCharges = ({ amount = 1500 }) => {
 };
 
 const PaymentSuccess = ({ amount, method }) => {
-  const { values } = useContext(LeadContext);
+  const { values, setCurrentStepIndex } = useContext(LeadContext);
   return (
     <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
       <Topbar title='L&T Charges' id={values?.lead?.id} showClose={true} />
@@ -485,7 +490,14 @@ const PaymentSuccess = ({ amount, method }) => {
         </div>
       </div>
       <div className='mt-auto w-full p-4 fixed bottom-0'>
-        <Button primary={true} inputClasses='h-12' link='/lead/property-details'>
+        <Button
+          primary={true}
+          inputClasses='h-12'
+          link='/lead/property-details'
+          onClick={() => {
+            setCurrentStepIndex(6);
+          }}
+        >
           Next
         </Button>
       </div>
