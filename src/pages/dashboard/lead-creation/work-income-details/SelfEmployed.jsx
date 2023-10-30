@@ -186,7 +186,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
       <TextInput
         label='GST number'
         placeholder='Eg: 06AAAPB2117A1ZI'
-        className='uppercase'
+        // className='uppercase'
         name={`applicants[${activeIndex}].work_income_detail.gst_number`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
@@ -229,6 +229,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
           }
         }}
         onChange={(e) => {
+          e.target.value = e.target.value.toUpperCase();
           const value = e.currentTarget.value;
           const pattern = /^[a-zA-Z0-9]+$/;
           if (!pattern.test(value) && value.length > 0) {
