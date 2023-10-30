@@ -17,10 +17,11 @@ function PdfAndImageUpload({
   hint,
   setLatLong,
   imageArrayBorder, //in address proof of upload page there is no border for immage array but in salary slip there is border so when you want to add border to immage array just pass true to this prop
+  errorMessage,
   ...props
 }) {
   const { activeIndex, values } = useContext(LeadContext);
-  const [message, setMessage] = useState();
+  const [message, setMessage] = useState(errorMessage);
   const [loader, setLoader] = useState(false);
 
   const [show, setShow] = useState(false);
