@@ -79,7 +79,15 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, sin
                         />
 
                         <p className='absolute bottom-0 left-0 text-white p-3'>
-                          Lat: {photo.geo_lat}, Long: {photo.geo_long}
+                          CAF: {values.applicants?.[activeIndex]?.applicant_details?.lead_id}; Lat:{' '}
+                          {photo.geo_lat}; Long: {photo.geo_long}; EMP code:{' '}
+                          {userData?.employee_code}; Timestamp: {Timestamp?.toLocaleString()}; LO
+                          Name:{' '}
+                          {userData?.first_name +
+                            ' ' +
+                            userData?.middle_name +
+                            ' ' +
+                            userData?.last_name}
                         </p>
                       </div>
                     ),
@@ -98,7 +106,6 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, sin
                   {singlePhoto.geo_lat}; Long: {singlePhoto.geo_long}; EMP code:{' '}
                   {userData?.employee_code}; Timestamp: {Timestamp?.toLocaleString()}; LO Name:{' '}
                   {userData?.first_name + ' ' + userData?.middle_name + ' ' + userData?.last_name}
-                  {}
                 </p>
               </div>
             )}
