@@ -86,6 +86,7 @@ const Eligibility = () => {
   const [faceMatchResponse, setFaceMatchResponse] = useState(null);
   const [edited_applicants, setEditedApplicants] = useState([]);
   const [sdfcResponse, setSdfcResponse] = useState(false);
+  const [sfdcStatus, setSfdcStatus] = useState(false);
 
   useEffect(() => {
     setEditedApplicants(
@@ -697,8 +698,12 @@ const Eligibility = () => {
 
         setToastMessage('Data has been successfully pushed to the Salesforce');
         setSdfcResponse(true);
+        setSfdcStatus(false);
       } catch (err) {
         console.log(err);
+        setToastMessage('The data push to Salesforce has failed');
+        setSdfcResponse(true);
+        setSfdcStatus(true);
       }
     }
 
@@ -710,7 +715,11 @@ const Eligibility = () => {
       <Topbar title='Eligibility' id={values?.lead?.id} showClose={true} />
 
       <div className='p-4 h-full pb-28'>
-        <ToastMessage message={toastMessage} setMessage={setToastMessage} />
+        <ToastMessage
+          message={toastMessage}
+          setMessage={setToastMessage}
+          error={sfdcStatus ? true : false}
+        />
 
         <div className='flex items-start gap-2'>
           <img src={InfoIcon} className='w-4 h-4' alt='info-icon' />
@@ -732,14 +741,14 @@ const Eligibility = () => {
           </p>
           <p className='text-xs text-primary-black font-normal mt-0.5'>Salesforce ID: 1234567</p>
           <div className='flex justify-between text-primary-black font-medium mt-1'>
-            {!bre201 ? <h3>Verification in progress</h3> : <h3>Application submitted</h3>}
+            {!sdfcResponse ? <h3>Verification in progress</h3> : <h3>Application submitted</h3>}
             <h3>
               {progress}/{finalApi}
             </h3>
           </div>
 
           <div className='mt-3 bg-primary-black rounded-lg p-4'>
-            {!bre201 ? (
+            {!sdfcResponse ? (
               <div className='flex justify-center items-center gap-3'>
                 <div className='ml-auto'>
                   <img
