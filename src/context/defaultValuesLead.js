@@ -7,6 +7,7 @@ export const defaultValuesLead = {
     applied_amount: '500000',
     extra_params: {
       progress: 0,
+      progress_without_eligibility: 0,
     },
   },
 

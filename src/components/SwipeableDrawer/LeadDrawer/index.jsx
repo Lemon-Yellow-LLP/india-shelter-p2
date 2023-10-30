@@ -214,7 +214,9 @@ export default function SwipeableDrawerComponent() {
                 </h4>
               </div>
               <div className='flex flex-col items-end'>
-                <span className='text-base text-[#E33439] font-medium'>15%</span>
+                <span className='text-base text-[#E33439] font-medium'>
+                  {values?.lead?.extra_params?.progress}%
+                </span>
                 <span className='text-xs text-[#727376] font-normal'>Completed</span>
               </div>
             </div>
@@ -395,7 +397,7 @@ export default function SwipeableDrawerComponent() {
                     index={primaryIndex}
                     stepIndex={11}
                     noProgress={true}
-                    lock={false}
+                    lock={values?.lead?.extra_params?.progress_without_eligibility !== 100}
                   />
                 </div>
               </TabPanel>

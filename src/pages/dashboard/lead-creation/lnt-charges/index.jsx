@@ -31,9 +31,22 @@ import { CircularProgress } from '@mui/material';
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
 
-const LnTCharges = ({ amount = 1500 }) => {
-  const { values, errors, touched, handleBlur, setFieldValue, setCurrentStepIndex } =
-    useContext(LeadContext);
+const LnTCharges = () => {
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    setFieldValue,
+    setCurrentStepIndex,
+    updateCompleteFormProgress,
+    activeIndex,
+  } = useContext(LeadContext);
+
+  const amount =
+    values?.applicants?.[activeIndex]?.applicant_details?.bre_101_response?.body?.Display?.[
+      'L&T_Charges'
+    ] ?? 1500;
 
   const [toastMessage, setToastMessage] = useState('');
 
@@ -83,6 +96,8 @@ const LnTCharges = ({ amount = 1500 }) => {
           setFieldValue('lt_charges', resp);
           setPaymentStatus('success');
         }
+
+        updateCompleteFormProgress();
       } catch (err) {
         const resp = await addLnTCharges(values?.lead?.id);
         setLntId(resp.id);
@@ -92,6 +107,8 @@ const LnTCharges = ({ amount = 1500 }) => {
         setHasSentOTPOnce(false);
         setShowResendLink(false);
         setActiveItem('UPI Payment');
+
+        updateCompleteFormProgress();
       }
     })();
   }, []);
@@ -104,6 +121,7 @@ const LnTCharges = ({ amount = 1500 }) => {
           const resp = await checkIfLntExists(values?.lead?.id);
           setFieldValue('lt_charges', resp);
         }
+        updateCompleteFormProgress();
       } catch (err) {
         console.error(err);
       }
