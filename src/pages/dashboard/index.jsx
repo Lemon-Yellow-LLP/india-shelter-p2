@@ -189,7 +189,7 @@ export default function Dashboard() {
           )}
         </div>
       ) : (
-        <div className='absolute flex items-center w-full h-[60%] bg-white'>
+        <div className='absolute flex items-center w-full dashBoardLoaderHeight bg-white'>
           <LoaderDynamicText text='Loading...' textColor='black' height='60%' />
         </div>
       )}

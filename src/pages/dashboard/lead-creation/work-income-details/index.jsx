@@ -647,6 +647,7 @@ const WorkIncomeDetails = () => {
 
               <TextInput
                 required
+                type='tel'
                 hint='City and State fields will get filled based on Pincode'
                 placeholder='Eg: 123456'
                 label='Pincode'
