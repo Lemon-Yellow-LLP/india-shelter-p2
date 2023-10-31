@@ -28,7 +28,8 @@ const PersonalDetails = () => {
   });
 
   const [openExistingPopup, setOpenExistingPopup] = useState(
-    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+    values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
+      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
       !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done
       ? true
       : false,
@@ -92,7 +93,7 @@ const PersonalDetails = () => {
             await editFieldsById(
               values?.applicants[activeIndex]?.applicant_details?.id,
               'applicant',
-              { personal_detail: res.id },
+              { personal_details: res.id },
             );
           })
           .catch((err) => {
@@ -153,56 +154,68 @@ const PersonalDetails = () => {
       gender: existing_customer_gender,
       father_husband_name: existing_customer_father_husband_name,
       mother_name: existing_customer_mother_name,
-      extra_params: {},
     };
 
-    let finalData = { ...values };
+    let finalData = structuredClone(values);
 
     finalData.applicants[activeIndex].personal_details = {
       ...finalData.applicants[activeIndex].personal_details,
       ...mappedData,
     };
 
-    setValues(finalData);
+    const filteredMappedData = Object.entries(mappedData)
+      .filter(([key, value]) => value !== null && value !== undefined && value !== '')
+      .reduce((acc, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {});
 
-    setFieldValue(
-      `applicants[${activeIndex}].personal_details.extra_params.is_existing_done`,
-      true,
+    const updatedRequiredFieldsStatus = Object.fromEntries(
+      Object.entries(requiredFieldsStatus).map(([key, value]) => [
+        key,
+        key in filteredMappedData ? true : value,
+      ]),
     );
+
+    setFieldValue(`applicants[${activeIndex}].personal_details`, {
+      ...finalData.applicants[activeIndex].personal_details,
+      extra_params: {
+        ...finalData.applicants[activeIndex].personal_details.extra_params,
+        is_existing_done: true,
+      },
+    });
 
     if (values?.applicants[activeIndex]?.personal_details?.id) {
       const res = await editFieldsById(
         values?.applicants[activeIndex]?.personal_details?.id,
         'personal',
-        mappedData,
-      ).then((res) => {
-        updateFields();
-      });
-    } else {
-      const res = await addApi('personal', mappedData);
-      setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
-      await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details?.id, 'applicant', {
-        personal_detail: res.id,
-      });
-      updateFields();
+        {
+          ...finalData.applicants[activeIndex].personal_details,
+          extra_params: {
+            ...finalData.applicants[activeIndex].personal_details.extra_params,
+            is_existing_done: true,
+          },
+        },
+      );
     }
+
+    setRequiredFieldsStatus(updatedRequiredFieldsStatus);
 
     setOpenExistingPopup(false);
   };
 
   useEffect(() => {
     if (
+      values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
       values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
       !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done
     ) {
-      setOpenExistingPopup(
-        values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-          !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done,
-      );
+      setOpenExistingPopup(true);
     } else {
       setOpenExistingPopup(false);
     }
   }, [
+    values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed,
     values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
     values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done,
   ]);
@@ -285,167 +298,171 @@ const PersonalDetails = () => {
         <SwipeableDrawerComponent />
       </div>
 
-      <DynamicDrawer
-        open={
-          openExistingPopup &&
-          values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed
-        }
-        setOpen={setOpenExistingPopup}
-        height='80vh'
-      >
-        <div className='flex flex-col items-center h-full'>
-          <span className='w-full font-semibold text-[14px] leading-[21px]'>
-            This is an existing customer.
-          </span>
-          <div className='flex flex-col flex-1 w-full gap-[7px] overflow-auto mt-[10px] mb-[10px]'>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>ID Type**</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_id_type}
-              </span>
-            </div>
+      {openExistingPopup ? (
+        <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>
+          <div className='flex flex-col items-center h-full'>
+            <span className='w-full font-semibold text-[14px] leading-[21px]'>
+              This is an existing customer.
+            </span>
+            <div className='flex flex-col flex-1 w-full gap-[7px] overflow-auto mt-[10px] mb-[10px]'>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>ID Type**</span>
+                <span className='w-full text-[12px]'>
+                  {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_id_type}
+                </span>
+              </div>
 
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>ID Number**</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_id_number}
-              </span>
-            </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>ID Number**</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_id_number
+                  }
+                </span>
+              </div>
 
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Address proof**</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_selected_address_proof
-                }
-              </span>
-            </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Address proof**</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_selected_address_proof
+                  }
+                </span>
+              </div>
 
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Address proof number**</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_address_proof_number
-                }
-              </span>
-            </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Address proof number**</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_address_proof_number
+                  }
+                </span>
+              </div>
 
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>First name**</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_first_name}
-              </span>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>First name**</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_first_name
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Middle name</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_middle_name
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Last name</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_last_name
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Gender</span>
+                <span className='w-full text-[12px]'>
+                  {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_gender}
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Date of birth</span>
+                <span className='w-full text-[12px]'>
+                  {values?.applicants?.[activeIndex]?.personal_details?.date_of_birth}
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Mobile number</span>
+                <span className='w-full text-[12px]'>
+                  {values?.applicants?.[activeIndex]?.personal_details?.mobile_number}
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Father/Husband's name</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_father_husband_name
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Mother's name</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_mother_name
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Marital status**</span>
+                <span className='w-full text-[12px]'>
+                  {values?.applicants?.[activeIndex]?.personal_details?.marital_status}
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Religion**</span>
+                <span className='w-full text-[12px]'>
+                  {values?.applicants?.[activeIndex]?.personal_details?.religion}
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Preferred Language**</span>
+                <span className='w-full text-[12px]'>
+                  {values?.applicants?.[activeIndex]?.personal_details?.preferred_language}
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Qualification**</span>
+                <span className='w-full text-[12px]'>
+                  {values?.applicants?.[activeIndex]?.personal_details?.qualification}
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Email**</span>
+                <span className='w-full text-[12px]'>
+                  {values?.applicants?.[activeIndex]?.personal_details?.email}
+                </span>
+              </div>
             </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Middle name</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_middle_name
-                }
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Last name</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_last_name}
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Gender</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.applicant_details?.existing_customer_gender}
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Date of birth</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.personal_details?.date_of_birth}
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Mobile number</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.personal_details?.mobile_number}
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Father/Husband's name</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_father_husband_name
-                }
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Mother's name</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_mother_name
-                }
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Marital status**</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.personal_details?.marital_status}
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Religion**</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.personal_details?.religion}
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Preferred Language**</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.personal_details?.preferred_language}
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Qualification**</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.personal_details?.qualification}
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Email**</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.personal_details?.email}
-              </span>
+            <span className='w-full text-[#96989A] font-normal text-[12px] text-left leading-[18px]'>
+              ** Editable fields
+            </span>
+            <span className='w-full font-medium text-[14px] text-left mt-[6px] leading-[21px]'>
+              Would the customer prefer to proceed with the same details?
+            </span>
+            <div className='w-full flex gap-4 mt-3'>
+              <Button
+                inputClasses='w-full h-[46px]'
+                onClick={() => {
+                  setOpenExistingPopup(false);
+                  setFieldValue(
+                    `applicants[${activeIndex}].personal_details.extra_params.is_existing_done`,
+                    true,
+                  );
+                  updateFields();
+                }}
+              >
+                No
+              </Button>
+              <Button primary={true} inputClasses=' w-full h-[46px]' onClick={handleAutofill}>
+                Yes
+              </Button>
             </div>
           </div>
-          <span className='w-full text-[#96989A] font-normal text-[12px] text-left leading-[18px]'>
-            ** Editable fields
-          </span>
-          <span className='w-full font-medium text-[14px] text-left mt-[6px] leading-[21px]'>
-            Would the customer prefer to proceed with the same details?
-          </span>
-          <div className='w-full flex gap-4 mt-3'>
-            <Button
-              inputClasses='w-full h-[46px]'
-              onClick={() => {
-                setOpenExistingPopup(false);
-                setFieldValue(
-                  `applicants[${activeIndex}].personal_details.extra_params.is_existing_done`,
-                  true,
-                );
-                updateFields();
-              }}
-            >
-              No
-            </Button>
-            <Button primary={true} inputClasses=' w-full h-[46px]' onClick={handleAutofill}>
-              Yes
-            </Button>
-          </div>
-        </div>
-      </DynamicDrawer>
+        </DynamicDrawer>
+      ) : null}
     </>
   );
 };

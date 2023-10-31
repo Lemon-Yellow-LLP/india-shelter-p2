@@ -338,69 +338,36 @@ const ApplicantDetails = () => {
             auth: 'exi$t_Sys@85',
             'source flag': '1',
             body: {
-              DOB: values.applicants[activeIndex]?.applicant_details.date_of_birth,
-              'Mobile Number': values.applicants[activeIndex]?.applicant_details.mobile_number,
-              Product: values.lead.loan_type,
+              loan_type: values.lead.loan_type,
+              date_of_birth: values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth,
+              mobile_number: values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
             },
           });
 
-          // const { body } = await checkExistingCustomer(bodyForExistingCustomer);
+          await checkExistingCustomer(bodyForExistingCustomer).then(({ body }) => {
+            if (body && body?.length !== 0) {
+              const { loan_type, ...dataWithoutLoanType } = body[0];
 
-          let body = [
-            {
-              existing_customer_first_name: 'SHASHI',
-              existing_customer_middle_name: 'BHUSHAN',
-              existing_customer_last_name: 'SHARMA',
-              existing_customer_gender: 'Male',
-              existing_customer_id_type: 'PAN',
-              existing_customer_id_number: 'AAAPB2117A',
-              existing_customer_selected_address_proof: 'AADHAR',
-              existing_customer_address_proof_number: '********3298',
-              existing_customer_father_husband_name: 'SB SHARMA',
-              existing_customer_mother_name: 'Test mother',
-              existing_customer_Mobile: '8287983881',
-              existing_customer_current_flat_no_building_name: 'Plot no 21/22 Bajaj enclave',
-              existing_customer_current_street_area_locality: 'Old palam road',
-              existing_customer_current_town: 'fskjf',
-              existing_customer_current_landmark: 'fjdshfj',
-              existing_customer_current_pincode: '421201',
-              existing_customer_current_city: 'Dombivli',
-              existing_customer_current_state: 'Maharashtra',
-              existing_customer_current_no_of_year_residing: '0-1',
-              existing_customer_permanent_flat_no_building_name: 'werewvs sfds fds fsdf',
-              existing_customer_permanent_street_area_locality: 'dsadsa',
-              existing_customer_permanent_town: 'dasd',
-              existing_customer_permanent_landmark: 'dasdsa',
-              existing_customer_permanent_pincode: '421201',
-              existing_customer_permanent_city: 'Dombivli',
-              existing_customer_permanent_state: 'Maharashtra',
-              existing_customer_permanent_no_of_year_residing: '0-1',
-              existing_customer_is_existing_customer: 'False',
-              existing_customer_pre_approved_amount: '100000',
-              loan_type: '',
-            },
-          ];
+              setFieldValue(`applicants[${activeIndex}].applicant_details`, {
+                ...values?.applicants[activeIndex]?.applicant_details,
+                ...dataWithoutLoanType,
+              });
 
-          if (body?.length !== 0) {
-            const { loan_type, ...dataWithoutLoanType } = body[0];
+              editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
+                ...values?.applicants[activeIndex]?.applicant_details,
+                ...dataWithoutLoanType,
+                extra_params: {
+                  ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                  is_existing: true,
+                },
+              });
 
-            setFieldValue(`pplicants[${activeIndex}].applicant_details`, {
-              ...dataWithoutLoanType,
-            });
-
-            editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
-              ...dataWithoutLoanType,
-              extra_params: {
-                ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
-                is_existing: true,
-              },
-            });
-
-            setFieldValue(
-              `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
-              true,
-            );
-          }
+              setFieldValue(
+                `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                true,
+              );
+            }
+          });
         });
       });
     } else {
@@ -914,55 +881,61 @@ const ApplicantDetails = () => {
         <SwipeableDrawerComponent />
       </div>
 
-      <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='223px'>
-        <div className='z-[6000] h-full w-full flex flex-col'>
-          <span className='font-normal text-center leading-[21px] text-[16px] text-black '>
-            This is an existing customer and is already pre-approved for a loan upto
-          </span>
-          {
-            values?.applicants?.[activeIndex]?.applicant_details
-              ?.existing_customer_pre_approved_amount ? (
-              <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
-                {parseInt(
-                  values.applicants?.[activeIndex].applicant_details
-                    .existing_customer_pre_approved_amount,
-                )
-                  .toLocaleString('en-IN', {
-                    style: 'currency',
-                    currency: 'INR',
-                  })
-                  .replace('.00', '')}
-                /-
-              </span>
-            ) : (
-              <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
-                N/A
-              </span>
-            ) // Display 'N/A' or some other fallback if the value is undefined
-          }
-          <Button
-            primary={true}
-            inputClasses='w-full h-[46px]'
-            onClick={() => {
-              setFieldValue(
-                `applicants[${activeIndex}].applicant_details.extra_params.is_existing_done`,
-                true,
-              );
-              editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
-                extra_params: {
-                  ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
-                  is_existing_done: true,
-                },
-              });
-              setOpenExistingPopup(false);
-              setCurrentStepIndex(1);
-            }}
-            link='/lead/personal-details'
-          >
-            Continue
-          </Button>
-        </div>
-      </DynamicDrawer>
+      {openExistingPopup ? (
+        <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='223px'>
+          <div className='z-[6000] h-full w-full flex flex-col'>
+            <span className='font-normal text-center leading-[21px] text-[16px] text-black '>
+              This is an existing customer and is already pre-approved for a loan upto
+            </span>
+            {
+              values?.applicants?.[activeIndex]?.applicant_details
+                ?.existing_customer_pre_approved_amount ? (
+                <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
+                  {parseInt(
+                    values.applicants?.[activeIndex].applicant_details
+                      .existing_customer_pre_approved_amount,
+                  )
+                    .toLocaleString('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                    })
+                    .replace('.00', '')}
+                  /-
+                </span>
+              ) : (
+                <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
+                  N/A
+                </span>
+              ) // Display 'N/A' or some other fallback if the value is undefined
+            }
+            <Button
+              primary={true}
+              inputClasses='w-full h-[46px]'
+              onClick={() => {
+                setFieldValue(
+                  `applicants[${activeIndex}].applicant_details.extra_params.is_existing_done`,
+                  true,
+                );
+                editFieldsById(
+                  values?.applicants[activeIndex]?.applicant_details?.id,
+                  'applicant',
+                  {
+                    extra_params: {
+                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                      is_existing_done: true,
+                    },
+                  },
+                );
+                setOpenExistingPopup(false);
+                setCurrentStepIndex(1);
+              }}
+              link='/lead/personal-details'
+            >
+              Continue
+            </Button>
+          </div>
+        </DynamicDrawer>
+      ) : null}
     </>
   );
 };

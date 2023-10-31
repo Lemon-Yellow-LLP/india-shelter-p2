@@ -35,7 +35,8 @@ export default function AddressDetails() {
   } = useContext(LeadContext);
 
   const [openExistingPopup, setOpenExistingPopup] = useState(
-    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+    values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence &&
+      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
       !values?.applicants?.[activeIndex]?.address_detail?.extra_params?.is_existing_done
       ? true
       : false,
@@ -380,20 +381,21 @@ export default function AddressDetails() {
 
   useEffect(() => {
     if (
+      values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence &&
       values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
       !values?.applicants?.[activeIndex]?.address_detail?.extra_params?.is_existing_done
     ) {
-      setOpenExistingPopup(
-        values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-          !values?.applicants?.[activeIndex]?.address_detail?.extra_params?.is_existing_done,
-      );
+      setOpenExistingPopup(true);
     } else {
       setOpenExistingPopup(false);
     }
   }, [
+    values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence,
     values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
     values?.applicants?.[activeIndex]?.address_detail?.extra_params?.is_existing_done,
   ]);
+
+  console.log(openExistingPopup);
 
   const handleAutofill = async () => {
     const fillData = { ...values.applicants?.[activeIndex]?.applicant_details };
@@ -438,19 +440,34 @@ export default function AddressDetails() {
       permanent_no_of_year_residing: existing_customer_permanent_no_of_year_residing,
     };
 
-    let finalData = { ...values };
+    let finalData = structuredClone(values);
 
     finalData.applicants[activeIndex].address_detail = {
       ...finalData.applicants[activeIndex].address_detail,
       ...mappedData,
     };
 
-    setValues(finalData);
+    const filteredMappedData = Object.entries(mappedData)
+      .filter(([key, value]) => value !== null && value !== undefined && value !== '')
+      .reduce((acc, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {});
 
-    setFieldValue(
-      `applicants[${activeIndex}].personal_details.extra_params.is_existing_done`,
-      true,
+    const updatedRequiredFieldsStatus = Object.fromEntries(
+      Object.entries(requiredFieldsStatus).map(([key, value]) => [
+        key,
+        key in filteredMappedData ? true : value,
+      ]),
     );
+
+    setFieldValue(`applicants[${activeIndex}].address_detail`, {
+      ...finalData.applicants[activeIndex].address_detail,
+      extra_params: {
+        ...finalData.applicants[activeIndex].address_detail.extra_params,
+        is_existing_done: true,
+      },
+    });
 
     if (values?.applicants[activeIndex]?.address_detail?.id) {
       const res = await editFieldsById(
@@ -458,7 +475,6 @@ export default function AddressDetails() {
         'address',
         {
           ...finalData.applicants[activeIndex].address_detail,
-          ...mappedData,
           extra_params: {
             ...finalData.applicants[activeIndex].address_detail.extra_params,
             is_existing_done: true,
@@ -466,6 +482,8 @@ export default function AddressDetails() {
         },
       );
     }
+
+    setRequiredFieldsStatus(updatedRequiredFieldsStatus);
 
     setOpenExistingPopup(false);
   };
@@ -1427,212 +1445,213 @@ export default function AddressDetails() {
         <SwipeableDrawerComponent />
       </div>
 
-      <DynamicDrawer
-        open={
-          openExistingPopup &&
-          values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence
-        }
-        setOpen={setOpenExistingPopup}
-        height='80vh'
-      >
-        <div className='flex flex-col items-center h-full'>
-          <span className='w-full font-semibold text-[14px] leading-[21px]'>
-            This is an existing customer.
-          </span>
-          <div className='flex flex-col flex-1 w-full gap-[7px] overflow-auto mt-[10px] mb-[10px]'>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Type of residence</span>
-              <span className='w-full text-[12px]'>
-                {values?.applicants?.[activeIndex]?.applicant_details?.current_type_of_residence ||
-                  ''}
-              </span>
-            </div>
-            <span className='w-full font-semibold text-[12px] leading-[18px]'>CURRENT ADDRESS</span>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Flat no/Building name</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_current_flat_no_building_name
-                }
-              </span>
-            </div>
-
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Street/Area/Locality</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_current_street_area_locality
-                }
-              </span>
-            </div>
-
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Town</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_current_town
-                }
-              </span>
-            </div>
-
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Landmark</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_current_landmark
-                }
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Pincode</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_current_pincode
-                }
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>City</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_current_city
-                }
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>State</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_current_state
-                }
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>No. of years residing</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_current_no_of_year_residing
-                }
-              </span>
-            </div>
-
-            <span className='w-full font-semibold text-[12px] leading-[18px]'>
-              PERMANENT ADDRESS
+      {openExistingPopup ? (
+        <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>
+          <div className='flex flex-col items-center h-full'>
+            <span className='w-full font-semibold text-[14px] leading-[21px]'>
+              This is an existing customer.
             </span>
-            <div className='flex items-center gap-2'>
-              <Checkbox
-                checked={
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_permanent_address_same_as_current || false
-                }
-                name='permanent_address_same_as_current'
-                onTouchEnd
-                disabled={true}
-              />
-              <span className='text-[#373435] text-xs font-normal'>
-                Permanent address is same as Current address
+            <div className='flex flex-col flex-1 w-full gap-[7px] overflow-auto mt-[10px] mb-[10px]'>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Type of residence</span>
+                <span className='w-full text-[12px]'>
+                  {values?.applicants?.[activeIndex]?.applicant_details
+                    ?.current_type_of_residence || ''}
+                </span>
+              </div>
+              <span className='w-full font-semibold text-[12px] leading-[18px]'>
+                CURRENT ADDRESS
               </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Flat no/Building name</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_permanent_flat_no_building_name
-                }
-              </span>
-            </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Flat no/Building name</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_current_flat_no_building_name
+                  }
+                </span>
+              </div>
 
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Street/Area/Locality</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_permanent_street_area_locality
-                }
-              </span>
-            </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Street/Area/Locality</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_current_street_area_locality
+                  }
+                </span>
+              </div>
 
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Town</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_permanent_town
-                }
-              </span>
-            </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Town</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_current_town
+                  }
+                </span>
+              </div>
 
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Landmark</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_permanent_landmark
-                }
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Landmark</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_current_landmark
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Pincode</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_current_pincode
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>City</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_current_city
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>State</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_current_state
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>No. of years residing</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_current_no_of_year_residing
+                  }
+                </span>
+              </div>
+
+              <span className='w-full font-semibold text-[12px] leading-[18px]'>
+                PERMANENT ADDRESS
               </span>
+              <div className='flex items-center gap-2'>
+                <Checkbox
+                  checked={
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_permanent_address_same_as_current || false
+                  }
+                  name='permanent_address_same_as_current'
+                  onTouchEnd
+                  disabled={true}
+                />
+                <span className='text-[#373435] text-xs font-normal'>
+                  Permanent address is same as Current address
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Flat no/Building name</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_permanent_flat_no_building_name
+                  }
+                </span>
+              </div>
+
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Street/Area/Locality</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_permanent_street_area_locality
+                  }
+                </span>
+              </div>
+
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Town</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_permanent_town
+                  }
+                </span>
+              </div>
+
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Landmark</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_permanent_landmark
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>Pincode</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_permanent_pincode
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>City</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_permanent_city
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>State</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_permanent_state
+                  }
+                </span>
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='w-full text-[12px] text-[#727376]'>No. of years residing</span>
+                <span className='w-full text-[12px]'>
+                  {
+                    values?.applicants?.[activeIndex]?.applicant_details
+                      ?.existing_customer_permanent_no_of_year_residing
+                  }
+                </span>
+              </div>
             </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>Pincode</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_permanent_pincode
-                }
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>City</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_permanent_city
-                }
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>State</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_permanent_state
-                }
-              </span>
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='w-full text-[12px] text-[#727376]'>No. of years residing</span>
-              <span className='w-full text-[12px]'>
-                {
-                  values?.applicants?.[activeIndex]?.applicant_details
-                    ?.existing_customer_permanent_no_of_year_residing
-                }
-              </span>
+            <span className='w-full text-[#96989A] font-normal text-[12px] text-left leading-[18px]'>
+              ** Editable fields
+            </span>
+            <span className='w-full font-medium text-[14px] text-left mt-[6px] leading-[21px]'>
+              Would the customer prefer to proceed with the same details?
+            </span>
+            <div className='w-full flex gap-4 mt-3'>
+              <Button inputClasses='w-full h-[46px]' onClick={() => setOpenExistingPopup(false)}>
+                No
+              </Button>
+              <Button
+                primary={true}
+                inputClasses=' w-full h-[46px]'
+                onClick={() => handleAutofill()}
+              >
+                Yes
+              </Button>
             </div>
           </div>
-          <span className='w-full text-[#96989A] font-normal text-[12px] text-left leading-[18px]'>
-            ** Editable fields
-          </span>
-          <span className='w-full font-medium text-[14px] text-left mt-[6px] leading-[21px]'>
-            Would the customer prefer to proceed with the same details?
-          </span>
-          <div className='w-full flex gap-4 mt-3'>
-            <Button inputClasses='w-full h-[46px]' onClick={() => setOpenExistingPopup(false)}>
-              No
-            </Button>
-            <Button primary={true} inputClasses=' w-full h-[46px]' onClick={handleAutofill}>
-              Yes
-            </Button>
-          </div>
-        </div>
-      </DynamicDrawer>
+        </DynamicDrawer>
+      ) : null}
     </>
   );
 }
