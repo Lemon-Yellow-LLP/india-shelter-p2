@@ -22,6 +22,7 @@ import SpeedoMeterAnimation from '../../../../components/speedometer';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import Topbar from '../../../../components/Topbar';
 import { useLocation } from 'react-router';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const Qualifier = () => {
   const {
@@ -32,6 +33,8 @@ const Qualifier = () => {
     setCurrentStepIndex,
     updateCompleteFormProgress,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const SpeedoMeterAnimationRef = useRef(null);
 
@@ -89,7 +92,11 @@ const Qualifier = () => {
 
   useEffect(() => {
     async function breOne() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
       const bre_101_response = res.bre_101_response;
 
@@ -168,7 +175,15 @@ const Qualifier = () => {
         }));
 
         final_api.push(
-          verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, { type: 'id' }, {}),
+          verifyPan(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            { type: 'id' },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          ),
         );
       } else if (values.applicants[activeIndex]?.personal_details.id_type === 'Driving license') {
         setDL((prev) => ({
@@ -178,7 +193,15 @@ const Qualifier = () => {
         }));
 
         final_api.push(
-          verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, { type: 'id' }, {}),
+          verifyDL(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            { type: 'id' },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          ),
         );
       } else if (values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID') {
         setVoterID((prev) => ({
@@ -191,7 +214,11 @@ const Qualifier = () => {
           verifyVoterID(
             values?.applicants?.[activeIndex]?.applicant_details.id,
             { type: 'id' },
-            {},
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           ),
         );
       }
@@ -211,7 +238,11 @@ const Qualifier = () => {
             verifyDL(
               values?.applicants?.[activeIndex]?.applicant_details.id,
               { type: 'address' },
-              {},
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             ),
           );
         } else if (
@@ -227,7 +258,11 @@ const Qualifier = () => {
             verifyVoterID(
               values?.applicants?.[activeIndex]?.applicant_details.id,
               { type: 'address' },
-              {},
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             ),
           );
         }
@@ -236,15 +271,33 @@ const Qualifier = () => {
       if (values.applicants[activeIndex]?.work_income_detail.pf_uan) {
         setPfUAN((prev) => ({ ...prev, loader: true, ran: true }));
 
-        final_api.push(verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+        final_api.push(
+          verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {
+            headers: {
+              Authorization: token,
+            },
+          }),
+        );
       } else if (values.applicants[activeIndex]?.work_income_detail.gst_number) {
         setGST((prev) => ({ ...prev, loader: true, ran: true }));
 
-        final_api.push(verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+        final_api.push(
+          verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {
+            headers: {
+              Authorization: token,
+            },
+          }),
+        );
       }
 
       setDedupe((prev) => ({ ...prev, loader: true, ran: true }));
-      final_api.push(checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+      final_api.push(
+        checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {
+          headers: {
+            Authorization: token,
+          },
+        }),
+      );
 
       try {
         let response = null;
@@ -274,7 +327,11 @@ const Qualifier = () => {
 
         const bre99_res = await checkBre99(
           values?.applicants?.[activeIndex]?.applicant_details.id,
-          {},
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         if (bre99_res.bre_99_response.statusCode == 200) {
@@ -294,7 +351,11 @@ const Qualifier = () => {
         try {
           const cibil_res = await checkCibil(
             values?.applicants?.[activeIndex]?.applicant_details.id,
-            {},
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           if (cibil_res.status == 200) {
             setBureau((prev) => ({
@@ -315,7 +376,11 @@ const Qualifier = () => {
         try {
           const crif_res = await checkCrif(
             values?.applicants?.[activeIndex]?.applicant_details.id,
-            {},
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           if (crif_res.status == 200) {
             setBureau((prev) => ({
@@ -335,10 +400,11 @@ const Qualifier = () => {
       }
 
       try {
-        const bre_res = await checkBre101(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          {},
-        );
+        const bre_res = await checkBre101(values?.applicants?.[activeIndex]?.applicant_details.id, {
+          headers: {
+            Authorization: token,
+          },
+        });
 
         if (bre_res.bre_101_response.statusCode != 200) return;
 
@@ -361,10 +427,19 @@ const Qualifier = () => {
           GST_Status: bre_res.bre_101_response.body.Display.GST_Status,
         };
 
-        await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
-          bre_101_response: bre_res.bre_101_response,
-          extra_params: edited_extra_params,
-        });
+        await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            bre_101_response: bre_res.bre_101_response,
+            extra_params: edited_extra_params,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
 
         setFieldValue(
           `applicants[${activeIndex}].applicant_details.extra_params`,

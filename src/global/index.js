@@ -15,29 +15,29 @@ async function pingAPI() {
   return res.data;
 }
 
-async function checkIsValidStatePincode(pincode) {
-  const res = await axios.get(`${API_URL}/state-pin/${pincode}`, {}, requestOptions);
+async function checkIsValidStatePincode(pincode, options) {
+  const res = await axios.get(`${API_URL}/state-pin/${pincode}`, options, requestOptions);
   return res.data;
 }
 
-async function editReferenceById(id, referenceData) {
+async function editReferenceById(id, referenceData, options) {
   if (!id) return;
 
-  const res = await axios.patch(`${API_URL}/reference/edit/${id}`, referenceData, requestOptions);
+  const res = await axios.patch(`${API_URL}/reference/edit/${id}`, referenceData, options);
   return res.data;
 }
 
-async function editPropertyById(id, propertyData) {
+async function editPropertyById(id, propertyData, options) {
   if (!id) return;
 
-  const res = await axios.patch(`${API_URL}/property/edit/${id}`, propertyData, requestOptions);
+  const res = await axios.patch(`${API_URL}/property/edit/${id}`, propertyData, options);
   return res.data;
 }
 
 //WORK AND INCOME SCREEN
 
-async function getCompanyNamesList() {
-  const res = await axios.get(`${API_URL}/company-list`, requestOptions);
+async function getCompanyNamesList(options) {
+  const res = await axios.get(`${API_URL}/company-list`, options);
   return res.data;
 }
 
@@ -247,23 +247,19 @@ async function checkBre201(id, options) {
 }
 
 async function pushToSalesforce(id, options) {
-  const res = await axios.get(
-    `${API_URL}/lead/salesforce-push/${id}`,
-    {},
-    {
-      ...options,
-      timeout: bre_timeout,
-      'axios-retry': {
-        retries: 3,
-        retryCondition: () => true,
-      },
+  const res = await axios.get(`${API_URL}/lead/salesforce-push/${id}`, {
+    ...options,
+    timeout: bre_timeout,
+    'axios-retry': {
+      retries: 3,
+      retryCondition: () => true,
     },
-  );
+  });
   return res.data;
 }
 
-async function getLeadById(id) {
-  const res = await axios.get(`${API_URL}/lead/${id}`);
+async function getLeadById(id, options) {
+  const res = await axios.get(`${API_URL}/lead/${id}`, options);
   return res.data;
 }
 
@@ -279,8 +275,8 @@ async function editDoc(id, data, options) {
   return res.data;
 }
 
-async function getApplicantById(id) {
-  const res = await axios.get(`${API_URL}/applicant/${id}`);
+async function getApplicantById(id, options) {
+  const res = await axios.get(`${API_URL}/applicant/${id}`, options);
   return res.data;
 }
 
@@ -289,13 +285,13 @@ async function reUploadDoc(id, data, options) {
   return res.data;
 }
 
-async function getUploadOtp(id) {
-  const res = await axios.get(`${API_URL}/account/send-sms/${id}`, {}, requestOptions);
+async function getUploadOtp(id, options) {
+  const res = await axios.get(`${API_URL}/account/send-sms/${id}`, options, requestOptions);
   return res;
 }
 
-async function verifyUploadOtp(id, otp) {
-  const res = await axios.post(`${API_URL}/account/verify-sms/${id}`, { otp }, requestOptions);
+async function verifyUploadOtp(id, otp, options) {
+  const res = await axios.post(`${API_URL}/account/verify-sms/${id}`, { otp }, options);
   return res;
 }
 
@@ -330,44 +326,45 @@ function isEighteenOrAbove(date) {
   return false;
 }
 
-async function getEmailOtp(id) {
-  const res = await axios.get(`${API_URL}/personal/send-email/${id}`, {}, requestOptions);
+async function getEmailOtp(id, options) {
+  const res = await axios.get(`${API_URL}/personal/send-email/${id}`, options);
   return res;
 }
 
-async function verifyEmailOtp(id, otp) {
-  const res = await axios.post(`${API_URL}/personal/verify-email/${id}`, { otp }, requestOptions);
+async function verifyEmailOtp(id, otp, options) {
+  const res = await axios.post(`${API_URL}/personal/verify-email/${id}`, { otp }, options);
   return res;
 }
 
-async function editFieldsById(id, page, values) {
-  const { data } = await axios.patch(`${API_URL}/${page}/edit/${id}`, values, requestOptions);
+async function editFieldsById(id, page, values, options) {
+  const { data } = await axios.patch(`${API_URL}/${page}/edit/${id}`, values, options);
   return data;
 }
 
-async function addApi(page, values) {
-  const { data } = await axios.post(`${API_URL}/${page}/add`, values, requestOptions);
+async function addApi(page, values, options) {
+  const { data } = await axios.post(`${API_URL}/${page}/add`, values, options);
   return data;
 }
 
-async function getMobileOtp(id) {
-  const res = await axios.get(`${API_URL}/applicant/send-sms/${id}`, {}, requestOptions);
+async function getMobileOtp(id, options) {
+  const res = await axios.get(`${API_URL}/applicant/send-sms/${id}`, options, requestOptions);
   return res;
 }
 
-async function verifyMobileOtp(id, otp) {
-  const res = await axios.post(`${API_URL}/applicant/verify-sms/${id}`, { otp }, requestOptions);
+async function verifyMobileOtp(id, otp, options) {
+  const res = await axios.post(`${API_URL}/applicant/verify-sms/${id}`, { otp }, options);
   return res;
 }
 
-async function editAddressById(id, data) {
-  const res = await axios.patch(`${API_URL}/address/edit/${id}`, data, requestOptions);
+async function editAddressById(id, data, options) {
+  const res = await axios.patch(`${API_URL}/address/edit/${id}`, data, options);
   return res;
 }
 
-async function checkExistingCustomer(body) {
+async function checkExistingCustomer(body, token) {
   let myHeaders = new Headers();
   myHeaders.append('Content-Type', 'application/json');
+  myHeaders.append('Authorization', token);
   let requestOptions2 = {
     method: 'POST',
     headers: myHeaders,
@@ -385,12 +382,12 @@ async function checkExistingCustomer(body) {
 }
 
 // L&T
-export async function getLnTChargesQRCode(leadId) {
-  const { data } = await axios.post(`${API_URL}/lt-charges/payment-qr/${leadId}`);
+export async function getLnTChargesQRCode(leadId, options) {
+  const { data } = await axios.post(`${API_URL}/lt-charges/payment-qr/${leadId}`, {}, options);
   return data;
 }
 
-export async function checkPaymentStatus(leadId) {
+export async function checkPaymentStatus(leadId, options) {
   const controller = new AbortController();
   setTimeout(() => {
     controller.abort();
@@ -399,6 +396,7 @@ export async function checkPaymentStatus(leadId) {
     `${API_URL}/lt-charges/payment-verify/${leadId}`,
     {},
     {
+      ...options,
       signal: controller.signal,
     },
   );
@@ -406,15 +404,19 @@ export async function checkPaymentStatus(leadId) {
   return data;
 }
 
-export async function checkIfLntExists(leadId) {
-  const { data } = await axios.get(`${API_URL}/lt-charges/check-lead-payment/${leadId}`);
+export async function checkIfLntExists(leadId, options) {
+  const { data } = await axios.get(`${API_URL}/lt-charges/check-lead-payment/${leadId}`, options);
   return data;
 }
 
-export async function addLnTCharges(leadId) {
-  const { data } = await axios.post(`${API_URL}/lt-charges/add/`, {
-    lead_id: leadId,
-  });
+export async function addLnTCharges(leadId, options) {
+  const { data } = await axios.post(
+    `${API_URL}/lt-charges/add/`,
+    {
+      lead_id: leadId,
+    },
+    options,
+  );
   return data;
 }
 
@@ -433,12 +435,16 @@ export async function doesLnTChargesExist(leadId) {
   }
 }
 
-export async function makePaymentByCash(id) {
+export async function makePaymentByCash(id, options) {
   try {
-    const { data } = await axios.patch(`${API_URL}/lt-charges/edit/${id}`, {
-      method: 'Cash',
-      status: 'Completed',
-    });
+    const { data } = await axios.patch(
+      `${API_URL}/lt-charges/edit/${id}`,
+      {
+        method: 'Cash',
+        status: 'Completed',
+      },
+      options,
+    );
     return data;
   } catch (err) {
     console.error(err);
@@ -454,18 +460,22 @@ export async function editLnTCharges(id, values) {
   }
 }
 
-export async function makePaymentByLink(id, values) {
+export async function makePaymentByLink(id, values, options) {
   try {
-    const { data } = await axios.post(`${API_URL}/lt-charges/invoice-create/${id}`, values);
+    const { data } = await axios.post(
+      `${API_URL}/lt-charges/invoice-create/${id}`,
+      values,
+      options,
+    );
     return data;
   } catch (err) {
     console.log(err);
   }
 }
 
-export async function getDashboardLeadById(id, values) {
+export async function getDashboardLeadById(id, options) {
   try {
-    const { data } = await axios.get(`${API_URL}/dashboard/lead/${id}`, values);
+    const { data } = await axios.get(`${API_URL}/dashboard/lead/${id}`, options);
     return data;
   } catch (err) {
     return err;

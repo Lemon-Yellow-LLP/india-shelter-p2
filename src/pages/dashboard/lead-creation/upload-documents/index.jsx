@@ -47,6 +47,7 @@ const UploadDocuments = () => {
     loData,
     setIsQaulifierActivated,
     setOtpFailCount,
+    token,
   } = useContext(AuthContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
 
@@ -173,7 +174,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function getQualifierResponse() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
       if (res.extra_params.is_upload_otp_verified) {
         setMobileVerified(true);
@@ -228,9 +233,18 @@ const UploadDocuments = () => {
 
       const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
 
-      editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
-        extra_params: { ...extra_params, is_upload_otp_verified: false },
-      });
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.applicant_details.id,
+        'applicant',
+        {
+          extra_params: { ...extra_params, is_upload_otp_verified: false },
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
     }
   }, [selfie]);
 
@@ -243,6 +257,11 @@ const UploadDocuments = () => {
         values?.applicants[activeIndex]?.personal_details?.id,
         'personal',
         values?.applicants[activeIndex]?.personal_details,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
     } else {
       if (values?.applicants[activeIndex]?.personal_details?.id) {
@@ -250,20 +269,38 @@ const UploadDocuments = () => {
           values?.applicants[activeIndex]?.personal_details?.id,
           'personal',
           newData,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
       } else {
         let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
         let addData = { ...clonedCoApplicantValues.personal_details, [name]: value };
-        await addApi('personal', {
-          ...addData,
-          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
-        })
+        await addApi(
+          'personal',
+          {
+            ...addData,
+            applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
           .then(async (res) => {
             setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
             await editFieldsById(
               values?.applicants[activeIndex]?.applicant_details?.id,
               'applicant',
               { personal_detail: res.id },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           })
           .catch((err) => {
@@ -462,7 +499,11 @@ const UploadDocuments = () => {
     setHasSentOTPOnce(true);
     setShowOTPInput(true);
 
-    const res = await getUploadOtp(loData.session.user_id);
+    const res = await getUploadOtp(loData.session.user_id, {
+      headers: {
+        Authorization: token,
+      },
+    });
     if (!res) return;
 
     setToastMessage('OTP has been sent to the mobile number');
@@ -473,15 +514,28 @@ const UploadDocuments = () => {
       const otp = parseInt(loginotp);
 
       try {
-        const res = await verifyUploadOtp(loData.session.user_id, otp);
+        const res = await verifyUploadOtp(loData.session.user_id, otp, {
+          headers: {
+            Authorization: token,
+          },
+        });
 
         if (!res) return;
 
         const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
 
-        await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
-          extra_params: { ...extra_params, is_upload_otp_verified: true },
-        });
+        await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            extra_params: { ...extra_params, is_upload_otp_verified: true },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
 
         setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: true }));
 
@@ -537,12 +591,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('property_paper_photos' in document_meta == false) {
@@ -555,6 +615,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -620,6 +685,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editPropertyPaper.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -627,6 +693,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.property_paper_photos.filter((data) => {
@@ -642,7 +713,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.property_paper_photos?.find((data) => {
         return data.active === true;
       });
@@ -688,12 +763,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           // console.log(applicant);
           const document_meta = applicant.document_meta;
@@ -708,6 +789,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -725,7 +811,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.customer_photos?.find((data) => {
         return data.active === true;
       });
@@ -771,12 +861,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('id_proof_photos' in document_meta == false) {
@@ -790,6 +886,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -842,6 +943,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editIdProof.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -849,6 +951,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.id_proof_photos.filter((data) => {
@@ -866,7 +973,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.id_proof_photos?.find((data) => {
         return data.active === true;
       });
@@ -915,12 +1026,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('address_proof_photos' in document_meta == false) {
@@ -934,6 +1051,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -992,6 +1114,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editAddressProof.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -999,6 +1122,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
@@ -1017,7 +1145,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.address_proof_photos?.find((data) => {
         return data.active === true;
       });
@@ -1063,12 +1195,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('salary_slip_photos' in document_meta == false) {
@@ -1082,6 +1220,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -1133,6 +1276,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editSalarySlip.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -1140,6 +1284,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.salary_slip_photos.filter((data) => {
@@ -1154,7 +1303,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.salary_slip_photos?.find((data) => {
         return data.active === true;
       });
@@ -1200,12 +1353,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('form_60_photos' in document_meta == false) {
@@ -1218,6 +1377,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -1267,6 +1431,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editForm60.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -1274,6 +1439,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.form_60_photos.filter((data) => {
@@ -1288,7 +1458,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.form_60_photos?.find((data) => {
         return data.active === true;
       });
@@ -1334,12 +1508,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('property_photos' in document_meta == false) {
@@ -1352,6 +1532,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -1401,6 +1586,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editProperty.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -1408,6 +1594,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.property_photos.filter((data) => {
@@ -1422,7 +1613,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.property_photos?.find((data) => {
         return data.active === true;
       });
@@ -1468,12 +1663,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('lo_selfie' in document_meta == false) {
@@ -1486,6 +1687,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -1502,7 +1708,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.lo_selfie?.find((data) => {
         return data.active === true;
       });
@@ -1548,12 +1758,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('other_docs' in document_meta == false) {
@@ -1566,6 +1782,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -1613,6 +1834,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editDoc.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -1620,6 +1842,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.other_docs.filter((data) => {
@@ -1634,7 +1861,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function getPreviousUploads() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
       if (!res) return;
 
@@ -1765,6 +1996,11 @@ const UploadDocuments = () => {
     async function getRequiredFields() {
       const { extra_params, document_meta } = await getApplicantById(
         values?.applicants?.[activeIndex]?.applicant_details?.id,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
 
       setRequiredFieldsStatus({ ...extra_params.upload_required_fields_status });
@@ -1943,6 +2179,11 @@ const UploadDocuments = () => {
                               'personal',
                               {
                                 id_number: e.target.value,
+                              },
+                              {
+                                headers: {
+                                  Authorization: token,
+                                },
                               },
                             );
                           }
@@ -2202,6 +2443,11 @@ const UploadDocuments = () => {
                               'personal',
                               {
                                 address_proof_number: e.target.value,
+                              },
+                              {
+                                headers: {
+                                  Authorization: token,
+                                },
                               },
                             );
                           }

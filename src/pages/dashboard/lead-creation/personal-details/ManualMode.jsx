@@ -11,6 +11,7 @@ import { manualModeDropdownOptions } from './manualModeDropdownOptions';
 import OtpInput from '../../../../components/OtpInput/index';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import { getEmailOtp, verifyEmailOtp } from '../../../../global';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields }) {
   const {
@@ -27,6 +28,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setFieldError,
     setValues,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
@@ -291,12 +294,21 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     // setDisableEmailInput((prev) => !prev);
     setShowOTPInput(true);
     setHasSentOTPOnce(true);
-    getEmailOtp(values?.applicants?.[activeIndex]?.personal_details?.id);
+
+    getEmailOtp(values?.applicants?.[activeIndex]?.personal_details?.id, {
+      headers: {
+        Authorization: token,
+      },
+    });
     setToastMessage('OTP has been sent to your mail id');
   };
 
   const verifyOTP = (otp) => {
-    verifyEmailOtp(values?.applicants?.[activeIndex]?.personal_details?.id, otp)
+    verifyEmailOtp(values?.applicants?.[activeIndex]?.personal_details?.id, otp, {
+      headers: {
+        Authorization: token,
+      },
+    })
       .then((res) => {
         setEmailVerified(true);
         setShowOTPInput(false);

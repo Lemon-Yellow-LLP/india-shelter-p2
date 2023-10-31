@@ -7,6 +7,7 @@ import {
   editAddressById,
   editFieldsById,
 } from '../../../../global';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 import Checkbox from '../../../../components/Checkbox';
 import { residenceData, yearsResidingData } from './AddressDropdownData';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
@@ -33,6 +34,8 @@ export default function AddressDetails() {
     pincodeErr,
     setPincodeErr,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const [openExistingPopup, setOpenExistingPopup] = useState(
     values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing || false,
@@ -65,16 +68,32 @@ export default function AddressDetails() {
       setFieldValue(e.name, e.value);
       const name = e.name.split('.')[2];
       if (values?.applicants?.[activeIndex]?.address_detail?.id) {
-        await editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-          [name]: e.value,
-        });
+        await editAddressById(
+          values?.applicants?.[activeIndex]?.address_detail?.id,
+          {
+            [name]: e.value,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
       } else {
         let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
         let addData = { ...clonedCoApplicantValues.address_detail, [name]: e.value };
-        await addApi('address', {
-          ...addData,
-          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
-        })
+        await addApi(
+          'address',
+          {
+            ...addData,
+            applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
           .then(async (res) => {
             setFieldValue(`applicants[${activeIndex}].address_detail`, {
               ...addData,
@@ -89,6 +108,11 @@ export default function AddressDetails() {
               values?.applicants[activeIndex]?.applicant_details?.id,
               'applicant',
               { address_detail: res.id },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             ).then(() => {
               return res;
             });
@@ -108,10 +132,18 @@ export default function AddressDetails() {
           `applicants[${activeIndex}].address_detail.permanent_no_of_year_residing`,
           e.value,
         );
-        editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-          permanent_no_of_year_residing:
-            values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing,
-        });
+        editAddressById(
+          values?.applicants?.[activeIndex]?.address_detail?.id,
+          {
+            permanent_no_of_year_residing:
+              values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
       }
 
       if (!requiredFieldsStatus[name]) {
@@ -130,11 +162,19 @@ export default function AddressDetails() {
       setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: false }));
 
-      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-        current_pincode: '',
-        current_city: '',
-        current_state: '',
-      });
+      editAddressById(
+        values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          current_pincode: '',
+          current_city: '',
+          current_state: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
 
       if (
         values?.applicants?.[activeIndex]?.address_detail?.extra_params
@@ -144,11 +184,19 @@ export default function AddressDetails() {
         setFieldValue(`applicants[${activeIndex}].address_detail.permanent_city`, '');
         setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, '');
 
-        editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-          permanent_pincode: '',
-          permanent_city: '',
-          permanent_state: '',
-        });
+        editAddressById(
+          values?.applicants?.[activeIndex]?.address_detail?.id,
+          {
+            permanent_pincode: '',
+            permanent_city: '',
+            permanent_state: '',
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
       }
 
       return;
@@ -156,6 +204,11 @@ export default function AddressDetails() {
 
     const res = await checkIsValidStatePincode(
       values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
     if (!res) {
       setFieldError(`applicants[${activeIndex}].address_detail.current_pincode`, 'Invalid Pincode');
@@ -165,11 +218,19 @@ export default function AddressDetails() {
       setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: false }));
 
-      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-        current_pincode: '',
-        current_city: '',
-        current_state: '',
-      });
+      editAddressById(
+        values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          current_pincode: '',
+          current_city: '',
+          current_state: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
 
       if (
         values?.applicants?.[activeIndex]?.address_detail?.extra_params
@@ -183,11 +244,19 @@ export default function AddressDetails() {
       return;
     }
 
-    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-      current_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
-      current_city: res.city,
-      current_state: res.state,
-    });
+    editAddressById(
+      values?.applicants?.[activeIndex]?.address_detail?.id,
+      {
+        current_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+        current_city: res.city,
+        current_state: res.state,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, res.city);
     setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, res.state);
@@ -197,11 +266,19 @@ export default function AddressDetails() {
       values?.applicants?.[activeIndex]?.address_detail?.extra_params
         ?.permanent_address_same_as_current
     ) {
-      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-        permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
-        permanent_city: res.city,
-        permanent_state: res.state,
-      });
+      editAddressById(
+        values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+          permanent_city: res.city,
+          permanent_state: res.state,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
 
       setFieldValue(
         `applicants[${activeIndex}].address_detail.permanent_pincode`,
@@ -291,19 +368,27 @@ export default function AddressDetails() {
     }
 
     if (values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence) {
-      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-        permanent_flat_no_building_name:
-          values?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name,
-        permanent_street_area_locality:
-          values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality,
-        permanent_town: values?.applicants?.[activeIndex]?.address_detail?.current_town,
-        permanent_landmark: values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
-        permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
-        permanent_city: values?.applicants?.[activeIndex]?.address_detail?.current_city,
-        permanent_state: values?.applicants?.[activeIndex]?.address_detail?.current_state,
-        permanent_no_of_year_residing:
-          values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing,
-      });
+      editAddressById(
+        values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          permanent_flat_no_building_name:
+            values?.applicants?.[activeIndex]?.address_detail?.current_flat_no_building_name,
+          permanent_street_area_locality:
+            values?.applicants?.[activeIndex]?.address_detail?.current_street_area_locality,
+          permanent_town: values?.applicants?.[activeIndex]?.address_detail?.current_town,
+          permanent_landmark: values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
+          permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+          permanent_city: values?.applicants?.[activeIndex]?.address_detail?.current_city,
+          permanent_state: values?.applicants?.[activeIndex]?.address_detail?.current_state,
+          permanent_no_of_year_residing:
+            values?.applicants?.[activeIndex]?.address_detail?.current_no_of_year_residing,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
     }
   };
 
@@ -316,16 +401,29 @@ export default function AddressDetails() {
       setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['permanent_pincode']: false }));
 
-      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-        permanent_pincode: '',
-        permanent_city: '',
-        permanent_state: '',
-      });
+      editAddressById(
+        values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          permanent_pincode: '',
+          permanent_city: '',
+          permanent_state: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       return;
     }
 
     const res = await checkIsValidStatePincode(
       values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
     if (!res) {
       setFieldError(
@@ -342,19 +440,35 @@ export default function AddressDetails() {
       setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['permanent_pincode']: false }));
 
-      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-        permanent_pincode: '',
-        permanent_city: '',
-        permanent_state: '',
-      });
+      editAddressById(
+        values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          permanent_pincode: '',
+          permanent_city: '',
+          permanent_state: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       return;
     }
 
-    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-      permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode,
-      permanent_city: res.city,
-      permanent_state: res.state,
-    });
+    editAddressById(
+      values?.applicants?.[activeIndex]?.address_detail?.id,
+      {
+        permanent_pincode: values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode,
+        permanent_city: res.city,
+        permanent_state: res.state,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     setFieldValue(`applicants[${activeIndex}].address_detail.permanent_city`, res.city);
     setFieldValue(`applicants[${activeIndex}].address_detail.permanent_state`, res.state);
@@ -447,17 +561,35 @@ export default function AddressDetails() {
         values?.applicants[activeIndex]?.address_detail?.id,
         'address',
         mappedData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       ).then(async (res) => {
         await editFieldsById(
           values?.applicants[activeIndex]?.address_detail?.id,
           'address',
           values,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
       });
     } else {
-      const res = await addApi('address', mappedData);
+      const res = await addApi('address', mappedData, {
+        headers: {
+          Authorization: token,
+        },
+      });
       setFieldValue(`applicants[${activeIndex}].address_detail.id`, res.id);
-      await editFieldsById(res.id, 'address', values);
+      await editFieldsById(res.id, 'address', values, {
+        headers: {
+          Authorization: token,
+        },
+      });
     }
 
     setOpenExistingPopup(false);
@@ -549,20 +681,36 @@ export default function AddressDetails() {
                         values?.applicants?.[activeIndex]?.address_detail
                           ?.current_flat_no_building_name,
                       );
-                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                        current_flat_no_building_name:
-                          values?.applicants?.[activeIndex]?.address_detail
-                            ?.current_flat_no_building_name,
-                        permanent_flat_no_building_name:
-                          values?.applicants?.[activeIndex]?.address_detail
-                            ?.current_flat_no_building_name,
-                      });
+                      editAddressById(
+                        values?.applicants?.[activeIndex]?.address_detail?.id,
+                        {
+                          current_flat_no_building_name:
+                            values?.applicants?.[activeIndex]?.address_detail
+                              ?.current_flat_no_building_name,
+                          permanent_flat_no_building_name:
+                            values?.applicants?.[activeIndex]?.address_detail
+                              ?.current_flat_no_building_name,
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
                     } else {
-                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                        current_flat_no_building_name:
-                          values?.applicants?.[activeIndex]?.address_detail
-                            ?.current_flat_no_building_name,
-                      });
+                      editAddressById(
+                        values?.applicants?.[activeIndex]?.address_detail?.id,
+                        {
+                          current_flat_no_building_name:
+                            values?.applicants?.[activeIndex]?.address_detail
+                              ?.current_flat_no_building_name,
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
                     }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -570,9 +718,17 @@ export default function AddressDetails() {
                       current_flat_no_building_name: false,
                     }));
 
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      current_flat_no_building_name: '',
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_flat_no_building_name: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
                 }}
                 disabled={
@@ -633,20 +789,36 @@ export default function AddressDetails() {
                         values?.applicants?.[activeIndex]?.address_detail
                           ?.current_street_area_locality,
                       );
-                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                        current_street_area_locality:
-                          values?.applicants?.[activeIndex]?.address_detail
-                            ?.current_street_area_locality,
-                        permanent_street_area_locality:
-                          values?.applicants?.[activeIndex]?.address_detail
-                            ?.current_street_area_locality,
-                      });
+                      editAddressById(
+                        values?.applicants?.[activeIndex]?.address_detail?.id,
+                        {
+                          current_street_area_locality:
+                            values?.applicants?.[activeIndex]?.address_detail
+                              ?.current_street_area_locality,
+                          permanent_street_area_locality:
+                            values?.applicants?.[activeIndex]?.address_detail
+                              ?.current_street_area_locality,
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
                     } else {
-                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                        current_street_area_locality:
-                          values?.applicants?.[activeIndex]?.address_detail
-                            ?.current_street_area_locality,
-                      });
+                      editAddressById(
+                        values?.applicants?.[activeIndex]?.address_detail?.id,
+                        {
+                          current_street_area_locality:
+                            values?.applicants?.[activeIndex]?.address_detail
+                              ?.current_street_area_locality,
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
                     }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -654,9 +826,17 @@ export default function AddressDetails() {
                       current_street_area_locality: false,
                     }));
 
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      current_street_area_locality: '',
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_street_area_locality: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
                 }}
                 disabled={
@@ -709,17 +889,33 @@ export default function AddressDetails() {
                         `applicants[${activeIndex}].address_detail.permanent_town`,
                         values?.applicants?.[activeIndex]?.address_detail?.current_town,
                       );
-                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                        current_town:
-                          values?.applicants?.[activeIndex]?.address_detail?.current_town,
-                        permanent_town:
-                          values?.applicants?.[activeIndex]?.address_detail?.current_town,
-                      });
+                      editAddressById(
+                        values?.applicants?.[activeIndex]?.address_detail?.id,
+                        {
+                          current_town:
+                            values?.applicants?.[activeIndex]?.address_detail?.current_town,
+                          permanent_town:
+                            values?.applicants?.[activeIndex]?.address_detail?.current_town,
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
                     } else {
-                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                        current_town:
-                          values?.applicants?.[activeIndex]?.address_detail?.current_town,
-                      });
+                      editAddressById(
+                        values?.applicants?.[activeIndex]?.address_detail?.id,
+                        {
+                          current_town:
+                            values?.applicants?.[activeIndex]?.address_detail?.current_town,
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
                     }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -727,9 +923,17 @@ export default function AddressDetails() {
                       current_town: false,
                     }));
 
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      current_town: '',
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_town: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
                 }}
                 disabled={
@@ -780,17 +984,33 @@ export default function AddressDetails() {
                         `applicants[${activeIndex}].address_detail.permanent_landmark`,
                         values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
                       );
-                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                        current_landmark:
-                          values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
-                        permanent_landmark:
-                          values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
-                      });
+                      editAddressById(
+                        values?.applicants?.[activeIndex]?.address_detail?.id,
+                        {
+                          current_landmark:
+                            values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
+                          permanent_landmark:
+                            values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
                     } else {
-                      editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                        current_landmark:
-                          values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
-                      });
+                      editAddressById(
+                        values?.applicants?.[activeIndex]?.address_detail?.id,
+                        {
+                          current_landmark:
+                            values?.applicants?.[activeIndex]?.address_detail?.current_landmark,
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
                     }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -798,9 +1018,17 @@ export default function AddressDetails() {
                       current_landmark: false,
                     }));
 
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      current_landmark: '',
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_landmark: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
                 }}
                 disabled={
@@ -854,9 +1082,17 @@ export default function AddressDetails() {
                     errors?.applicants?.[activeIndex]?.address_detail?.current_landmark ||
                     !values?.applicants?.[activeIndex]?.address_detail?.current_landmark
                   ) {
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      current_pincode: '',
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_pincode: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
                 }}
                 min='0'
@@ -1043,15 +1279,31 @@ export default function AddressDetails() {
                     values?.applicants?.[activeIndex]?.address_detail
                       ?.permanent_flat_no_building_name
                   ) {
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      permanent_flat_no_building_name:
-                        values?.applicants?.[activeIndex]?.address_detail
-                          ?.permanent_flat_no_building_name,
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        permanent_flat_no_building_name:
+                          values?.applicants?.[activeIndex]?.address_detail
+                            ?.permanent_flat_no_building_name,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   } else {
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      permanent_flat_no_building_name: '',
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        permanent_flat_no_building_name: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
                 }}
                 disabled={
@@ -1104,15 +1356,31 @@ export default function AddressDetails() {
                     values?.applicants?.[activeIndex]?.address_detail
                       ?.permanent_street_area_locality
                   ) {
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      permanent_street_area_locality:
-                        values?.applicants?.[activeIndex]?.address_detail
-                          ?.permanent_street_area_locality,
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        permanent_street_area_locality:
+                          values?.applicants?.[activeIndex]?.address_detail
+                            ?.permanent_street_area_locality,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   } else {
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      permanent_street_area_locality: '',
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        permanent_street_area_locality: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
                 }}
                 disabled={
@@ -1157,14 +1425,30 @@ export default function AddressDetails() {
                     !errors?.applicants?.[activeIndex]?.address_detail?.permanent_town &&
                     values?.applicants?.[activeIndex]?.address_detail?.permanent_town
                   ) {
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      permanent_town:
-                        values?.applicants?.[activeIndex]?.address_detail?.permanent_town,
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        permanent_town:
+                          values?.applicants?.[activeIndex]?.address_detail?.permanent_town,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   } else {
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      permanent_town: '',
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        permanent_town: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
                 }}
                 disabled={
@@ -1209,14 +1493,30 @@ export default function AddressDetails() {
                     !errors?.applicants?.[activeIndex]?.address_detail?.permanent_landmark &&
                     values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark
                   ) {
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      permanent_landmark:
-                        values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark,
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        permanent_landmark:
+                          values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   } else {
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      permanent_landmark: '',
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        permanent_landmark: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
                 }}
                 disabled={
@@ -1274,9 +1574,17 @@ export default function AddressDetails() {
                     errors?.applicants?.[activeIndex]?.address_detail?.permanent_landmark ||
                     !values?.applicants?.[activeIndex]?.address_detail?.permanent_landmark
                   ) {
-                    editAddressById(values?.applicants?.[activeIndex]?.address_detail?.id, {
-                      permanent_pincode: '',
-                    });
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        permanent_pincode: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
                 }}
                 min='0'

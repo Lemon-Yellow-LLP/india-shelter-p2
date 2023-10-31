@@ -15,6 +15,7 @@ import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import Popup from '../../../../components/Popup';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -33,6 +34,8 @@ const WorkIncomeDetails = () => {
     pincodeErr,
     setPincodeErr,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.required_fields_status,
@@ -163,11 +166,20 @@ const WorkIncomeDetails = () => {
             newData.applicants[activeIndex].work_income_detail.id,
             'work-income',
             newData.applicants[activeIndex].work_income_detail,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
 
           return;
         } else {
-          await addApi('work-income', newData.applicants[activeIndex].work_income_detail)
+          await addApi('work-income', newData.applicants[activeIndex].work_income_detail, {
+            headers: {
+              Authorization: token,
+            },
+          })
             .then(async (res) => {
               setFieldValue(`applicants[${activeIndex}].work_income_detail`, {
                 ...newData.applicants[activeIndex].work_income_detail,
@@ -184,6 +196,11 @@ const WorkIncomeDetails = () => {
                 values?.applicants?.[activeIndex]?.applicant_details?.id,
                 'applicant',
                 { work_income_detail: res.id },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
               );
               return res;
             })
@@ -197,9 +214,18 @@ const WorkIncomeDetails = () => {
       setFieldValue(e.name, e.value);
 
       if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
-        editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-          [name]: e.value,
-        });
+        editFieldsById(
+          values?.applicants?.[activeIndex]?.work_income_detail?.id,
+          'work-income',
+          {
+            [name]: e.value,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
         if (!requiredFieldsStatus[name]) {
           setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
         }
@@ -243,17 +269,31 @@ const WorkIncomeDetails = () => {
       setFieldValue(`applicants[${activeIndex}].work_income_detail.state`, '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: false }));
 
-      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-        city: '',
-        state: '',
-        pincode: '',
-      });
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.work_income_detail?.id,
+        'work-income',
+        {
+          city: '',
+          state: '',
+          pincode: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
 
       return;
     }
 
     const res = await checkIsValidStatePincode(
       values?.applicants?.[activeIndex]?.work_income_detail?.pincode,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
 
     if (!res) {
@@ -267,19 +307,37 @@ const WorkIncomeDetails = () => {
       setFieldValue(`applicants[${activeIndex}].work_income_detail.city`, '');
       setFieldValue(`applicants[${activeIndex}].work_income_detail.state`, '');
 
-      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-        city: '',
-        state: '',
-        pincode: '',
-      });
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.work_income_detail?.id,
+        'work-income',
+        {
+          city: '',
+          state: '',
+          pincode: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       return;
     }
 
-    editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-      city: res.city,
-      state: res.state,
-      pincode: values?.applicants?.[activeIndex]?.work_income_detail?.pincode,
-    });
+    editFieldsById(
+      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+      'work-income',
+      {
+        city: res.city,
+        state: res.state,
+        pincode: values?.applicants?.[activeIndex]?.work_income_detail?.pincode,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     setFieldValue(`applicants[${activeIndex}].work_income_detail.city`, res.city);
     setFieldValue(`applicants[${activeIndex}].work_income_detail.state`, res.state);
@@ -412,6 +470,11 @@ const WorkIncomeDetails = () => {
                           values?.applicants?.[activeIndex]?.work_income_detail
                             ?.flat_no_building_name,
                       },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
                     );
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -423,6 +486,11 @@ const WorkIncomeDetails = () => {
                       'work-income',
                       {
                         flat_no_building_name: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
                       },
                     );
                   }
@@ -478,6 +546,11 @@ const WorkIncomeDetails = () => {
                           values?.applicants?.[activeIndex]?.work_income_detail
                             ?.street_area_locality,
                       },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
                     );
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -490,6 +563,11 @@ const WorkIncomeDetails = () => {
                       'work-income',
                       {
                         street_area_locality: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
                       },
                     );
                   }
@@ -541,6 +619,11 @@ const WorkIncomeDetails = () => {
                       {
                         town: values?.applicants?.[activeIndex]?.work_income_detail?.town,
                       },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
                     );
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -553,6 +636,11 @@ const WorkIncomeDetails = () => {
                       'work-income',
                       {
                         town: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
                       },
                     );
                   }
@@ -604,6 +692,11 @@ const WorkIncomeDetails = () => {
                       {
                         landmark: values?.applicants?.[activeIndex]?.work_income_detail?.landmark,
                       },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
                     );
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -615,6 +708,11 @@ const WorkIncomeDetails = () => {
                       'work-income',
                       {
                         landmark: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
                       },
                     );
                   }
@@ -673,6 +771,11 @@ const WorkIncomeDetails = () => {
                       {
                         pincode: values?.applicants?.[activeIndex]?.work_income_detail?.pincode,
                       },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
                     );
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -684,6 +787,11 @@ const WorkIncomeDetails = () => {
                       'work-income',
                       {
                         pincode: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
                       },
                     );
                   }
@@ -849,6 +957,11 @@ const WorkIncomeDetails = () => {
                           values?.applicants?.[activeIndex]?.work_income_detail
                             ?.total_household_income,
                       },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
                     );
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -861,6 +974,11 @@ const WorkIncomeDetails = () => {
                       'work-income',
                       {
                         total_household_income: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
                       },
                     );
                   }

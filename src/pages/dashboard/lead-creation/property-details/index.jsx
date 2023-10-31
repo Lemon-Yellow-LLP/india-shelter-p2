@@ -9,6 +9,7 @@ import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import Popup from '../../../../components/Popup';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const propertyIdentificationOptions = [
   {
@@ -37,6 +38,8 @@ const PropertyDetails = () => {
     setCurrentStepIndex,
   } = useContext(LeadContext);
 
+  const { token } = useContext(AuthContext);
+
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.property_details?.extra_params?.required_fields_status,
   });
@@ -60,22 +63,30 @@ const PropertyDetails = () => {
 
       if (values?.property_details?.id) {
         if (e.value === 'not-yet') {
-          editPropertyById(values?.property_details?.id, {
-            property_value_estimate: '',
-            owner_name: '',
-            plot_house_flat: '',
-            project_society_colony: '',
-            pincode: null,
-            city: '',
-            state: '',
-            extra_params: {
-              ...values?.property_details?.extra_params,
-              progress: 100,
-              required_fields_status: {
-                property_identification_is: true,
+          editPropertyById(
+            values?.property_details?.id,
+            {
+              property_value_estimate: '',
+              owner_name: '',
+              plot_house_flat: '',
+              project_society_colony: '',
+              pincode: null,
+              city: '',
+              state: '',
+              extra_params: {
+                ...values?.property_details?.extra_params,
+                progress: 100,
+                required_fields_status: {
+                  property_identification_is: true,
+                },
               },
             },
-          });
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          );
 
           setValues({
             ...values,
@@ -103,9 +114,17 @@ const PropertyDetails = () => {
             property_identification_is: true,
           });
         } else {
-          editPropertyById(values?.property_details?.id, {
-            property_identification_is: e.value,
-          });
+          editPropertyById(
+            values?.property_details?.id,
+            {
+              property_identification_is: e.value,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          );
           setRequiredFieldsStatus((prev) => ({
             ...prev,
             owner_name: false,
@@ -128,10 +147,18 @@ const PropertyDetails = () => {
             },
           };
         }
-        await addApi('property', {
-          ...addData,
-          lead_id: values?.lead?.id,
-        })
+        await addApi(
+          'property',
+          {
+            ...addData,
+            lead_id: values?.lead?.id,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
           .then(async (res) => {
             setFieldValue('property_details', { ...addData, id: res.id });
           })

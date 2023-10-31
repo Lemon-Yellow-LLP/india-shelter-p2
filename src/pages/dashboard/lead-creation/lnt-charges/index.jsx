@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import Topbar from '../../../../components/Topbar';
 import PropTypes from 'prop-types';
 import { CircularProgress } from '@mui/material';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
@@ -42,6 +43,8 @@ const LnTCharges = () => {
     updateCompleteFormProgress,
     activeIndex,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const amount =
     values?.applicants?.[activeIndex]?.applicant_details?.bre_101_response?.body?.Display?.[
@@ -78,7 +81,11 @@ const LnTCharges = () => {
   const fetchQR = async () => {
     try {
       setLoadingQr(true);
-      const resp = await getLnTChargesQRCode(values?.lead?.id);
+      const resp = await getLnTChargesQRCode(values?.lead?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       if (resp.DecryptedData?.QRCODE_STRING) setQrCode(resp.DecryptedData.QRCODE_STRING);
     } catch (err) {
       console.log(err);
@@ -92,14 +99,22 @@ const LnTCharges = () => {
       try {
         // check whether LnT exists
         if (values?.lead?.id) {
-          const resp = await checkIfLntExists(values?.lead?.id);
+          const resp = await checkIfLntExists(values?.lead?.id, {
+            headers: {
+              Authorization: token,
+            },
+          });
           setFieldValue('lt_charges', resp);
           setPaymentStatus('success');
         }
 
         updateCompleteFormProgress();
       } catch (err) {
-        const resp = await addLnTCharges(values?.lead?.id);
+        const resp = await addLnTCharges(values?.lead?.id, {
+          headers: {
+            Authorization: token,
+          },
+        });
         setLntId(resp.id);
         await fetchQR();
 
@@ -118,7 +133,11 @@ const LnTCharges = () => {
       try {
         // check whether LnT exists
         if (values?.lead?.id) {
-          const resp = await checkIfLntExists(values?.lead?.id);
+          const resp = await checkIfLntExists(values?.lead?.id, {
+            headers: {
+              Authorization: token,
+            },
+          });
           setFieldValue('lt_charges', resp);
         }
         updateCompleteFormProgress();
@@ -131,7 +150,11 @@ const LnTCharges = () => {
   const handleCheckingStatus = async (label = '') => {
     try {
       setCheckingStatus(label);
-      const resp = await checkPaymentStatus(values?.lead?.id);
+      const resp = await checkPaymentStatus(values?.lead?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       if (resp?.airpay_response_json?.airpay_verify_transaction_status == '200') {
         setPaymentStatus('success');
       } else if (resp?.airpay_response_json?.airpay_verify_transaction_status == '400') {
@@ -205,7 +228,11 @@ const LnTCharges = () => {
   };
 
   const handlePaymentByCash = async () => {
-    await makePaymentByCash(lntId);
+    await makePaymentByCash(lntId, {
+      headers: {
+        Authorization: token,
+      },
+    });
     setPaymentStatus('success');
   };
 
@@ -213,9 +240,17 @@ const LnTCharges = () => {
     setDisablePhoneNumber(true);
     setHasSentOTPOnce(true);
 
-    const resp = await makePaymentByLink(values?.lead?.id, {
-      mobile_number: values?.lnt_mobile_number?.mobile_number,
-    });
+    const resp = await makePaymentByLink(
+      values?.lead?.id,
+      {
+        mobile_number: values?.lnt_mobile_number?.mobile_number,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
     if (resp) {
       setToastMessage('Link has been sent to the entered mobile number');
     }
