@@ -255,7 +255,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   useEffect(() => {
     if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-      let newData = JSON.parse(JSON.stringify(values));
+      let newData = structuredClone(values);
 
       newData.applicants[activeIndex].personal_details = {
         ...newData.applicants[activeIndex].personal_details,
@@ -270,7 +270,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
       values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN Card'
     ) {
-      let newData = JSON.parse(JSON.stringify(values));
+      let newData = structuredClone(values);
 
       newData.applicants[activeIndex].personal_details = {
         ...newData.applicants[activeIndex].personal_details,

@@ -1,5 +1,4 @@
 import * as Yup from 'yup';
-import { checkIsValidStatePincode } from '../global';
 
 export const signInSchema = Yup.object({
   username: Yup.string()
