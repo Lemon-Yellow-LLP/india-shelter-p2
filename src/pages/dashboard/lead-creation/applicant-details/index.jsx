@@ -345,30 +345,38 @@ const ApplicantDetails = () => {
             },
           };
 
-          await checkExistingCustomer(bodyForExistingCustomer).then(({ body }) => {
-            if (body && body?.length !== 0) {
-              const { loan_type, ...dataWithoutLoanType } = body[0];
+          await checkExistingCustomer(bodyForExistingCustomer)
+            .then((body) => {
+              if (body && body?.length !== 0) {
+                const { loan_type, ...dataWithoutLoanType } = body[0];
 
-              setFieldValue(`applicants[${activeIndex}].applicant_details`, {
-                ...values?.applicants[activeIndex]?.applicant_details,
-                ...dataWithoutLoanType,
-              });
+                setFieldValue(`applicants[${activeIndex}].applicant_details`, {
+                  ...values?.applicants[activeIndex]?.applicant_details,
+                  ...dataWithoutLoanType,
+                });
 
-              editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
-                ...values?.applicants[activeIndex]?.applicant_details,
-                ...dataWithoutLoanType,
-                extra_params: {
-                  ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
-                  is_existing: true,
-                },
-              });
+                editFieldsById(
+                  values?.applicants[activeIndex]?.applicant_details?.id,
+                  'applicant',
+                  {
+                    ...values?.applicants[activeIndex]?.applicant_details,
+                    ...dataWithoutLoanType,
+                    extra_params: {
+                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                      is_existing: true,
+                    },
+                  },
+                );
 
-              setFieldValue(
-                `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
-                true,
-              );
-            }
-          });
+                setFieldValue(
+                  `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                  true,
+                );
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         });
       });
     } else {
