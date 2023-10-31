@@ -417,6 +417,7 @@ const Qualifier = () => {
         }
       } catch (err) {
         console.log(err);
+        setBre101((prev) => ({ ...prev, res: true }));
       }
     }
 
