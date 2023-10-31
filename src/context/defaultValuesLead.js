@@ -156,7 +156,7 @@ export const defaultValuesLead = {
         is_email_verified: false,
         extra_params: {
           same_as_id_type: false,
-          progress: 13,
+          progress: 20,
           is_existing_done: false,
           required_fields_status: {
             how_would_you_like_to_proceed: false,
@@ -164,7 +164,7 @@ export const defaultValuesLead = {
             id_number: false,
             selected_address_proof: false,
             address_proof_number: false,
-            first_name: false,
+            first_name: true,
             gender: false,
             date_of_birth: true,
             mobile_number: true,

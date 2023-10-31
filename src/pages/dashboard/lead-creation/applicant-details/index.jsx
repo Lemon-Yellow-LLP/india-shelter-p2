@@ -597,7 +597,7 @@ const ApplicantDetails = () => {
             touched={
               touched?.applicants && touched?.applicants[activeIndex]?.applicant_details?.first_name
             }
-            onBlur={(e) => {
+            onBlur={async (e) => {
               handleBlur(e);
               const name = e.currentTarget.name.split('.')[2];
               if (
@@ -611,11 +611,31 @@ const ApplicantDetails = () => {
                 if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
                   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                 }
+
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      first_name: values?.applicants?.[activeIndex]?.applicant_details?.first_name,
+                    },
+                  );
+                }
               } else {
                 if (requiredFieldsStatus[name] !== undefined) {
                   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                 }
                 updateFieldsApplicant(name, '');
+
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      first_name: '',
+                    },
+                  );
+                }
               }
             }}
             disabled={
@@ -642,7 +662,7 @@ const ApplicantDetails = () => {
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
-                onBlur={(e) => {
+                onBlur={async (e) => {
                   handleBlur(e);
                   const name = e.currentTarget.name.split('.')[2];
                   if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
@@ -650,8 +670,28 @@ const ApplicantDetails = () => {
                       name,
                       values.applicants[activeIndex]?.applicant_details?.[name],
                     );
+
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          middle_name:
+                            values?.applicants?.[activeIndex]?.applicant_details?.middle_name,
+                        },
+                      );
+                    }
                   } else {
                     updateFieldsApplicant(name, '');
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          middle_name: '',
+                        },
+                      );
+                    }
                   }
                 }}
                 onChange={handleTextInputChange}
@@ -676,7 +716,7 @@ const ApplicantDetails = () => {
                 onChange={handleTextInputChange}
                 inputClasses='capitalize'
                 // onFocus={datePickerScrollToTop}
-                onBlur={(e) => {
+                onBlur={async (e) => {
                   handleBlur(e);
                   const name = e.currentTarget.name.split('.')[2];
                   if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
@@ -684,8 +724,28 @@ const ApplicantDetails = () => {
                       name,
                       values.applicants[activeIndex]?.applicant_details?.[name],
                     );
+
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          last_name:
+                            values?.applicants?.[activeIndex]?.applicant_details?.last_name,
+                        },
+                      );
+                    }
                   } else {
                     updateFieldsApplicant(name, '');
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          last_name: '',
+                        },
+                      );
+                    }
                   }
                 }}
               />
