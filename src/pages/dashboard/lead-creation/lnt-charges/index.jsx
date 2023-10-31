@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import Topbar from '../../../../components/Topbar';
 import PropTypes from 'prop-types';
 import { CircularProgress } from '@mui/material';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const QR_TIMEOUT = 5 * 60;
 const LINK_RESEND_TIME = 30;
@@ -43,6 +44,7 @@ const LnTCharges = () => {
     activeIndex,
   } = useContext(LeadContext);
 
+  const { phoneNumberList } = useContext(AuthContext);
   const amount =
     values?.applicants?.[activeIndex]?.applicant_details?.bre_101_response?.body?.Display?.[
       'L&T_Charges'
@@ -331,13 +333,19 @@ const LnTCharges = () => {
                         name='lnt_mobile_number.mobile_number'
                         value={mobile_number}
                         onChange={handleOnPhoneNumberChange}
-                        error={errors?.lnt_mobile_number?.mobile_number}
+                        error={
+                          errors?.lnt_mobile_number?.mobile_number ||
+                          (phoneNumberList?.lo && phoneNumberList.lo == mobile_number
+                            ? 'Mobile number cannot be same as Lo number'
+                            : '')
+                        }
                         touched={touched?.lnt_mobile_number?.mobile_number}
                         onOTPSendClick={sendPaymentLink}
                         disabledOtpButton={
                           !mobile_number ||
                           !!errors?.lnt_mobile_number?.mobile_number ||
-                          hasSentOTPOnce
+                          hasSentOTPOnce ||
+                          phoneNumberList?.lo == mobile_number
                         }
                         hideOTPButton={hasSentOTPOnce}
                         disabled={disablePhoneNumber}
