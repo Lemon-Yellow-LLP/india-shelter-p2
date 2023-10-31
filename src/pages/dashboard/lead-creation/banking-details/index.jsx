@@ -119,6 +119,31 @@ const BankingDetails = () => {
     let newBanking = values?.applicants?.[activeIndex]?.banking_details;
     newBanking = newBanking.filter((account) => account.id !== deleteId);
     setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
+    if (newBanking?.length) {
+      setFieldValue(
+        `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
+        100,
+      );
+      let newData = { ...values?.applicants?.[activeIndex]?.applicant_details };
+      newData.extra_params.banking_progress = 100;
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+        'applicant',
+        newData,
+      );
+    } else {
+      setFieldValue(
+        `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
+        0,
+      );
+      let newData = { ...values?.applicants?.[activeIndex]?.applicant_details };
+      newData.extra_params.banking_progress = 0;
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+        'applicant',
+        newData,
+      );
+    }
     setOpenPopup(false);
   };
 

@@ -15,7 +15,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'light' ? '#fff' : grey[800],
 }));
 
-export default function DynamicDrawer({ open, setOpen, height, children }) {
+export default function DynamicDrawer({ open = false, setOpen, height, children }) {
   const toggleDrawer = () => {
     setOpen((prev) => !prev);
   };
@@ -25,8 +25,8 @@ export default function DynamicDrawer({ open, setOpen, height, children }) {
       <SwipeableDrawer
         anchor='bottom'
         open={open}
-        onClose={toggleDrawer}
-        onOpen={toggleDrawer}
+        onClose={() => console.log('close')}
+        onOpen={() => console.log('open')}
         swipeAreaWidth={drawerBleeding}
         allowSwipeInChildren={false}
         disableSwipeToOpen={false}

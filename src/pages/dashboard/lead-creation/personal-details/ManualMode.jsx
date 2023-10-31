@@ -255,7 +255,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   useEffect(() => {
     if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-      let newData = JSON.parse(JSON.stringify(values));
+      let newData = structuredClone(values);
 
       newData.applicants[activeIndex].personal_details = {
         ...newData.applicants[activeIndex].personal_details,
@@ -270,7 +270,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
       values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN Card'
     ) {
-      let newData = JSON.parse(JSON.stringify(values));
+      let newData = structuredClone(values);
 
       newData.applicants[activeIndex].personal_details = {
         ...newData.applicants[activeIndex].personal_details,
@@ -606,72 +606,37 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         placeholder='Eg: Sanjay'
         required
         name={`applicants[${activeIndex}].personal_details.first_name`}
-        value={values?.applicants?.[activeIndex]?.personal_details?.first_name}
+        value={values?.applicants?.[activeIndex]?.applicant_details?.first_name}
         onChange={handleTextInputChange}
-        error={errors.applicants?.[activeIndex]?.personal_details?.first_name}
+        error={errors.applicants?.[activeIndex]?.applicant_details?.first_name}
         touched={
-          touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.first_name
+          touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.first_name
         }
-        onBlur={(e) => {
-          handleBlur(e);
-          const name = e.target.name.split('.')[2];
-          if (
-            !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
-            values?.applicants?.[activeIndex]?.personal_details?.[name]
-          ) {
-            updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
-            if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
-              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-            }
-          } else {
-            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
-            updateFields(name, '');
-          }
-        }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={true}
       />
-
       <TextInput
         label='Middle Name'
         placeholder='Eg: Sham'
         name={`applicants[${activeIndex}].personal_details.middle_name`}
-        value={values?.applicants?.[activeIndex]?.personal_details?.middle_name}
+        value={values?.applicants?.[activeIndex]?.applicant_details?.middle_name}
         onChange={handleTextInputChange}
-        error={errors.applicants?.[activeIndex]?.personal_details?.middle_name}
+        error={errors.applicants?.[activeIndex]?.applicant_details?.middle_name}
         touched={
-          touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.middle_name
+          touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.middle_name
         }
-        onBlur={(e) => {
-          handleBlur(e);
-          const name = e.target.name.split('.')[2];
-          if (!errors.applicants?.[activeIndex]?.personal_details?.[name]) {
-            updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
-          } else {
-            updateFields(name, '');
-          }
-        }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={true}
       />
       <TextInput
         label='Last Name'
         placeholder='Eg: Picha'
         name={`applicants[${activeIndex}].personal_details.last_name`}
-        value={values?.applicants?.[activeIndex]?.personal_details?.last_name}
+        value={values?.applicants?.[activeIndex]?.applicant_details?.last_name}
         onChange={handleTextInputChange}
-        error={errors.applicants?.[activeIndex]?.personal_details?.last_name}
+        error={errors.applicants?.[activeIndex]?.applicant_details?.last_name}
         touched={
-          touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.last_name
+          touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.last_name
         }
-        onBlur={(e) => {
-          handleBlur(e);
-          const name = e.target.name.split('.')[2];
-          if (!errors.applicants?.[activeIndex]?.personal_details?.[name]) {
-            updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
-          } else {
-            updateFields(name, '');
-          }
-        }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={true}
       />
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
