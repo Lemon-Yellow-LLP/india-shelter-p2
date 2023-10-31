@@ -193,11 +193,11 @@ const PersonalDetails = () => {
   useEffect(() => {
     if (
       values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-      values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done
+      !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done
     ) {
       setOpenExistingPopup(
         values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done,
+          !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done,
       );
     } else {
       setOpenExistingPopup(false);
@@ -285,7 +285,14 @@ const PersonalDetails = () => {
         <SwipeableDrawerComponent />
       </div>
 
-      <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>
+      <DynamicDrawer
+        open={
+          openExistingPopup &&
+          values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed
+        }
+        setOpen={setOpenExistingPopup}
+        height='80vh'
+      >
         <div className='flex flex-col items-center h-full'>
           <span className='w-full font-semibold text-[14px] leading-[21px]'>
             This is an existing customer.

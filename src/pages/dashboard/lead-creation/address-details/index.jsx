@@ -35,7 +35,10 @@ export default function AddressDetails() {
   } = useContext(LeadContext);
 
   const [openExistingPopup, setOpenExistingPopup] = useState(
-    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing || false,
+    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+      !values?.applicants?.[activeIndex]?.address_detail?.extra_params?.is_existing_done
+      ? true
+      : false,
   );
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
@@ -225,7 +228,7 @@ export default function AddressDetails() {
 
   const handlePermanentSameAsCurrentAddress = (isChecked, current_type_of_residence) => {
     if (isChecked) {
-      let newData = JSON.parse(JSON.stringify(values));
+      let newData = structuredClone(values);
 
       newData.applicants[activeIndex].address_detail = {
         ...newData.applicants[activeIndex].address_detail,
@@ -259,7 +262,7 @@ export default function AddressDetails() {
         permanent_no_of_year_residing: true,
       }));
     } else {
-      let newData = JSON.parse(JSON.stringify(values));
+      let newData = structuredClone(values);
 
       newData.applicants[activeIndex].address_detail = {
         ...newData.applicants[activeIndex].address_detail,
@@ -376,14 +379,21 @@ export default function AddressDetails() {
   };
 
   useEffect(() => {
-    if (values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing) {
+    if (
+      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+      !values?.applicants?.[activeIndex]?.address_detail?.extra_params?.is_existing_done
+    ) {
       setOpenExistingPopup(
-        values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
+        values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+          !values?.applicants?.[activeIndex]?.address_detail?.extra_params?.is_existing_done,
       );
     } else {
       setOpenExistingPopup(false);
     }
-  }, [values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing]);
+  }, [
+    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
+    values?.applicants?.[activeIndex]?.address_detail?.extra_params?.is_existing_done,
+  ]);
 
   const handleAutofill = async () => {
     const fillData = { ...values.applicants?.[activeIndex]?.applicant_details };
@@ -446,18 +456,15 @@ export default function AddressDetails() {
       const res = await editFieldsById(
         values?.applicants[activeIndex]?.address_detail?.id,
         'address',
-        mappedData,
-      ).then(async (res) => {
-        await editFieldsById(
-          values?.applicants[activeIndex]?.address_detail?.id,
-          'address',
-          values,
-        );
-      });
-    } else {
-      const res = await addApi('address', mappedData);
-      setFieldValue(`applicants[${activeIndex}].address_detail.id`, res.id);
-      await editFieldsById(res.id, 'address', values);
+        {
+          ...finalData.applicants[activeIndex].address_detail,
+          ...mappedData,
+          extra_params: {
+            ...finalData.applicants[activeIndex].address_detail.extra_params,
+            is_existing_done: true,
+          },
+        },
+      );
     }
 
     setOpenExistingPopup(false);
@@ -1420,7 +1427,14 @@ export default function AddressDetails() {
         <SwipeableDrawerComponent />
       </div>
 
-      <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>
+      <DynamicDrawer
+        open={
+          openExistingPopup &&
+          values?.applicants?.[activeIndex]?.address_detail?.current_type_of_residence
+        }
+        setOpen={setOpenExistingPopup}
+        height='80vh'
+      >
         <div className='flex flex-col items-center h-full'>
           <span className='w-full font-semibold text-[14px] leading-[21px]'>
             This is an existing customer.

@@ -111,7 +111,7 @@ export default function SwipeableDrawerComponent() {
   const handleMakePrimary = async () => {
     setToggle(true);
 
-    let newData = JSON.parse(JSON.stringify(values));
+    let newData = structuredClone(values);
 
     newData.applicants[activeCoApplicantIndex].applicant_details = {
       ...newData.applicants[activeCoApplicantIndex].applicant_details,
@@ -147,9 +147,9 @@ export default function SwipeableDrawerComponent() {
   };
 
   const handleDelete = async () => {
-    let ogData = JSON.parse(JSON.stringify(values));
+    let ogData = structuredClone(values);
 
-    let newData = JSON.parse(JSON.stringify(ogData));
+    let newData = structuredClone(ogData);
 
     newData.applicants = newData.applicants.filter((e, index) => index !== activeCoApplicantIndex);
 
