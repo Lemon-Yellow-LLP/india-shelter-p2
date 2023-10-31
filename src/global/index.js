@@ -366,22 +366,14 @@ async function editAddressById(id, data) {
 }
 
 async function checkExistingCustomer(body) {
-  let myHeaders = new Headers();
-  myHeaders.append('Content-Type', 'application/json');
-  let requestOptions2 = {
-    method: 'POST',
-    headers: myHeaders,
-    body: body,
-    redirect: 'follow',
-    mode: 'no-cors',
-  };
-
-  await fetch(
-    'https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run',
-    requestOptions2,
-  ).then((res) => {
-    return res;
-  });
+  await axios
+    .post('https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run', body)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 // L&T

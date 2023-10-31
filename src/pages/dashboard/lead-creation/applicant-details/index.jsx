@@ -331,7 +331,8 @@ const ApplicantDetails = () => {
           setShowOTPInput(true);
           setHasSentOTPOnce(true);
           setToastMessage('OTP has been sent to your mail id');
-          const bodyForExistingCustomer = JSON.stringify({
+
+          const bodyForExistingCustomer = {
             resource: '/customer_check',
             path: '/customer_check',
             httpMethod: 'POST',
@@ -342,7 +343,7 @@ const ApplicantDetails = () => {
               date_of_birth: values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth,
               mobile_number: values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
             },
-          });
+          };
 
           await checkExistingCustomer(bodyForExistingCustomer).then(({ body }) => {
             if (body && body?.length !== 0) {
