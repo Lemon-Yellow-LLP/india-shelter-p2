@@ -1786,6 +1786,21 @@ const UploadDocuments = () => {
 
         if (
           values?.property_details?.property_identification_is === 'not-yet' ||
+          document_meta?.property_image?.find((slip) => slip?.active)
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            property_image: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            property_image: false,
+          };
+        }
+
+        if (
+          values?.property_details?.property_identification_is === 'not-yet' ||
           document_meta?.property_paper_photos?.find((slip) => slip?.active)
         ) {
           requiredFields = {
@@ -2427,26 +2442,28 @@ const UploadDocuments = () => {
             }
           />
 
-          <ImageUpload
-            files={propertyPhotos}
-            setFile={setPropertyPhotos}
-            uploads={propertyUploads}
-            setUploads={setPropertyUploads}
-            setEdit={setEditProperty}
-            label='Property image'
-            required
-            hint='File size should be less than 5MB'
-            setSingleFile={setPropertyPhotosFile}
-            setLatLong={setPropertyLatLong}
-            imageArrayBorder={true}
-            errorMessage={
-              preview === location.pathname &&
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                ?.upload_required_fields_status?.property_image == false
-                ? 'This field is mandatory'
-                : ''
-            }
-          />
+          {values?.property_details?.property_identification_is !== 'not-yet' && (
+            <ImageUpload
+              files={propertyPhotos}
+              setFile={setPropertyPhotos}
+              uploads={propertyUploads}
+              setUploads={setPropertyUploads}
+              setEdit={setEditProperty}
+              label='Property image'
+              required
+              hint='File size should be less than 5MB'
+              setSingleFile={setPropertyPhotosFile}
+              setLatLong={setPropertyLatLong}
+              imageArrayBorder={true}
+              errorMessage={
+                preview === location.pathname &&
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                  ?.upload_required_fields_status?.property_image == false
+                  ? 'This field is mandatory'
+                  : ''
+              }
+            />
+          )}
 
           <div>
             <div className='flex justify-between gap-2'>
