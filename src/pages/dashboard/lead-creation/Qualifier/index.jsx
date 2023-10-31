@@ -906,10 +906,19 @@ const Qualifier = () => {
           </div>
         </div>
         <div>
-          <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center'>
-            Do not close the app or go back. Please wait for ID <br /> verification as it may take
-            some time. We are validating these checks as per your consent
-          </p>
+          {!bre101.res ? (
+            <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-primary-black mt-3 p-1.5 border border-[#E1CE3F] bg-[#FFFAD6] rounded-md'>
+              <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+              Do not close the app or go back. Please wait for ID verification as it may take some
+              time. We are validating these checks as per your consent.
+            </p>
+          ) : (
+            <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-dark-grey mt-3'>
+              <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+              Do not close the app or go back. Please wait for ID verification as it may take some
+              time. We are validating these checks as per your consent.
+            </p>
+          )}
         </div>
       </div>
 
