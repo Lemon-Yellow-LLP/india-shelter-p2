@@ -1767,9 +1767,8 @@ const UploadDocuments = () => {
         values?.applicants?.[activeIndex]?.applicant_details?.id,
       );
 
-      setRequiredFieldsStatus({ ...extra_params.upload_required_fields_status });
       setRequiredFieldsStatus((prev) => {
-        let requiredFields = prev;
+        let requiredFields = { ...extra_params.upload_required_fields_status };
         if (
           values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
           document_meta?.salary_slip_photos?.find((slip) => slip?.active)
@@ -2080,7 +2079,7 @@ const UploadDocuments = () => {
                   setUploads={setIdProofUploads}
                   setEdit={setEditIdProof}
                   setLatLong={setIdProofLatLong}
-                  error={
+                  errorMessage={
                     preview === location.pathname &&
                     values?.applicants?.[activeIndex]?.applicant_details?.extra_params
                       ?.upload_required_fields_status?.id_proof == false
