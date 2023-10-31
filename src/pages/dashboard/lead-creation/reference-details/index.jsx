@@ -133,7 +133,14 @@ const ReferenceDetails = () => {
   const handleTextInputChange = useCallback(
     (e) => {
       let value = e.currentTarget.value;
-      const pattern = /^[a-zA-Z ]+$/;
+      value = value?.trimStart()?.replace(/\s\s+/g, ' ');
+      let pattern = /^[a-zA-Z ]+$/;
+      if (
+        e.currentTarget.name === 'reference_details.reference_1_address' ||
+        e.currentTarget.name === 'reference_details.reference_2_address'
+      ) {
+        pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
+      }
       if (pattern.test(value) || value.length == 0) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
@@ -170,6 +177,8 @@ const ReferenceDetails = () => {
 
     const res = await checkIsValidStatePincode(values?.reference_details?.reference_1_pincode);
     if (!res) {
+      setFieldValue('reference_details.reference_1_city', '');
+      setFieldValue('reference_details.reference_1_state', '');
       setFieldError('reference_details.reference_1_pincode', 'Invalid Pincode');
       setPincodeErr((prev) => ({ ...prev, reference_1: 'Invalid Pincode' }));
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_pincode']: false }));
@@ -225,6 +234,8 @@ const ReferenceDetails = () => {
       setFieldError('reference_details.reference_2_pincode', 'Invalid Pincode');
       setPincodeErr((prev) => ({ ...prev, reference_2: 'Invalid Pincode' }));
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_pincode']: false }));
+      setFieldValue('reference_details.reference_2_city', '');
+      setFieldValue('reference_details.reference_2_state', '');
       editReferenceById(values?.reference_details?.id, {
         reference_2_city: '',
         reference_2_state: '',

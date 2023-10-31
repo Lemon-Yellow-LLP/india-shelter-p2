@@ -13,10 +13,11 @@ function PhotoUpload({
   label,
   hint,
   setLatLong,
+  errorMessage,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
-  const [message, setMessage] = useState();
+  const [message, setMessage] = useState(errorMessage);
   const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
 
@@ -27,22 +28,26 @@ function PhotoUpload({
 
     let file = e.target.files;
 
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
+    if (file.length !== 0) {
+      for (let i = 0; i < file.length; i++) {
+        const fileType = file[i]['type'];
 
-      const validImageTypes = ['image/jpeg'];
+        const validImageTypes = ['image/jpeg'];
 
-      if (validImageTypes.includes(fileType)) {
-        if (file[i].size <= 5000000) {
-          setSingleFile(file[i]);
-          setFile([...files, file[i]]);
+        if (validImageTypes.includes(fileType)) {
+          if (file[i].size <= 5000000) {
+            setSingleFile(file[i]);
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File size should be less than 5MB');
+          }
         } else {
-          setLoader(false);
-          setMessage('File size should be less than 5MB');
+          setMessage('File format not supported');
         }
-      } else {
-        setMessage('File format not supported');
       }
+    } else {
+      setLoader(false);
     }
   };
 

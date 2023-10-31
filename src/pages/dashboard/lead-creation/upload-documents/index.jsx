@@ -26,6 +26,7 @@ import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/Lea
 import Topbar from '../../../../components/Topbar';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import Popup from '../../../../components/Popup';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 const UploadDocuments = () => {
   const {
@@ -135,6 +136,16 @@ const UploadDocuments = () => {
 
   const idRef = useRef();
   const addressRef = useRef();
+
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const preview = searchParams.get('preview');
+
+  // useEffect(() => {
+  //   if (preview === location.pathname) {
+  //     console.log('show error');
+  //   }
+  // }, [preview]);
 
   const handleCloseQualifierNotActivePopup = () => {
     setOpenQualifierNotActivePopup(false);
@@ -520,46 +531,50 @@ const UploadDocuments = () => {
         data.append('file', propertyPapersFile);
       }
 
-      const res = await uploadDoc(data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (res) {
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-        );
-        const document_meta = applicant.document_meta;
-        if ('property_paper_photos' in document_meta == false) {
-          document_meta['property_paper_photos'] = [];
-        }
-        document_meta['property_paper_photos'].push(res.document);
-
-        const edited_applicant = await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          {
-            document_meta: document_meta,
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
-
-        const pdf = edited_applicant.document_meta.property_paper_photos.find((data) => {
-          if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
-            return data;
-          }
         });
 
-        if (pdf) {
-          setPropertyPdf(pdf);
-        } else {
-          const active_uploads = edited_applicant.document_meta.property_paper_photos.filter(
-            (data) => {
-              return data.active === true;
+        if (res) {
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+          );
+          const document_meta = applicant.document_meta;
+          if ('property_paper_photos' in document_meta == false) {
+            document_meta['property_paper_photos'] = [];
+          }
+          document_meta['property_paper_photos'].push(res.document);
+
+          const edited_applicant = await editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            'applicant',
+            {
+              document_meta: document_meta,
             },
           );
 
-          setPropertyPaperUploads({ data: active_uploads });
+          const pdf = edited_applicant.document_meta.property_paper_photos.find((data) => {
+            if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+              return data;
+            }
+          });
+
+          if (pdf) {
+            setPropertyPdf(pdf);
+          } else {
+            const active_uploads = edited_applicant.document_meta.property_paper_photos.filter(
+              (data) => {
+                return data.active === true;
+              },
+            );
+
+            setPropertyPaperUploads({ data: active_uploads });
+          }
         }
       }
 
@@ -599,24 +614,28 @@ const UploadDocuments = () => {
         data.append('file', editPropertyPaper.file);
       }
 
-      const res = await reUploadDoc(editPropertyPaper.id, data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (!res) return;
+      if (fileSize.size <= 5000000) {
+        const res = await reUploadDoc(editPropertyPaper.id, data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
-      const applicant = await getApplicantById(
-        values?.applicants?.[activeIndex]?.applicant_details.id,
-      );
+        if (!res) return;
 
-      const active_uploads = applicant.document_meta.property_paper_photos.filter((data) => {
-        return data.active === true;
-      });
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
 
-      setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
-      setPropertyPapers(active_uploads);
+        const active_uploads = applicant.document_meta.property_paper_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
+        setPropertyPapers(active_uploads);
+      }
     }
     editPropertyPaper.id && editPropertyPaperPhotos();
   }, [editPropertyPaper]);
@@ -663,37 +682,41 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await uploadDoc(data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (res) {
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-        );
-        // console.log(applicant);
-        const document_meta = applicant.document_meta;
-        if ('customer_photos' in document_meta == false) {
-          document_meta['customer_photos'] = [];
-        }
-
-        document_meta['customer_photos'].push(res.document);
-
-        const edited_applicant = await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          {
-            document_meta: document_meta,
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
-
-        const active_upload = edited_applicant.document_meta.customer_photos.find((data) => {
-          return data.active === true;
         });
 
-        setCustomerUploads({ type: 'customer_photos', data: active_upload });
+        if (res) {
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+          );
+          // console.log(applicant);
+          const document_meta = applicant.document_meta;
+          if ('customer_photos' in document_meta == false) {
+            document_meta['customer_photos'] = [];
+          }
+
+          document_meta['customer_photos'].push(res.document);
+
+          const edited_applicant = await editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            'applicant',
+            {
+              document_meta: document_meta,
+            },
+          );
+
+          const active_upload = edited_applicant.document_meta.customer_photos.find((data) => {
+            return data.active === true;
+          });
+
+          setCustomerUploads({ type: 'customer_photos', data: active_upload });
+        }
       }
       setRequiredFieldsStatus((prev) => ({ ...prev, ['customer_photo']: true }));
     }
@@ -742,39 +765,43 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await uploadDoc(data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (res) {
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-        );
-        const document_meta = applicant.document_meta;
-        if ('id_proof_photos' in document_meta == false) {
-          document_meta['id_proof_photos'] = [];
-        }
-
-        document_meta['id_proof_photos'].push(res.document);
-
-        const edited_applicant = await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          {
-            document_meta: document_meta,
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
-
-        const active_uploads = edited_applicant.document_meta.id_proof_photos.filter((data) => {
-          return (
-            data.active === true &&
-            data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
-          );
         });
 
-        setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+        if (res) {
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+          );
+          const document_meta = applicant.document_meta;
+          if ('id_proof_photos' in document_meta == false) {
+            document_meta['id_proof_photos'] = [];
+          }
+
+          document_meta['id_proof_photos'].push(res.document);
+
+          const edited_applicant = await editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            'applicant',
+            {
+              document_meta: document_meta,
+            },
+          );
+
+          const active_uploads = edited_applicant.document_meta.id_proof_photos.filter((data) => {
+            return (
+              data.active === true &&
+              data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+            );
+          });
+
+          setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+        }
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['id_proof']: true }));
@@ -809,26 +836,30 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await reUploadDoc(editIdProof.id, data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (!res) return;
+      if (fileSize.size <= 5000000) {
+        const res = await reUploadDoc(editIdProof.id, data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
-      const applicant = await getApplicantById(
-        values?.applicants?.[activeIndex]?.applicant_details.id,
-      );
+        if (!res) return;
 
-      const active_uploads = applicant.document_meta.id_proof_photos.filter((data) => {
-        return (
-          data.active === true &&
-          data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
         );
-      });
 
-      setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+        const active_uploads = applicant.document_meta.id_proof_photos.filter((data) => {
+          return (
+            data.active === true &&
+            data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+          );
+        });
+
+        setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+      }
     }
     editIdProof.id && editIdProofPhotos();
   }, [editIdProof]);
@@ -878,42 +909,46 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await uploadDoc(data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (res) {
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-        );
-        const document_meta = applicant.document_meta;
-        if ('address_proof_photos' in document_meta == false) {
-          document_meta['address_proof_photos'] = [];
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        if (res) {
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+          );
+          const document_meta = applicant.document_meta;
+          if ('address_proof_photos' in document_meta == false) {
+            document_meta['address_proof_photos'] = [];
+          }
+
+          document_meta['address_proof_photos'].push(res.document);
+
+          const edited_applicant = await editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            'applicant',
+            {
+              document_meta: document_meta,
+            },
+          );
+
+          const active_uploads = edited_applicant.document_meta.address_proof_photos.filter(
+            (data) => {
+              return (
+                data.active === true &&
+                data.document_type ==
+                  values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+              );
+            },
+          );
+
+          setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
         }
-
-        document_meta['address_proof_photos'].push(res.document);
-
-        const edited_applicant = await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          {
-            document_meta: document_meta,
-          },
-        );
-
-        const active_uploads = edited_applicant.document_meta.address_proof_photos.filter(
-          (data) => {
-            return (
-              data.active === true &&
-              data.document_type ==
-                values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
-            );
-          },
-        );
-
-        setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['address_proof']: true }));
@@ -951,27 +986,31 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await reUploadDoc(editAddressProof.id, data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (!res) return;
+      if (fileSize.size <= 5000000) {
+        const res = await reUploadDoc(editAddressProof.id, data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
-      const applicant = await getApplicantById(
-        values?.applicants?.[activeIndex]?.applicant_details.id,
-      );
+        if (!res) return;
 
-      const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
-        return (
-          data.active === true &&
-          data.document_type ==
-            values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
         );
-      });
 
-      setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+        const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
+          return (
+            data.active === true &&
+            data.document_type ==
+              values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+          );
+        });
+
+        setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+      }
     }
     editAddressProof.id && editAddressProofPhotos();
   }, [editAddressProof]);
@@ -1018,36 +1057,42 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await uploadDoc(data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (res) {
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-        );
-        const document_meta = applicant.document_meta;
-        if ('salary_slip_photos' in document_meta == false) {
-          document_meta['salary_slip_photos'] = [];
-        }
-
-        document_meta['salary_slip_photos'].push(res.document);
-
-        const edited_applicant = await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          {
-            document_meta: document_meta,
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
-
-        const active_uploads = edited_applicant.document_meta.salary_slip_photos.filter((data) => {
-          return data.active === true;
         });
 
-        setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
+        if (res) {
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+          );
+          const document_meta = applicant.document_meta;
+          if ('salary_slip_photos' in document_meta == false) {
+            document_meta['salary_slip_photos'] = [];
+          }
+
+          document_meta['salary_slip_photos'].push(res.document);
+
+          const edited_applicant = await editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            'applicant',
+            {
+              document_meta: document_meta,
+            },
+          );
+
+          const active_uploads = edited_applicant.document_meta.salary_slip_photos.filter(
+            (data) => {
+              return data.active === true;
+            },
+          );
+
+          setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
+        }
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['salary_slip']: true }));
@@ -1082,23 +1127,27 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await reUploadDoc(editSalarySlip.id, data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (!res) return;
+      if (fileSize.size <= 5000000) {
+        const res = await reUploadDoc(editSalarySlip.id, data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
-      const applicant = await getApplicantById(
-        values?.applicants?.[activeIndex]?.applicant_details.id,
-      );
+        if (!res) return;
 
-      const active_uploads = applicant.document_meta.salary_slip_photos.filter((data) => {
-        return data.active === true;
-      });
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
 
-      setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
+        const active_uploads = applicant.document_meta.salary_slip_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
+      }
     }
     editSalarySlip.id && editSalarySlipPhotos();
   }, [editSalarySlip]);
@@ -1145,35 +1194,39 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await uploadDoc(data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (res) {
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-        );
-        const document_meta = applicant.document_meta;
-        if ('form_60_photos' in document_meta == false) {
-          document_meta['form_60_photos'] = [];
-        }
-        document_meta['form_60_photos'].push(res.document);
-
-        const edited_applicant = await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          {
-            document_meta: document_meta,
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
-
-        const active_uploads = edited_applicant.document_meta.form_60_photos.filter((data) => {
-          return data.active === true;
         });
 
-        setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
+        if (res) {
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+          );
+          const document_meta = applicant.document_meta;
+          if ('form_60_photos' in document_meta == false) {
+            document_meta['form_60_photos'] = [];
+          }
+          document_meta['form_60_photos'].push(res.document);
+
+          const edited_applicant = await editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            'applicant',
+            {
+              document_meta: document_meta,
+            },
+          );
+
+          const active_uploads = edited_applicant.document_meta.form_60_photos.filter((data) => {
+            return data.active === true;
+          });
+
+          setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
+        }
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['form_60']: true }));
@@ -1208,26 +1261,30 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await reUploadDoc(editForm60.id, data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (!res) return;
+      if (fileSize.size <= 5000000) {
+        const res = await reUploadDoc(editForm60.id, data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
-      const applicant = await getApplicantById(
-        values?.applicants?.[activeIndex]?.applicant_details.id,
-      );
+        if (!res) return;
 
-      const active_uploads = applicant.document_meta.form_60_photos.filter((data) => {
-        return data.active === true;
-      });
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
 
-      setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
+        const active_uploads = applicant.document_meta.form_60_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
+      }
     }
-    form60photos.id && editForm60Photos();
-  }, [form60photos]);
+    editForm60.id && editForm60Photos();
+  }, [editForm60]);
 
   useEffect(() => {
     async function removeProgress() {
@@ -1271,35 +1328,39 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await uploadDoc(data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (res) {
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-        );
-        const document_meta = applicant.document_meta;
-        if ('property_photos' in document_meta == false) {
-          document_meta['property_photos'] = [];
-        }
-        document_meta['property_photos'].push(res.document);
-
-        const edited_applicant = await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          {
-            document_meta: document_meta,
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
-
-        const active_uploads = edited_applicant.document_meta.property_photos.filter((data) => {
-          return data.active === true;
         });
 
-        setPropertyUploads({ type: 'property_photos', data: active_uploads });
+        if (res) {
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+          );
+          const document_meta = applicant.document_meta;
+          if ('property_photos' in document_meta == false) {
+            document_meta['property_photos'] = [];
+          }
+          document_meta['property_photos'].push(res.document);
+
+          const edited_applicant = await editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            'applicant',
+            {
+              document_meta: document_meta,
+            },
+          );
+
+          const active_uploads = edited_applicant.document_meta.property_photos.filter((data) => {
+            return data.active === true;
+          });
+
+          setPropertyUploads({ type: 'property_photos', data: active_uploads });
+        }
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['property_image']: true }));
@@ -1334,23 +1395,27 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await reUploadDoc(editProperty.id, data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (!res) return;
+      if (fileSize.size <= 5000000) {
+        const res = await reUploadDoc(editProperty.id, data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
-      const applicant = await getApplicantById(
-        values?.applicants?.[activeIndex]?.applicant_details.id,
-      );
+        if (!res) return;
 
-      const active_uploads = applicant.document_meta.property_photos.filter((data) => {
-        return data.active === true;
-      });
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
 
-      setPropertyUploads({ type: 'property_photos', data: active_uploads });
+        const active_uploads = applicant.document_meta.property_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setPropertyUploads({ type: 'property_photos', data: active_uploads });
+      }
     }
     editProperty.id && editPropertyPhotos();
   }, [editProperty]);
@@ -1397,35 +1462,39 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await uploadDoc(data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (res) {
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-        );
-        const document_meta = applicant.document_meta;
-        if ('lo_selfie' in document_meta == false) {
-          document_meta['lo_selfie'] = [];
-        }
-        document_meta['lo_selfie'].push(res.document);
-
-        const edited_applicant = await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          {
-            document_meta: document_meta,
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
-
-        const active_upload = edited_applicant.document_meta.lo_selfie.find((data) => {
-          return data.active === true;
         });
 
-        setSelfieUploads({ type: 'lo_selfie', data: active_upload });
+        if (res) {
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+          );
+          const document_meta = applicant.document_meta;
+          if ('lo_selfie' in document_meta == false) {
+            document_meta['lo_selfie'] = [];
+          }
+          document_meta['lo_selfie'].push(res.document);
+
+          const edited_applicant = await editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            'applicant',
+            {
+              document_meta: document_meta,
+            },
+          );
+
+          const active_upload = edited_applicant.document_meta.lo_selfie.find((data) => {
+            return data.active === true;
+          });
+
+          setSelfieUploads({ type: 'lo_selfie', data: active_upload });
+        }
       }
     }
     selfie.length > 0 && addSelfiePhoto();
@@ -1473,35 +1542,39 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await uploadDoc(data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (res) {
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-        );
-        const document_meta = applicant.document_meta;
-        if ('other_docs' in document_meta == false) {
-          document_meta['other_docs'] = [];
-        }
-        document_meta['other_docs'].push(res.document);
-
-        const edited_applicant = await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          'applicant',
-          {
-            document_meta: document_meta,
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
-
-        const active_uploads = edited_applicant.document_meta.other_docs.filter((data) => {
-          return data.active === true;
         });
 
-        setDocUploads({ type: 'other_docs', data: active_uploads });
+        if (res) {
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+          );
+          const document_meta = applicant.document_meta;
+          if ('other_docs' in document_meta == false) {
+            document_meta['other_docs'] = [];
+          }
+          document_meta['other_docs'].push(res.document);
+
+          const edited_applicant = await editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            'applicant',
+            {
+              document_meta: document_meta,
+            },
+          );
+
+          const active_uploads = edited_applicant.document_meta.other_docs.filter((data) => {
+            return data.active === true;
+          });
+
+          setDocUploads({ type: 'other_docs', data: active_uploads });
+        }
       }
     }
     docs.length > 0 && addOtherDocPhotos();
@@ -1534,23 +1607,27 @@ const UploadDocuments = () => {
         console.log(error);
       }
 
-      const res = await reUploadDoc(editDoc.id, data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (!res) return;
+      if (fileSize.size <= 5000000) {
+        const res = await reUploadDoc(editDoc.id, data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
-      const applicant = await getApplicantById(
-        values?.applicants?.[activeIndex]?.applicant_details.id,
-      );
+        if (!res) return;
 
-      const active_uploads = applicant.document_meta.other_docs.filter((data) => {
-        return data.active === true;
-      });
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+        );
 
-      setDocUploads({ type: 'other_docs', data: active_uploads });
+        const active_uploads = applicant.document_meta.other_docs.filter((data) => {
+          return data.active === true;
+        });
+
+        setDocUploads({ type: 'other_docs', data: active_uploads });
+      }
     }
     editDoc.id && editOtherDocPhotos();
   }, [editDoc]);
@@ -1764,6 +1841,13 @@ const UploadDocuments = () => {
             setLatLong={setCustomerLatLong}
             label='Customer photo'
             required
+            errorMessage={
+              preview === location.pathname &&
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                ?.upload_required_fields_status?.customer_photo == false
+                ? 'This field is mandatory'
+                : ''
+            }
           />
 
           <div className='flex flex-col gap-5'>
@@ -1775,7 +1859,6 @@ const UploadDocuments = () => {
               placeholder='Choose ID type'
               onChange={changeIdType}
               defaultSelected={values?.applicants?.[activeIndex]?.personal_details?.id_type}
-              // error={errors.applicants?.[activeIndex]?.personal_details?.id_type}
               touched={
                 touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.id_type
               }
@@ -1801,7 +1884,15 @@ const UploadDocuments = () => {
               />
 
               {isQaulifierActivated ? (
-                <div className='bg-white mt-1 border-x border-y border-stroke rounded-lg px-2 pb-2'>
+                <div
+                  className={`bg-white mt-1 border-x border-y rounded-lg px-2 pb-2 ${
+                    preview === location.pathname &&
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                      ?.upload_required_fields_status?.id_proof == false
+                      ? 'border-primary-red border-2'
+                      : 'border-stroke  border-1'
+                  }`}
+                >
                   <ImageUpload
                     files={idProofPhotos}
                     setFile={setIdProofPhotos}
@@ -1811,6 +1902,13 @@ const UploadDocuments = () => {
                     noBorder={true}
                     setEdit={setEditIdProof}
                     setLatLong={setIdProofLatLong}
+                    error={
+                      preview === location.pathname &&
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                        ?.upload_required_fields_status?.id_proof == false
+                        ? 'This field is mandatory'
+                        : ''
+                    }
                   />
 
                   <div
@@ -1982,6 +2080,14 @@ const UploadDocuments = () => {
                   setUploads={setIdProofUploads}
                   setEdit={setEditIdProof}
                   setLatLong={setIdProofLatLong}
+                  error={
+                    preview === location.pathname &&
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                      ?.upload_required_fields_status?.id_proof == false
+                      ? 'This field is mandatory'
+                      : ''
+                  }
+                  imageArrayBorder={true}
                 />
               )}
 
@@ -2033,7 +2139,15 @@ const UploadDocuments = () => {
               />
 
               {isQaulifierActivated ? (
-                <div className='bg-white mt-1 border-x border-y border-stroke rounded-lg px-2 pb-2'>
+                <div
+                  className={`bg-white mt-1 border-x border-y rounded-lg px-2 pb-2 ${
+                    preview === location.pathname &&
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                      ?.upload_required_fields_status?.address_proof == false
+                      ? 'border-primary-red border-2'
+                      : 'border-stroke border-1'
+                  }`}
+                >
                   <ImageUpload
                     files={addressProofPhotos}
                     setFile={setAddressProofPhotos}
@@ -2095,8 +2209,8 @@ const UploadDocuments = () => {
                         inputClasses='text-xs capitalize h-3'
                         onKeyDown={(e) => {
                           if (
-                            values?.applicants?.[activeIndex]?.personal_details?.id_type ===
-                              'AADHAR' &&
+                            values?.applicants?.[activeIndex]?.personal_details
+                              ?.selected_address_proof === 'AADHAR' &&
                             (e.key === 'ArrowUp' ||
                               e.key === 'ArrowDown' ||
                               e.key === 'ArrowLeft' ||
@@ -2226,6 +2340,14 @@ const UploadDocuments = () => {
                   uploads={addressProofUploads}
                   setUploads={setAddressProofUploads}
                   setLatLong={setAddressProofLatLong}
+                  errorMessage={
+                    preview === location.pathname &&
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                      ?.upload_required_fields_status?.address_proof == false
+                      ? 'This field is mandatory'
+                      : ''
+                  }
+                  imageArrayBorder={true}
                 />
               )}
 
@@ -2252,6 +2374,13 @@ const UploadDocuments = () => {
               setSingleFile={setPropertyPapersFile}
               setLatLong={setPropertyPapersLatLong}
               imageArrayBorder={true}
+              errorMessage={
+                preview === location.pathname &&
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                  ?.upload_required_fields_status?.property_paper == false
+                  ? 'This field is mandatory'
+                  : ''
+              }
             />
           )}
 
@@ -2268,6 +2397,13 @@ const UploadDocuments = () => {
               setSingleFile={setSalarySlipPhotosFile}
               setLatLong={setSalarySlipLatLong}
               imageArrayBorder={true}
+              errorMessage={
+                preview === location.pathname &&
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                  ?.upload_required_fields_status?.salary_slip == false
+                  ? 'This field is mandatory'
+                  : ''
+              }
             />
           )}
 
@@ -2283,6 +2419,13 @@ const UploadDocuments = () => {
             setSingleFile={setForm60photosFile}
             setLatLong={setForm60LatLong}
             imageArrayBorder={true}
+            errorMessage={
+              preview === location.pathname &&
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                ?.upload_required_fields_status?.form_60 == false
+                ? 'This field is mandatory'
+                : ''
+            }
           />
 
           <ImageUpload
@@ -2297,6 +2440,13 @@ const UploadDocuments = () => {
             setSingleFile={setPropertyPhotosFile}
             setLatLong={setPropertyLatLong}
             imageArrayBorder={true}
+            errorMessage={
+              preview === location.pathname &&
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                ?.upload_required_fields_status?.property_image == false
+                ? 'This field is mandatory'
+                : ''
+            }
           />
 
           <div>
@@ -2311,6 +2461,13 @@ const UploadDocuments = () => {
                   setLatLong={setLoSelfieLatLong}
                   label='Upload selfie'
                   required
+                  errorMessage={
+                    preview === location.pathname &&
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                      ?.upload_required_fields_status?.upload_selfie == false
+                      ? 'This field is mandatory'
+                      : ''
+                  }
                 />
               </div>
 

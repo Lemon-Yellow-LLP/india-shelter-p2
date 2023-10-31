@@ -16,10 +16,11 @@ function ImageUpload({
   noBorder,
   setLatLong,
   imageArrayBorder, //in address proof of upload page there is no border for immage array but in salary slip there is border so when you want to add border to immage array just pass true to this prop
+  errorMessage,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
-  const [message, setMessage] = useState();
+  const [message, setMessage] = useState(errorMessage);
   const [loader, setLoader] = useState(false);
 
   const [show, setShow] = useState(false);
@@ -32,23 +33,27 @@ function ImageUpload({
 
     let file = e.target.files;
 
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
+    if (file.length !== 0) {
+      for (let i = 0; i < file.length; i++) {
+        const fileType = file[i]['type'];
 
-      const validImageTypes = ['image/jpeg'];
+        const validImageTypes = ['image/jpeg'];
 
-      if (validImageTypes.includes(fileType)) {
-        if (file[i].size <= 5000000) {
-          setSingleFile(file[i]);
-          setFile([...files, file[i]]);
+        if (validImageTypes.includes(fileType)) {
+          if (file[i].size <= 5000000) {
+            setSingleFile(file[i]);
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File size should be less than 5MB');
+          }
         } else {
           setLoader(false);
-          setMessage('File size should be less than 5MB');
+          setMessage('File format not supported');
         }
-      } else {
-        setLoader(false);
-        setMessage('File format not supported');
       }
+    } else {
+      setLoader(false);
     }
   };
 
@@ -59,21 +64,30 @@ function ImageUpload({
 
     let file = e.target.files;
 
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
+    if (file.length !== 0) {
+      for (let i = 0; i < file.length; i++) {
+        const fileType = file[i]['type'];
 
-      const validImageTypes = ['image/jpeg'];
+        const validImageTypes = ['image/jpeg'];
 
-      if (validImageTypes.includes(fileType)) {
-        setEdit({
-          file: file[i],
-          id: id,
-        });
-        setFile([...files, file[i]]);
-      } else {
-        setLoader(false);
-        setMessage('File format not supported');
+        if (validImageTypes.includes(fileType)) {
+          if (file[i].size <= 5000000) {
+            setEdit({
+              file: file[i],
+              id: id,
+            });
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File size should be less than 5MB');
+          }
+        } else {
+          setLoader(false);
+          setMessage('File format not supported');
+        }
       }
+    } else {
+      setLoader(false);
     }
   };
 
