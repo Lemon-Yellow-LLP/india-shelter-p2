@@ -42,6 +42,9 @@ const PersonalDetails = () => {
 
   const updateFields = async (name, value) => {
     let newData = {
+      first_name: values?.applicants[activeIndex]?.applicant_details?.first_name,
+      middle_name: values?.applicants[activeIndex]?.applicant_details?.middle_name,
+      last_name: values?.applicants[activeIndex]?.applicant_details?.last_name,
       date_of_birth: values?.applicants[activeIndex]?.applicant_details?.date_of_birth,
       mobile_number: values?.applicants[activeIndex]?.applicant_details?.mobile_number,
     };
@@ -66,6 +69,9 @@ const PersonalDetails = () => {
         let addData = {
           ...clonedCoApplicantValues.personal_details,
           [name]: value,
+          first_name: values?.applicants[activeIndex]?.applicant_details?.first_name,
+          middle_name: values?.applicants[activeIndex]?.applicant_details?.middle_name,
+          last_name: values?.applicants[activeIndex]?.applicant_details?.last_name,
           date_of_birth: values?.applicants[activeIndex]?.applicant_details?.date_of_birth,
           mobile_number: values?.applicants[activeIndex]?.applicant_details?.mobile_number,
         };
