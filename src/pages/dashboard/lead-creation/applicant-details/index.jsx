@@ -623,6 +623,11 @@ const ApplicantDetails = () => {
                     {
                       first_name: values?.applicants?.[activeIndex]?.applicant_details?.first_name,
                     },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
                   );
                 }
               } else {
@@ -637,6 +642,11 @@ const ApplicantDetails = () => {
                     'personal',
                     {
                       first_name: '',
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
                     },
                   );
                 }
@@ -683,6 +693,11 @@ const ApplicantDetails = () => {
                           middle_name:
                             values?.applicants?.[activeIndex]?.applicant_details?.middle_name,
                         },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
                       );
                     }
                   } else {
@@ -693,6 +708,11 @@ const ApplicantDetails = () => {
                         'personal',
                         {
                           middle_name: '',
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
                         },
                       );
                     }
@@ -737,6 +757,11 @@ const ApplicantDetails = () => {
                           last_name:
                             values?.applicants?.[activeIndex]?.applicant_details?.last_name,
                         },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
                       );
                     }
                   } else {
@@ -747,6 +772,11 @@ const ApplicantDetails = () => {
                         'personal',
                         {
                           last_name: '',
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
                         },
                       );
                     }
@@ -978,6 +1008,11 @@ const ApplicantDetails = () => {
                     extra_params: {
                       ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
                       is_existing_done: true,
+                    },
+                  },
+                  {
+                    headers: {
+                      Authorization: token,
                     },
                   },
                 );

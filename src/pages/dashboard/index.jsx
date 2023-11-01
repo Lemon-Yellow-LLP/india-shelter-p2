@@ -93,10 +93,17 @@ export default function Dashboard() {
     (async () => {
       try {
         setLoading(true);
-        const data = await getDashboardLeadList({
-          fromDate: selectionRange.startDate,
-          toDate: moment(selectionRange.endDate).add(1, 'day'),
-        });
+        const data = await getDashboardLeadList(
+          {
+            fromDate: selectionRange.startDate,
+            toDate: moment(selectionRange.endDate).add(1, 'day'),
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
         const formatted = data?.leads.filter((l) => l.applicants?.length > 0);
         setLeadList(formatted);
       } catch (err) {

@@ -207,9 +207,17 @@ const IdentificationDoneFields = ({
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             } else {
-              editPropertyById(values?.property_details?.id, {
-                property_value_estimate: '',
-              });
+              editPropertyById(
+                values?.property_details?.id,
+                {
+                  property_value_estimate: '',
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
 
               if (requiredFieldsStatus[name]) {
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));

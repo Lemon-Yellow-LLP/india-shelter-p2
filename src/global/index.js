@@ -70,8 +70,8 @@ async function testLogout(options) {
   return res.data;
 }
 
-async function getAllLoanOfficers() {
-  const res = await axios.get(`${API_URL}/account`, requestOptions);
+async function getAllLoanOfficers(options) {
+  const res = await axios.get(`${API_URL}/account`, options);
   return res.data;
 }
 
@@ -295,8 +295,8 @@ async function verifyUploadOtp(id, otp, options) {
   return res;
 }
 
-async function getUserById(id) {
-  const res = await axios.get(`${API_URL}/account/${id}`, {}, requestOptions);
+async function getUserById(id, options) {
+  const res = await axios.get(`${API_URL}/account/${id}`, options);
   return res.data;
 }
 
@@ -484,7 +484,7 @@ export async function getDashboardLeadList(
     fromDate,
     toDate,
   },
-  values,
+  options,
 ) {
   fromDate = moment(fromDate).format('DD-MM-YYYY');
   toDate = moment(toDate).format('DD-MM-YYYY');
@@ -492,7 +492,7 @@ export async function getDashboardLeadList(
   try {
     const { data } = await axios.get(
       `${API_URL}/dashboard/lead-list/l?fromDate=${fromDate}&toDate=${toDate}`,
-      values,
+      options,
     );
     // const { data } = await axios.get(`${API_URL}/dashboard/lead-list/l`, values);
     return data;

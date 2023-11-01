@@ -170,6 +170,11 @@ const BankingDetails = () => {
         values?.applicants?.[activeIndex]?.applicant_details?.id,
         'applicant',
         newData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
     } else {
       setFieldValue(
@@ -182,6 +187,11 @@ const BankingDetails = () => {
         values?.applicants?.[activeIndex]?.applicant_details?.id,
         'applicant',
         newData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
     }
     setOpenPopup(false);
