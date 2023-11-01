@@ -713,7 +713,7 @@ const Eligibility = () => {
 
   return (
     <>
-      <Topbar title='Eligibility' id={values?.lead?.id} showClose={true} />
+      <Topbar title='Eligibility' id={values?.lead?.id} showClose={!sdfcResponse ? false : true} />
 
       <div className='p-4 h-full pb-28'>
         <ToastMessage
@@ -774,9 +774,9 @@ const Eligibility = () => {
           PAN.status === 'In-Valid' ||
           PAN.status === 'Valid No Match' ||
           bre101?.extra_params?.pan_ran ? (
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!PAN.ran ? (
+                {/* {!PAN.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -806,7 +806,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>PAN card</p>
               </div>
@@ -823,9 +823,9 @@ const Eligibility = () => {
           DL.status === 'In-Valid' ||
           DL.status === 'Valid No Match' ||
           bre101?.extra_params?.dl_ran ? (
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!DL.ran ? (
+                {/* {!DL.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -855,7 +855,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>Driving license</p>
               </div>
@@ -872,9 +872,9 @@ const Eligibility = () => {
           voterID.status === 'In-Valid' ||
           voterID.status === 'Valid No Match' ||
           bre101?.extra_params?.voter_ran ? (
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!voterID.ran ? (
+                {/* {!voterID.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -904,7 +904,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>Voter ID</p>
               </div>
@@ -923,9 +923,9 @@ const Eligibility = () => {
           pfUAN.status === 'In-Valid' ||
           pfUAN.status === 'Valid No Match' ||
           bre101?.extra_params?.pf_ran ? (
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!pfUAN.ran ? (
+                {/* {!pfUAN.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -955,7 +955,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>PF UAN</p>
               </div>
@@ -980,9 +980,9 @@ const Eligibility = () => {
           GST.status === 'In-Valid' ||
           GST.status === 'Valid No Match' ||
           bre101?.extra_params?.gst_ran ? (
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!GST.ran ? (
+                {/* {!GST.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -1012,7 +1012,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>GST</p>
               </div>
@@ -1033,9 +1033,9 @@ const Eligibility = () => {
 
           {display ? (
             <>
-              <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
                 <div className='flex items-center gap-1'>
-                  {!bre99.ran ? (
+                  {/* {!bre99.ran ? (
                     <svg
                       width='24'
                       height='24'
@@ -1065,7 +1065,7 @@ const Eligibility = () => {
                         strokeLinejoin='round'
                       />
                     </svg>
-                  )}
+                  )} */}
 
                   <p className='text-sm text-primary-black'>BRE 99</p>
                 </div>
@@ -1085,9 +1085,9 @@ const Eligibility = () => {
                 </div>
               </div>
 
-              <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
                 <div className='flex items-center gap-1'>
-                  {!bureau.ran ? (
+                  {/* {!bureau.ran ? (
                     <svg
                       width='24'
                       height='24'
@@ -1117,7 +1117,7 @@ const Eligibility = () => {
                         strokeLinejoin='round'
                       />
                     </svg>
-                  )}
+                  )} */}
 
                   <p className='text-sm text-primary-black'>Bureau</p>
                 </div>
@@ -1139,9 +1139,9 @@ const Eligibility = () => {
             </>
           ) : null}
 
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+          <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
-              {!upiName.ran ? (
+              {/* {!upiName.ran ? (
                 <svg
                   width='24'
                   height='24'
@@ -1171,7 +1171,7 @@ const Eligibility = () => {
                     strokeLinejoin='round'
                   />
                 </svg>
-              )}
+              )} */}
 
               <p className='text-sm text-primary-black'>UPI Name</p>
             </div>
@@ -1190,9 +1190,9 @@ const Eligibility = () => {
           <div>
             <p className='text-sm text-primary-black'>Primary applicant</p>
 
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5 mt-2'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5 mt-2'>
               <div className='flex items-center gap-1'>
-                {!faceMatch.ran ? (
+                {/* {!faceMatch.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -1222,7 +1222,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>Face Match</p>
               </div>
@@ -1253,9 +1253,9 @@ const Eligibility = () => {
                   {data?.applicant_details?.applicant_type}
                 </p>
 
-                <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5 mt-2'>
+                <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5 mt-2'>
                   <div className='flex items-center gap-1'>
-                    {!faceMatch.ran ? (
+                    {/* {!faceMatch.ran ? (
                       <svg
                         width='24'
                         height='24'
@@ -1285,7 +1285,7 @@ const Eligibility = () => {
                           strokeLinejoin='round'
                         />
                       </svg>
-                    )}
+                    )} */}
 
                     <p className='text-sm text-primary-black'>Face Match</p>
                   </div>
@@ -1316,10 +1316,21 @@ const Eligibility = () => {
           )}
         </div>
 
-        <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center w-full '>
-          Do not close the app or go back. Please wait for ID <br /> verification as it may take
-          some time. We are validating these checks as per your consent
-        </p>
+        <div>
+          {!sdfcResponse ? (
+            <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-primary-black mt-3 p-1.5 border border-[#E1CE3F] bg-[#FFFAD6] rounded-md'>
+              <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+              Do not close the app or go back. Please wait for ID verification as it may take some
+              time. We are validating these checks as per your consent.
+            </p>
+          ) : (
+            <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-dark-grey mt-3'>
+              <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+              Do not close the app or go back. Please wait for ID verification as it may take some
+              time. We are validating these checks as per your consent.
+            </p>
+          )}
+        </div>
       </div>
 
       <div className='flex flex-col gap-[18px] fixed bottom-0 border-t-[1px] w-full p-4 bg-white'>
