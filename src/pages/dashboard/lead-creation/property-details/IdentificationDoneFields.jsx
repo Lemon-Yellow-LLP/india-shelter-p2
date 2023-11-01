@@ -29,6 +29,7 @@ const IdentificationDoneFields = ({
   const { token } = useContext(AuthContext);
 
   const [showMap, setShowMap] = useState(false);
+  const [propertyValueEstimateError, setPropertyValueEstimateError] = useState('');
 
   // const onMapButtonClick = useCallback(() => {
   //   setShowMap((prev) => !prev);
@@ -140,6 +141,9 @@ const IdentificationDoneFields = ({
         'property_details.property_value_estimate',
         'Property estimation value should be greater than Loan Amount',
       );
+      setPropertyValueEstimateError('Property estimation value should be greater than Loan Amount');
+    } else {
+      setPropertyValueEstimateError('');
     }
   }, [
     values?.property_details?.property_value_estimate,
@@ -156,7 +160,7 @@ const IdentificationDoneFields = ({
           required
           placeholder='1,00,000'
           value={values?.property_details?.property_value_estimate}
-          error={errors?.property_details?.property_value_estimate}
+          error={errors?.property_details?.property_value_estimate || propertyValueEstimateError}
           touched={touched.property_details?.property_value_estimate}
           onChange={(e) => {
             handleChange(e);
@@ -203,6 +207,10 @@ const IdentificationDoneFields = ({
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             } else {
+              editPropertyById(values?.property_details?.id, {
+                property_value_estimate: '',
+              });
+
               if (requiredFieldsStatus[name]) {
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
               }

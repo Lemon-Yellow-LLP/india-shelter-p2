@@ -46,6 +46,7 @@ const LnTCharges = () => {
 
   const { token } = useContext(AuthContext);
 
+  const { phoneNumberList } = useContext(AuthContext);
   const amount =
     values?.applicants?.[activeIndex]?.applicant_details?.bre_101_response?.body?.Display?.[
       'L&T_Charges'
@@ -366,13 +367,19 @@ const LnTCharges = () => {
                         name='lnt_mobile_number.mobile_number'
                         value={mobile_number}
                         onChange={handleOnPhoneNumberChange}
-                        error={errors?.lnt_mobile_number?.mobile_number}
+                        error={
+                          errors?.lnt_mobile_number?.mobile_number ||
+                          (phoneNumberList?.lo && phoneNumberList.lo == mobile_number
+                            ? 'Mobile number cannot be same as Lo number'
+                            : '')
+                        }
                         touched={touched?.lnt_mobile_number?.mobile_number}
                         onOTPSendClick={sendPaymentLink}
                         disabledOtpButton={
                           !mobile_number ||
                           !!errors?.lnt_mobile_number?.mobile_number ||
-                          hasSentOTPOnce
+                          hasSentOTPOnce ||
+                          phoneNumberList?.lo == mobile_number
                         }
                         hideOTPButton={hasSentOTPOnce}
                         disabled={disablePhoneNumber}

@@ -373,12 +373,8 @@ async function checkExistingCustomer(body, token) {
     mode: 'no-cors',
   };
 
-  await fetch(
-    'https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run',
-    requestOptions2,
-  ).then((res) => {
-    return res;
-  });
+  await fetch('https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run', body);
+  return res.data.body;
 }
 
 // L&T

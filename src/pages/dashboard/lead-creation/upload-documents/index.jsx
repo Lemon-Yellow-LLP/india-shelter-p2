@@ -2003,9 +2003,8 @@ const UploadDocuments = () => {
         },
       );
 
-      setRequiredFieldsStatus({ ...extra_params.upload_required_fields_status });
       setRequiredFieldsStatus((prev) => {
-        let requiredFields = prev;
+        let requiredFields = { ...extra_params.upload_required_fields_status };
         if (
           values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
           document_meta?.salary_slip_photos?.find((slip) => slip?.active)
@@ -2018,6 +2017,21 @@ const UploadDocuments = () => {
           requiredFields = {
             ...requiredFields,
             salary_slip: false,
+          };
+        }
+
+        if (
+          values?.property_details?.property_identification_is === 'not-yet' ||
+          document_meta?.property_image?.find((slip) => slip?.active)
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            property_image: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            property_image: false,
           };
         }
 
@@ -2321,7 +2335,7 @@ const UploadDocuments = () => {
                   setUploads={setIdProofUploads}
                   setEdit={setEditIdProof}
                   setLatLong={setIdProofLatLong}
-                  error={
+                  errorMessage={
                     preview === location.pathname &&
                     values?.applicants?.[activeIndex]?.applicant_details?.extra_params
                       ?.upload_required_fields_status?.id_proof == false
@@ -2674,26 +2688,28 @@ const UploadDocuments = () => {
             }
           />
 
-          <ImageUpload
-            files={propertyPhotos}
-            setFile={setPropertyPhotos}
-            uploads={propertyUploads}
-            setUploads={setPropertyUploads}
-            setEdit={setEditProperty}
-            label='Property image'
-            required
-            hint='File size should be less than 5MB'
-            setSingleFile={setPropertyPhotosFile}
-            setLatLong={setPropertyLatLong}
-            imageArrayBorder={true}
-            errorMessage={
-              preview === location.pathname &&
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                ?.upload_required_fields_status?.property_image == false
-                ? 'This field is mandatory'
-                : ''
-            }
-          />
+          {values?.property_details?.property_identification_is !== 'not-yet' && (
+            <ImageUpload
+              files={propertyPhotos}
+              setFile={setPropertyPhotos}
+              uploads={propertyUploads}
+              setUploads={setPropertyUploads}
+              setEdit={setEditProperty}
+              label='Property image'
+              required
+              hint='File size should be less than 5MB'
+              setSingleFile={setPropertyPhotosFile}
+              setLatLong={setPropertyLatLong}
+              imageArrayBorder={true}
+              errorMessage={
+                preview === location.pathname &&
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                  ?.upload_required_fields_status?.property_image == false
+                  ? 'This field is mandatory'
+                  : ''
+              }
+            />
+          )}
 
           <div>
             <div className='flex justify-between gap-2'>

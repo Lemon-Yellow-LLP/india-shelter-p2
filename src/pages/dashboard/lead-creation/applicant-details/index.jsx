@@ -368,94 +368,57 @@ const ApplicantDetails = () => {
           setShowOTPInput(true);
           setHasSentOTPOnce(true);
           setToastMessage('OTP has been sent to your mail id');
-          const bodyForExistingCustomer = JSON.stringify({
+
+          const bodyForExistingCustomer = {
             resource: '/customer_check',
             path: '/customer_check',
             httpMethod: 'POST',
             auth: 'exi$t_Sys@85',
             'source flag': '1',
             body: {
-              DOB: values.applicants[activeIndex]?.applicant_details.date_of_birth,
-              'Mobile Number': values.applicants[activeIndex]?.applicant_details.mobile_number,
-              Product: values.lead.loan_type,
+              loan_type: values.lead.loan_type,
+              date_of_birth: values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth,
+              mobile_number: values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
             },
-          });
-
-          const responce = await checkExistingCustomer(bodyForExistingCustomer, token);
-
-          const { body } = {
-            ErrorCode: 200,
-            body: [
-              {
-                is_existing_customer: 'TRUE',
-                pre_approved_amount: '1000000',
-
-                id_type: 'PAN',
-                id_number: 'AAAPB2117A',
-
-                selected_address_proof: 'AADHAR',
-                address_proof_number: '654987321659',
-
-                first_name: 'SANTOSH YADAV',
-                middle_name: '',
-                last_name: '',
-
-                gender: 'MALE',
-                father_husband_name: 'XYZ',
-                mother_name: 'XYZ',
-
-                current_flat_no_building_name: '12',
-                current_street_area_locality: 'Thane',
-                current_town: 'Delhi',
-                current_landmark: 'ABC',
-                current_pincode: '421202',
-                current_city: 'Dombivli',
-                current_state: 'Maharashtra',
-                current_no_of_year_residing: '20',
-                permanent_flat_no_building_name: '12',
-                permanent_street_area_locality: 'Thane',
-                permanent_town: 'Delhi',
-                permanent_landmark: 'ABC',
-                permanent_pincode: '421202',
-                permanent_city: 'Dombivli',
-                permanent_state: 'Maharashtra',
-                permanent_no_of_year_residing: '20',
-              },
-            ],
           };
 
-          let {
-            id_type,
-            id_number,
-            selected_address_proof,
-            address_proof_number,
-            first_name,
-            middle_name,
-            last_name,
-            gender,
-            father_husband_name,
-            mother_name,
-          } = body[0];
+          await checkExistingCustomer(bodyForExistingCustomer, token)
+            .then((body) => {
+              if (body && body?.length !== 0) {
+                const { loan_type, ...dataWithoutLoanType } = body[0];
 
-          let newData = { ...values };
+                setFieldValue(`applicants[${activeIndex}].applicant_details`, {
+                  ...values?.applicants[activeIndex]?.applicant_details,
+                  ...dataWithoutLoanType,
+                });
 
-          newData.personal_details = {
-            id_type,
-            id_number,
-            selected_address_proof,
-            address_proof_number,
-            first_name,
-            middle_name,
-            last_name,
-            gender,
-            father_husband_name,
-            mother_name,
-          };
-          // setValues(newData);
-          // setFieldValue(
-          //   `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
-          //   true,
-          // );
+                editFieldsById(
+                  values?.applicants[activeIndex]?.applicant_details?.id,
+                  'applicant',
+                  {
+                    ...values?.applicants[activeIndex]?.applicant_details,
+                    ...dataWithoutLoanType,
+                    extra_params: {
+                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                      is_existing: true,
+                    },
+                  },
+                  {
+                    headers: {
+                      Authorization: token,
+                    },
+                  },
+                );
+
+                setFieldValue(
+                  `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                  true,
+                );
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         });
       });
     } else {
@@ -638,7 +601,7 @@ const ApplicantDetails = () => {
             touched={
               touched?.applicants && touched?.applicants[activeIndex]?.applicant_details?.first_name
             }
-            onBlur={(e) => {
+            onBlur={async (e) => {
               handleBlur(e);
               const name = e.currentTarget.name.split('.')[2];
               if (
@@ -652,11 +615,31 @@ const ApplicantDetails = () => {
                 if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
                   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                 }
+
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      first_name: values?.applicants?.[activeIndex]?.applicant_details?.first_name,
+                    },
+                  );
+                }
               } else {
                 if (requiredFieldsStatus[name] !== undefined) {
                   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                 }
                 updateFieldsApplicant(name, '');
+
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      first_name: '',
+                    },
+                  );
+                }
               }
             }}
             disabled={
@@ -683,7 +666,7 @@ const ApplicantDetails = () => {
                   inputDisabled ||
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
-                onBlur={(e) => {
+                onBlur={async (e) => {
                   handleBlur(e);
                   const name = e.currentTarget.name.split('.')[2];
                   if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
@@ -691,8 +674,28 @@ const ApplicantDetails = () => {
                       name,
                       values.applicants[activeIndex]?.applicant_details?.[name],
                     );
+
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          middle_name:
+                            values?.applicants?.[activeIndex]?.applicant_details?.middle_name,
+                        },
+                      );
+                    }
                   } else {
                     updateFieldsApplicant(name, '');
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          middle_name: '',
+                        },
+                      );
+                    }
                   }
                 }}
                 onChange={handleTextInputChange}
@@ -717,7 +720,7 @@ const ApplicantDetails = () => {
                 onChange={handleTextInputChange}
                 inputClasses='capitalize'
                 // onFocus={datePickerScrollToTop}
-                onBlur={(e) => {
+                onBlur={async (e) => {
                   handleBlur(e);
                   const name = e.currentTarget.name.split('.')[2];
                   if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
@@ -725,8 +728,28 @@ const ApplicantDetails = () => {
                       name,
                       values.applicants[activeIndex]?.applicant_details?.[name],
                     );
+
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          last_name:
+                            values?.applicants?.[activeIndex]?.applicant_details?.last_name,
+                        },
+                      );
+                    }
                   } else {
                     updateFieldsApplicant(name, '');
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          last_name: '',
+                        },
+                      );
+                    }
                   }
                 }}
               />
@@ -898,13 +921,13 @@ const ApplicantDetails = () => {
           }
           onNextClick={() => {
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
               ? setOpenExistingPopup(true)
               : setCurrentStepIndex(1);
           }}
           linkNext={
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
               ? undefined
               : '/lead/personal-details'
           }
@@ -913,16 +936,17 @@ const ApplicantDetails = () => {
         <SwipeableDrawerComponent />
       </div>
 
-      <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='223px'>
-        <div className='z-[6000] h-full w-full flex flex-col'>
-          <span className='font-normal text-center leading-[21px] text-[16px] text-black '>
-            This is an existing customer and is already pre-approved for a loan upto
-          </span>
-          <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
+      {openExistingPopup ? (
+        <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='223px'>
+          <div className='z-[6000] h-full w-full flex flex-col'>
+            <span className='font-normal text-center leading-[21px] text-[16px] text-black '>
+              This is an existing customer and is already pre-approved for a loan upto
+            </span>
             {
               values?.applicants?.[activeIndex]?.applicant_details
-                ?.existing_customer_pre_approved_amount
-                ? parseInt(
+                ?.existing_customer_pre_approved_amount ? (
+                <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
+                  {parseInt(
                     values.applicants?.[activeIndex].applicant_details
                       .existing_customer_pre_approved_amount,
                   )
@@ -930,21 +954,43 @@ const ApplicantDetails = () => {
                       style: 'currency',
                       currency: 'INR',
                     })
-                    .replace('.00', '')
-                : 'N/A' // Display 'N/A' or some other fallback if the value is undefined
+                    .replace('.00', '')}
+                  /-
+                </span>
+              ) : (
+                <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
+                  N/A
+                </span>
+              ) // Display 'N/A' or some other fallback if the value is undefined
             }
-            /-
-          </span>
-          <Button
-            primary={true}
-            inputClasses='w-full h-[46px]'
-            onClick={() => setCurrentStepIndex(1)}
-            link='/lead/personal-details'
-          >
-            Continue
-          </Button>
-        </div>
-      </DynamicDrawer>
+            <Button
+              primary={true}
+              inputClasses='w-full h-[46px]'
+              onClick={() => {
+                setFieldValue(
+                  `applicants[${activeIndex}].applicant_details.extra_params.is_existing_done`,
+                  true,
+                );
+                editFieldsById(
+                  values?.applicants[activeIndex]?.applicant_details?.id,
+                  'applicant',
+                  {
+                    extra_params: {
+                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                      is_existing_done: true,
+                    },
+                  },
+                );
+                setOpenExistingPopup(false);
+                setCurrentStepIndex(1);
+              }}
+              link='/lead/personal-details'
+            >
+              Continue
+            </Button>
+          </div>
+        </DynamicDrawer>
+      ) : null}
     </>
   );
 };
