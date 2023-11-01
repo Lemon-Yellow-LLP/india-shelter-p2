@@ -348,13 +348,33 @@ const ApplicantDetails = () => {
           await checkExistingCustomer(bodyForExistingCustomer)
             .then((body) => {
               if (body && body?.length !== 0) {
-                const { loan_type, ...dataWithoutLoanType } = body[0];
+                const { existing_customer_is_existing_customer } = body[0];
+                if (
+                  existing_customer_is_existing_customer &&
+                  existing_customer_is_existing_customer?.toLowercase() === 'false'
+                ) {
+                  editFieldsById(
+                    values?.applicants[activeIndex]?.applicant_details?.id,
+                    'applicant',
+                    {
+                      extra_params: {
+                        ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                        is_existing: false,
+                      },
+                    },
+                  );
+                  setFieldValue(
+                    `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                    false,
+                  );
+                  return;
+                }
 
+                const { loan_type, ...dataWithoutLoanType } = body[0];
                 setFieldValue(`applicants[${activeIndex}].applicant_details`, {
                   ...values?.applicants[activeIndex]?.applicant_details,
                   ...dataWithoutLoanType,
                 });
-
                 editFieldsById(
                   values?.applicants[activeIndex]?.applicant_details?.id,
                   'applicant',
@@ -367,15 +387,39 @@ const ApplicantDetails = () => {
                     },
                   },
                 );
-
                 setFieldValue(
                   `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
                   true,
+                );
+              } else {
+                editFieldsById(
+                  values?.applicants[activeIndex]?.applicant_details?.id,
+                  'applicant',
+                  {
+                    extra_params: {
+                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                      is_existing: false,
+                    },
+                  },
+                );
+                setFieldValue(
+                  `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                  false,
                 );
               }
             })
             .catch((err) => {
               console.log(err);
+              editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
+                extra_params: {
+                  ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                  is_existing: false,
+                },
+              });
+              setFieldValue(
+                `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                false,
+              );
             });
         });
       });
