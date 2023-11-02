@@ -49,7 +49,6 @@ const UploadDocuments = () => {
     setOtpFailCount,
   } = useContext(AuthContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
-
   const [customerPhotos, setCustomerPhotos] = useState([]);
   const [customerPhotosFile, setCustomerPhotosFile] = useState(null);
   const [customerUploads, setCustomerUploads] = useState(null);
@@ -133,6 +132,8 @@ const UploadDocuments = () => {
   const [mobileVerified, setMobileVerified] = useState(values?.is_mobile_verified);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(false);
+
+  const isCoApplicant = values?.applicants?.[activeIndex]?.applicant_details?.is_primary == false;
 
   const idRef = useRef();
   const addressRef = useRef();
@@ -1768,10 +1769,11 @@ const UploadDocuments = () => {
       );
 
       setRequiredFieldsStatus((prev) => {
-        let requiredFields = { ...extra_params.upload_required_fields_status };
+        let requiredFields = structuredClone(extra_params.upload_required_fields_status);
         if (
           values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
-          document_meta?.salary_slip_photos?.find((slip) => slip?.active)
+          document_meta?.salary_slip_photos?.find((slip) => slip?.active) ||
+          isCoApplicant
         ) {
           requiredFields = {
             ...requiredFields,
@@ -1786,7 +1788,8 @@ const UploadDocuments = () => {
 
         if (
           values?.property_details?.property_identification_is === 'not-yet' ||
-          document_meta?.property_image?.find((slip) => slip?.active)
+          document_meta?.property_image?.find((slip) => slip?.active) ||
+          isCoApplicant
         ) {
           requiredFields = {
             ...requiredFields,
@@ -1801,7 +1804,8 @@ const UploadDocuments = () => {
 
         if (
           values?.property_details?.property_identification_is === 'not-yet' ||
-          document_meta?.property_paper_photos?.find((slip) => slip?.active)
+          document_meta?.property_paper_photos?.find((slip) => slip?.active) ||
+          isCoApplicant
         ) {
           requiredFields = {
             ...requiredFields,
@@ -1811,6 +1815,18 @@ const UploadDocuments = () => {
           requiredFields = {
             ...requiredFields,
             property_paper: false,
+          };
+        }
+
+        if (document_meta?.lo_selfie?.find((slip) => slip?.active) || isCoApplicant) {
+          requiredFields = {
+            ...requiredFields,
+            upload_selfie: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            upload_selfie: false,
           };
         }
         return requiredFields;
@@ -2373,7 +2389,7 @@ const UploadDocuments = () => {
             </div>
           </div>
 
-          {values?.property_details?.property_identification_is !== 'not-yet' && (
+          {values?.property_details?.property_identification_is !== 'not-yet' && !isCoApplicant && (
             <PdfAndImageUpload
               files={propertyPapers}
               setFile={setPropertyPapers}
@@ -2442,7 +2458,7 @@ const UploadDocuments = () => {
             }
           />
 
-          {values?.property_details?.property_identification_is !== 'not-yet' && (
+          {values?.property_details?.property_identification_is !== 'not-yet' && !isCoApplicant && (
             <ImageUpload
               files={propertyPhotos}
               setFile={setPropertyPhotos}
@@ -2465,51 +2481,53 @@ const UploadDocuments = () => {
             />
           )}
 
-          <div>
-            <div className='flex justify-between gap-2'>
-              <div className={selfieUploads ? 'w-[65%]' : 'w-full'}>
-                <PhotoUpload
-                  files={selfie}
-                  setFile={setSelfie}
-                  setSingleFile={setSelfieFile}
-                  uploads={selfieUploads}
-                  setUploads={setSelfieUploads}
-                  setLatLong={setLoSelfieLatLong}
-                  label='Upload selfie'
-                  required
-                  errorMessage={
-                    preview === location.pathname &&
-                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                      ?.upload_required_fields_status?.upload_selfie == false
-                      ? 'This field is mandatory'
-                      : ''
-                  }
-                />
+          {!isCoApplicant ? (
+            <div>
+              <div className='flex justify-between gap-2'>
+                <div className={selfieUploads ? 'w-[65%]' : 'w-full'}>
+                  <PhotoUpload
+                    files={selfie}
+                    setFile={setSelfie}
+                    setSingleFile={setSelfieFile}
+                    uploads={selfieUploads}
+                    setUploads={setSelfieUploads}
+                    setLatLong={setLoSelfieLatLong}
+                    label='Upload selfie'
+                    required
+                    errorMessage={
+                      preview === location.pathname &&
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                        ?.upload_required_fields_status?.upload_selfie == false
+                        ? 'This field is mandatory'
+                        : ''
+                    }
+                  />
+                </div>
+
+                {selfieUploads && (
+                  <button
+                    className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
+                      mobileVerified || hasSentOTPOnce || selfie.length === 0
+                        ? 'text-dark-grey bg-stroke pointer-events-none'
+                        : 'bg-primary-red text-white'
+                    }`}
+                    onClick={sendMobileOtp}
+                  >
+                    Send OTP
+                  </button>
+                )}
               </div>
 
-              {selfieUploads && (
-                <button
-                  className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
-                    mobileVerified || hasSentOTPOnce || selfie.length === 0
-                      ? 'text-dark-grey bg-stroke pointer-events-none'
-                      : 'bg-primary-red text-white'
-                  }`}
-                  onClick={sendMobileOtp}
-                >
-                  Send OTP
-                </button>
+              {mobileVerified && !showOTPInput && selfie.length >= 1 && (
+                <span className='flex text-primary-black text-xs leading-[18px] mt-2'>
+                  OTP Verified
+                  <img src={otpVerified} alt='Otp Verified' role='presentation' />
+                </span>
               )}
             </div>
+          ) : null}
 
-            {mobileVerified && !showOTPInput && selfie.length >= 1 && (
-              <span className='flex text-primary-black text-xs leading-[18px] mt-2'>
-                OTP Verified
-                <img src={otpVerified} alt='Otp Verified' role='presentation' />
-              </span>
-            )}
-          </div>
-
-          {showOTPInput && selfie.length >= 1 ? (
+          {showOTPInput && selfie.length >= 1 && !isCoApplicant ? (
             <OtpInputNoEdit
               label='Enter OTP'
               required
