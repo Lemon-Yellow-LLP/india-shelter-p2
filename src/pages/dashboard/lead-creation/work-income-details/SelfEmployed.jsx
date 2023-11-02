@@ -5,18 +5,30 @@ import DropDown from '../../../../components/DropDown';
 import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
 import { industriesOptions } from './WorkIncomeDropdownData';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, errors, handleBlur, touched, setFieldValue, setFieldError, activeIndex } =
     useContext(LeadContext);
 
+  const { token } = useContext(AuthContext);
+
   const handleDropdownChange = useCallback(
     (name, value) => {
       setFieldValue(name, value);
 
-      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-        industries: value,
-      });
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.work_income_detail?.id,
+        'work-income',
+        {
+          industries: value,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
 
       if (!requiredFieldsStatus['industries']) {
         setRequiredFieldsStatus((prev) => ({
@@ -65,6 +77,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               {
                 business_name: values?.applicants?.[activeIndex]?.work_income_detail?.business_name,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             setRequiredFieldsStatus((prev) => ({
@@ -77,6 +94,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               'work-income',
               {
                 business_name: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }
@@ -154,6 +176,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
                     extra_industries: 'Others',
                   },
                 },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
               );
             } else {
               editFieldsById(
@@ -163,6 +190,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
                   industries: '',
                   extra_params: {
                     extra_industries: '',
+                  },
+                },
+                {
+                  headers: {
+                    Authorization: token,
                   },
                 },
               );
@@ -217,6 +249,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               {
                 gst_number: values?.applicants?.[activeIndex]?.work_income_detail?.gst_number,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             editFieldsById(
@@ -224,6 +261,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               'work-income',
               {
                 gst_number: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }
@@ -268,6 +310,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
                   values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan,
                 ),
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
 
             setRequiredFieldsStatus((prev) => ({
@@ -282,6 +329,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
                 'work-income',
                 {
                   ongoing_emi: null,
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
                 },
               );
 
@@ -312,6 +364,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               'work-income',
               {
                 no_current_loan: 0,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }
@@ -357,6 +414,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               {
                 ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             setRequiredFieldsStatus((prev) => ({
@@ -369,6 +431,11 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               'work-income',
               {
                 ongoing_emi: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }

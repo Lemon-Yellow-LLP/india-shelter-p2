@@ -23,6 +23,7 @@ import DrawerStepBanking from './DrawerStepBanking';
 import QualifierStep from './QualifierStep';
 import EligibilityStep from './EligibilityStep';
 import UploadSteps from './UplodSteps';
+import { AuthContext } from '../../../context/AuthContextProvider';
 
 const drawerBleeding = 0;
 
@@ -77,6 +78,8 @@ export default function SwipeableDrawerComponent() {
     setActiveCoApplicantIndex,
     coApplicants,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const theme = useTheme();
 
@@ -136,12 +139,26 @@ export default function SwipeableDrawerComponent() {
         is_primary: true,
         applicant_type: 'Primary Applicant',
       },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
 
-    await editFieldsById(values?.applicants[primaryIndex]?.applicant_details?.id, 'applicant', {
-      is_primary: false,
-      applicant_type: 'Co Applicant',
-    });
+    await editFieldsById(
+      values?.applicants[primaryIndex]?.applicant_details?.id,
+      'applicant',
+      {
+        is_primary: false,
+        applicant_type: 'Co Applicant',
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     setChangePrimaryAlert(false);
   };
@@ -167,6 +184,11 @@ export default function SwipeableDrawerComponent() {
       'applicant',
       {
         is_deleted: true,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
       },
     );
 

@@ -6,10 +6,13 @@ import SearchableTextInput from '../../../../components/TextInput/SearchableText
 import CurrencyInput from '../../../../components/CurrencyInput';
 import { editFieldsById, getCompanyNamesList } from '../../../../global';
 import { workingSinceOptions, modeOfSalary } from './WorkIncomeDropdownData';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, errors, touched, handleBlur, setFieldValue, setFieldError, activeIndex } =
     useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const [companyNameOptions, setCompanyNameOptions] = useState([]);
 
@@ -18,9 +21,18 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
       setFieldValue(name, value?.value);
       const new_name = name.split('.')[2];
 
-      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-        [new_name]: value?.value,
-      });
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.work_income_detail?.id,
+        'work-income',
+        {
+          [new_name]: value?.value,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
 
       if (!requiredFieldsStatus[new_name]) {
         setRequiredFieldsStatus((prev) => ({
@@ -35,7 +47,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
   useEffect(() => {
     const getCompanies = async () => {
       try {
-        const data = await getCompanyNamesList();
+        const data = await getCompanyNamesList({
+          headers: {
+            Authorization: token,
+          },
+        });
 
         if (!data) return;
 
@@ -60,9 +76,18 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
   const handleDropdownChange = useCallback(
     (value) => {
       setFieldValue(`applicants[${activeIndex}].work_income_detail.mode_of_salary`, value);
-      editFieldsById(values?.applicants?.[activeIndex]?.work_income_detail?.id, 'work-income', {
-        mode_of_salary: value,
-      });
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.work_income_detail?.id,
+        'work-income',
+        {
+          mode_of_salary: value,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
 
       if (!requiredFieldsStatus['mode_of_salary']) {
         setRequiredFieldsStatus((prev) => ({
@@ -99,6 +124,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               {
                 company_name: values?.applicants?.[activeIndex]?.work_income_detail?.company_name,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             setRequiredFieldsStatus((prev) => ({
@@ -111,6 +141,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               'work-income',
               {
                 company_name: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }
@@ -155,6 +190,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                     extra_company_name: 'Others',
                   },
                 },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
               );
             } else {
               setRequiredFieldsStatus((prev) => ({
@@ -169,6 +209,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                   company_name: '',
                   extra_params: {
                     extra_company_name: '',
+                  },
+                },
+                {
+                  headers: {
+                    Authorization: token,
                   },
                 },
               );
@@ -216,6 +261,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               {
                 total_income: values?.applicants?.[activeIndex]?.work_income_detail?.total_income,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             setRequiredFieldsStatus((prev) => ({
@@ -228,6 +278,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               'work-income',
               {
                 total_income: 0,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }
@@ -271,6 +326,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               {
                 pf_uan: values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             editFieldsById(
@@ -278,6 +338,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               'work-income',
               {
                 pf_uan: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }
@@ -340,6 +405,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                   values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan,
                 ),
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
 
             setRequiredFieldsStatus((prev) => ({
@@ -354,6 +424,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                 'work-income',
                 {
                   ongoing_emi: null,
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
                 },
               );
 
@@ -384,6 +459,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               'work-income',
               {
                 no_current_loan: 0,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }
@@ -430,6 +510,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               {
                 ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             setRequiredFieldsStatus((prev) => ({
@@ -442,6 +527,11 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               'work-income',
               {
                 ongoing_emi: 0,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }

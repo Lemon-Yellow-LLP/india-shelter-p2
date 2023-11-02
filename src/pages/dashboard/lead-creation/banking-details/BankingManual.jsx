@@ -17,6 +17,7 @@ import imageCompression from 'browser-image-compression';
 import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 import PdfAndImageUploadBanking from '../../../../components/PdfAndImageUpload/PdfAndImageUploadBanking';
 import { set } from 'date-fns';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export const entityType = [
   {
@@ -89,6 +90,8 @@ export default function BankingManual() {
     setBankSuccessTost,
     setBankErrorTost,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const {
     values,
@@ -206,9 +209,18 @@ export default function BankingManual() {
     if (preFilledData) {
       valuesData = { ...valuesData, banking_id: preFilledData?.id };
 
-      await editFieldsById(preFilledData?.id, 'banking', {
-        ...values,
-      });
+      await editFieldsById(
+        preFilledData?.id,
+        'banking',
+        {
+          ...values,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
     }
 
     await axios
@@ -431,6 +443,7 @@ export default function BankingManual() {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -496,6 +509,7 @@ export default function BankingManual() {
       const res = await reUploadDoc(editBankStatement.id, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          Authorization: token,
         },
       });
 

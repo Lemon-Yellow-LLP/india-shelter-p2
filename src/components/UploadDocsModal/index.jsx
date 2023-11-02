@@ -7,7 +7,7 @@ import { getUserById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
 
 const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, singlePhoto }) => {
-  const { loData } = useContext(AuthContext);
+  const { loData, token } = useContext(AuthContext);
   const { values, activeIndex } = useContext(LeadContext);
   const [activeStep, setActiveStep] = useState(0);
   const [Timestamp, setTimeStamp] = useState(null);
@@ -20,7 +20,11 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, sin
     setTimeStamp(timestamp);
 
     async function getUserData() {
-      const lo_info = await getUserById(loData.session.user_id);
+      const lo_info = await getUserById(loData.session.user_id, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
       setUserData(lo_info);
     }
