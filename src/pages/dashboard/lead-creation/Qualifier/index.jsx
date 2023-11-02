@@ -417,6 +417,7 @@ const Qualifier = () => {
         }
       } catch (err) {
         console.log(err);
+        setBre101((prev) => ({ ...prev, res: true }));
       }
     }
 
@@ -513,7 +514,7 @@ const Qualifier = () => {
             values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN') && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!PAN.ran ? (
+                {/* {!PAN.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -543,7 +544,7 @@ const Qualifier = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>PAN card</p>
               </div>
@@ -561,7 +562,7 @@ const Qualifier = () => {
               'Driving license') && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!DL.ran ? (
+                {/* {!DL.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -591,7 +592,7 @@ const Qualifier = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>Driving license</p>
               </div>
@@ -609,7 +610,7 @@ const Qualifier = () => {
               'Voter ID') && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!voterID.ran ? (
+                {/* {!voterID.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -639,7 +640,7 @@ const Qualifier = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>Voter ID</p>
               </div>
@@ -657,7 +658,7 @@ const Qualifier = () => {
           {values.applicants[activeIndex]?.work_income_detail.pf_uan && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!pfUAN.ran ? (
+                {/* {!pfUAN.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -687,7 +688,7 @@ const Qualifier = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>PF UAN</p>
               </div>
@@ -711,7 +712,7 @@ const Qualifier = () => {
           {values.applicants[activeIndex]?.work_income_detail.gst_number && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!GST.ran ? (
+                {/* {!GST.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -741,7 +742,7 @@ const Qualifier = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>GST</p>
               </div>
@@ -762,7 +763,7 @@ const Qualifier = () => {
 
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
-              {!dedupe.ran ? (
+              {/* {!dedupe.ran ? (
                 <svg
                   width='24'
                   height='24'
@@ -792,7 +793,7 @@ const Qualifier = () => {
                     strokeLinejoin='round'
                   />
                 </svg>
-              )}
+              )} */}
 
               <p className='text-sm text-primary-black'>Dedupe</p>
             </div>
@@ -810,7 +811,7 @@ const Qualifier = () => {
 
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
-              {!bre99.ran ? (
+              {/* {!bre99.ran ? (
                 <svg
                   width='24'
                   height='24'
@@ -840,7 +841,7 @@ const Qualifier = () => {
                     strokeLinejoin='round'
                   />
                 </svg>
-              )}
+              )} */}
 
               <p className='text-sm text-primary-black'>BRE 99</p>
             </div>
@@ -858,7 +859,7 @@ const Qualifier = () => {
 
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
-              {!bureau.ran ? (
+              {/* {!bureau.ran ? (
                 <svg
                   width='24'
                   height='24'
@@ -888,7 +889,7 @@ const Qualifier = () => {
                     strokeLinejoin='round'
                   />
                 </svg>
-              )}
+              )} */}
 
               <p className='text-sm text-primary-black'>Bureau</p>
             </div>
@@ -905,10 +906,19 @@ const Qualifier = () => {
           </div>
         </div>
         <div>
-          <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center'>
-            Do not close the app or go back. Please wait for ID <br /> verification as it may take
-            some time. We are validating these checks as per your consent
-          </p>
+          {!bre101.res ? (
+            <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-primary-black mt-3 p-1.5 border border-[#E1CE3F] bg-[#FFFAD6] rounded-md'>
+              <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+              Do not close the app or go back. Please wait for ID verification as it may take some
+              time. We are validating these checks as per your consent.
+            </p>
+          ) : (
+            <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-dark-grey mt-3'>
+              <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+              Do not close the app or go back. Please wait for ID verification as it may take some
+              time. We are validating these checks as per your consent.
+            </p>
+          )}
         </div>
       </div>
 
