@@ -207,6 +207,11 @@ const BankingDetails = () => {
       .post(
         `https://lo.scotttiger.in/api/applicant/penny-drop/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         { ...data },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       )
       .then(({ data }) => {
         setLoading(false);
@@ -231,6 +236,11 @@ const BankingDetails = () => {
       await axios
         .get(
           `https://lo.scotttiger.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         )
         .then(({ data }) => {
           const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);

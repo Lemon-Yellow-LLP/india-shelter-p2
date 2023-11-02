@@ -13,7 +13,7 @@ const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
 export default function AccountAggregator() {
   const { values, activeIndex, setBankSuccessTost, setFieldValue } = useContext(LeadContext);
-  const { values: authValues } = useContext(AuthContext);
+  const { values: authValues, token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [mobileNo, setMobileNo] = useState('');
   const [mobileNoError, setMobileNoError] = useState('');
@@ -32,6 +32,11 @@ export default function AccountAggregator() {
       .post(
         `https://lo.scotttiger.in/api/applicant/account-aggregator/initiate-by-phone-number/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         { phone_number: mobileNo },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       )
       .then(({ data }) => {
         setReferenceId(data.account_aggregator_response_initiate_by_phone.referenceId);
@@ -50,6 +55,11 @@ export default function AccountAggregator() {
       .post(
         `https://lo.scotttiger.in/api/applicant/account-aggregator/regenerate-redirection-url/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         { referenceId: referenceId },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       )
       .then((res) => {
         setAAInitiated(true);
@@ -68,6 +78,11 @@ export default function AccountAggregator() {
         {
           referenceId: referenceId,
         },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       )
       .then(async ({ data }) => {
         setChecking(false);
@@ -77,6 +92,11 @@ export default function AccountAggregator() {
           await axios
             .get(
               `https://lo.scotttiger.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             )
             .then((res) => {
               const newBanking = res?.data?.filter((bank) => !bank?.extra_params?.is_deleted);
