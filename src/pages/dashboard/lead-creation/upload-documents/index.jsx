@@ -360,7 +360,7 @@ const UploadDocuments = () => {
 
       if (
         pattern2.test(value) &&
-        (e.target.name == `applicants[${activeIndex}].personal_details.father_husband_name` ||
+        (e.target.name == `applicants[${activeIndex}].personal_details.father_name` ||
           e.target.name == `applicants[${activeIndex}].personal_details.mother_name`)
       ) {
         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));

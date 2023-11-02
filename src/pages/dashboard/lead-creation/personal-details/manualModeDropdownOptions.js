@@ -43,18 +43,6 @@ export const manualModeDropdownOptions = [
         label: 'Passport',
         value: 'Passport',
       },
-      {
-        label: 'Gas bill',
-        value: 'Gas bill',
-      },
-      {
-        label: 'Rent agreement',
-        value: 'Rent agreement',
-      },
-      {
-        label: 'Electricity bill',
-        value: 'Electricity bill',
-      },
     ],
   },
   {
