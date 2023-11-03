@@ -69,58 +69,119 @@ const WorkIncomeDetails = () => {
         let _requiredFieldStatus = {};
 
         if (e.value === 'Salaried') {
-          _requiredFieldStatus = {
-            profession: true,
-            company_name: false,
-            total_income: false,
-            working_since: false,
-            mode_of_salary: false,
-            flat_no_building_name: false,
-            street_area_locality: false,
-            town: false,
-            landmark: false,
-            pincode: false,
-            no_current_loan: false,
-            ongoing_emi: false,
-            total_family_number: false,
-            total_household_income: false,
-            no_of_dependents: false,
-          };
+          if (values?.applicants?.[activeIndex]?.is_primary) {
+            _requiredFieldStatus = {
+              profession: true,
+              company_name: false,
+              total_income: false,
+              working_since: false,
+              mode_of_salary: false,
+              flat_no_building_name: false,
+              street_area_locality: false,
+              town: false,
+              landmark: false,
+              pincode: false,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: false,
+              total_household_income: false,
+              no_of_dependents: false,
+            };
+          } else {
+            _requiredFieldStatus = {
+              profession: true,
+              company_name: false,
+              total_income: false,
+              working_since: false,
+              mode_of_salary: false,
+              flat_no_building_name: false,
+              street_area_locality: false,
+              town: false,
+              landmark: false,
+              pincode: false,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: true,
+              total_household_income: true,
+              no_of_dependents: true,
+            };
+          }
         } else if (e.value === 'Self-employed') {
-          _requiredFieldStatus = {
-            profession: true,
-            business_name: false,
-            industries: false,
-            flat_no_building_name: false,
-            street_area_locality: false,
-            town: false,
-            landmark: false,
-            pincode: false,
-            no_current_loan: false,
-            ongoing_emi: false,
-            total_family_number: false,
-            total_household_income: false,
-            no_of_dependents: false,
-          };
+          if (values?.applicants?.[activeIndex]?.is_primary) {
+            _requiredFieldStatus = {
+              profession: true,
+              business_name: false,
+              industries: false,
+              flat_no_building_name: false,
+              street_area_locality: false,
+              town: false,
+              landmark: false,
+              pincode: false,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: false,
+              total_household_income: false,
+              no_of_dependents: false,
+            };
+          } else {
+            _requiredFieldStatus = {
+              profession: true,
+              business_name: false,
+              industries: false,
+              flat_no_building_name: false,
+              street_area_locality: false,
+              town: false,
+              landmark: false,
+              pincode: false,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: true,
+              total_household_income: true,
+              no_of_dependents: true,
+            };
+          }
         } else if (e.value === 'Unemployed') {
-          _requiredFieldStatus = {
-            profession: true,
-            no_current_loan: false,
-            ongoing_emi: false,
-            total_family_number: false,
-            total_household_income: false,
-            no_of_dependents: false,
-          };
+          if (values?.applicants?.[activeIndex]?.is_primary) {
+            _requiredFieldStatus = {
+              profession: true,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: false,
+              total_household_income: false,
+              no_of_dependents: false,
+            };
+          } else {
+            _requiredFieldStatus = {
+              profession: true,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: true,
+              total_household_income: true,
+              no_of_dependents: true,
+            };
+          }
         } else if (e.value === 'Retired') {
-          _requiredFieldStatus = {
-            profession: true,
-            no_current_loan: false,
-            ongoing_emi: false,
-            total_family_number: false,
-            total_household_income: false,
-            no_of_dependents: false,
-            pention_amount: false,
-          };
+          if (values?.applicants?.[activeIndex]?.is_primary) {
+            _requiredFieldStatus = {
+              profession: true,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: false,
+              total_household_income: false,
+              no_of_dependents: false,
+              pention_amount: false,
+            };
+          } else {
+            _requiredFieldStatus = {
+              profession: true,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: true,
+              total_household_income: true,
+              no_of_dependents: true,
+              pention_amount: false,
+            };
+          }
         }
         setRequiredFieldsStatus(_requiredFieldStatus);
 
@@ -442,7 +503,6 @@ const WorkIncomeDetails = () => {
               setRequiredFieldsStatus={setRequiredFieldsStatus}
             />
           )}
-
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Salaried' ||
           values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Self-employed' ? (
             <>
@@ -898,6 +958,7 @@ const WorkIncomeDetails = () => {
           ) : null}
 
           {professionOptions.length &&
+          values?.applicants?.[activeIndex]?.applicant_details.is_primary &&
           values?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
             <>
               <div className='flex flex-col gap-2'>

@@ -1354,7 +1354,8 @@ const Eligibility = () => {
 
                 {faceMatchResponse && (
                   <span className='text-xs font-normal text-light-grey'>
-                    {faceMatchResponse?.main_applicant?.[0]?.Face_match_with_ID_Proof}
+                    {faceMatchResponse?.main_applicant?.[0]?.Face_match_with_ID_Proof ||
+                      faceMatchResponse?.main_applicant?.[0]?.Face_match_with_Address_Proof}
                   </span>
                 )}
               </div>
@@ -1418,10 +1419,10 @@ const Eligibility = () => {
                     {/* {console.log(index + 1)} */}
                     {faceMatchResponse && (
                       <span className='text-xs font-normal text-light-grey'>
-                        {
+                        {faceMatchResponse?.[`co_applicant_${index + 1}`]?.[0]
+                          ?.Face_match_with_ID_Proof ||
                           faceMatchResponse?.[`co_applicant_${index + 1}`]?.[0]
-                            ?.Face_match_with_ID_Proof
-                        }
+                            ?.Face_match_with_Address_Proof}
                       </span>
                     )}
                   </div>
