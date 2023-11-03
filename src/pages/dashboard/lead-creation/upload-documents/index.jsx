@@ -1950,9 +1950,26 @@ const UploadDocuments = () => {
           },
         },
       );
+      setFieldValue(
+        `values?.applicants?.[${activeIndex}]?.applicant_details.document_meta`,
+        document_meta,
+      );
+      let requiredFields = {
+        customer_photo: !!document_meta?.customer_photos?.find((slip) => slip?.active),
+        id_proof: !!document_meta?.id_proof_photos?.find((slip) => slip?.active),
+        address_proof: !!document_meta?.address_proof_photos?.find((slip) => slip?.active),
+        property_paper: !!document_meta?.property_paper_photos?.find((slip) => slip?.active),
+        salary_slip: !!document_meta?.salary_slip_photos?.find((slip) => slip?.active),
+        form_60: !!document_meta?.form_60_photos?.find((slip) => slip?.active),
+        property_image: !!document_meta?.property_photos?.find((slip) => slip?.active),
+        upload_selfie:
+          document_meta?.lo_selfie?.find((slip) => slip?.active) &&
+          extra_params?.is_upload_otp_verified,
+      };
+
+      console.log(document_meta);
 
       setRequiredFieldsStatus((prev) => {
-        let requiredFields = structuredClone(extra_params.upload_required_fields_status);
         if (
           values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
           document_meta?.salary_slip_photos?.find((slip) => slip?.active) ||
@@ -1971,7 +1988,7 @@ const UploadDocuments = () => {
 
         if (
           values?.property_details?.property_identification_is === 'not-yet' ||
-          document_meta?.property_image?.find((slip) => slip?.active) ||
+          document_meta?.property_photos?.find((slip) => slip?.active) ||
           isCoApplicant
         ) {
           requiredFields = {
@@ -2001,7 +2018,11 @@ const UploadDocuments = () => {
           };
         }
 
-        if (document_meta?.lo_selfie?.find((slip) => slip?.active) || isCoApplicant) {
+        if (
+          (document_meta?.lo_selfie?.find((slip) => slip?.active) &&
+            extra_params?.is_upload_otp_verified) ||
+          isCoApplicant
+        ) {
           requiredFields = {
             ...requiredFields,
             upload_selfie: true,
@@ -2753,71 +2774,73 @@ const UploadDocuments = () => {
                 disabled={uanStatus === 'Valid'}
               />
 
-              <div className='flex justify-between mt-1'>
-                <div className='flex items-center gap-1'>
-                  {uanStatus === 'Valid' ? (
-                    <>
-                      <svg
-                        width='18'
-                        height='18'
-                        viewBox='0 0 18 18'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
-                      >
-                        <path
-                          d='M15 4.5L6.75 12.75L3 9'
-                          stroke='#147257'
-                          strokeWidth='1.5'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                        />
-                      </svg>
-                      <span className='text-secondary-green leading-5 text-xs font-normal'>
-                        Verified
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        width='16'
-                        height='16'
-                        viewBox='0 0 16 16'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
-                      >
-                        <g clipPath='url(#clip0_3732_51311)'>
+              {isQaulifierActivated ? (
+                <div className='flex justify-between mt-1'>
+                  <div className='flex items-center gap-1'>
+                    {uanStatus === 'Valid' ? (
+                      <>
+                        <svg
+                          width='18'
+                          height='18'
+                          viewBox='0 0 18 18'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
                           <path
-                            d='M8 5.28003V8.3867'
-                            stroke='#E33439'
+                            d='M15 4.5L6.75 12.75L3 9'
+                            stroke='#147257'
                             strokeWidth='1.5'
                             strokeLinecap='round'
                             strokeLinejoin='round'
                           />
-                          <path
-                            d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
-                            fill='#E33439'
-                          />
-                          <path
-                            d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
-                            stroke='#E33439'
-                            strokeWidth='1.5'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                          />
-                        </g>
-                        <defs>
-                          <clipPath id='clip0_3732_51311'>
-                            <rect width='16' height='16' fill='white' />
-                          </clipPath>
-                        </defs>
-                      </svg>
-                      <span className='text-primary-red leading-5 text-xs font-normal'>
-                        Not Verified
-                      </span>
-                    </>
-                  )}
+                        </svg>
+                        <span className='text-secondary-green leading-5 text-xs font-normal'>
+                          Verified
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <g clipPath='url(#clip0_3732_51311)'>
+                            <path
+                              d='M8 5.28003V8.3867'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                            <path
+                              d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
+                              fill='#E33439'
+                            />
+                            <path
+                              d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id='clip0_3732_51311'>
+                              <rect width='16' height='16' fill='white' />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <span className='text-primary-red leading-5 text-xs font-normal'>
+                          Not Verified
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           ) : null}
 
@@ -2882,71 +2905,73 @@ const UploadDocuments = () => {
                 }}
                 disabled={gstStatus === 'Valid'}
               />
-              <div className='flex justify-between mt-1'>
-                <div className='flex items-center gap-1'>
-                  {gstStatus === 'Valid' ? (
-                    <>
-                      <svg
-                        width='18'
-                        height='18'
-                        viewBox='0 0 18 18'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
-                      >
-                        <path
-                          d='M15 4.5L6.75 12.75L3 9'
-                          stroke='#147257'
-                          strokeWidth='1.5'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                        />
-                      </svg>
-                      <span className='text-secondary-green leading-5 text-xs font-normal'>
-                        Verified
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        width='16'
-                        height='16'
-                        viewBox='0 0 16 16'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
-                      >
-                        <g clipPath='url(#clip0_3732_51311)'>
+              {isQaulifierActivated ? (
+                <div className='flex justify-between mt-1'>
+                  <div className='flex items-center gap-1'>
+                    {gstStatus === 'Valid' ? (
+                      <>
+                        <svg
+                          width='18'
+                          height='18'
+                          viewBox='0 0 18 18'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
                           <path
-                            d='M8 5.28003V8.3867'
-                            stroke='#E33439'
+                            d='M15 4.5L6.75 12.75L3 9'
+                            stroke='#147257'
                             strokeWidth='1.5'
                             strokeLinecap='round'
                             strokeLinejoin='round'
                           />
-                          <path
-                            d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
-                            fill='#E33439'
-                          />
-                          <path
-                            d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
-                            stroke='#E33439'
-                            strokeWidth='1.5'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                          />
-                        </g>
-                        <defs>
-                          <clipPath id='clip0_3732_51311'>
-                            <rect width='16' height='16' fill='white' />
-                          </clipPath>
-                        </defs>
-                      </svg>
-                      <span className='text-primary-red leading-5 text-xs font-normal'>
-                        Not Verified
-                      </span>
-                    </>
-                  )}
+                        </svg>
+                        <span className='text-secondary-green leading-5 text-xs font-normal'>
+                          Verified
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <g clipPath='url(#clip0_3732_51311)'>
+                            <path
+                              d='M8 5.28003V8.3867'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                            <path
+                              d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
+                              fill='#E33439'
+                            />
+                            <path
+                              d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id='clip0_3732_51311'>
+                              <rect width='16' height='16' fill='white' />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <span className='text-primary-red leading-5 text-xs font-normal'>
+                          Not Verified
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           ) : null}
 
