@@ -15,6 +15,7 @@ function PhotoUpload({
   hint,
   setLatLong,
   errorMessage,
+  disabled,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
@@ -208,7 +209,11 @@ function PhotoUpload({
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
             {message}
           </span>
-          <div className='bg-white border-x border-y border-stroke rounded-lg p-2 flex justify-between mt-1'>
+          <div
+            className={` border-x border-y border-stroke rounded-lg p-2 flex justify-between mt-1 ${
+              disabled ? 'bg-stroke pointer-events-none' : 'bg-white pointer-events-auto'
+            }`}
+          >
             <div className='flex gap-2 items-center'>
               <div className='relative rounded-md h-10 w-10'>
                 <div className='absolute h-full w-full bg-black opacity-40'></div>

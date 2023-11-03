@@ -7,7 +7,7 @@ import PdfAndImageUpload from '../../../../components/PdfAndImageUpload';
 import PhotoUpload from '../../../../components/PhotoUpload';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { manualModeDropdownOptions } from '../personal-details/manualModeDropdownOptions';
-import { DropDown, ToastMessage, UploadDocsInput } from '../../../../components';
+import { DropDown, TextInput, ToastMessage, UploadDocsInput } from '../../../../components';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import OtpInputNoEdit from '../../../../components/OtpInput/OtpInputNoEdit';
 import {
@@ -128,6 +128,8 @@ const UploadDocuments = () => {
   const [editAddressNumber, setEditAddressNumber] = useState(false);
   const [idStatus, setIdSatus] = useState(null);
   const [addressStatus, setAddressSatus] = useState(null);
+  const [uanStatus, setUanStatus] = useState(null);
+  const [gstStatus, setGstStatus] = useState(null);
 
   const [showOTPInput, setShowOTPInput] = useState(false);
   const [mobileVerified, setMobileVerified] = useState(values?.is_mobile_verified);
@@ -188,6 +190,8 @@ const UploadDocuments = () => {
 
       if (res.bre_101_response) {
         const bre_Display_body = res.bre_101_response.body.Display;
+        setUanStatus(bre_Display_body?.UAN_Status);
+        setGstStatus(bre_Display_body?.GST_Status);
 
         const id_type = values?.applicants?.[activeIndex]?.personal_details?.id_type;
         const address_type =
@@ -2727,11 +2731,288 @@ const UploadDocuments = () => {
             />
           )}
 
+          {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' ? (
+            <div>
+              <TextInput
+                label='PF UAN'
+                placeholder='Eg: 100563503285'
+                type='number'
+                pattern='\d*'
+                name={`applicants[${activeIndex}].work_income_detail.pf_uan`}
+                value={values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
+                error={errors?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
+                touched={touched?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
+                onBlur={(e) => {
+                  handleBlur(e);
+                  if (
+                    !errors?.applicants?.[activeIndex]?.work_income_detail?.pf_uan &&
+                    values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan
+                  ) {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        pf_uan: values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+                  } else {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        pf_uan: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+                  }
+                }}
+                onChange={(e) => {
+                  let value = e.currentTarget.value;
+                  if (value.length > 12) {
+                    return;
+                  }
+
+                  if (value < 0) {
+                    value = '';
+                  }
+
+                  const address_pattern = /^\d+$/;
+                  if (!address_pattern.test(value) && value.length > 0) {
+                    return;
+                  }
+
+                  setFieldValue(
+                    e.currentTarget.name,
+                    value.charAt(0).toUpperCase() + value.slice(1),
+                  );
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Backspace') {
+                    setFieldValue(
+                      `applicants[${activeIndex}].work_income_detail.pf_uan`,
+                      values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan.slice(0),
+                    );
+                  }
+                  if (DISALLOW_CHAR.includes(e.key)) {
+                    e.preventDefault();
+                    return;
+                  }
+                }}
+                disabled={uanStatus === 'Valid'}
+              />
+
+              <div className='flex justify-between mt-1'>
+                <div className='flex items-center gap-1'>
+                  {uanStatus === 'Valid' ? (
+                    <>
+                      <svg
+                        width='18'
+                        height='18'
+                        viewBox='0 0 18 18'
+                        fill='none'
+                        xmlns='http://www.w3.org/2000/svg'
+                      >
+                        <path
+                          d='M15 4.5L6.75 12.75L3 9'
+                          stroke='#147257'
+                          strokeWidth='1.5'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                        />
+                      </svg>
+                      <span className='text-secondary-green leading-5 text-xs font-normal'>
+                        Verified
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        width='16'
+                        height='16'
+                        viewBox='0 0 16 16'
+                        fill='none'
+                        xmlns='http://www.w3.org/2000/svg'
+                      >
+                        <g clipPath='url(#clip0_3732_51311)'>
+                          <path
+                            d='M8 5.28003V8.3867'
+                            stroke='#E33439'
+                            strokeWidth='1.5'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                          />
+                          <path
+                            d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
+                            fill='#E33439'
+                          />
+                          <path
+                            d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
+                            stroke='#E33439'
+                            strokeWidth='1.5'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                          />
+                        </g>
+                        <defs>
+                          <clipPath id='clip0_3732_51311'>
+                            <rect width='16' height='16' fill='white' />
+                          </clipPath>
+                        </defs>
+                      </svg>
+                      <span className='text-primary-red leading-5 text-xs font-normal'>
+                        Not Verified
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Self-employed' ? (
+            <div>
+              <TextInput
+                label='GST number'
+                placeholder='Eg: 06AAAPB2117A1ZI'
+                // className='uppercase'
+                name={`applicants[${activeIndex}].work_income_detail.gst_number`}
+                value={values?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
+                error={errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
+                touched={touched?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
+                onBlur={(e) => {
+                  handleBlur(e);
+
+                  if (
+                    !errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number &&
+                    values?.applicants?.[activeIndex]?.work_income_detail?.gst_number
+                  ) {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        gst_number:
+                          values?.applicants?.[activeIndex]?.work_income_detail?.gst_number,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+                  } else {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        gst_number: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+                  }
+                }}
+                onChange={(e) => {
+                  e.target.value = e.target.value.toUpperCase();
+                  const value = e.currentTarget.value;
+                  const pattern = /^[a-zA-Z0-9]+$/;
+                  if (!pattern.test(value) && value.length > 0) {
+                    return;
+                  }
+                  if (pattern.exec(value[value.length - 1])) {
+                    setFieldValue(
+                      e.currentTarget.name,
+                      value.charAt(0).toUpperCase() + value.slice(1),
+                    );
+                  }
+                }}
+                disabled={gstStatus === 'Valid'}
+              />
+              <div className='flex justify-between mt-1'>
+                <div className='flex items-center gap-1'>
+                  {gstStatus === 'Valid' ? (
+                    <>
+                      <svg
+                        width='18'
+                        height='18'
+                        viewBox='0 0 18 18'
+                        fill='none'
+                        xmlns='http://www.w3.org/2000/svg'
+                      >
+                        <path
+                          d='M15 4.5L6.75 12.75L3 9'
+                          stroke='#147257'
+                          strokeWidth='1.5'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                        />
+                      </svg>
+                      <span className='text-secondary-green leading-5 text-xs font-normal'>
+                        Verified
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        width='16'
+                        height='16'
+                        viewBox='0 0 16 16'
+                        fill='none'
+                        xmlns='http://www.w3.org/2000/svg'
+                      >
+                        <g clipPath='url(#clip0_3732_51311)'>
+                          <path
+                            d='M8 5.28003V8.3867'
+                            stroke='#E33439'
+                            strokeWidth='1.5'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                          />
+                          <path
+                            d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
+                            fill='#E33439'
+                          />
+                          <path
+                            d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
+                            stroke='#E33439'
+                            strokeWidth='1.5'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                          />
+                        </g>
+                        <defs>
+                          <clipPath id='clip0_3732_51311'>
+                            <rect width='16' height='16' fill='white' />
+                          </clipPath>
+                        </defs>
+                      </svg>
+                      <span className='text-primary-red leading-5 text-xs font-normal'>
+                        Not Verified
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           {!isCoApplicant ? (
             <div>
               <div className='flex justify-between gap-2'>
                 <div className={selfieUploads ? 'w-[65%]' : 'w-full'}>
                   <PhotoUpload
+                    disabled={mobileVerified && selfie.length >= 1}
                     files={selfie}
                     setFile={setSelfie}
                     setSingleFile={setSelfieFile}

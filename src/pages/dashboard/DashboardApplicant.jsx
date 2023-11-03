@@ -138,38 +138,40 @@ export default function DashboardApplicant() {
 
   const bankingDetailsArr = (applicant) => {
     let arr = [];
-    applicant?.banking_details?.map(
-      (b, i) =>
-        (arr = [
-          ...arr,
+    applicant?.banking_details
+      ?.filter((b) => !b?.extra_params?.is_deleted)
+      ?.map(
+        (b, i) =>
+          (arr = [
+            ...arr,
 
-          {
-            subtitle: `ACCOUNT ${i + 1}`,
-            label: 'Bank name',
-            value: b?.bank_name,
-          },
-          {
-            label: 'Account number',
-            value: b?.account_number,
-          },
-          {
-            label: 'Penny drop',
-            value: b?.penny_drop_response?.result?.active === 'yes' ? 'Success' : 'Failed',
-          },
-          {
-            label: 'IFSC Code',
-            value: b?.ifsc_code,
-          },
-          {
-            label: 'Branch',
-            value: b?.branch_name,
-          },
-          {
-            label: 'Account type',
-            value: b?.account_type,
-          },
-        ]),
-    );
+            {
+              subtitle: `ACCOUNT ${i + 1}`,
+              label: 'Bank name',
+              value: b?.bank_name,
+            },
+            {
+              label: 'Account number',
+              value: b?.account_number,
+            },
+            {
+              label: 'Penny drop',
+              value: b?.penny_drop_response?.result?.active === 'yes' ? 'Success' : 'Failed',
+            },
+            {
+              label: 'IFSC Code',
+              value: b?.ifsc_code,
+            },
+            {
+              label: 'Branch',
+              value: b?.branch_name,
+            },
+            {
+              label: 'Account type',
+              value: b?.account_type,
+            },
+          ]),
+      );
     return arr;
   };
 

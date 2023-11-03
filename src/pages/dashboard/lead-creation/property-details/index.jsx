@@ -58,7 +58,6 @@ const PropertyDetails = () => {
     async (e) => {
       const name = e.name;
 
-      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       setFieldValue('property_details.property_identification_is', e.value);
 
       if (values?.property_details?.id) {
