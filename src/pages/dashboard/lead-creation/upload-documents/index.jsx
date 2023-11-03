@@ -7,7 +7,7 @@ import PdfAndImageUpload from '../../../../components/PdfAndImageUpload';
 import PhotoUpload from '../../../../components/PhotoUpload';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { manualModeDropdownOptions } from '../personal-details/manualModeDropdownOptions';
-import { DropDown, ToastMessage, UploadDocsInput } from '../../../../components';
+import { DropDown, TextInput, ToastMessage, UploadDocsInput } from '../../../../components';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import OtpInputNoEdit from '../../../../components/OtpInput/OtpInputNoEdit';
 import {
@@ -47,9 +47,9 @@ const UploadDocuments = () => {
     loData,
     setIsQaulifierActivated,
     setOtpFailCount,
+    token,
   } = useContext(AuthContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
-
   const [customerPhotos, setCustomerPhotos] = useState([]);
   const [customerPhotosFile, setCustomerPhotosFile] = useState(null);
   const [customerUploads, setCustomerUploads] = useState(null);
@@ -128,11 +128,15 @@ const UploadDocuments = () => {
   const [editAddressNumber, setEditAddressNumber] = useState(false);
   const [idStatus, setIdSatus] = useState(null);
   const [addressStatus, setAddressSatus] = useState(null);
+  const [uanStatus, setUanStatus] = useState(null);
+  const [gstStatus, setGstStatus] = useState(null);
 
   const [showOTPInput, setShowOTPInput] = useState(false);
   const [mobileVerified, setMobileVerified] = useState(values?.is_mobile_verified);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(false);
+
+  const isCoApplicant = values?.applicants?.[activeIndex]?.applicant_details?.is_primary == false;
 
   const idRef = useRef();
   const addressRef = useRef();
@@ -173,7 +177,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function getQualifierResponse() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
       if (res.extra_params.is_upload_otp_verified) {
         setMobileVerified(true);
@@ -182,6 +190,8 @@ const UploadDocuments = () => {
 
       if (res.bre_101_response) {
         const bre_Display_body = res.bre_101_response.body.Display;
+        setUanStatus(bre_Display_body?.UAN_Status);
+        setGstStatus(bre_Display_body?.GST_Status);
 
         const id_type = values?.applicants?.[activeIndex]?.personal_details?.id_type;
         const address_type =
@@ -214,25 +224,35 @@ const UploadDocuments = () => {
             setAddressSatus(bre_Display_body[i]);
           }
         }
-
         setIsQaulifierActivated(res.bre_101_response);
+      } else {
+        setIsQaulifierActivated(false);
       }
     }
     getQualifierResponse();
   }, []);
 
-  useEffect(() => {
-    if (selfie.length === 0) {
-      setMobileVerified(false);
-      setDisablePhoneNumber(true);
+  // useEffect(() => {
+  //   if (selfie.length === 0) {
+  //     setMobileVerified(false);
+  //     setDisablePhoneNumber(true);
 
-      const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
+  //     const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
 
-      editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
-        extra_params: { ...extra_params, is_upload_otp_verified: false },
-      });
-    }
-  }, [selfie]);
+  //     editFieldsById(
+  //       values?.applicants?.[activeIndex]?.applicant_details.id,
+  //       'applicant',
+  //       {
+  //         extra_params: { ...extra_params, is_upload_otp_verified: false },
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: token,
+  //         },
+  //       },
+  //     );
+  //   }
+  // }, [selfie]);
 
   const updateFields = async (name, value) => {
     let newData = {};
@@ -243,6 +263,11 @@ const UploadDocuments = () => {
         values?.applicants[activeIndex]?.personal_details?.id,
         'personal',
         values?.applicants[activeIndex]?.personal_details,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
     } else {
       if (values?.applicants[activeIndex]?.personal_details?.id) {
@@ -250,20 +275,38 @@ const UploadDocuments = () => {
           values?.applicants[activeIndex]?.personal_details?.id,
           'personal',
           newData,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
       } else {
         let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
         let addData = { ...clonedCoApplicantValues.personal_details, [name]: value };
-        await addApi('personal', {
-          ...addData,
-          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
-        })
+        await addApi(
+          'personal',
+          {
+            ...addData,
+            applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
           .then(async (res) => {
             setFieldValue(`applicants[${activeIndex}].personal_details.id`, res.id);
             await editFieldsById(
               values?.applicants[activeIndex]?.applicant_details?.id,
               'applicant',
               { personal_detail: res.id },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           })
           .catch((err) => {
@@ -288,63 +331,6 @@ const UploadDocuments = () => {
   }, []);
 
   const handleTextInputChange = useCallback(
-    // (e) => {
-    //   const value = e.target.value;
-    //   const pattern = /^[A-Za-z]+$/;
-    //   if (
-    //     pattern.exec(value[value.length - 1]) &&
-    //     e.target.name !== `applicants[${activeIndex}].personal_details.email` &&
-    //     e.target.name !== `applicants[${activeIndex}].personal_details.id_number` &&
-    //     e.target.name !== `applicants[${activeIndex}].personal_details.address_proof_number`
-    //   ) {
-    //     setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
-    //   }
-
-    //   if (
-    //     e.target.name === `applicants[${activeIndex}].personal_details.id_number` ||
-    //     e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number`
-    //   ) {
-    //     if (
-    //       e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
-    //       values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR'
-    //     ) {
-    //       if (e.target.selectionStart !== value.length) {
-    //         e.target.selectionStart = e.target.selectionEnd = value.length;
-    //         return;
-    //       }
-    //       let aadharPattern = /^\d$/;
-    //       if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
-    //         const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
-    //         const maskedAadhar = maskedPortion + value.slice(8);
-    //         setFieldValue(e.target.name, maskedAadhar);
-    //       } else if (
-    //         value.length < values?.applicants?.[activeIndex]?.personal_details?.id_number.length
-    //       ) {
-    //         setFieldValue(e.target.name, value);
-    //       }
-    //     } else if (
-    //       e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
-    //       values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR'
-    //     ) {
-    //       let aadharPattern = /^\d$/;
-    //       if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
-    //         const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
-    //         const maskedAadhar = maskedPortion + value.slice(8);
-    //         setFieldValue(e.target.name, maskedAadhar);
-    //       } else if (
-    //         value.length <
-    //         values?.applicants?.[activeIndex]?.personal_details?.address_proof_number.length
-    //       ) {
-    //         setFieldValue(e.target.name, value);
-    //       }
-    //     } else {
-    //       const pattern2 = /^[A-Za-z0-9]+$/;
-    //       if (pattern2.exec(value[value.length - 1])) {
-    //         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
-    //       }
-    //     }
-    //   }
-    // },
     (e) => {
       if (e.target.value === ' ') {
         return;
@@ -462,7 +448,11 @@ const UploadDocuments = () => {
     setHasSentOTPOnce(true);
     setShowOTPInput(true);
 
-    const res = await getUploadOtp(loData.session.user_id);
+    const res = await getUploadOtp(loData.session.user_id, {
+      headers: {
+        Authorization: token,
+      },
+    });
     if (!res) return;
 
     setToastMessage('OTP has been sent to the mobile number');
@@ -473,15 +463,28 @@ const UploadDocuments = () => {
       const otp = parseInt(loginotp);
 
       try {
-        const res = await verifyUploadOtp(loData.session.user_id, otp);
+        const res = await verifyUploadOtp(loData.session.user_id, otp, {
+          headers: {
+            Authorization: token,
+          },
+        });
 
         if (!res) return;
 
         const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
 
-        await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
-          extra_params: { ...extra_params, is_upload_otp_verified: true },
-        });
+        await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            extra_params: { ...extra_params, is_upload_otp_verified: true },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
 
         setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: true }));
 
@@ -537,12 +540,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('property_paper_photos' in document_meta == false) {
@@ -555,6 +564,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -620,6 +634,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editPropertyPaper.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -627,6 +642,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.property_paper_photos.filter((data) => {
@@ -642,7 +662,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.property_paper_photos?.find((data) => {
         return data.active === true;
       });
@@ -688,12 +712,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           // console.log(applicant);
           const document_meta = applicant.document_meta;
@@ -708,6 +738,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -725,7 +760,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.customer_photos?.find((data) => {
         return data.active === true;
       });
@@ -771,12 +810,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('id_proof_photos' in document_meta == false) {
@@ -790,6 +835,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -842,6 +892,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editIdProof.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -849,6 +900,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.id_proof_photos.filter((data) => {
@@ -866,7 +922,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.id_proof_photos?.find((data) => {
         return data.active === true;
       });
@@ -915,12 +975,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('address_proof_photos' in document_meta == false) {
@@ -934,6 +1000,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -992,6 +1063,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editAddressProof.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -999,6 +1071,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
@@ -1017,7 +1094,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.address_proof_photos?.find((data) => {
         return data.active === true;
       });
@@ -1063,12 +1144,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('salary_slip_photos' in document_meta == false) {
@@ -1082,6 +1169,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -1133,6 +1225,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editSalarySlip.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -1140,6 +1233,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.salary_slip_photos.filter((data) => {
@@ -1154,7 +1252,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.salary_slip_photos?.find((data) => {
         return data.active === true;
       });
@@ -1200,12 +1302,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('form_60_photos' in document_meta == false) {
@@ -1218,6 +1326,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -1267,6 +1380,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editForm60.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -1274,6 +1388,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.form_60_photos.filter((data) => {
@@ -1288,7 +1407,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.form_60_photos?.find((data) => {
         return data.active === true;
       });
@@ -1334,12 +1457,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('property_photos' in document_meta == false) {
@@ -1352,6 +1481,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -1401,6 +1535,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editProperty.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -1408,6 +1543,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.property_photos.filter((data) => {
@@ -1422,7 +1562,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.property_photos?.find((data) => {
         return data.active === true;
       });
@@ -1468,12 +1612,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('lo_selfie' in document_meta == false) {
@@ -1486,6 +1636,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -1502,7 +1657,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function removeProgress() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
       const active_uploads = res.document_meta.lo_selfie?.find((data) => {
         return data.active === true;
       });
@@ -1548,12 +1707,18 @@ const UploadDocuments = () => {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
         if (res) {
           const applicant = await getApplicantById(
             values?.applicants?.[activeIndex]?.applicant_details.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           const document_meta = applicant.document_meta;
           if ('other_docs' in document_meta == false) {
@@ -1566,6 +1731,11 @@ const UploadDocuments = () => {
             'applicant',
             {
               document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -1613,6 +1783,7 @@ const UploadDocuments = () => {
         const res = await reUploadDoc(editDoc.id, data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -1620,6 +1791,11 @@ const UploadDocuments = () => {
 
         const applicant = await getApplicantById(
           values?.applicants?.[activeIndex]?.applicant_details.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         const active_uploads = applicant.document_meta.other_docs.filter((data) => {
@@ -1634,7 +1810,11 @@ const UploadDocuments = () => {
 
   useEffect(() => {
     async function getPreviousUploads() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
       if (!res) return;
 
@@ -1765,13 +1945,36 @@ const UploadDocuments = () => {
     async function getRequiredFields() {
       const { extra_params, document_meta } = await getApplicantById(
         values?.applicants?.[activeIndex]?.applicant_details?.id,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
+      setFieldValue(
+        `values?.applicants?.[${activeIndex}]?.applicant_details.document_meta`,
+        document_meta,
+      );
+      let requiredFields = {
+        customer_photo: !!document_meta?.customer_photos?.find((slip) => slip?.active),
+        id_proof: !!document_meta?.id_proof_photos?.find((slip) => slip?.active),
+        address_proof: !!document_meta?.address_proof_photos?.find((slip) => slip?.active),
+        property_paper: !!document_meta?.property_paper_photos?.find((slip) => slip?.active),
+        salary_slip: !!document_meta?.salary_slip_photos?.find((slip) => slip?.active),
+        form_60: !!document_meta?.form_60_photos?.find((slip) => slip?.active),
+        property_image: !!document_meta?.property_photos?.find((slip) => slip?.active),
+        upload_selfie:
+          document_meta?.lo_selfie?.find((slip) => slip?.active) &&
+          extra_params?.is_upload_otp_verified,
+      };
+
+      console.log(document_meta);
 
       setRequiredFieldsStatus((prev) => {
-        let requiredFields = { ...extra_params.upload_required_fields_status };
         if (
           values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
-          document_meta?.salary_slip_photos?.find((slip) => slip?.active)
+          document_meta?.salary_slip_photos?.find((slip) => slip?.active) ||
+          isCoApplicant
         ) {
           requiredFields = {
             ...requiredFields,
@@ -1786,7 +1989,8 @@ const UploadDocuments = () => {
 
         if (
           values?.property_details?.property_identification_is === 'not-yet' ||
-          document_meta?.property_image?.find((slip) => slip?.active)
+          document_meta?.property_photos?.find((slip) => slip?.active) ||
+          isCoApplicant
         ) {
           requiredFields = {
             ...requiredFields,
@@ -1801,7 +2005,8 @@ const UploadDocuments = () => {
 
         if (
           values?.property_details?.property_identification_is === 'not-yet' ||
-          document_meta?.property_paper_photos?.find((slip) => slip?.active)
+          document_meta?.property_paper_photos?.find((slip) => slip?.active) ||
+          isCoApplicant
         ) {
           requiredFields = {
             ...requiredFields,
@@ -1811,6 +2016,22 @@ const UploadDocuments = () => {
           requiredFields = {
             ...requiredFields,
             property_paper: false,
+          };
+        }
+
+        if (
+          (document_meta?.lo_selfie?.find((slip) => slip?.active) &&
+            extra_params?.is_upload_otp_verified) ||
+          isCoApplicant
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            upload_selfie: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            upload_selfie: false,
           };
         }
         return requiredFields;
@@ -1957,6 +2178,11 @@ const UploadDocuments = () => {
                               'personal',
                               {
                                 id_number: e.target.value,
+                              },
+                              {
+                                headers: {
+                                  Authorization: token,
+                                },
                               },
                             );
                           }
@@ -2217,6 +2443,11 @@ const UploadDocuments = () => {
                               {
                                 address_proof_number: e.target.value,
                               },
+                              {
+                                headers: {
+                                  Authorization: token,
+                                },
+                              },
                             );
                           }
                         }}
@@ -2373,7 +2604,7 @@ const UploadDocuments = () => {
             </div>
           </div>
 
-          {values?.property_details?.property_identification_is !== 'not-yet' && (
+          {values?.property_details?.property_identification_is !== 'not-yet' && !isCoApplicant && (
             <PdfAndImageUpload
               files={propertyPapers}
               setFile={setPropertyPapers}
@@ -2442,7 +2673,7 @@ const UploadDocuments = () => {
             }
           />
 
-          {values?.property_details?.property_identification_is !== 'not-yet' && (
+          {values?.property_details?.property_identification_is !== 'not-yet' && !isCoApplicant && (
             <ImageUpload
               files={propertyPhotos}
               setFile={setPropertyPhotos}
@@ -2465,51 +2696,334 @@ const UploadDocuments = () => {
             />
           )}
 
-          <div>
-            <div className='flex justify-between gap-2'>
-              <div className={selfieUploads ? 'w-[65%]' : 'w-full'}>
-                <PhotoUpload
-                  files={selfie}
-                  setFile={setSelfie}
-                  setSingleFile={setSelfieFile}
-                  uploads={selfieUploads}
-                  setUploads={setSelfieUploads}
-                  setLatLong={setLoSelfieLatLong}
-                  label='Upload selfie'
-                  required
-                  errorMessage={
-                    preview === location.pathname &&
-                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                      ?.upload_required_fields_status?.upload_selfie == false
-                      ? 'This field is mandatory'
-                      : ''
+          {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' ? (
+            <div>
+              <TextInput
+                label='PF UAN'
+                placeholder='Eg: 100563503285'
+                type='number'
+                pattern='\d*'
+                name={`applicants[${activeIndex}].work_income_detail.pf_uan`}
+                value={values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
+                error={errors?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
+                touched={touched?.applicants?.[activeIndex]?.work_income_detail?.pf_uan}
+                onBlur={(e) => {
+                  handleBlur(e);
+                  if (
+                    !errors?.applicants?.[activeIndex]?.work_income_detail?.pf_uan &&
+                    values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan
+                  ) {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        pf_uan: values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+                  } else {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        pf_uan: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
                   }
-                />
+                }}
+                onChange={(e) => {
+                  let value = e.currentTarget.value;
+                  if (value.length > 12) {
+                    return;
+                  }
+
+                  if (value < 0) {
+                    value = '';
+                  }
+
+                  const address_pattern = /^\d+$/;
+                  if (!address_pattern.test(value) && value.length > 0) {
+                    return;
+                  }
+
+                  setFieldValue(
+                    e.currentTarget.name,
+                    value.charAt(0).toUpperCase() + value.slice(1),
+                  );
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Backspace') {
+                    setFieldValue(
+                      `applicants[${activeIndex}].work_income_detail.pf_uan`,
+                      values?.applicants?.[activeIndex]?.work_income_detail?.pf_uan.slice(0),
+                    );
+                  }
+                  if (DISALLOW_CHAR.includes(e.key)) {
+                    e.preventDefault();
+                    return;
+                  }
+                }}
+                disabled={uanStatus === 'Valid'}
+              />
+
+              {isQaulifierActivated ? (
+                <div className='flex justify-between mt-1'>
+                  <div className='flex items-center gap-1'>
+                    {uanStatus === 'Valid' ? (
+                      <>
+                        <svg
+                          width='18'
+                          height='18'
+                          viewBox='0 0 18 18'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M15 4.5L6.75 12.75L3 9'
+                            stroke='#147257'
+                            strokeWidth='1.5'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                          />
+                        </svg>
+                        <span className='text-secondary-green leading-5 text-xs font-normal'>
+                          Verified
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <g clipPath='url(#clip0_3732_51311)'>
+                            <path
+                              d='M8 5.28003V8.3867'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                            <path
+                              d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
+                              fill='#E33439'
+                            />
+                            <path
+                              d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id='clip0_3732_51311'>
+                              <rect width='16' height='16' fill='white' />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <span className='text-primary-red leading-5 text-xs font-normal'>
+                          Not Verified
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Self-employed' ? (
+            <div>
+              <TextInput
+                label='GST number'
+                placeholder='Eg: 06AAAPB2117A1ZI'
+                // className='uppercase'
+                name={`applicants[${activeIndex}].work_income_detail.gst_number`}
+                value={values?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
+                error={errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
+                touched={touched?.applicants?.[activeIndex]?.work_income_detail?.gst_number}
+                onBlur={(e) => {
+                  handleBlur(e);
+
+                  if (
+                    !errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number &&
+                    values?.applicants?.[activeIndex]?.work_income_detail?.gst_number
+                  ) {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        gst_number:
+                          values?.applicants?.[activeIndex]?.work_income_detail?.gst_number,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+                  } else {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                      'work-income',
+                      {
+                        gst_number: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+                  }
+                }}
+                onChange={(e) => {
+                  e.target.value = e.target.value.toUpperCase();
+                  const value = e.currentTarget.value;
+                  const pattern = /^[a-zA-Z0-9]+$/;
+                  if (!pattern.test(value) && value.length > 0) {
+                    return;
+                  }
+                  if (pattern.exec(value[value.length - 1])) {
+                    setFieldValue(
+                      e.currentTarget.name,
+                      value.charAt(0).toUpperCase() + value.slice(1),
+                    );
+                  }
+                }}
+                disabled={gstStatus === 'Valid'}
+              />
+              {isQaulifierActivated ? (
+                <div className='flex justify-between mt-1'>
+                  <div className='flex items-center gap-1'>
+                    {gstStatus === 'Valid' ? (
+                      <>
+                        <svg
+                          width='18'
+                          height='18'
+                          viewBox='0 0 18 18'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <path
+                            d='M15 4.5L6.75 12.75L3 9'
+                            stroke='#147257'
+                            strokeWidth='1.5'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                          />
+                        </svg>
+                        <span className='text-secondary-green leading-5 text-xs font-normal'>
+                          Verified
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          width='16'
+                          height='16'
+                          viewBox='0 0 16 16'
+                          fill='none'
+                          xmlns='http://www.w3.org/2000/svg'
+                        >
+                          <g clipPath='url(#clip0_3732_51311)'>
+                            <path
+                              d='M8 5.28003V8.3867'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                            <path
+                              d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
+                              fill='#E33439'
+                            />
+                            <path
+                              d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
+                              stroke='#E33439'
+                              strokeWidth='1.5'
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id='clip0_3732_51311'>
+                              <rect width='16' height='16' fill='white' />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <span className='text-primary-red leading-5 text-xs font-normal'>
+                          Not Verified
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {!isCoApplicant ? (
+            <div>
+              <div className='flex justify-between gap-2'>
+                <div className={selfieUploads ? 'w-[65%]' : 'w-full'}>
+                  <PhotoUpload
+                    disabled={mobileVerified && selfie.length >= 1}
+                    files={selfie}
+                    setFile={setSelfie}
+                    setSingleFile={setSelfieFile}
+                    uploads={selfieUploads}
+                    setUploads={setSelfieUploads}
+                    setLatLong={setLoSelfieLatLong}
+                    label='Upload selfie'
+                    required
+                    errorMessage={
+                      preview === location.pathname &&
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                        ?.upload_required_fields_status?.upload_selfie == false
+                        ? 'This field is mandatory'
+                        : ''
+                    }
+                  />
+                </div>
+
+                {selfieUploads && (
+                  <button
+                    className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
+                      mobileVerified || hasSentOTPOnce || selfie.length === 0
+                        ? 'text-dark-grey bg-stroke pointer-events-none'
+                        : 'bg-primary-red text-white'
+                    }`}
+                    onClick={sendMobileOtp}
+                  >
+                    Send OTP
+                  </button>
+                )}
               </div>
 
-              {selfieUploads && (
-                <button
-                  className={`w-[35%] self-end font-normal h-[57px] py-3 px-2 rounded disabled:text-dark-grey disabled:bg-stroke ${
-                    mobileVerified || hasSentOTPOnce || selfie.length === 0
-                      ? 'text-dark-grey bg-stroke pointer-events-none'
-                      : 'bg-primary-red text-white'
-                  }`}
-                  onClick={sendMobileOtp}
-                >
-                  Send OTP
-                </button>
+              {mobileVerified && !showOTPInput && selfie.length >= 1 && (
+                <span className='flex text-primary-black text-xs leading-[18px] mt-2'>
+                  OTP Verified
+                  <img src={otpVerified} alt='Otp Verified' role='presentation' />
+                </span>
               )}
             </div>
+          ) : null}
 
-            {mobileVerified && !showOTPInput && selfie.length >= 1 && (
-              <span className='flex text-primary-black text-xs leading-[18px] mt-2'>
-                OTP Verified
-                <img src={otpVerified} alt='Otp Verified' role='presentation' />
-              </span>
-            )}
-          </div>
-
-          {showOTPInput && selfie.length >= 1 ? (
+          {showOTPInput && selfie.length >= 1 && !isCoApplicant ? (
             <OtpInputNoEdit
               label='Enter OTP'
               required

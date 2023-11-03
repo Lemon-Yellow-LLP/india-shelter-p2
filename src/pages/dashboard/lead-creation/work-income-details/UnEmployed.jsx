@@ -3,10 +3,13 @@ import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInput from '../../../../components/TextInput';
 import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, errors, touched, handleBlur, setFieldValue, activeIndex } =
     useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   return (
     <>
@@ -36,6 +39,11 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
                   values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan,
                 ),
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
 
             setRequiredFieldsStatus((prev) => ({
@@ -50,6 +58,11 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
                 'work-income',
                 {
                   ongoing_emi: null,
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
                 },
               );
 
@@ -79,6 +92,11 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
               'work-income',
               {
                 no_current_loan: 0,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }
@@ -124,6 +142,11 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
               {
                 ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             setRequiredFieldsStatus((prev) => ({
@@ -136,6 +159,11 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
               'work-income',
               {
                 ongoing_emi: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }

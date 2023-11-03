@@ -3,6 +3,7 @@ import { TextInput, CurrencyInput, MapInput, Map } from '../../../../components'
 import propTypes from 'prop-types';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { checkIsValidStatePincode, editPropertyById } from '../../../../global';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
 
@@ -24,6 +25,8 @@ const IdentificationDoneFields = ({
     pincodeErr,
     setPincodeErr,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const [showMap, setShowMap] = useState(false);
   const [propertyValueEstimateError, setPropertyValueEstimateError] = useState('');
@@ -58,35 +61,63 @@ const IdentificationDoneFields = ({
       setFieldValue('property_details.state', '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: false }));
 
-      editPropertyById(values?.property_details?.id, {
-        city: '',
-        state: '',
-        pincode: null,
-      });
+      editPropertyById(
+        values?.property_details?.id,
+        {
+          city: '',
+          state: '',
+          pincode: null,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       return;
     }
 
-    const res = await checkIsValidStatePincode(values?.property_details?.pincode);
+    const res = await checkIsValidStatePincode(values?.property_details?.pincode, {
+      headers: {
+        Authorization: token,
+      },
+    });
     if (!res) {
       setFieldError('property_details.pincode', 'Invalid Pincode');
       setPincodeErr((prev) => ({ ...prev, property_details: 'Invalid Pincode' }));
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pincode']: false }));
       setFieldValue('property_details.city', '');
       setFieldValue('property_details.state', '');
-      editPropertyById(values?.property_details?.id, {
-        city: '',
-        state: '',
-        pincode: null,
-      });
+      editPropertyById(
+        values?.property_details?.id,
+        {
+          city: '',
+          state: '',
+          pincode: null,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
 
       return;
     }
 
-    editPropertyById(values?.property_details?.id, {
-      city: res.city,
-      state: res.state,
-      pincode: parseInt(values?.property_details?.pincode),
-    });
+    editPropertyById(
+      values?.property_details?.id,
+      {
+        city: res.city,
+        state: res.state,
+        pincode: parseInt(values?.property_details?.pincode),
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     setFieldValue('property_details.city', res.city);
     setFieldValue('property_details.state', res.state);
@@ -160,17 +191,33 @@ const IdentificationDoneFields = ({
               parseInt(values?.lead?.applied_amount) <
                 parseInt(values?.property_details?.property_value_estimate)
             ) {
-              editPropertyById(values?.property_details?.id, {
-                property_value_estimate: values?.property_details?.property_value_estimate,
-              });
+              editPropertyById(
+                values?.property_details?.id,
+                {
+                  property_value_estimate: values?.property_details?.property_value_estimate,
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
 
               if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               }
             } else {
-              editPropertyById(values?.property_details?.id, {
-                property_value_estimate: '',
-              });
+              editPropertyById(
+                values?.property_details?.id,
+                {
+                  property_value_estimate: '',
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
 
               if (requiredFieldsStatus[name]) {
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
@@ -194,9 +241,17 @@ const IdentificationDoneFields = ({
           const name = e.currentTarget.name.split('.')[1];
 
           if (!errors?.property_details?.owner_name && values?.property_details?.owner_name) {
-            editPropertyById(values?.property_details?.id, {
-              owner_name: values?.property_details?.owner_name,
-            });
+            editPropertyById(
+              values?.property_details?.id,
+              {
+                owner_name: values?.property_details?.owner_name,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
 
             if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
@@ -205,9 +260,17 @@ const IdentificationDoneFields = ({
             if (requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
             }
-            editPropertyById(values?.property_details?.id, {
-              owner_name: '',
-            });
+            editPropertyById(
+              values?.property_details?.id,
+              {
+                owner_name: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
           }
         }}
         inputClasses='capitalize'
@@ -244,9 +307,17 @@ const IdentificationDoneFields = ({
             !errors?.property_details?.plot_house_flat &&
             values?.property_details?.plot_house_flat
           ) {
-            editPropertyById(values?.property_details?.id, {
-              plot_house_flat: values?.property_details?.plot_house_flat,
-            });
+            editPropertyById(
+              values?.property_details?.id,
+              {
+                plot_house_flat: values?.property_details?.plot_house_flat,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
             if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
             }
@@ -254,9 +325,17 @@ const IdentificationDoneFields = ({
             if (requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
             }
-            editPropertyById(values?.property_details?.id, {
-              plot_house_flat: '',
-            });
+            editPropertyById(
+              values?.property_details?.id,
+              {
+                plot_house_flat: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
           }
         }}
       />
@@ -294,9 +373,17 @@ const IdentificationDoneFields = ({
             !errors?.property_details?.project_society_colony &&
             values?.property_details?.project_society_colony
           ) {
-            editPropertyById(values?.property_details?.id, {
-              project_society_colony: values?.property_details?.project_society_colony,
-            });
+            editPropertyById(
+              values?.property_details?.id,
+              {
+                project_society_colony: values?.property_details?.project_society_colony,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
             if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
             }
@@ -304,9 +391,17 @@ const IdentificationDoneFields = ({
             if (requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
             }
-            editPropertyById(values?.property_details?.id, {
-              project_society_colony: '',
-            });
+            editPropertyById(
+              values?.property_details?.id,
+              {
+                project_society_colony: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
           }
         }}
       />
@@ -359,9 +454,17 @@ const IdentificationDoneFields = ({
               ...prev,
               ['pincode']: false,
             }));
-            editPropertyById(values?.property_details?.id, {
-              pincode: '',
-            });
+            editPropertyById(
+              values?.property_details?.id,
+              {
+                pincode: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
           }
         }}
         min='0'

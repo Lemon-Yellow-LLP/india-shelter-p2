@@ -13,6 +13,7 @@ import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 import ErrorTost from '../../../../components/ToastMessage/ErrorTost';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export const bankingMode = [
   {
@@ -39,6 +40,8 @@ const BankingDetails = () => {
     setBankErrorTost,
     setCurrentStepIndex,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -73,10 +76,28 @@ const BankingDetails = () => {
     });
     setValues(newData);
 
-    editFieldsById(id, 'banking', { is_primary: checked });
+    editFieldsById(
+      id,
+      'banking',
+      { is_primary: checked },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     if (currentPrimaryId) {
-      editFieldsById(currentPrimaryId, 'banking', { is_primary: false });
+      editFieldsById(
+        currentPrimaryId,
+        'banking',
+        { is_primary: false },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
     }
   };
 
@@ -97,6 +118,11 @@ const BankingDetails = () => {
           values?.applicants?.[activeIndex]?.applicant_details?.id,
           'applicant',
           newData,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
       } else {
         setFieldValue(
@@ -109,13 +135,27 @@ const BankingDetails = () => {
           values?.applicants?.[activeIndex]?.applicant_details?.id,
           'applicant',
           newData,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
       }
     }
   }, [values?.applicants?.[activeIndex]?.banking_details]);
 
   const handleDelete = async () => {
-    await editFieldsById(deleteId, 'banking', { extra_params: { is_deleted: true } });
+    await editFieldsById(
+      deleteId,
+      'banking',
+      { extra_params: { is_deleted: true } },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
     let newBanking = values?.applicants?.[activeIndex]?.banking_details;
     newBanking = newBanking.filter((account) => account.id !== deleteId);
     setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
@@ -130,6 +170,11 @@ const BankingDetails = () => {
         values?.applicants?.[activeIndex]?.applicant_details?.id,
         'applicant',
         newData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
     } else {
       setFieldValue(
@@ -142,6 +187,11 @@ const BankingDetails = () => {
         values?.applicants?.[activeIndex]?.applicant_details?.id,
         'applicant',
         newData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
     }
     setOpenPopup(false);
@@ -157,6 +207,11 @@ const BankingDetails = () => {
       .post(
         `https://lo.scotttiger.in/api/applicant/penny-drop/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         { ...data },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       )
       .then(({ data }) => {
         setLoading(false);
@@ -181,6 +236,11 @@ const BankingDetails = () => {
       await axios
         .get(
           `https://lo.scotttiger.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         )
         .then(({ data }) => {
           const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);

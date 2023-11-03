@@ -17,6 +17,7 @@ import imageCompression from 'browser-image-compression';
 import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 import PdfAndImageUploadBanking from '../../../../components/PdfAndImageUpload/PdfAndImageUploadBanking';
 import { set } from 'date-fns';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export const entityType = [
   {
@@ -89,6 +90,8 @@ export default function BankingManual() {
     setBankSuccessTost,
     setBankErrorTost,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const {
     values,
@@ -206,9 +209,18 @@ export default function BankingManual() {
     if (preFilledData) {
       valuesData = { ...valuesData, banking_id: preFilledData?.id };
 
-      await editFieldsById(preFilledData?.id, 'banking', {
-        ...values,
-      });
+      await editFieldsById(
+        preFilledData?.id,
+        'banking',
+        {
+          ...values,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
     }
 
     await axios
@@ -217,11 +229,21 @@ export default function BankingManual() {
         {
           ...valuesData,
         },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       )
       .then(async (res) => {
         await axios
           .get(
             `https://lo.scotttiger.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           )
           .then(({ data }) => {
             const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
@@ -240,6 +262,11 @@ export default function BankingManual() {
         await axios
           .get(
             `https://lo.scotttiger.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           )
           .then(({ data }) => {
             const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
@@ -260,10 +287,18 @@ export default function BankingManual() {
 
   const getIfsc = async () => {
     axios
-      .post(`https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`, {
-        bank: searchedBank,
-        branch: searchedBranch,
-      })
+      .post(
+        `https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`,
+        {
+          bank: searchedBank,
+          branch: searchedBranch,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      )
       .then(({ data }) => {
         setSearchedIfsc(data[0].ifsc_code);
       })
@@ -274,9 +309,17 @@ export default function BankingManual() {
 
   const getBankFromIfsc = async () => {
     axios
-      .post(`https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`, {
-        ifsc: values?.ifsc_code,
-      })
+      .post(
+        `https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`,
+        {
+          ifsc: values?.ifsc_code,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      )
       .then(({ data }) => {
         setFieldValue('bank_name', data[0]?.name);
         setFieldValue('branch_name', data[0]?.branch);
@@ -290,9 +333,18 @@ export default function BankingManual() {
 
   const getBranchesFromBankName = async (value) => {
     axios
-      .post(`https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`, {
-        bank: value,
-      })
+      .post(
+        `https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`,
+        {
+          bank: value,
+        },
+
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      )
       .then(({ data }) => {
         const newData = data.map((item) => {
           return { label: item.branch, value: item.branch };
@@ -306,7 +358,11 @@ export default function BankingManual() {
 
   const getAllBanks = async () => {
     axios
-      .get(`https://lo.scotttiger.in/api/ifsc/r/get-all-bank`)
+      .get(`https://lo.scotttiger.in/api/ifsc/r/get-all-bank`, {
+        headers: {
+          Authorization: token,
+        },
+      })
       .then(({ data }) => {
         const newData = data.map((item) => {
           return { label: item.name, value: item.name };
@@ -431,6 +487,7 @@ export default function BankingManual() {
         const res = await uploadDoc(data, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            Authorization: token,
           },
         });
 
@@ -496,6 +553,7 @@ export default function BankingManual() {
       const res = await reUploadDoc(editBankStatement.id, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          Authorization: token,
         },
       });
 

@@ -43,18 +43,6 @@ export const manualModeDropdownOptions = [
         label: 'Passport',
         value: 'Passport',
       },
-      {
-        label: 'Gas bill',
-        value: 'Gas bill',
-      },
-      {
-        label: 'Rent agreement',
-        value: 'Rent agreement',
-      },
-      {
-        label: 'Electricity bill',
-        value: 'Electricity bill',
-      },
     ],
   },
   {
@@ -64,7 +52,6 @@ export const manualModeDropdownOptions = [
         label: 'Hindu',
         value: 'Hindu',
       },
-
       {
         label: 'Buddhist',
         value: 'Buddhist',
@@ -91,7 +78,6 @@ export const manualModeDropdownOptions = [
       },
     ],
   },
-
   {
     title: 'Language',
     options: [
@@ -99,7 +85,6 @@ export const manualModeDropdownOptions = [
         label: 'Hindi',
         value: 'Hindi',
       },
-
       {
         label: 'English',
         value: 'English',
@@ -122,7 +107,6 @@ export const manualModeDropdownOptions = [
       },
     ],
   },
-
   {
     title: 'Qualification',
     options: [
@@ -130,7 +114,6 @@ export const manualModeDropdownOptions = [
         label: 'Graduate',
         value: 'Graduate',
       },
-
       {
         label: 'Illiterate',
         value: 'Illiterate',

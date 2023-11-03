@@ -12,20 +12,20 @@ const applicantSchema = Yup.object().shape({
     first_name: Yup.string()
       .trim()
       .min(2, 'First Name must be atleast 2 characters long')
-      .max(10, 'First Name can be max 10 characters long')
+      .max(50, 'First Name can be max 50 characters long')
       .required('First Name is required')
       .matches(/^[A-Za-z][A-Za-z\s]*$/, 'Invalid characters in First Name'),
     middle_name: Yup.string()
       .trim()
       .nullable()
       .min(2, 'Middle Name must be atleast 2 characters long')
-      .max(10, 'Middle Name can be max 10 characters long')
+      .max(50, 'Middle Name can be max 50 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters'),
     last_name: Yup.string()
       .trim()
       .nullable()
       .min(2, 'Last Name must be atleast 2 characters long')
-      .max(10, 'Last Name can be max 10 characters long')
+      .max(50, 'Last Name can be max 50 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters'),
     date_of_birth: Yup.string().required(
       'Date of Birth is Required. Minimum age must be 18 or 18+',
@@ -105,18 +105,18 @@ const applicantSchema = Yup.object().shape({
     }),
     first_name: Yup.string()
       .min(2, 'First Name must be atleast 2 characters long')
-      .max(10, 'First Name can be max 10 characters long')
+      .max(50, 'First Name can be max 50 characters long')
       .required('First Name is required')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     middle_name: Yup.string()
       .nullable()
       .min(2, 'Middle Name must be atleast 2 characters long')
-      .max(10, 'Middle Name can be max 10 characters long')
+      .max(50, 'Middle Name can be max 50 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
     last_name: Yup.string()
       .nullable()
       .min(2, 'Last Name must be atleast 2 characters long')
-      .max(10, 'Last Name can be max 10 characters long')
+      .max(50, 'Last Name can be max 50 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Last Name'),
     gender: Yup.string().required('This field is mandatory.'),
     date_of_birth: Yup.string().required('Date of birth is required'),

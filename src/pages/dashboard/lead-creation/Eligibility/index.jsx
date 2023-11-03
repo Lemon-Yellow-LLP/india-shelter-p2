@@ -26,7 +26,7 @@ import Topbar from '../../../../components/Topbar';
 const Eligibility = () => {
   const { activeIndex, values, setFieldValue, updateCompleteFormProgress } =
     useContext(LeadContext);
-  const { toastMessage, setToastMessage } = useContext(AuthContext);
+  const { toastMessage, setToastMessage, token } = useContext(AuthContext);
 
   const [progress, setProgress] = useState(0);
   const [finalApi, setFinalApi] = useState(0);
@@ -97,8 +97,16 @@ const Eligibility = () => {
 
   useEffect(() => {
     async function breTwo() {
-      const lead = await getLeadById(values?.applicants?.[activeIndex]?.applicant_details.lead_id);
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
+      const lead = await getLeadById(values?.applicants?.[activeIndex]?.applicant_details.lead_id, {
+        headers: {
+          Authorization: token,
+        },
+      });
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
       if (res.bre_101_response && lead.bre_201_response) {
         setBre101(res);
@@ -207,7 +215,15 @@ const Eligibility = () => {
         }));
 
         final_api.push(
-          verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, { type: 'id' }, {}),
+          verifyPan(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            { type: 'id' },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          ),
         );
 
         test_api_ran.push('PAN');
@@ -231,7 +247,11 @@ const Eligibility = () => {
               verifyPan(
                 values?.applicants?.[activeIndex]?.applicant_details.id,
                 { type: 'id' },
-                {},
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
               ),
             );
 
@@ -257,7 +277,15 @@ const Eligibility = () => {
         }
 
         final_api.push(
-          verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, { type: type }, {}),
+          verifyDL(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            { type: type },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          ),
         );
 
         test_api_ran.push('Driving license');
@@ -278,7 +306,15 @@ const Eligibility = () => {
             }));
 
             final_api.push(
-              verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, { type: 'id' }, {}),
+              verifyDL(
+                values?.applicants?.[activeIndex]?.applicant_details.id,
+                { type: 'id' },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              ),
             );
 
             test_api_ran.push('Driving license');
@@ -299,7 +335,11 @@ const Eligibility = () => {
               verifyDL(
                 values?.applicants?.[activeIndex]?.applicant_details.id,
                 { type: 'address' },
-                {},
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
               ),
             );
 
@@ -328,7 +368,11 @@ const Eligibility = () => {
           verifyVoterID(
             values?.applicants?.[activeIndex]?.applicant_details.id,
             { type: type },
-            {},
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           ),
         );
 
@@ -353,7 +397,11 @@ const Eligibility = () => {
               verifyVoterID(
                 values?.applicants?.[activeIndex]?.applicant_details.id,
                 { type: 'id' },
-                {},
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
               ),
             );
 
@@ -375,7 +423,11 @@ const Eligibility = () => {
               verifyVoterID(
                 values?.applicants?.[activeIndex]?.applicant_details.id,
                 { type: 'address' },
-                {},
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
               ),
             );
 
@@ -396,7 +448,13 @@ const Eligibility = () => {
           status: res.bre_101_response.body.Display.UAN_Status,
         }));
 
-        final_api.push(verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+        final_api.push(
+          verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {
+            headers: {
+              Authorization: token,
+            },
+          }),
+        );
 
         test_api_ran.push('pf');
       } else if (
@@ -414,7 +472,13 @@ const Eligibility = () => {
             status: res.bre_101_response.body.Display.UAN_Status,
           }));
 
-          final_api.push(verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+          final_api.push(
+            verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {
+              headers: {
+                Authorization: token,
+              },
+            }),
+          );
 
           test_api_ran.push('pf');
         }
@@ -432,7 +496,13 @@ const Eligibility = () => {
           status: res.bre_101_response.body.Display.GST_Status,
         }));
 
-        final_api.push(verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+        final_api.push(
+          verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {
+            headers: {
+              Authorization: token,
+            },
+          }),
+        );
 
         test_api_ran.push('gst');
       } else if (
@@ -450,7 +520,13 @@ const Eligibility = () => {
             status: res.bre_101_response.body.Display.GST_Status,
           }));
 
-          final_api.push(verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+          final_api.push(
+            verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {
+              headers: {
+                Authorization: token,
+              },
+            }),
+          );
 
           test_api_ran.push('gst');
         }
@@ -476,7 +552,11 @@ const Eligibility = () => {
 
           const bre99_res = await checkBre99(
             values?.applicants?.[activeIndex]?.applicant_details.id,
-            {},
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
 
           if (bre99_res.bre_99_response.statusCode == 200) {
@@ -496,7 +576,11 @@ const Eligibility = () => {
           try {
             const cibil_res = await checkCibil(
               values?.applicants?.[activeIndex]?.applicant_details.id,
-              {},
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
             if (cibil_res.status == 200) {
               setBureau((prev) => ({
@@ -517,7 +601,11 @@ const Eligibility = () => {
           try {
             const crif_res = await checkCrif(
               values?.applicants?.[activeIndex]?.applicant_details.id,
-              {},
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
             if (crif_res.status == 200) {
               setBureau((prev) => ({
@@ -539,7 +627,11 @@ const Eligibility = () => {
         try {
           const bre_res = await checkBre101(
             values?.applicants?.[activeIndex]?.applicant_details.id,
-            {},
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
 
           if (bre_res.bre_101_response.statusCode != 200) return;
@@ -563,6 +655,11 @@ const Eligibility = () => {
             {
               bre_101_response: bre_res.bre_101_response,
               extra_params: edited_extra_params,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
             },
           );
 
@@ -613,7 +710,11 @@ const Eligibility = () => {
       try {
         const bre_res = await checkBre201(
           values?.applicants?.[activeIndex]?.applicant_details.lead_id,
-          {},
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         if (bre_res.bre_201_response.statusCode != 200) return;
@@ -652,6 +753,11 @@ const Eligibility = () => {
             {
               extra_params: edited_extra_params,
             },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
 
           setFieldValue(
@@ -678,6 +784,11 @@ const Eligibility = () => {
             {
               extra_params: edited_extra_params,
             },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
 
           setFieldValue(
@@ -692,7 +803,11 @@ const Eligibility = () => {
       try {
         const sdfc_res = await pushToSalesforce(
           values?.applicants?.[activeIndex]?.applicant_details.lead_id,
-          {},
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         if (!sdfc_res) return;
@@ -713,7 +828,7 @@ const Eligibility = () => {
 
   return (
     <>
-      <Topbar title='Eligibility' id={values?.lead?.id} showClose={true} />
+      <Topbar title='Eligibility' id={values?.lead?.id} showClose={!sdfcResponse ? false : true} />
 
       <div className='p-4 h-full pb-28'>
         <ToastMessage
@@ -774,9 +889,9 @@ const Eligibility = () => {
           PAN.status === 'In-Valid' ||
           PAN.status === 'Valid No Match' ||
           bre101?.extra_params?.pan_ran ? (
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!PAN.ran ? (
+                {/* {!PAN.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -806,7 +921,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>PAN card</p>
               </div>
@@ -823,9 +938,9 @@ const Eligibility = () => {
           DL.status === 'In-Valid' ||
           DL.status === 'Valid No Match' ||
           bre101?.extra_params?.dl_ran ? (
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!DL.ran ? (
+                {/* {!DL.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -855,7 +970,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>Driving license</p>
               </div>
@@ -872,9 +987,9 @@ const Eligibility = () => {
           voterID.status === 'In-Valid' ||
           voterID.status === 'Valid No Match' ||
           bre101?.extra_params?.voter_ran ? (
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!voterID.ran ? (
+                {/* {!voterID.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -904,7 +1019,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>Voter ID</p>
               </div>
@@ -923,9 +1038,9 @@ const Eligibility = () => {
           pfUAN.status === 'In-Valid' ||
           pfUAN.status === 'Valid No Match' ||
           bre101?.extra_params?.pf_ran ? (
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!pfUAN.ran ? (
+                {/* {!pfUAN.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -955,7 +1070,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>PF UAN</p>
               </div>
@@ -980,9 +1095,9 @@ const Eligibility = () => {
           GST.status === 'In-Valid' ||
           GST.status === 'Valid No Match' ||
           bre101?.extra_params?.gst_ran ? (
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!GST.ran ? (
+                {/* {!GST.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -1012,7 +1127,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>GST</p>
               </div>
@@ -1033,9 +1148,9 @@ const Eligibility = () => {
 
           {display ? (
             <>
-              <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
                 <div className='flex items-center gap-1'>
-                  {!bre99.ran ? (
+                  {/* {!bre99.ran ? (
                     <svg
                       width='24'
                       height='24'
@@ -1065,7 +1180,7 @@ const Eligibility = () => {
                         strokeLinejoin='round'
                       />
                     </svg>
-                  )}
+                  )} */}
 
                   <p className='text-sm text-primary-black'>BRE 99</p>
                 </div>
@@ -1085,9 +1200,9 @@ const Eligibility = () => {
                 </div>
               </div>
 
-              <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+              <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
                 <div className='flex items-center gap-1'>
-                  {!bureau.ran ? (
+                  {/* {!bureau.ran ? (
                     <svg
                       width='24'
                       height='24'
@@ -1117,7 +1232,7 @@ const Eligibility = () => {
                         strokeLinejoin='round'
                       />
                     </svg>
-                  )}
+                  )} */}
 
                   <p className='text-sm text-primary-black'>Bureau</p>
                 </div>
@@ -1139,9 +1254,9 @@ const Eligibility = () => {
             </>
           ) : null}
 
-          <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
+          <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
-              {!upiName.ran ? (
+              {/* {!upiName.ran ? (
                 <svg
                   width='24'
                   height='24'
@@ -1171,7 +1286,7 @@ const Eligibility = () => {
                     strokeLinejoin='round'
                   />
                 </svg>
-              )}
+              )} */}
 
               <p className='text-sm text-primary-black'>UPI Name</p>
             </div>
@@ -1190,9 +1305,9 @@ const Eligibility = () => {
           <div>
             <p className='text-sm text-primary-black'>Primary applicant</p>
 
-            <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5 mt-2'>
+            <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5 mt-2'>
               <div className='flex items-center gap-1'>
-                {!faceMatch.ran ? (
+                {/* {!faceMatch.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -1222,7 +1337,7 @@ const Eligibility = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>Face Match</p>
               </div>
@@ -1239,7 +1354,8 @@ const Eligibility = () => {
 
                 {faceMatchResponse && (
                   <span className='text-xs font-normal text-light-grey'>
-                    {faceMatchResponse?.main_applicant?.[0]?.Face_match_with_ID_Proof}
+                    {faceMatchResponse?.main_applicant?.[0]?.Face_match_with_ID_Proof ||
+                      faceMatchResponse?.main_applicant?.[0]?.Face_match_with_Address_Proof}
                   </span>
                 )}
               </div>
@@ -1253,9 +1369,9 @@ const Eligibility = () => {
                   {data?.applicant_details?.applicant_type}
                 </p>
 
-                <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5 mt-2'>
+                <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5 mt-2'>
                   <div className='flex items-center gap-1'>
-                    {!faceMatch.ran ? (
+                    {/* {!faceMatch.ran ? (
                       <svg
                         width='24'
                         height='24'
@@ -1285,7 +1401,7 @@ const Eligibility = () => {
                           strokeLinejoin='round'
                         />
                       </svg>
-                    )}
+                    )} */}
 
                     <p className='text-sm text-primary-black'>Face Match</p>
                   </div>
@@ -1303,10 +1419,10 @@ const Eligibility = () => {
                     {/* {console.log(index + 1)} */}
                     {faceMatchResponse && (
                       <span className='text-xs font-normal text-light-grey'>
-                        {
+                        {faceMatchResponse?.[`co_applicant_${index + 1}`]?.[0]
+                          ?.Face_match_with_ID_Proof ||
                           faceMatchResponse?.[`co_applicant_${index + 1}`]?.[0]
-                            ?.Face_match_with_ID_Proof
-                        }
+                            ?.Face_match_with_Address_Proof}
                       </span>
                     )}
                   </div>
@@ -1316,10 +1432,21 @@ const Eligibility = () => {
           )}
         </div>
 
-        <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center w-full '>
-          Do not close the app or go back. Please wait for ID <br /> verification as it may take
-          some time. We are validating these checks as per your consent
-        </p>
+        <div>
+          {!sdfcResponse ? (
+            <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-primary-black mt-3 p-1.5 border border-[#E1CE3F] bg-[#FFFAD6] rounded-md'>
+              <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+              Do not close the app or go back. Please wait for ID verification as it may take some
+              time. We are validating these checks as per your consent.
+            </p>
+          ) : (
+            <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-dark-grey mt-3'>
+              <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+              Do not close the app or go back. Please wait for ID verification as it may take some
+              time. We are validating these checks as per your consent.
+            </p>
+          )}
+        </div>
       </div>
 
       <div className='flex flex-col gap-[18px] fixed bottom-0 border-t-[1px] w-full p-4 bg-white'>
