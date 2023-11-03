@@ -3,10 +3,12 @@ import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInput from '../../../../components/TextInput';
 import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, errors, handleBlur, touched, setFieldValue, activeIndex } =
     useContext(LeadContext);
+  const { token } = useContext(AuthContext);
 
   return (
     <>

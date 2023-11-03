@@ -117,6 +117,25 @@ const PropertyDetails = () => {
             values?.property_details?.id,
             {
               property_identification_is: e.value,
+              property_value_estimate: '',
+              owner_name: '',
+              plot_house_flat: '',
+              project_society_colony: '',
+              pincode: null,
+              city: '',
+              state: '',
+              extra_params: {
+                ...values?.property_details?.extra_params,
+                progress: 16,
+                required_fields_status: {
+                  owner_name: false,
+                  pincode: false,
+                  plot_house_flat: false,
+                  project_society_colony: false,
+                  property_identification_is: true,
+                  property_value_estimate: false,
+                },
+              },
             },
             {
               headers: {
