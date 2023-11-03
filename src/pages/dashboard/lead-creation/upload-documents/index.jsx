@@ -231,27 +231,27 @@ const UploadDocuments = () => {
     getQualifierResponse();
   }, []);
 
-  useEffect(() => {
-    if (selfie.length === 0) {
-      setMobileVerified(false);
-      setDisablePhoneNumber(true);
+  // useEffect(() => {
+  //   if (selfie.length === 0) {
+  //     setMobileVerified(false);
+  //     setDisablePhoneNumber(true);
 
-      const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
+  //     const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
 
-      editFieldsById(
-        values?.applicants?.[activeIndex]?.applicant_details.id,
-        'applicant',
-        {
-          extra_params: { ...extra_params, is_upload_otp_verified: false },
-        },
-        {
-          headers: {
-            Authorization: token,
-          },
-        },
-      );
-    }
-  }, [selfie]);
+  //     editFieldsById(
+  //       values?.applicants?.[activeIndex]?.applicant_details.id,
+  //       'applicant',
+  //       {
+  //         extra_params: { ...extra_params, is_upload_otp_verified: false },
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: token,
+  //         },
+  //       },
+  //     );
+  //   }
+  // }, [selfie]);
 
   const updateFields = async (name, value) => {
     let newData = {};
@@ -330,63 +330,6 @@ const UploadDocuments = () => {
   }, []);
 
   const handleTextInputChange = useCallback(
-    // (e) => {
-    //   const value = e.target.value;
-    //   const pattern = /^[A-Za-z]+$/;
-    //   if (
-    //     pattern.exec(value[value.length - 1]) &&
-    //     e.target.name !== `applicants[${activeIndex}].personal_details.email` &&
-    //     e.target.name !== `applicants[${activeIndex}].personal_details.id_number` &&
-    //     e.target.name !== `applicants[${activeIndex}].personal_details.address_proof_number`
-    //   ) {
-    //     setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
-    //   }
-
-    //   if (
-    //     e.target.name === `applicants[${activeIndex}].personal_details.id_number` ||
-    //     e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number`
-    //   ) {
-    //     if (
-    //       e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
-    //       values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR'
-    //     ) {
-    //       if (e.target.selectionStart !== value.length) {
-    //         e.target.selectionStart = e.target.selectionEnd = value.length;
-    //         return;
-    //       }
-    //       let aadharPattern = /^\d$/;
-    //       if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
-    //         const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
-    //         const maskedAadhar = maskedPortion + value.slice(8);
-    //         setFieldValue(e.target.name, maskedAadhar);
-    //       } else if (
-    //         value.length < values?.applicants?.[activeIndex]?.personal_details?.id_number.length
-    //       ) {
-    //         setFieldValue(e.target.name, value);
-    //       }
-    //     } else if (
-    //       e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
-    //       values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR'
-    //     ) {
-    //       let aadharPattern = /^\d$/;
-    //       if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
-    //         const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
-    //         const maskedAadhar = maskedPortion + value.slice(8);
-    //         setFieldValue(e.target.name, maskedAadhar);
-    //       } else if (
-    //         value.length <
-    //         values?.applicants?.[activeIndex]?.personal_details?.address_proof_number.length
-    //       ) {
-    //         setFieldValue(e.target.name, value);
-    //       }
-    //     } else {
-    //       const pattern2 = /^[A-Za-z0-9]+$/;
-    //       if (pattern2.exec(value[value.length - 1])) {
-    //         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
-    //       }
-    //     }
-    //   }
-    // },
     (e) => {
       if (e.target.value === ' ') {
         return;
