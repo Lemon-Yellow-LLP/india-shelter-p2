@@ -503,7 +503,6 @@ const WorkIncomeDetails = () => {
               setRequiredFieldsStatus={setRequiredFieldsStatus}
             />
           )}
-
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Salaried' ||
           values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Self-employed' ? (
             <>
@@ -959,7 +958,7 @@ const WorkIncomeDetails = () => {
           ) : null}
 
           {professionOptions.length &&
-          values?.applicants?.[activeIndex]?.is_primary &&
+          values?.applicants?.[activeIndex]?.applicant_details.is_primary &&
           values?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
             <>
               <div className='flex flex-col gap-2'>
