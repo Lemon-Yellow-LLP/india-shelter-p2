@@ -75,7 +75,11 @@ export default function Login() {
       setHasSentOTPOnce(true);
       setShowOTPInput(true);
     } else {
-      const officers = await getAllLoanOfficers();
+      const officers = await getAllLoanOfficers({
+        headers: {
+          Authorization: token,
+        },
+      });
 
       const user_exists = officers.find((user) => {
         return user.username === values.username;

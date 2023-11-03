@@ -1097,33 +1097,35 @@ export default function Preview() {
       </div>
 
       {/* Lnt Charges */}
-      <Snackbar
-        sx={{
-          '& .MuiPaper-root': {
-            backgroundColor: '#000000F2',
-            fontFamily: 'Poppins',
-          },
+      {values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ? (
+        <Snackbar
+          sx={{
+            '& .MuiPaper-root': {
+              backgroundColor: '#000000F2',
+              fontFamily: 'Poppins',
+            },
 
-          '& .MuiPaper-root .MuiSnackbarContent-message': {
-            color: '#FEFEFE',
+            '& .MuiPaper-root .MuiSnackbarContent-message': {
+              color: '#FEFEFE',
 
-            fontSize: '14px',
-            fontStyle: 'normal',
-            fontWeight: 400,
-          },
-        }}
-        className='-translate-y-32 m-[10px]'
-        open={!values?.lt_charges?.find((e) => e.status === 'Completed')}
-        onClose={() => {}}
-        message='L&T charges is pending'
-        action={
-          <button onClick={gotoLntCharges} className='mr-3'>
-            <span className='text-right text-sm not-italic font-semibold text-primary-red'>
-              Pay now
-            </span>
-          </button>
-        }
-      />
+              fontSize: '14px',
+              fontStyle: 'normal',
+              fontWeight: 400,
+            },
+          }}
+          className='-translate-y-32 m-[10px]'
+          open={!values?.lt_charges?.find((e) => e.status === 'Completed')}
+          onClose={() => {}}
+          message='L&T charges is pending'
+          action={
+            <button onClick={gotoLntCharges} className='mr-3'>
+              <span className='text-right text-sm not-italic font-semibold text-primary-red'>
+                Pay now
+              </span>
+            </button>
+          }
+        />
+      ) : null}
     </>
   );
 }
