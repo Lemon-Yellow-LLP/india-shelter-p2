@@ -54,12 +54,12 @@ export default function Preview() {
 
   function checkTotalProgress(applicant) {
     return (
-      applicant?.applicant_details?.extra_params.progress == 100 &&
-      applicant?.personal_details?.extra_params.progress == 100 &&
-      applicant?.address_detail?.extra_params.progress == 100 &&
-      applicant?.work_income_detail?.extra_params.progress == 100 &&
-      applicant?.applicant_details?.extra_params.banking_progress == 100 &&
-      applicant?.applicant_details?.extra_params.upload_progress == 100
+      applicant?.applicant_details?.extra_params?.progress == 100 &&
+      applicant?.personal_details?.extra_params?.progress == 100 &&
+      applicant?.address_detail?.extra_params?.progress == 100 &&
+      applicant?.work_income_detail?.extra_params?.progress == 100 &&
+      applicant?.applicant_details?.extra_params?.banking_progress == 100 &&
+      applicant?.applicant_details?.extra_params?.upload_progress == 100
     );
   }
 
@@ -626,7 +626,7 @@ export default function Preview() {
               }
               title={pages.upload_documents.title}
               link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
-              hideLabel={true}
+              // hideLabel={true}
               count={
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.applicant_details.name
