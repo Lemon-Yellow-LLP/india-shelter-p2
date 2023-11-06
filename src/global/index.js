@@ -250,10 +250,6 @@ async function pushToSalesforce(id, options) {
   const res = await axios.get(`${API_URL}/lead/salesforce-push/${id}`, {
     ...options,
     timeout: bre_timeout,
-    'axios-retry': {
-      retries: 3,
-      retryCondition: () => true,
-    },
   });
   return res.data;
 }

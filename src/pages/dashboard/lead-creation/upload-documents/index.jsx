@@ -1951,10 +1951,7 @@ const UploadDocuments = () => {
           },
         },
       );
-      setFieldValue(
-        `values?.applicants?.[${activeIndex}]?.applicant_details.document_meta`,
-        document_meta,
-      );
+      setFieldValue(`applicants.[${activeIndex}].applicant_details.document_meta`, document_meta);
       let requiredFields = {
         customer_photo: !!document_meta?.customer_photos?.find((slip) => slip?.active),
         id_proof: !!document_meta?.id_proof_photos?.find((slip) => slip?.active),

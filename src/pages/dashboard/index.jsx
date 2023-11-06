@@ -153,6 +153,7 @@ export default function Dashboard() {
             setQuery={setQuery}
             handleSubmit={handleSearch}
             handleReset={handleResetSearch}
+            disabled={loading}
           />
         </div>
       </div>
