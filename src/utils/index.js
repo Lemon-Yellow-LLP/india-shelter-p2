@@ -25,7 +25,7 @@ export const fieldLabels = {
   selected_address_proof: 'Address proof',
   address_proof_number: 'Address proof number',
   gender: 'Gender',
-  father_husband_name: `Father/Husband's name`,
+  father_name: `Father/Husband's name`,
   mother_name: `Mother's name`,
   marital_status: 'Marital Status',
   religion: 'Religion',

@@ -178,7 +178,7 @@ const PersonalDetails = () => {
       middle_name: existing_customer_middle_name,
       last_name: existing_customer_last_name,
       gender: existing_customer_gender,
-      father_husband_name: existing_customer_father_husband_name,
+      father_name: existing_customer_father_husband_name,
       mother_name: existing_customer_mother_name,
     };
 

@@ -134,7 +134,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
       if (
         pattern2.test(value) &&
-        (e.target.name == `applicants[${activeIndex}].personal_details.father_husband_name` ||
+        (e.target.name == `applicants[${activeIndex}].personal_details.father_name` ||
           e.target.name == `applicants[${activeIndex}].personal_details.mother_name`)
       ) {
         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
@@ -650,6 +650,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
         disabled={true}
       />
+
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
           Gender <span className='text-primary-red text-xs'>*</span>
@@ -735,16 +736,15 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       />
 
       <TextInput
-        label={`Father/Husband's name`}
+        label={`Father's Name`}
         placeholder='Eg: Akash'
         required
-        name={`applicants[${activeIndex}].personal_details.father_husband_name`}
-        value={values?.applicants?.[activeIndex]?.personal_details?.father_husband_name}
+        name={`applicants[${activeIndex}].personal_details.father_name`}
+        value={values?.applicants?.[activeIndex]?.personal_details?.father_name}
         onChange={handleTextInputChange}
-        error={errors.applicants?.[activeIndex]?.personal_details?.father_husband_name}
+        error={errors.applicants?.[activeIndex]?.personal_details?.father_name}
         touched={
-          touched?.applicants &&
-          touched.applicants?.[activeIndex]?.personal_details?.father_husband_name
+          touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.father_name
         }
         onBlur={(e) => {
           handleBlur(e);
@@ -830,6 +830,38 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       ) : (
         ''
       )}
+
+      {values?.applicants?.[activeIndex]?.personal_details?.marital_status === 'Married' ? (
+        <TextInput
+          label={`Spouse Name`}
+          placeholder='Eg: Akash'
+          required
+          name={`applicants[${activeIndex}].personal_details.spouse_name`}
+          value={values?.applicants?.[activeIndex]?.personal_details?.spouse_name}
+          onChange={handleTextInputChange}
+          error={errors.applicants?.[activeIndex]?.personal_details?.spouse_name}
+          touched={
+            touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.spouse_name
+          }
+          onBlur={(e) => {
+            handleBlur(e);
+            const name = e.target.name.split('.')[2];
+            if (
+              !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
+              values?.applicants?.[activeIndex]?.personal_details?.[name]
+            ) {
+              updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+              if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+              }
+            } else {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+              updateFields(name, '');
+            }
+          }}
+          disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        />
+      ) : null}
 
       <DropDown
         label='Religion'
