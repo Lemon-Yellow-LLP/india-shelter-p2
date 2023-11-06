@@ -67,7 +67,7 @@ const LeadContextProvider = ({ children }) => {
       let progressMap = {};
       let progressMapTemp = {};
       Object.keys(newData).forEach((key) => {
-        if (key !== 'lead') {
+        if (key !== 'lead' && key !== 'values?') {
           progressMap[key] = getProgress(newData[key]);
         }
       });
@@ -111,7 +111,6 @@ const LeadContextProvider = ({ children }) => {
       progressMapTemp.lt_charges = structuredClone(progressMap.lt_charges);
 
       const { totalKeys, valuesSum } = countKeysAndValues(progressMap);
-
       const resValues = countKeysAndValues(progressMapTemp);
 
       let finalProgress = parseInt(parseInt(valuesSum) / parseInt(totalKeys));

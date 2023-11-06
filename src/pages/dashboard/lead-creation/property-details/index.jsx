@@ -108,10 +108,6 @@ const PropertyDetails = () => {
               },
             },
           });
-
-          setRequiredFieldsStatus({
-            property_identification_is: true,
-          });
         } else {
           editPropertyById(
             values?.property_details?.id,
