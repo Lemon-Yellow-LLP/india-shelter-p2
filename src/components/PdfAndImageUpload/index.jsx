@@ -3,6 +3,7 @@ import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
 import { editDoc, editFieldsById, getApplicantById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 function PdfAndImageUpload({
   files,
@@ -21,6 +22,7 @@ function PdfAndImageUpload({
   ...props
 }) {
   const { activeIndex, values } = useContext(LeadContext);
+  const { token } = useContext(AuthContext);
   const [message, setMessage] = useState(errorMessage);
   const [loader, setLoader] = useState(false);
 
@@ -103,10 +105,23 @@ function PdfAndImageUpload({
   async function removeImage(id) {
     setFile(files.filter((x) => x.name !== id));
 
-    await editDoc(id, { active: false });
+    await editDoc(
+      id,
+      { active: false },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     const applicant = await getApplicantById(
       values?.applicants?.[activeIndex]?.applicant_details.id,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
     const document_meta = applicant.document_meta;
 
@@ -147,10 +162,23 @@ function PdfAndImageUpload({
   }
 
   async function deletePDF(id) {
-    await editDoc(id, { active: false });
+    await editDoc(
+      id,
+      { active: false },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     const applicant = await getApplicantById(
       values?.applicants?.[activeIndex]?.applicant_details.id,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
     const document_meta = applicant.document_meta;
 

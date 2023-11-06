@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
 import { validationSchemaLead } from '../schemas/index';
@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { applicantSteps, coApplicantSteps } from './Steps';
 import { editFieldsById, getApplicantById } from '../global';
 import { newCoApplicantValues } from './NewCoApplicant';
+import { AuthContext } from './AuthContextProvider';
 
 export const LeadContext = createContext(defaultValuesLead);
 
@@ -27,6 +28,8 @@ const LeadContextProvider = ({ children }) => {
   const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
   const [coApplicants, setCoApplicants] = useState([]);
   const [pincodeErr, setPincodeErr] = useState({});
+
+  const { token } = useContext(AuthContext);
 
   const location = useLocation();
 
@@ -121,12 +124,21 @@ const LeadContextProvider = ({ children }) => {
       formik.setFieldValue('lead.extra_params.progress_without_eligibility', tempFinalProgress);
 
       if (formik?.values?.lead?.id) {
-        await editFieldsById(formik?.values?.lead?.id, 'lead', {
-          extra_params: {
-            progress: finalProgress,
-            progress_without_eligibility: tempFinalProgress,
+        await editFieldsById(
+          formik?.values?.lead?.id,
+          'lead',
+          {
+            extra_params: {
+              progress: finalProgress,
+              progress_without_eligibility: tempFinalProgress,
+            },
           },
-        });
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
       }
     }
   };
@@ -150,9 +162,18 @@ const LeadContextProvider = ({ children }) => {
       if (newData?.[updateStep] && typeof newData[updateStep]?.extra_params === 'object') {
         newData[updateStep].extra_params.progress = finalProgress;
         newData[updateStep].extra_params.required_fields_status = requiredFieldsStatus;
-        await editFieldsById(formik.values[updateStep].id, page, {
-          extra_params: newData[updateStep].extra_params,
-        });
+        await editFieldsById(
+          formik.values[updateStep].id,
+          page,
+          {
+            extra_params: newData[updateStep].extra_params,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
       }
     } else {
       if (
@@ -163,9 +184,18 @@ const LeadContextProvider = ({ children }) => {
         newData.applicants[activeIndex][updateStep].extra_params.required_fields_status =
           requiredFieldsStatus;
 
-        await editFieldsById(formik.values.applicants[activeIndex][updateStep].id, page, {
-          extra_params: newData.applicants[activeIndex][updateStep].extra_params,
-        });
+        await editFieldsById(
+          formik.values.applicants[activeIndex][updateStep].id,
+          page,
+          {
+            extra_params: newData.applicants[activeIndex][updateStep].extra_params,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
       }
     }
     formik.setValues(newData);
@@ -197,6 +227,11 @@ const LeadContextProvider = ({ children }) => {
 
     const applicant = await getApplicantById(
       formik.values?.applicants?.[activeIndex]?.applicant_details.id,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
 
     const old_extra_params = applicant.extra_params;
@@ -213,9 +248,18 @@ const LeadContextProvider = ({ children }) => {
       upload_progress: finalProgress,
     };
 
-    await editFieldsById(formik.values.applicants[activeIndex].applicant_details.id, 'applicant', {
-      extra_params: updated_extra_params,
-    });
+    await editFieldsById(
+      formik.values.applicants[activeIndex].applicant_details.id,
+      'applicant',
+      {
+        extra_params: updated_extra_params,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     formik.setValues(newData);
 

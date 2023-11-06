@@ -10,6 +10,7 @@ import { Button } from '../../../../components';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const PersonalDetails = () => {
   const {
@@ -22,6 +23,8 @@ const PersonalDetails = () => {
     setValues,
     setCurrentStepIndex,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.applicants?.[activeIndex]?.personal_details?.extra_params?.required_fields_status,
@@ -56,6 +59,11 @@ const PersonalDetails = () => {
         values?.applicants[activeIndex]?.personal_details?.id,
         'personal',
         values?.applicants[activeIndex]?.personal_details,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
     } else {
       if (values?.applicants[activeIndex]?.personal_details?.id) {
@@ -63,6 +71,11 @@ const PersonalDetails = () => {
           values?.applicants[activeIndex]?.personal_details?.id,
           'personal',
           newData,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
       } else {
         let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
@@ -76,10 +89,18 @@ const PersonalDetails = () => {
           date_of_birth: values?.applicants[activeIndex]?.applicant_details?.date_of_birth,
           mobile_number: values?.applicants[activeIndex]?.applicant_details?.mobile_number,
         };
-        await addApi('personal', {
-          ...addData,
-          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
-        })
+        await addApi(
+          'personal',
+          {
+            ...addData,
+            applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
           .then(async (res) => {
             setFieldValue(`applicants[${activeIndex}].personal_details`, {
               ...addData,
@@ -94,6 +115,11 @@ const PersonalDetails = () => {
               values?.applicants[activeIndex]?.applicant_details?.id,
               'applicant',
               { personal_details: res.id },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           })
           .catch((err) => {
@@ -194,6 +220,11 @@ const PersonalDetails = () => {
           extra_params: {
             ...finalData.applicants[activeIndex].personal_details.extra_params,
             is_existing_done: true,
+          },
+        },
+        {
+          headers: {
+            Authorization: token,
           },
         },
       );

@@ -22,6 +22,7 @@ import SpeedoMeterAnimation from '../../../../components/speedometer';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import Topbar from '../../../../components/Topbar';
 import { useLocation } from 'react-router';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const Qualifier = () => {
   const {
@@ -32,6 +33,8 @@ const Qualifier = () => {
     setCurrentStepIndex,
     updateCompleteFormProgress,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const SpeedoMeterAnimationRef = useRef(null);
 
@@ -89,7 +92,11 @@ const Qualifier = () => {
 
   useEffect(() => {
     async function breOne() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id);
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
       const bre_101_response = res.bre_101_response;
 
@@ -168,7 +175,15 @@ const Qualifier = () => {
         }));
 
         final_api.push(
-          verifyPan(values?.applicants?.[activeIndex]?.applicant_details.id, { type: 'id' }, {}),
+          verifyPan(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            { type: 'id' },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          ),
         );
       } else if (values.applicants[activeIndex]?.personal_details.id_type === 'Driving license') {
         setDL((prev) => ({
@@ -178,7 +193,15 @@ const Qualifier = () => {
         }));
 
         final_api.push(
-          verifyDL(values?.applicants?.[activeIndex]?.applicant_details.id, { type: 'id' }, {}),
+          verifyDL(
+            values?.applicants?.[activeIndex]?.applicant_details.id,
+            { type: 'id' },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          ),
         );
       } else if (values.applicants[activeIndex]?.personal_details.id_type === 'Voter ID') {
         setVoterID((prev) => ({
@@ -191,7 +214,11 @@ const Qualifier = () => {
           verifyVoterID(
             values?.applicants?.[activeIndex]?.applicant_details.id,
             { type: 'id' },
-            {},
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           ),
         );
       }
@@ -211,7 +238,11 @@ const Qualifier = () => {
             verifyDL(
               values?.applicants?.[activeIndex]?.applicant_details.id,
               { type: 'address' },
-              {},
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             ),
           );
         } else if (
@@ -227,7 +258,11 @@ const Qualifier = () => {
             verifyVoterID(
               values?.applicants?.[activeIndex]?.applicant_details.id,
               { type: 'address' },
-              {},
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             ),
           );
         }
@@ -236,15 +271,33 @@ const Qualifier = () => {
       if (values.applicants[activeIndex]?.work_income_detail.pf_uan) {
         setPfUAN((prev) => ({ ...prev, loader: true, ran: true }));
 
-        final_api.push(verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+        final_api.push(
+          verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {
+            headers: {
+              Authorization: token,
+            },
+          }),
+        );
       } else if (values.applicants[activeIndex]?.work_income_detail.gst_number) {
         setGST((prev) => ({ ...prev, loader: true, ran: true }));
 
-        final_api.push(verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+        final_api.push(
+          verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {
+            headers: {
+              Authorization: token,
+            },
+          }),
+        );
       }
 
       setDedupe((prev) => ({ ...prev, loader: true, ran: true }));
-      final_api.push(checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {}));
+      final_api.push(
+        checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {
+          headers: {
+            Authorization: token,
+          },
+        }),
+      );
 
       try {
         let response = null;
@@ -274,7 +327,11 @@ const Qualifier = () => {
 
         const bre99_res = await checkBre99(
           values?.applicants?.[activeIndex]?.applicant_details.id,
-          {},
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
 
         if (bre99_res.bre_99_response.statusCode == 200) {
@@ -294,7 +351,11 @@ const Qualifier = () => {
         try {
           const cibil_res = await checkCibil(
             values?.applicants?.[activeIndex]?.applicant_details.id,
-            {},
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           if (cibil_res.status == 200) {
             setBureau((prev) => ({
@@ -315,7 +376,11 @@ const Qualifier = () => {
         try {
           const crif_res = await checkCrif(
             values?.applicants?.[activeIndex]?.applicant_details.id,
-            {},
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
           if (crif_res.status == 200) {
             setBureau((prev) => ({
@@ -335,10 +400,11 @@ const Qualifier = () => {
       }
 
       try {
-        const bre_res = await checkBre101(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
-          {},
-        );
+        const bre_res = await checkBre101(values?.applicants?.[activeIndex]?.applicant_details.id, {
+          headers: {
+            Authorization: token,
+          },
+        });
 
         if (bre_res.bre_101_response.statusCode != 200) return;
 
@@ -361,10 +427,19 @@ const Qualifier = () => {
           GST_Status: bre_res.bre_101_response.body.Display.GST_Status,
         };
 
-        await editFieldsById(values?.applicants?.[activeIndex]?.applicant_details.id, 'applicant', {
-          bre_101_response: bre_res.bre_101_response,
-          extra_params: edited_extra_params,
-        });
+        await editFieldsById(
+          values?.applicants?.[activeIndex]?.applicant_details.id,
+          'applicant',
+          {
+            bre_101_response: bre_res.bre_101_response,
+            extra_params: edited_extra_params,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
 
         setFieldValue(
           `applicants[${activeIndex}].applicant_details.extra_params`,
@@ -417,6 +492,7 @@ const Qualifier = () => {
         }
       } catch (err) {
         console.log(err);
+        setBre101((prev) => ({ ...prev, res: true }));
       }
     }
 
@@ -513,7 +589,7 @@ const Qualifier = () => {
             values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN') && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!PAN.ran ? (
+                {/* {!PAN.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -543,7 +619,7 @@ const Qualifier = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>PAN card</p>
               </div>
@@ -561,7 +637,7 @@ const Qualifier = () => {
               'Driving license') && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!DL.ran ? (
+                {/* {!DL.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -591,7 +667,7 @@ const Qualifier = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>Driving license</p>
               </div>
@@ -609,7 +685,7 @@ const Qualifier = () => {
               'Voter ID') && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!voterID.ran ? (
+                {/* {!voterID.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -639,7 +715,7 @@ const Qualifier = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>Voter ID</p>
               </div>
@@ -657,7 +733,7 @@ const Qualifier = () => {
           {values.applicants[activeIndex]?.work_income_detail.pf_uan && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!pfUAN.ran ? (
+                {/* {!pfUAN.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -687,7 +763,7 @@ const Qualifier = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>PF UAN</p>
               </div>
@@ -711,7 +787,7 @@ const Qualifier = () => {
           {values.applicants[activeIndex]?.work_income_detail.gst_number && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
-                {!GST.ran ? (
+                {/* {!GST.ran ? (
                   <svg
                     width='24'
                     height='24'
@@ -741,7 +817,7 @@ const Qualifier = () => {
                       strokeLinejoin='round'
                     />
                   </svg>
-                )}
+                )} */}
 
                 <p className='text-sm text-primary-black'>GST</p>
               </div>
@@ -762,7 +838,7 @@ const Qualifier = () => {
 
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
-              {!dedupe.ran ? (
+              {/* {!dedupe.ran ? (
                 <svg
                   width='24'
                   height='24'
@@ -792,7 +868,7 @@ const Qualifier = () => {
                     strokeLinejoin='round'
                   />
                 </svg>
-              )}
+              )} */}
 
               <p className='text-sm text-primary-black'>Dedupe</p>
             </div>
@@ -810,7 +886,7 @@ const Qualifier = () => {
 
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
-              {!bre99.ran ? (
+              {/* {!bre99.ran ? (
                 <svg
                   width='24'
                   height='24'
@@ -840,7 +916,7 @@ const Qualifier = () => {
                     strokeLinejoin='round'
                   />
                 </svg>
-              )}
+              )} */}
 
               <p className='text-sm text-primary-black'>BRE 99</p>
             </div>
@@ -858,7 +934,7 @@ const Qualifier = () => {
 
           <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
             <div className='flex items-center gap-1'>
-              {!bureau.ran ? (
+              {/* {!bureau.ran ? (
                 <svg
                   width='24'
                   height='24'
@@ -888,7 +964,7 @@ const Qualifier = () => {
                     strokeLinejoin='round'
                   />
                 </svg>
-              )}
+              )} */}
 
               <p className='text-sm text-primary-black'>Bureau</p>
             </div>
@@ -905,10 +981,19 @@ const Qualifier = () => {
           </div>
         </div>
         <div>
-          <p className='text-xs not-italic font-normal text-dark-grey mt-3 text-center'>
-            Do not close the app or go back. Please wait for ID <br /> verification as it may take
-            some time. We are validating these checks as per your consent
-          </p>
+          {!bre101.res ? (
+            <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-primary-black mt-3 p-1.5 border border-[#E1CE3F] bg-[#FFFAD6] rounded-md'>
+              <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+              Do not close the app or go back. Please wait for ID verification as it may take some
+              time. We are validating these checks as per your consent.
+            </p>
+          ) : (
+            <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-dark-grey mt-3'>
+              <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+              Do not close the app or go back. Please wait for ID verification as it may take some
+              time. We are validating these checks as per your consent.
+            </p>
+          )}
         </div>
       </div>
 

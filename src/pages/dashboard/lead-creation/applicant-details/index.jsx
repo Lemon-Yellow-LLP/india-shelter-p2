@@ -55,6 +55,8 @@ const ApplicantDetails = () => {
 
   const { lo_id } = useContext(AuthContext);
 
+  const { token } = useContext(AuthContext);
+
   const [openExistingPopup, setOpenExistingPopup] = useState(false);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
@@ -103,10 +105,19 @@ const ApplicantDetails = () => {
         values?.applicants[activeIndex]?.applicant_details?.id,
         'applicant',
         newData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
       return res;
     } else {
-      await addApi('applicant', values?.applicants?.[activeIndex]?.applicant_details)
+      await addApi('applicant', values?.applicants?.[activeIndex]?.applicant_details, {
+        headers: {
+          Authorization: token,
+        },
+      })
         .then((res) => {
           setFieldValue(`applicants[${activeIndex}].applicant_details.id`, res.id);
           return res;
@@ -122,13 +133,21 @@ const ApplicantDetails = () => {
       let newData = {};
       newData[name] = value;
       newData.lo_id = lo_id;
-      const res = await editFieldsById(values?.lead?.id, 'lead', newData);
+      const res = await editFieldsById(values?.lead?.id, 'lead', newData, {
+        headers: {
+          Authorization: token,
+        },
+      });
       return res;
     } else {
       let newData = { ...values?.lead };
       newData[name] = value;
       newData.lo_id = lo_id;
-      await addApi('lead', newData)
+      await addApi('lead', newData, {
+        headers: {
+          Authorization: token,
+        },
+      })
         .then((res) => {
           setFieldValue('lead.id', res.id);
           return res;
@@ -265,6 +284,11 @@ const ApplicantDetails = () => {
               otp_fail_count: 0,
               otp_fail_release: null,
             },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
         }
       }
@@ -315,9 +339,18 @@ const ApplicantDetails = () => {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['date_of_birth']: true }));
       }
       if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-        await editFieldsById(values?.applicants[activeIndex]?.personal_details?.id, 'personal', {
-          date_of_birth: finalDate,
-        });
+        await editFieldsById(
+          values?.applicants[activeIndex]?.personal_details?.id,
+          'personal',
+          {
+            date_of_birth: finalDate,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
       }
     }
   };
@@ -327,7 +360,11 @@ const ApplicantDetails = () => {
       await updateFieldsApplicant().then(async () => {
         // setDisablePhoneNumber((prev) => !prev);
 
-        getMobileOtp(values.applicants[activeIndex]?.applicant_details?.id).then(async (res) => {
+        getMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, {
+          headers: {
+            Authorization: token,
+          },
+        }).then(async (res) => {
           setShowOTPInput(true);
           setHasSentOTPOnce(true);
           setToastMessage('OTP has been sent to your mail id');
@@ -345,7 +382,7 @@ const ApplicantDetails = () => {
             },
           };
 
-          await checkExistingCustomer(bodyForExistingCustomer)
+          await checkExistingCustomer(bodyForExistingCustomer, token)
             .then((body) => {
               if (body && body?.length !== 0) {
                 const { existing_customer_is_existing_customer } = body[0];
@@ -384,6 +421,11 @@ const ApplicantDetails = () => {
                     extra_params: {
                       ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
                       is_existing: true,
+                    },
+                  },
+                  {
+                    headers: {
+                      Authorization: token,
                     },
                   },
                 );
@@ -434,7 +476,11 @@ const ApplicantDetails = () => {
   };
 
   const verifyOTP = async (otp) => {
-    verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp)
+    verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp, {
+      headers: {
+        Authorization: token,
+      },
+    })
       .then(async () => {
         await updateFieldsLead().then((res) => {
           setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
@@ -621,6 +667,11 @@ const ApplicantDetails = () => {
                     {
                       first_name: values?.applicants?.[activeIndex]?.applicant_details?.first_name,
                     },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
                   );
                 }
               } else {
@@ -635,6 +686,11 @@ const ApplicantDetails = () => {
                     'personal',
                     {
                       first_name: '',
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
                     },
                   );
                 }
@@ -681,6 +737,11 @@ const ApplicantDetails = () => {
                           middle_name:
                             values?.applicants?.[activeIndex]?.applicant_details?.middle_name,
                         },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
                       );
                     }
                   } else {
@@ -691,6 +752,11 @@ const ApplicantDetails = () => {
                         'personal',
                         {
                           middle_name: '',
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
                         },
                       );
                     }
@@ -735,6 +801,11 @@ const ApplicantDetails = () => {
                           last_name:
                             values?.applicants?.[activeIndex]?.applicant_details?.last_name,
                         },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
                       );
                     }
                   } else {
@@ -745,6 +816,11 @@ const ApplicantDetails = () => {
                         'personal',
                         {
                           last_name: '',
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
                         },
                       );
                     }
@@ -976,6 +1052,11 @@ const ApplicantDetails = () => {
                     extra_params: {
                       ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
                       is_existing_done: true,
+                    },
+                  },
+                  {
+                    headers: {
+                      Authorization: token,
                     },
                   },
                 );

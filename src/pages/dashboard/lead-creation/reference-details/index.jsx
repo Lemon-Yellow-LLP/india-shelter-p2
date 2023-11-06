@@ -37,7 +37,7 @@ const ReferenceDetails = () => {
     setPincodeErr,
   } = useContext(LeadContext);
 
-  const { phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
+  const { phoneNumberList, setPhoneNumberList, token } = useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.reference_details?.extra_params?.required_fields_status,
@@ -58,14 +58,26 @@ const ReferenceDetails = () => {
     newData[name] = value;
 
     if (values?.reference_details?.id) {
-      await editFieldsById(values?.reference_details?.id, 'reference', newData);
+      await editFieldsById(values?.reference_details?.id, 'reference', newData, {
+        headers: {
+          Authorization: token,
+        },
+      });
     } else {
       let newDefaultValues = structuredClone(defaultValuesLead);
       let addData = { ...newDefaultValues.reference_details, [name]: value };
-      await addApi('reference', {
-        ...addData,
-        lead_id: values?.lead?.id,
-      })
+      await addApi(
+        'reference',
+        {
+          ...addData,
+          lead_id: values?.lead?.id,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      )
         .then(async (res) => {
           setFieldValue(`reference_details`, {
             ...addData,
@@ -167,15 +179,27 @@ const ReferenceDetails = () => {
       setFieldValue('reference_details.reference_1_state', '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_pincode']: false }));
 
-      editReferenceById(values?.reference_details?.id, {
-        reference_1_city: '',
-        reference_1_state: '',
-        reference_1_pincode: '',
-      });
+      editReferenceById(
+        values?.reference_details?.id,
+        {
+          reference_1_city: '',
+          reference_1_state: '',
+          reference_1_pincode: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       return;
     }
 
-    const res = await checkIsValidStatePincode(values?.reference_details?.reference_1_pincode);
+    const res = await checkIsValidStatePincode(values?.reference_details?.reference_1_pincode, {
+      headers: {
+        Authorization: token,
+      },
+    });
     if (!res) {
       setFieldValue('reference_details.reference_1_city', '');
       setFieldValue('reference_details.reference_1_state', '');
@@ -183,18 +207,34 @@ const ReferenceDetails = () => {
       setPincodeErr((prev) => ({ ...prev, reference_1: 'Invalid Pincode' }));
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_pincode']: false }));
 
-      editReferenceById(values?.reference_details?.id, {
-        reference_1_city: '',
-        reference_1_state: '',
-        reference_1_pincode: '',
-      });
+      editReferenceById(
+        values?.reference_details?.id,
+        {
+          reference_1_city: '',
+          reference_1_state: '',
+          reference_1_pincode: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       return;
     }
 
-    editReferenceById(values?.reference_details?.id, {
-      reference_1_city: res.city,
-      reference_1_state: res.state,
-    });
+    editReferenceById(
+      values?.reference_details?.id,
+      {
+        reference_1_city: res.city,
+        reference_1_state: res.state,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     setFieldValue('reference_details.reference_1_city', res.city);
     setFieldValue('reference_details.reference_1_state', res.state);
@@ -221,33 +261,61 @@ const ReferenceDetails = () => {
       setFieldValue('reference_details.reference_2_state', '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_pincode']: false }));
 
-      editReferenceById(values?.reference_details?.id, {
-        reference_2_city: '',
-        reference_2_state: '',
-        reference_2_pincode: '',
-      });
+      editReferenceById(
+        values?.reference_details?.id,
+        {
+          reference_2_city: '',
+          reference_2_state: '',
+          reference_2_pincode: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       return;
     }
 
-    const res = await checkIsValidStatePincode(values?.reference_details?.reference_2_pincode);
+    const res = await checkIsValidStatePincode(values?.reference_details?.reference_2_pincode, {
+      headers: {
+        Authorization: token,
+      },
+    });
     if (!res) {
       setFieldError('reference_details.reference_2_pincode', 'Invalid Pincode');
       setPincodeErr((prev) => ({ ...prev, reference_2: 'Invalid Pincode' }));
       setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_pincode']: false }));
       setFieldValue('reference_details.reference_2_city', '');
       setFieldValue('reference_details.reference_2_state', '');
-      editReferenceById(values?.reference_details?.id, {
-        reference_2_city: '',
-        reference_2_state: '',
-        reference_2_pincode: '',
-      });
+      editReferenceById(
+        values?.reference_details?.id,
+        {
+          reference_2_city: '',
+          reference_2_state: '',
+          reference_2_pincode: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       return;
     }
 
-    editReferenceById(values?.reference_details?.id, {
-      reference_2_city: res.city,
-      reference_2_state: res.state,
-    });
+    editReferenceById(
+      values?.reference_details?.id,
+      {
+        reference_2_city: res.city,
+        reference_2_state: res.state,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     setFieldValue('reference_details.reference_2_city', res.city);
     setFieldValue('reference_details.reference_2_state', res.state);

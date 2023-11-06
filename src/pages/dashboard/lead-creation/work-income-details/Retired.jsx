@@ -3,10 +3,12 @@ import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInput from '../../../../components/TextInput';
 import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, errors, handleBlur, touched, setFieldValue, activeIndex } =
     useContext(LeadContext);
+  const { token } = useContext(AuthContext);
 
   return (
     <>
@@ -32,6 +34,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
                 pention_amount:
                   values?.applicants?.[activeIndex]?.work_income_detail?.pention_amount,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             setRequiredFieldsStatus((prev) => ({
@@ -44,6 +51,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
               'work-income',
               {
                 pention_amount: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }
@@ -88,6 +100,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
                   values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan,
                 ),
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
 
             setRequiredFieldsStatus((prev) => ({
@@ -102,6 +119,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
                 'work-income',
                 {
                   ongoing_emi: null,
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
                 },
               );
 
@@ -132,6 +154,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
               'work-income',
               {
                 no_current_loan: 0,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }
@@ -178,6 +205,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
               {
                 ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             setRequiredFieldsStatus((prev) => ({
@@ -190,6 +222,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
               'work-income',
               {
                 ongoing_emi: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
               },
             );
           }

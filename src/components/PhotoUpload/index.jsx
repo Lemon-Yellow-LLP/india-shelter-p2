@@ -3,6 +3,7 @@ import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
 import { editDoc, editFieldsById, getApplicantById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 function PhotoUpload({
   files,
@@ -14,9 +15,11 @@ function PhotoUpload({
   hint,
   setLatLong,
   errorMessage,
+  disabled,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
+  const { token } = useContext(AuthContext);
   const [message, setMessage] = useState(errorMessage);
   const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
@@ -56,10 +59,23 @@ function PhotoUpload({
 
     setFile(files.filter((x) => x.name !== id));
 
-    await editDoc(id, { active: false });
+    await editDoc(
+      id,
+      { active: false },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     const applicant = await getApplicantById(
       values?.applicants?.[activeIndex]?.applicant_details.id,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
     const document_meta = applicant.document_meta;
 
@@ -193,7 +209,11 @@ function PhotoUpload({
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
             {message}
           </span>
-          <div className='bg-white border-x border-y border-stroke rounded-lg p-2 flex justify-between mt-1'>
+          <div
+            className={` border-x border-y border-stroke rounded-lg p-2 flex justify-between mt-1 ${
+              disabled ? 'bg-stroke pointer-events-none' : 'bg-white pointer-events-auto'
+            }`}
+          >
             <div className='flex gap-2 items-center'>
               <div className='relative rounded-md h-10 w-10'>
                 <div className='absolute h-full w-full bg-black opacity-40'></div>

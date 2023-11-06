@@ -14,6 +14,7 @@ import EditLeadEnabled from '../../assets/icons/EditFormEnabled';
 import loading from '../../assets/icons/loading.svg';
 
 export default function DashboardApplicant() {
+  const { token } = useContext(AuthContext);
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
@@ -45,7 +46,11 @@ export default function DashboardApplicant() {
   useEffect(() => {
     (async () => {
       try {
-        const data = await getDashboardLeadById(id);
+        const data = await getDashboardLeadById(id, {
+          headers: {
+            Authorization: token,
+          },
+        });
         setLeadData(data);
 
         // Find Primary Applicant
@@ -133,38 +138,40 @@ export default function DashboardApplicant() {
 
   const bankingDetailsArr = (applicant) => {
     let arr = [];
-    applicant?.banking_details?.map(
-      (b, i) =>
-        (arr = [
-          ...arr,
+    applicant?.banking_details
+      ?.filter((b) => !b?.extra_params?.is_deleted)
+      ?.map(
+        (b, i) =>
+          (arr = [
+            ...arr,
 
-          {
-            subtitle: `ACCOUNT ${i + 1}`,
-            label: 'Bank name',
-            value: b?.bank_name,
-          },
-          {
-            label: 'Account number',
-            value: b?.account_number,
-          },
-          {
-            label: 'Penny drop',
-            value: b?.penny_drop_response?.result?.active === 'yes' ? 'Success' : 'Failed',
-          },
-          {
-            label: 'IFSC Code',
-            value: b?.ifsc_code,
-          },
-          {
-            label: 'Branch',
-            value: b?.branch_name,
-          },
-          {
-            label: 'Account type',
-            value: b?.account_type,
-          },
-        ]),
-    );
+            {
+              subtitle: `ACCOUNT ${i + 1}`,
+              label: 'Bank name',
+              value: b?.bank_name,
+            },
+            {
+              label: 'Account number',
+              value: b?.account_number,
+            },
+            {
+              label: 'Penny drop',
+              value: b?.penny_drop_response?.result?.active === 'yes' ? 'Success' : 'Failed',
+            },
+            {
+              label: 'IFSC Code',
+              value: b?.ifsc_code,
+            },
+            {
+              label: 'Branch',
+              value: b?.branch_name,
+            },
+            {
+              label: 'Account type',
+              value: b?.account_type,
+            },
+          ]),
+      );
     return arr;
   };
 
@@ -1272,7 +1279,7 @@ export default function DashboardApplicant() {
 
 const Titlebar = ({ title, id, primaryApplicant }) => {
   const { setValues, setActiveIndex } = useContext(LeadContext);
-  const { setPhoneNumberList, toastMessage, setToastMessage } = useContext(AuthContext);
+  const { setPhoneNumberList, toastMessage, setToastMessage, token } = useContext(AuthContext);
 
   const [totalProgress, setTotalProgress] = useState(0);
   const [leadData, setLeadData] = useState(null);
@@ -1283,7 +1290,11 @@ const Titlebar = ({ title, id, primaryApplicant }) => {
   const navigate = useNavigate();
 
   const getLeadData = async () => {
-    const data = await getDashboardLeadById(id);
+    const data = await getDashboardLeadById(id, {
+      headers: {
+        Authorization: token,
+      },
+    });
     setLeadData(data);
     setTotalProgress(data?.lead?.extra_params?.progress);
   };
@@ -1293,7 +1304,11 @@ const Titlebar = ({ title, id, primaryApplicant }) => {
   }, []);
 
   const handleOpenForm = async (id) => {
-    const data = await getDashboardLeadById(id);
+    const data = await getDashboardLeadById(id, {
+      headers: {
+        Authorization: token,
+      },
+    });
 
     setPhoneNumberList((prev) => {
       return {
@@ -1334,7 +1349,11 @@ const Titlebar = ({ title, id, primaryApplicant }) => {
     setSfdcPush({ ...sfdcPush, loader: true });
 
     try {
-      const sfdc_res = await pushToSalesforce(leadData.lead.id, {});
+      const sfdc_res = await pushToSalesforce(leadData.lead.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
       if (sfdc_res) {
         setToastMessage('Data has been successfully pushed to the Salesforce');
