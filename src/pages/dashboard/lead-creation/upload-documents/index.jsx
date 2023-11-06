@@ -1965,8 +1965,6 @@ const UploadDocuments = () => {
           extra_params?.is_upload_otp_verified,
       };
 
-      console.log(document_meta);
-
       setRequiredFieldsStatus((prev) => {
         if (
           values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
