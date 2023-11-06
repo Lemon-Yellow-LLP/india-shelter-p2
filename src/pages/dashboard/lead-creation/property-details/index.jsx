@@ -10,7 +10,6 @@ import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import Popup from '../../../../components/Popup';
 import { AuthContext } from '../../../../context/AuthContextProvider';
-
 const propertyIdentificationOptions = [
   {
     label: 'Done!',
@@ -23,9 +22,7 @@ const propertyIdentificationOptions = [
     icon: <IconPropertyUnIdentified />,
   },
 ];
-
 const selectedLoanType = 'LAP';
-
 const PropertyDetails = () => {
   const {
     values,
@@ -37,29 +34,21 @@ const PropertyDetails = () => {
     activeIndex,
     setCurrentStepIndex,
   } = useContext(LeadContext);
-
   const { token } = useContext(AuthContext);
-
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.property_details?.extra_params?.required_fields_status,
   });
-
   const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(false);
-
   const handleCloseQualifierNotActivePopup = () => {
     setOpenQualifierNotActivePopup(false);
   };
-
   useEffect(() => {
     updateProgressApplicantSteps('property_details', requiredFieldsStatus, 'property');
   }, [requiredFieldsStatus]);
-
   const handleRadioChange = useCallback(
     async (e) => {
       const name = e.name;
-
       setFieldValue('property_details.property_identification_is', e.value);
-
       if (values?.property_details?.id) {
         if (e.value === 'not-yet') {
           editPropertyById(
@@ -86,7 +75,6 @@ const PropertyDetails = () => {
               },
             },
           );
-
           setValues({
             ...values,
             property_details: {
@@ -196,7 +184,6 @@ const PropertyDetails = () => {
     },
     [requiredFieldsStatus, setFieldValue],
   );
-
   return (
     <>
       <Popup
@@ -233,7 +220,6 @@ const PropertyDetails = () => {
               </CardRadio>
             ))}
           </div>
-
           {errors?.property_details?.property_identification_is &&
           touched?.property_details?.property_identification_is ? (
             <span
@@ -245,7 +231,6 @@ const PropertyDetails = () => {
           ) : (
             ''
           )}
-
           {values?.property_details?.property_identification_is === 'done' ? (
             <IdentificationDoneFields
               selectedLoanType={selectedLoanType}
@@ -254,9 +239,7 @@ const PropertyDetails = () => {
             />
           ) : null}
         </div>
-
         {/* <button onClick={handleSubmit}>submit</button> */}
-
         <PreviousNextButtons
           linkPrevious={
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
@@ -281,11 +264,9 @@ const PropertyDetails = () => {
               : null;
           }}
         />
-
         <SwipeableDrawerComponent />
       </div>
     </>
   );
 };
-
 export default PropertyDetails;
