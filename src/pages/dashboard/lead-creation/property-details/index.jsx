@@ -54,6 +54,7 @@ const PropertyDetails = () => {
           editPropertyById(
             values?.property_details?.id,
             {
+              property_identification_is: e.value,
               property_value_estimate: '',
               owner_name: '',
               plot_house_flat: '',
