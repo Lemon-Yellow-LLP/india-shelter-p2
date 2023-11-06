@@ -584,7 +584,9 @@ export default function Preview() {
               hide={
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.applicant_details.name
-                ]?.extra_params?.banking_progress == 100
+                ]?.extra_params?.banking_progress == 100 ||
+                !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.applicant_details
+                  ?.extra_params?.qualifier
               }
               title={pages.banking_details.title}
               link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
@@ -887,7 +889,8 @@ export default function Preview() {
               index={primaryIndex}
               hide={
                 values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.banking_progress == 100
+                  ?.banking_progress == 100 ||
+                !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.qualifier
               }
               title={pages.banking_details.title}
               link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
