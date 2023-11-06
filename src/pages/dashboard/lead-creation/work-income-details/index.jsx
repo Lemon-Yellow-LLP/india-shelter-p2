@@ -69,7 +69,7 @@ const WorkIncomeDetails = () => {
         let _requiredFieldStatus = {};
 
         if (e.value === 'Salaried') {
-          if (values?.applicants?.[activeIndex]?.is_primary) {
+          if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
               profession: true,
               company_name: false,
@@ -107,7 +107,7 @@ const WorkIncomeDetails = () => {
             };
           }
         } else if (e.value === 'Self-employed') {
-          if (values?.applicants?.[activeIndex]?.is_primary) {
+          if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
               profession: true,
               business_name: false,
@@ -141,7 +141,7 @@ const WorkIncomeDetails = () => {
             };
           }
         } else if (e.value === 'Unemployed') {
-          if (values?.applicants?.[activeIndex]?.is_primary) {
+          if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
               profession: true,
               no_current_loan: false,
@@ -161,7 +161,7 @@ const WorkIncomeDetails = () => {
             };
           }
         } else if (e.value === 'Retired') {
-          if (values?.applicants?.[activeIndex]?.is_primary) {
+          if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
               profession: true,
               no_current_loan: false,
