@@ -224,8 +224,9 @@ const UploadDocuments = () => {
             setAddressSatus(bre_Display_body[i]);
           }
         }
-
         setIsQaulifierActivated(res.bre_101_response);
+      } else {
+        setIsQaulifierActivated(false);
       }
     }
     getQualifierResponse();
