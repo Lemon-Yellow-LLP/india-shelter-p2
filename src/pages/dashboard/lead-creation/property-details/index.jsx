@@ -143,15 +143,14 @@ const PropertyDetails = () => {
               },
             },
           );
-          setRequiredFieldsStatus((prev) => ({
-            ...prev,
+          setRequiredFieldsStatus({
             owner_name: false,
             pincode: false,
             plot_house_flat: false,
             project_society_colony: false,
             property_identification_is: true,
             property_value_estimate: false,
-          }));
+          });
         }
       } else {
         let newDefaultValues = structuredClone(defaultValuesLead);
@@ -162,6 +161,19 @@ const PropertyDetails = () => {
             progress: 100,
             required_fields_status: {
               property_identification_is: true,
+            },
+          };
+        } else {
+          addData.extra_params = {
+            ...addData.extra_params,
+            progress: 16,
+            required_fields_status: {
+              property_identification_is: true,
+              property_value_estimate: false,
+              owner_name: false,
+              plot_house_flat: false,
+              project_society_colony: false,
+              pincode: false,
             },
           };
         }
@@ -179,6 +191,7 @@ const PropertyDetails = () => {
         )
           .then(async (res) => {
             setFieldValue('property_details', { ...addData, id: res.id });
+            setRequiredFieldsStatus({ ...addData.extra_params.required_fields_status });
           })
           .catch((err) => {
             console.log(err);
