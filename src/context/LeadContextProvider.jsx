@@ -67,7 +67,7 @@ const LeadContextProvider = ({ children }) => {
       let progressMap = {};
       let progressMapTemp = {};
       Object.keys(newData).forEach((key) => {
-        if (key !== 'lead' && key !== 'values?') {
+        if (key !== 'lead') {
           progressMap[key] = getProgress(newData[key]);
         }
       });
