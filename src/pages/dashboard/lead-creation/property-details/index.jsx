@@ -108,10 +108,6 @@ const PropertyDetails = () => {
               },
             },
           });
-
-          setRequiredFieldsStatus({
-            property_identification_is: true,
-          });
         } else {
           editPropertyById(
             values?.property_details?.id,
@@ -143,8 +139,7 @@ const PropertyDetails = () => {
               },
             },
           );
-          setRequiredFieldsStatus((prev) => ({
-            ...prev,
+          setRequiredFieldsStatus(() => ({
             owner_name: false,
             pincode: false,
             plot_house_flat: false,
@@ -179,6 +174,10 @@ const PropertyDetails = () => {
         )
           .then(async (res) => {
             setFieldValue('property_details', { ...addData, id: res.id });
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              property_identification_is: true,
+            }));
           })
           .catch((err) => {
             console.log(err);
