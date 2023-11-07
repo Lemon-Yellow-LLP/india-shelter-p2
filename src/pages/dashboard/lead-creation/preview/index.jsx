@@ -12,16 +12,39 @@ import { Snackbar } from '@mui/material';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import PropTypes from 'prop-types';
+import { getApplicantById } from '../../../../global';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 const steps = ['', '', '', '', ''];
 
 export default function Preview() {
-  const { values, errors, activeIndex, setActiveIndex, handleSubmit, pincodeErr } =
-    useContext(LeadContext);
+  const {
+    values,
+    errors,
+    activeIndex,
+    setActiveIndex,
+    handleSubmit,
+    pincodeErr,
+    setFieldValue,
+
+    updateProgressUploadDocumentSteps,
+  } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
+
+  const isCoApplicant = values?.applicants?.[activeIndex]?.applicant_details?.is_primary == false;
+
+  const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
+    ...values?.applicant_details?.extra_params?.upload_required_fields_status,
+  });
 
   useEffect(() => {
-    console.log(errors);
-  }, [errors]);
+    updateProgressUploadDocumentSteps(requiredFieldsStatus);
+  }, [requiredFieldsStatus]);
+
+  // useEffect(() => {
+  //   console.log(errors);
+  // }, [errors]);
 
   const navigate = useNavigate();
 
@@ -333,6 +356,100 @@ export default function Preview() {
     setCoApplicantIndex(activeStep ? activeStep - 1 : 0);
   }, [activeStep]);
 
+  useEffect(() => {
+    async function getRequiredFields() {
+      const { extra_params, document_meta } = await getApplicantById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      setFieldValue(`applicants.[${activeIndex}].applicant_details.document_meta`, document_meta);
+      let requiredFields = {
+        customer_photo: !!document_meta?.customer_photos?.find((slip) => slip?.active),
+        id_proof: !!document_meta?.id_proof_photos?.find((slip) => slip?.active),
+        address_proof: !!document_meta?.address_proof_photos?.find((slip) => slip?.active),
+        property_paper: !!document_meta?.property_paper_photos?.find((slip) => slip?.active),
+        salary_slip: !!document_meta?.salary_slip_photos?.find((slip) => slip?.active),
+        form_60: !!document_meta?.form_60_photos?.find((slip) => slip?.active),
+        property_image: !!document_meta?.property_photos?.find((slip) => slip?.active),
+        upload_selfie:
+          document_meta?.lo_selfie?.find((slip) => slip?.active) &&
+          extra_params?.is_upload_otp_verified,
+      };
+
+      setRequiredFieldsStatus((prev) => {
+        if (
+          values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
+          document_meta?.salary_slip_photos?.find((slip) => slip?.active) ||
+          isCoApplicant
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            salary_slip: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            salary_slip: false,
+          };
+        }
+
+        if (
+          values?.property_details?.property_identification_is === 'not-yet' ||
+          document_meta?.property_photos?.find((slip) => slip?.active) ||
+          isCoApplicant
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            property_image: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            property_image: false,
+          };
+        }
+
+        if (
+          values?.property_details?.property_identification_is === 'not-yet' ||
+          document_meta?.property_paper_photos?.find((slip) => slip?.active) ||
+          isCoApplicant
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            property_paper: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            property_paper: false,
+          };
+        }
+
+        if (
+          (document_meta?.lo_selfie?.find((slip) => slip?.active) &&
+            extra_params?.is_upload_otp_verified) ||
+          isCoApplicant
+        ) {
+          requiredFields = {
+            ...requiredFields,
+            upload_selfie: true,
+          };
+        } else {
+          requiredFields = {
+            ...requiredFields,
+            upload_selfie: false,
+          };
+        }
+        return requiredFields;
+      });
+    }
+    getRequiredFields();
+  }, []);
+
   const previousStep = () => {
     setActiveStep((prev) => {
       if (prev === 0) {
@@ -584,7 +701,9 @@ export default function Preview() {
               hide={
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.applicant_details.name
-                ]?.extra_params?.banking_progress == 100
+                ]?.extra_params?.banking_progress == 100 ||
+                !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.applicant_details
+                  ?.extra_params?.qualifier
               }
               title={pages.banking_details.title}
               link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
@@ -887,7 +1006,8 @@ export default function Preview() {
               index={primaryIndex}
               hide={
                 values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.banking_progress == 100
+                  ?.banking_progress == 100 ||
+                !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.qualifier
               }
               title={pages.banking_details.title}
               link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
