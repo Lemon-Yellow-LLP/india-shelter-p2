@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SearchIcon from '../../assets/icons/search';
 import CloseIcon2 from '../../assets/icons/close2';
 
-export default function Searchbox({ query, setQuery, handleSubmit, handleReset }) {
+export default function Searchbox({ query, setQuery, handleSubmit, handleReset, disabled }) {
   return (
     <form
       name='searchbox'
@@ -16,12 +16,21 @@ export default function Searchbox({ query, setQuery, handleSubmit, handleReset }
       <input
         value={query}
         onChange={(e) => {
-          setQuery(e.target.value);
-          if (e.target.value.trim().length === 0) handleReset();
+          let value = e.currentTarget.value;
+          value = value?.trimStart()?.replace(/\s\s+/g, ' ');
+          const pattern = /^[a-zA-Z0-9\\/-\s,.]+$/;
+          if (!pattern.test(value) && value.length != 0) {
+            return;
+          }
+          if (value.trim().length === 0) {
+            handleReset();
+          }
+          setQuery(value);
         }}
-        className='w-full truncate'
+        className={`w-full truncate ${disabled ? 'opacity-40' : 'opacity-100'}`}
         type='text'
         placeholder='Search for name, ID, mobile number'
+        disabled={disabled}
       />
       {query ? (
         <div className='flex gap-1'>
