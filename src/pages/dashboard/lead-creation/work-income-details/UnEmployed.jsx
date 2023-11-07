@@ -1,18 +1,146 @@
 import { useCallback, useContext, useState } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInput from '../../../../components/TextInput';
-import { CurrencyInput } from '../../../../components';
+import { CardRadio, CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import { professionOptions } from '../utils';
+import { IconSalarid, IconSelfEmployed } from '../../../../assets/icons';
 
 export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStatus }) {
-  const { values, errors, touched, handleBlur, setFieldValue, activeIndex } =
+  const { values, errors, touched, handleBlur, setFieldValue, activeIndex, handleChange } =
     useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
 
+  const IncomeProofOptions = [
+    {
+      label: 'PAN ID',
+      value: 'PAN ID',
+      icon: <IconSalarid />,
+    },
+    {
+      label: 'Form 60',
+      value: 'Form 60',
+      icon: <IconSelfEmployed />,
+    },
+  ];
+
+  const handleRadioChange = useCallback(
+    (e) => {
+      setFieldValue(e.name, e.value);
+      // const name = e.name.split('.')[2];
+      // updateFields(name, e.value);
+      // if (!requiredFieldsStatus[name]) {
+      //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+      // }
+      //requiredFieldsStatus
+    },
+    [values],
+  );
+
   return (
     <>
+      <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
+        Profession <span className='text-primary-red text-xs'>*</span>
+      </label>
+
+      <div className={`flex gap-4 w-full`}>
+        {IncomeProofOptions.map((option) => {
+          return (
+            <CardRadio
+              key={option.value}
+              label={option.label}
+              name={`applicants[${activeIndex}].work_income_detail.income_proof`}
+              value={option.value}
+              current={values?.applicants?.[activeIndex]?.work_income_detail?.income_proof}
+              onChange={handleRadioChange}
+              containerClasses='flex-1'
+              disabled={
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              }
+            >
+              {option.icon}
+            </CardRadio>
+          );
+        })}
+      </div>
+
+      {values?.applicants?.[activeIndex]?.work_income_detail?.income_proof === 'PAN ID' && (
+        <TextInput
+          label='Enter PAN number'
+          placeholder='ABCD1256D'
+          required
+          name={`applicants[${activeIndex}].work_income_detail.pan_number`}
+          value={values?.applicants?.[activeIndex]?.work_income_detail?.pan_number}
+          onChange={(e) => {
+            // e.target.value = e.target.value.toUpperCase();
+            // handleTextInputChange(e);
+            handleChange(e);
+          }}
+          inputClasses='capitalize'
+          error={errors.applicants?.[activeIndex]?.work_income_detail?.pan_number}
+          touched={
+            touched?.applicants &&
+            touched?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+          }
+          // disabled={
+          //   !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
+          //   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          // }
+          // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
+          onBlur={(e) => {
+            handleBlur(e);
+            // const name = e.target.name.split('.')[2];
+            // if (
+            //   !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
+            //   values?.applicants?.[activeIndex]?.personal_details?.[name]
+            // ) {
+            //   updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+            //   if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+            //     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            //   }
+
+            //   if (
+            //     values?.applicants?.[activeIndex]?.personal_details?.extra_params
+            //       ?.same_as_id_type
+            //   ) {
+            //     updateFields(
+            //       'address_proof_number',
+            //       values?.applicants?.[activeIndex]?.personal_details?.[name],
+            //     );
+            //     if (
+            //       requiredFieldsStatus.address_proof_number !== undefined &&
+            //       !requiredFieldsStatus.address_proof_number
+            //     ) {
+            //       setRequiredFieldsStatus((prev) => ({
+            //         ...prev,
+            //         address_proof_number: true,
+            //       }));
+            //     }
+            //   }
+            // } else {
+            //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            //   updateFields(name, '');
+            // }
+          }}
+          onKeyDown={(e) => {
+            if (
+              values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
+              (e.key === 'ArrowUp' ||
+                e.key === 'ArrowDown' ||
+                e.key === 'ArrowLeft' ||
+                e.key === 'ArrowRight' ||
+                e.key === ' ' ||
+                e.keyCode === 32 ||
+                (e.keyCode >= 65 && e.keyCode <= 90))
+            ) {
+              e.preventDefault();
+            }
+          }}
+        />
+      )}
+
       <TextInput
         type='number'
         label='No. of current loan(s)'
@@ -117,6 +245,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
+
       <CurrencyInput
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'
