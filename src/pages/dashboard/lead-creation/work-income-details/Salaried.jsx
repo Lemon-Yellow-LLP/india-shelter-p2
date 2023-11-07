@@ -9,8 +9,16 @@ import { workingSinceOptions, modeOfSalary } from './WorkIncomeDropdownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus }) {
-  const { values, errors, touched, handleBlur, setFieldValue, setFieldError, activeIndex } =
-    useContext(LeadContext);
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    setFieldValue,
+    setFieldError,
+    activeIndex,
+    handleChange,
+  } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
 
@@ -157,87 +165,170 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
       />
 
       {values?.applicants?.[activeIndex]?.work_income_detail?.company_name === 'Others' && (
-        <TextInput
-          label=''
-          placeholder='Enter company name'
-          name={`applicants[${activeIndex}].work_income_detail.extra_params.extra_company_name`}
-          value={
-            values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.extra_company_name
-          }
-          error={
-            errors?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.extra_company_name
-          }
-          touched={
-            touched?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.extra_company_name
-          }
-          onBlur={(e) => {
-            handleBlur(e);
-
-            if (
-              !errors?.applicants?.[activeIndex]?.work_income_detail?.extra_params
-                ?.extra_company_name &&
+        <>
+          <TextInput
+            label=''
+            placeholder='Enter company name'
+            name={`applicants[${activeIndex}].work_income_detail.extra_params.extra_company_name`}
+            value={
               values?.applicants?.[activeIndex]?.work_income_detail?.extra_params
                 ?.extra_company_name
-            ) {
-              editFieldsById(
-                values?.applicants?.[activeIndex]?.work_income_detail?.id,
-                'work-income',
-                {
-                  company_name:
-                    values?.applicants?.[activeIndex]?.work_income_detail?.extra_params
-                      ?.extra_company_name,
-                  extra_params: {
-                    extra_company_name: 'Others',
-                  },
-                },
-                {
-                  headers: {
-                    Authorization: token,
-                  },
-                },
-              );
-            } else {
-              setRequiredFieldsStatus((prev) => ({
-                ...prev,
-                ['company_name']: false,
-              }));
-
-              editFieldsById(
-                values?.applicants?.[activeIndex]?.work_income_detail?.id,
-                'work-income',
-                {
-                  company_name: '',
-                  extra_params: {
-                    extra_company_name: '',
-                  },
-                },
-                {
-                  headers: {
-                    Authorization: token,
-                  },
-                },
-              );
             }
-          }}
-          onChange={(e) => {
-            const value = e.currentTarget.value;
-            const pattern = /^[a-zA-Z\s]+$/;
-            if (!pattern.test(value) && value.length != 0) {
-              return;
+            error={
+              errors?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+                ?.extra_company_name
             }
-            if (pattern.exec(value[value.length - 1])) {
-              setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+            touched={
+              touched?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+                ?.extra_company_name
+            }
+            onBlur={(e) => {
+              handleBlur(e);
 
-              if (!requiredFieldsStatus['company_name']) {
+              if (
+                !errors?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+                  ?.extra_company_name &&
+                values?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+                  ?.extra_company_name
+              ) {
+                editFieldsById(
+                  values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                  'work-income',
+                  {
+                    company_name:
+                      values?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+                        ?.extra_company_name,
+                    extra_params: {
+                      extra_company_name: 'Others',
+                    },
+                  },
+                  {
+                    headers: {
+                      Authorization: token,
+                    },
+                  },
+                );
+              } else {
                 setRequiredFieldsStatus((prev) => ({
                   ...prev,
-                  ['company_name']: true,
+                  ['company_name']: false,
                 }));
+
+                editFieldsById(
+                  values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                  'work-income',
+                  {
+                    company_name: '',
+                    extra_params: {
+                      extra_company_name: '',
+                    },
+                  },
+                  {
+                    headers: {
+                      Authorization: token,
+                    },
+                  },
+                );
               }
-            }
-          }}
-          disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
-        />
+            }}
+            onChange={(e) => {
+              const value = e.currentTarget.value;
+              const pattern = /^[a-zA-Z\s]+$/;
+              if (!pattern.test(value) && value.length != 0) {
+                return;
+              }
+              if (pattern.exec(value[value.length - 1])) {
+                setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+                if (!requiredFieldsStatus['company_name']) {
+                  setRequiredFieldsStatus((prev) => ({
+                    ...prev,
+                    ['company_name']: true,
+                  }));
+                }
+              }
+            }}
+            disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+          />
+
+          <TextInput
+            label='No.of employees'
+            required
+            placeholder='Eg: 50'
+            name={`applicants[${activeIndex}].work_income_detail.no_of_employees`}
+            value={values?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees}
+            error={errors?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees}
+            touched={touched?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees}
+            onBlur={(e) => {
+              handleBlur(e);
+
+              // if (
+              //   !errors?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+              //     ?.extra_company_name &&
+              //   values?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+              //     ?.extra_company_name
+              // ) {
+              //   editFieldsById(
+              //     values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              //     'work-income',
+              //     {
+              //       company_name:
+              //         values?.applicants?.[activeIndex]?.work_income_detail?.extra_params
+              //           ?.extra_company_name,
+              //       extra_params: {
+              //         extra_company_name: 'Others',
+              //       },
+              //     },
+              //     {
+              //       headers: {
+              //         Authorization: token,
+              //       },
+              //     },
+              //   );
+              // } else {
+              //   setRequiredFieldsStatus((prev) => ({
+              //     ...prev,
+              //     ['company_name']: false,
+              //   }));
+
+              //   editFieldsById(
+              //     values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              //     'work-income',
+              //     {
+              //       company_name: '',
+              //       extra_params: {
+              //         extra_company_name: '',
+              //       },
+              //     },
+              //     {
+              //       headers: {
+              //         Authorization: token,
+              //       },
+              //     },
+              //   );
+              // }
+            }}
+            onChange={(e) => {
+              handleChange(e);
+              // const value = e.currentTarget.value;
+              // const pattern = /^[a-zA-Z\s]+$/;
+              // if (!pattern.test(value) && value.length != 0) {
+              //   return;
+              // }
+              // if (pattern.exec(value[value.length - 1])) {
+              //   setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+
+              //   if (!requiredFieldsStatus['company_name']) {
+              //     setRequiredFieldsStatus((prev) => ({
+              //       ...prev,
+              //       ['company_name']: true,
+              //     }));
+              //   }
+              // }
+            }}
+            disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+          />
+        </>
       )}
 
       <CurrencyInput
