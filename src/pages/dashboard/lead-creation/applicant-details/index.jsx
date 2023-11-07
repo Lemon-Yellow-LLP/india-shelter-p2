@@ -167,8 +167,24 @@ const ApplicantDetails = () => {
       setFieldValue(e.name, e.value);
       const name = e.name.split('.')[1];
       updateFieldsLead(name, e.value);
-      if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+
+      if (values.lead?.purpose_of_loan) {
+        setFieldValue('lead.purpose_of_loan', '');
+        updateFieldsLead('purpose_of_loan', '');
+      }
+
+      if (values?.lead.loan_type) {
+        setFieldValue('lead.property_type', '');
+        updateFieldsLead('property_type', '');
+      }
+
+      if (requiredFieldsStatus[name] !== undefined) {
+        setRequiredFieldsStatus((prev) => ({
+          ...prev,
+          [name]: true,
+          purpose_of_loan: false,
+          property_type: false,
+        }));
       }
     },
     [requiredFieldsStatus, values],
