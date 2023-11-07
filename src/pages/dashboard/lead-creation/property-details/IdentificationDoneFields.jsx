@@ -35,21 +35,18 @@ const IdentificationDoneFields = ({
   //   setShowMap((prev) => !prev);
   // }, []);
 
-  const handleTextInputChange = useCallback(
-    (e) => {
-      const value = e.currentTarget.value;
-      const name = e.target.name.split('.')[1];
-      const pattern = /^[A-Za-z\s]+$/;
-      if (pattern.test(value) || value.length === 0) {
-        setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-      }
+  const handleTextInputChange = (e) => {
+    const value = e.currentTarget.value;
+    const name = e.target.name.split('.')[1];
+    const pattern = /^[A-Za-z\s]+$/;
+    if (pattern.test(value) || value.length === 0) {
+      setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
+    }
 
-      if (!requiredFieldsStatus[name]) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-      }
-    },
-    [requiredFieldsStatus],
-  );
+    if (!requiredFieldsStatus[name]) {
+      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+    }
+  };
 
   const handleOnPincodeChange = useCallback(async () => {
     if (

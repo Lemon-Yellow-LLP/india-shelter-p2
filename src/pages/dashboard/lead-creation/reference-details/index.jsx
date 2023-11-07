@@ -477,12 +477,17 @@ const ReferenceDetails = () => {
 
             <TextInput
               label='Mobile number'
-              placeholder='Eg: 123456789'
+              placeholder='Eg: 1234567890'
               required
               name='reference_details.reference_1_phone_number'
               type='tel'
               value={values?.reference_details?.reference_1_phone_number}
-              error={errors?.reference_details?.reference_1_phone_number}
+              error={
+                errors?.reference_details?.reference_1_phone_number &&
+                phoneNumberList?.reference_1 === ''
+                  ? 'Reference phone number must be unique'
+                  : ''
+              }
               touched={touched?.reference_details?.reference_1_phone_number}
               onBlur={(e) => {
                 handleBlur(e);
@@ -807,12 +812,17 @@ const ReferenceDetails = () => {
 
             <TextInput
               label='Mobile number'
-              placeholder='Eg: 123456789'
+              placeholder='Eg: 1234567890'
               required
               name='reference_details.reference_2_phone_number'
               type='tel'
               value={values?.reference_details?.reference_2_phone_number}
-              error={errors?.reference_details?.reference_2_phone_number}
+              error={
+                errors?.reference_details?.reference_2_phone_number ||
+                phoneNumberList?.reference_2 === ''
+                  ? 'Reference phone number must be unique'
+                  : ''
+              }
               touched={touched?.reference_details?.reference_2_phone_number}
               onBlur={(e) => {
                 handleBlur(e);

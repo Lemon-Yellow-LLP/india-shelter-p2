@@ -53,7 +53,7 @@ const ApplicantDetails = () => {
 
   const { setOtpFailCount, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
 
-  const { lo_id } = useContext(AuthContext);
+  const { loData } = useContext(AuthContext);
 
   const { token } = useContext(AuthContext);
 
@@ -132,7 +132,7 @@ const ApplicantDetails = () => {
     if (values?.lead?.id) {
       let newData = {};
       newData[name] = value;
-      newData.lo_id = lo_id;
+      newData.lo_id = loData.session.user_id;
       const res = await editFieldsById(values?.lead?.id, 'lead', newData, {
         headers: {
           Authorization: token,
@@ -142,7 +142,7 @@ const ApplicantDetails = () => {
     } else {
       let newData = { ...values?.lead };
       newData[name] = value;
-      newData.lo_id = lo_id;
+      newData.lo_id = loData.session.user_id;
       await addApi('lead', newData, {
         headers: {
           Authorization: token,
@@ -167,8 +167,24 @@ const ApplicantDetails = () => {
       setFieldValue(e.name, e.value);
       const name = e.name.split('.')[1];
       updateFieldsLead(name, e.value);
-      if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+
+      if (values.lead?.purpose_of_loan) {
+        setFieldValue('lead.purpose_of_loan', '');
+        updateFieldsLead('purpose_of_loan', '');
+      }
+
+      if (values?.lead.loan_type) {
+        setFieldValue('lead.property_type', '');
+        updateFieldsLead('property_type', '');
+      }
+
+      if (requiredFieldsStatus[name] !== undefined) {
+        setRequiredFieldsStatus((prev) => ({
+          ...prev,
+          [name]: true,
+          purpose_of_loan: false,
+          property_type: false,
+        }));
       }
     },
     [requiredFieldsStatus, values],
@@ -476,34 +492,34 @@ const ApplicantDetails = () => {
   };
 
   const verifyOTP = async (otp) => {
-    verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp, {
-      headers: {
-        Authorization: token,
-      },
-    })
-      .then(async () => {
-        await updateFieldsLead().then((res) => {
-          setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
-          updateFieldsApplicant('lead_id', res.id);
-          setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
-          updateFieldsApplicant('is_mobile_verified', true);
-          setShowOTPInput(false);
-          if (
-            requiredFieldsStatus['mobile_number'] !== undefined &&
-            !requiredFieldsStatus['mobile_number']
-          ) {
-            setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
-          }
-          return true;
-        });
-      })
-      .catch((err) => {
-        setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
-        setShowOTPInput(true);
-        setVerifiedOnce(true);
-        setOtpFailCount(err.response.data.fail_count);
-        return false;
-      });
+    // verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp, {
+    //   headers: {
+    //     Authorization: token,
+    //   },
+    // })
+    //   .then(async () => {
+    await updateFieldsLead().then((res) => {
+      setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
+      updateFieldsApplicant('lead_id', res.id);
+      setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
+      updateFieldsApplicant('is_mobile_verified', true);
+      setShowOTPInput(false);
+      if (
+        requiredFieldsStatus['mobile_number'] !== undefined &&
+        !requiredFieldsStatus['mobile_number']
+      ) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
+      }
+      return true;
+    });
+    // })
+    // .catch((err) => {
+    //   setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
+    //   setShowOTPInput(true);
+    //   setVerifiedOnce(true);
+    //   setOtpFailCount(err.response.data.fail_count);
+    //   return false;
+    // });
   };
 
   useEffect(() => {
