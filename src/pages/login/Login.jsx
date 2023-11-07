@@ -9,6 +9,7 @@ import DynamicDrawer from '../../components/SwipeableDrawer/DynamicDrawer';
 import { Header } from '../../components';
 import { useNavigate } from 'react-router-dom';
 import OtpInputNoEdit from '../../components/OtpInput/OtpInputNoEdit';
+import ErrorTost from '../../components/ToastMessage/ErrorTost';
 
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
@@ -26,19 +27,25 @@ export default function Login() {
     otpFailCount,
     token,
     setToken,
+    toastMessage,
+    setToastMessage,
+    setLoData,
+    setPhoneNumberList,
+    errorToastMessage,
+    setErrorToastMessage,
   } = useContext(AuthContext);
-  const { toastMessage, setToastMessage, setLoData, setPhoneNumberList } = useContext(AuthContext);
 
   const [showOTPInput, setShowOTPInput] = useState(false);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
   const [mobileVerified, setMobileVerified] = useState(values?.is_mobile_verified);
   const [isOpen, setIsOpen] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const navigate = useNavigate();
 
   const handleOnPhoneNumberChange = useCallback(async (e) => {
     const phoneNumber = e.currentTarget.value;
-
+    setLoginError('');
     const pattern = /^\d+$/;
     if (!pattern.test(phoneNumber) && phoneNumber.length > 0) {
       return;
@@ -69,6 +76,7 @@ export default function Login() {
   }, []);
 
   const sendMobileOtp = async () => {
+    setLoginError('');
     //For bypass
     if (values.username.toString() === '9876543210') {
       setDisablePhoneNumber(true);
@@ -90,14 +98,26 @@ export default function Login() {
         return;
       }
 
-      setDisablePhoneNumber(true);
-      setHasSentOTPOnce(true);
-      setShowOTPInput(true);
+      try {
+        const res = await getLoginOtp(values.username);
 
-      const res = await getLoginOtp(values.username);
-      if (!res) return;
+        if (res.error) {
+          setDisablePhoneNumber(false);
+          setHasSentOTPOnce(false);
+          setShowOTPInput(false);
+          setErrorToastMessage(res.message);
+          setLoginError(res.message);
+          return;
+        }
 
-      setToastMessage('OTP has been sent to the mobile number');
+        setDisablePhoneNumber(true);
+        setHasSentOTPOnce(true);
+        setShowOTPInput(true);
+        setLoginError('');
+        setToastMessage('OTP has been sent to the mobile number');
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -200,6 +220,8 @@ export default function Login() {
     <>
       <ToastMessage message={toastMessage} setMessage={setToastMessage} />
 
+      <ErrorTost message={errorToastMessage} setMessage={setErrorToastMessage} />
+
       <div className='bg-[#CCE2BE] overflow-hidden h-[100vh] relative'>
         <Header />
         <div>
@@ -226,7 +248,7 @@ export default function Login() {
             name='username'
             value={values.username}
             onChange={handleOnPhoneNumberChange}
-            error={errors.username}
+            error={errors.username || loginError}
             touched={touched.username}
             onOTPSendClick={sendMobileOtp}
             disabledOtpButton={

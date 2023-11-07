@@ -53,7 +53,7 @@ const ApplicantDetails = () => {
 
   const { setOtpFailCount, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
 
-  const { lo_id } = useContext(AuthContext);
+  const { loData } = useContext(AuthContext);
 
   const { token } = useContext(AuthContext);
 
@@ -132,7 +132,7 @@ const ApplicantDetails = () => {
     if (values?.lead?.id) {
       let newData = {};
       newData[name] = value;
-      newData.lo_id = lo_id;
+      newData.lo_id = loData.session.user_id;
       const res = await editFieldsById(values?.lead?.id, 'lead', newData, {
         headers: {
           Authorization: token,
@@ -142,7 +142,7 @@ const ApplicantDetails = () => {
     } else {
       let newData = { ...values?.lead };
       newData[name] = value;
-      newData.lo_id = lo_id;
+      newData.lo_id = loData.session.user_id;
       await addApi('lead', newData, {
         headers: {
           Authorization: token,
