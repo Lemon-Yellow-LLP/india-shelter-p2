@@ -28,6 +28,7 @@ const AuthContextProvider = ({ children }) => {
   const [phoneNumberList, setPhoneNumberList] = useState({});
   const [otpFailCount, setOtpFailCount] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
+  const [errorToastMessage, setErrorToastMessage] = useState(null);
   const [isQaulifierActivated, setIsQaulifierActivated] = useState(null);
 
   const formik = useFormik({
@@ -55,6 +56,8 @@ const AuthContextProvider = ({ children }) => {
         setLoData,
         phoneNumberList,
         setPhoneNumberList,
+        errorToastMessage,
+        setErrorToastMessage,
       }}
     >
       {children}

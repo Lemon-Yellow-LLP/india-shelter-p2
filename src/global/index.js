@@ -44,11 +44,15 @@ async function getCompanyNamesList(options) {
 //LOGIN SCREEN
 
 async function getLoginOtp(mobile_no) {
-  const res = await axios.get(
-    `${API_URL}/account/login-sms-otp-request/${mobile_no}`,
-    requestOptions,
-  );
-  return res.data;
+  try {
+    const res = await axios.get(
+      `${API_URL}/account/login-sms-otp-request/${mobile_no}`,
+      requestOptions,
+    );
+    return res.data;
+  } catch (error) {
+    return { error: true, message: error.response.data.message };
+  }
 }
 
 async function verifyLoginOtp(mobile_no, otp) {
