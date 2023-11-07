@@ -123,7 +123,7 @@ const applicantSchema = Yup.object().shape({
     mobile_number: Yup.string()
       .matches(/^(?!.*(\d{5}).*\1)\d{10}$/, 'Enter a valid 10-digit mobile number')
       .required('Mobile number is required'),
-    father_name: Yup.string()
+    father_husband_name: Yup.string()
       .trim()
       .min(2, 'Father/Husbands Name must be atleast 2 characters long')
       .max(90, 'Father/Husbands Name can be max 90 characters long')
