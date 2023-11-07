@@ -650,6 +650,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
         disabled={true}
       />
+
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
           Gender <span className='text-primary-red text-xs'>*</span>
@@ -735,7 +736,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       />
 
       <TextInput
-        label={`Father/Husband's name`}
+        label={`Father's Name`}
         placeholder='Eg: Akash'
         required
         name={`applicants[${activeIndex}].personal_details.father_husband_name`}
