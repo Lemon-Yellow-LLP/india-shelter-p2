@@ -144,6 +144,7 @@ const applicantSchema = Yup.object().shape({
 
   work_income_detail: Yup.object().shape({
     profession: Yup.string().required('This field is mandatory'),
+    pan_number: Yup.string().required('This field is mandatory'),
     no_current_loan: Yup.number()
       .required('This field is mandatory')
       .min(0, 'No. of Current loan(s) can be min 0')
@@ -214,6 +215,7 @@ const applicantSchema = Yup.object().shape({
       .max(12, 'pf uan number must be atleast 12 characters'),
     working_since: Yup.string().required('This field is mandatory'),
     mode_of_salary: Yup.string().required('This field is mandatory'),
+    no_of_employees: Yup.string().required('This field is mandatory'),
 
     //Self Employed
     business_name: Yup.string()
