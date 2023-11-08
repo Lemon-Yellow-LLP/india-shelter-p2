@@ -24,12 +24,13 @@ const IdentificationDoneFields = ({
     activeIndex,
     pincodeErr,
     setPincodeErr,
+    propertyValueEstimateError,
+    setPropertyValueEstimateError,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
 
   const [showMap, setShowMap] = useState(false);
-  const [propertyValueEstimateError, setPropertyValueEstimateError] = useState('');
 
   // const onMapButtonClick = useCallback(() => {
   //   setShowMap((prev) => !prev);

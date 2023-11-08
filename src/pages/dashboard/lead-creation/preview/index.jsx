@@ -26,7 +26,7 @@ export default function Preview() {
     handleSubmit,
     pincodeErr,
     setFieldValue,
-
+    propertyValueEstimateError,
     updateProgressUploadDocumentSteps,
   } = useContext(LeadContext);
 
@@ -307,6 +307,11 @@ export default function Preview() {
       values?.property_details?.property_identification_is == 'not-yet'
     ) {
       _errors.property_details = {};
+    } else if (_errors?.property_details && propertyValueEstimateError) {
+      _errors.property_details = {
+        ..._errors.property_details,
+        property_value_estimate: false,
+      };
     }
 
     if (pincodeErr?.property_details) {
