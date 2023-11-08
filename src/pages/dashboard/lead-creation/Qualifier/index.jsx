@@ -559,7 +559,7 @@ const Qualifier = () => {
             {` ${values.applicants?.[activeIndex]?.applicant_details?.first_name} ${values.applicants?.[activeIndex]?.applicant_details?.middle_name} ${values.applicants?.[activeIndex]?.applicant_details?.last_name}`}
           </p>
           <div className='flex justify-between text-primary-black font-medium'>
-            <h3>Verification in progress</h3>
+            {!bre101.res ? <h3>Verification in progress</h3> : <h3>Verification completed</h3>}
             <h3>
               {progress}/{finalApi}
             </h3>

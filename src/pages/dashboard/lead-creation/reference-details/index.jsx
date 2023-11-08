@@ -477,7 +477,7 @@ const ReferenceDetails = () => {
 
             <TextInput
               label='Mobile number'
-              placeholder='Eg: 123456789'
+              placeholder='Eg: 1234567890'
               required
               name='reference_details.reference_1_phone_number'
               type='tel'
@@ -812,7 +812,7 @@ const ReferenceDetails = () => {
 
             <TextInput
               label='Mobile number'
-              placeholder='Eg: 123456789'
+              placeholder='Eg: 1234567890'
               required
               name='reference_details.reference_2_phone_number'
               type='tel'
