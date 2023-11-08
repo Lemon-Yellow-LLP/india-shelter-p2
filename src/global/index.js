@@ -364,7 +364,6 @@ async function editAddressById(id, data, options) {
 async function checkExistingCustomer(body, token) {
   let myHeaders = new Headers();
   myHeaders.append('Content-Type', 'application/json');
-  myHeaders.append('Authorization', token);
   let requestOptions2 = {
     method: 'POST',
     headers: myHeaders,
@@ -372,8 +371,10 @@ async function checkExistingCustomer(body, token) {
     redirect: 'follow',
     mode: 'no-cors',
   };
-
-  await fetch('https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run', body);
+  const res = await fetch(
+    'https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run',
+    requestOptions2,
+  );
   return res.data.body;
 }
 
