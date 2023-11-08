@@ -14,6 +14,7 @@ import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/Lea
 import PropTypes from 'prop-types';
 import { getApplicantById } from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import Popup from '../../../../components/Popup';
 
 const steps = ['', '', '', '', ''];
 
@@ -42,10 +43,6 @@ export default function Preview() {
     updateProgressUploadDocumentSteps(requiredFieldsStatus);
   }, [requiredFieldsStatus]);
 
-  // useEffect(() => {
-  //   console.log(errors);
-  // }, [errors]);
-
   const navigate = useNavigate();
 
   const [activeStep, setActiveStep] = useState(0);
@@ -53,6 +50,14 @@ export default function Preview() {
   const [coApplicantIndex, setCoApplicantIndex] = useState(null);
   const [coApplicantIndexes, setCoApplicantIndexes] = useState([]);
   const [flattedErrors, setFlattedErrors] = useState({});
+
+  const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(
+    !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier,
+  );
+
+  const handleCloseQualifierNotActivePopup = () => {
+    setOpenQualifierNotActivePopup(false);
+  };
 
   function flattenExtraParams(obj) {
     function flattenExtraParamsHelper(inputObj) {
@@ -1251,6 +1256,14 @@ export default function Preview() {
           }
         />
       ) : null}
+
+      <Popup
+        handleClose={handleCloseQualifierNotActivePopup}
+        open={openQualifierNotActivePopup}
+        setOpen={setOpenQualifierNotActivePopup}
+        title='Qualifier is not activated'
+        description='Complete Applicant, Personal, Address and Work & Income details to activate'
+      />
     </>
   );
 }
