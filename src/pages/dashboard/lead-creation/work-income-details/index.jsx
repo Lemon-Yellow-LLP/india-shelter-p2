@@ -424,12 +424,29 @@ const WorkIncomeDetails = () => {
       values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
       values?.applicants?.[activeIndex]?.personal_details?.id_number
     ) {
-      setFieldValue(
-        `applicants[${activeIndex}].work_income_detail.pan_number`,
-        values?.applicants?.[activeIndex]?.personal_details?.id_number,
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.work_income_detail.id,
+        'work-income',
+        {
+          pan_number: values?.applicants?.[activeIndex]?.personal_details?.id_number,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
     }
-  }, [values?.applicants?.[activeIndex]?.personal_details?.id_type]);
+  }, [
+    values?.applicants?.[activeIndex]?.personal_details?.id_type,
+    values?.applicants?.[activeIndex]?.personal_details?.id_number,
+    values?.applicants?.[activeIndex]?.work_income_detail?.profession,
+  ]);
+
+  // setFieldValue(
+  //   `applicants[${activeIndex}].work_income_detail.pan_number`,
+  //   values?.applicants?.[activeIndex]?.personal_details?.id_number,
+  // );
 
   return (
     <>
@@ -499,12 +516,26 @@ const WorkIncomeDetails = () => {
                   touched?.applicants?.[activeIndex]?.work_income_detail?.pan_number
                 }
                 disabled={
-                  values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' ||
+                  (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                    values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
                   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
                 }
                 // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
                 onBlur={(e) => {
                   handleBlur(e);
+
+                  editFieldsById(
+                    values?.applicants?.[activeIndex]?.work_income_detail.id,
+                    'work-income',
+                    {
+                      pan_number: e.target.value,
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
                   // const name = e.target.name.split('.')[2];
                   // if (
                   //   !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
@@ -538,20 +569,20 @@ const WorkIncomeDetails = () => {
                   //   updateFields(name, '');
                   // }
                 }}
-                onKeyDown={(e) => {
-                  if (
-                    values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
-                    (e.key === 'ArrowUp' ||
-                      e.key === 'ArrowDown' ||
-                      e.key === 'ArrowLeft' ||
-                      e.key === 'ArrowRight' ||
-                      e.key === ' ' ||
-                      e.keyCode === 32 ||
-                      (e.keyCode >= 65 && e.keyCode <= 90))
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
+                // onKeyDown={(e) => {
+                //   if (
+                //     values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
+                //     (e.key === 'ArrowUp' ||
+                //       e.key === 'ArrowDown' ||
+                //       e.key === 'ArrowLeft' ||
+                //       e.key === 'ArrowRight' ||
+                //       e.key === ' ' ||
+                //       e.keyCode === 32 ||
+                //       (e.keyCode >= 65 && e.keyCode <= 90))
+                //   ) {
+                //     e.preventDefault();
+                //   }
+                // }}
               />
             ) : null}
 

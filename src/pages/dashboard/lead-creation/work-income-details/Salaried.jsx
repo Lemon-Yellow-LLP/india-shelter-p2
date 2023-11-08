@@ -348,7 +348,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
           ) {
             editFieldsById(
               values?.applicants?.[activeIndex]?.work_income_detail?.id,
-              'work-income',
+              '',
               {
                 total_income: values?.applicants?.[activeIndex]?.work_income_detail?.total_income,
               },

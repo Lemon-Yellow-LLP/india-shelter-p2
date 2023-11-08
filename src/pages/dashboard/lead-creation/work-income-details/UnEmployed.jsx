@@ -28,6 +28,21 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
 
   const handleRadioChange = useCallback(
     (e) => {
+      if (e.value === 'Form 60') {
+        setFieldValue(`applicants[${activeIndex}].work_income_detail.pan_number`, '');
+        editFieldsById(
+          values?.applicants?.[activeIndex]?.work_income_detail.id,
+          'work-income',
+          {
+            pan_number: null,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+      }
       setFieldValue(e.name, e.value);
       // const name = e.name.split('.')[2];
       // updateFields(name, e.value);
@@ -69,7 +84,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
       {values?.applicants?.[activeIndex]?.work_income_detail?.income_proof === 'PAN ID' && (
         <TextInput
           label='Enter PAN number'
-          placeholder='ABCD1256D'
+          placeholder='EG ABCD1256D'
           required
           name={`applicants[${activeIndex}].work_income_detail.pan_number`}
           value={values?.applicants?.[activeIndex]?.work_income_detail?.pan_number}
@@ -84,13 +99,27 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
             touched?.applicants &&
             touched?.applicants?.[activeIndex]?.work_income_detail?.pan_number
           }
-          // disabled={
-          //   !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
-          //   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
-          // }
+          disabled={
+            (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+              values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          }
           // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
           onBlur={(e) => {
             handleBlur(e);
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail.id,
+              'work-income',
+              {
+                pan_number: e.value,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
             // const name = e.target.name.split('.')[2];
             // if (
             //   !errors.applicants?.[activeIndex]?.personal_details?.[name] &&

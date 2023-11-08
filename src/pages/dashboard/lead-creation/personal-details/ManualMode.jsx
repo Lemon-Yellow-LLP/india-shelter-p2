@@ -10,7 +10,7 @@ import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWith
 import { manualModeDropdownOptions } from './manualModeDropdownOptions';
 import OtpInput from '../../../../components/OtpInput/index';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
-import { getEmailOtp, verifyEmailOtp } from '../../../../global';
+import { editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 
 function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields }) {
@@ -72,9 +72,19 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const changeIdType = useCallback(
     (e) => {
       setFieldValue(`applicants[${activeIndex}].personal_details.id_type`, e);
-      setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
+
+      if (values?.applicants?.[activeIndex]?.work_income_detail?.pan_number && e === 'PAN') {
+        setFieldValue(
+          `applicants[${activeIndex}].personal_details.id_number`,
+          values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
+        );
+      } else {
+        setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
+        updateFields('id_number', '');
+      }
+
       updateFields('id_type', e);
-      updateFields('id_number', '');
+
       setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true, id_number: false }));
       if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
         if (e === 'PAN') {
@@ -357,6 +367,31 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   // console.log(values?.applicants[activeIndex]?.personal_details?.id_type);
   // console.log(values?.applicants[activeIndex]?.personal_details?.id_number);
+
+  // useEffect(() => {
+  //   if (
+  //     values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+  //     values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+  //   ) {
+  //     setFieldValue(
+  //       `values.applicants[${activeIndex}].personal_details.id_number`,
+  //       values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
+  //     );
+
+  //     editFieldsById(
+  //       values?.applicants?.[activeIndex]?.personal_details.id,
+  //       'personal',
+  //       {
+  //         id_number: values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: token,
+  //         },
+  //       },
+  //     );
+  //   }
+  // }, [values?.applicants?.[activeIndex]?.personal_details?.id_type]);
 
   return (
     <>
