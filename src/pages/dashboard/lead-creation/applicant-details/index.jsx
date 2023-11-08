@@ -497,7 +497,7 @@ const ApplicantDetails = () => {
         Authorization: token,
       },
     })
-      .then(async () => {
+      .then(async (res) => {
         await updateFieldsLead().then((res) => {
           setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
           updateFieldsApplicant('lead_id', res.id);
