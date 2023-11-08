@@ -736,7 +736,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       />
 
       <TextInput
-        label={`Father's Name`}
+        label={`Father/Husband’s name`}
         placeholder='Eg: Akash'
         required
         name={`applicants[${activeIndex}].personal_details.father_husband_name`}
