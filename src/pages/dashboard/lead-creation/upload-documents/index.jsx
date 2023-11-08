@@ -1952,84 +1952,30 @@ const UploadDocuments = () => {
         },
       );
       setFieldValue(`applicants.[${activeIndex}].applicant_details.document_meta`, document_meta);
-      let requiredFields = {
+      setRequiredFieldsStatus({
         customer_photo: !!document_meta?.customer_photos?.find((slip) => slip?.active),
         id_proof: !!document_meta?.id_proof_photos?.find((slip) => slip?.active),
         address_proof: !!document_meta?.address_proof_photos?.find((slip) => slip?.active),
-        property_paper: !!document_meta?.property_paper_photos?.find((slip) => slip?.active),
-        salary_slip: !!document_meta?.salary_slip_photos?.find((slip) => slip?.active),
+
         form_60: !!document_meta?.form_60_photos?.find((slip) => slip?.active),
-        property_image: !!document_meta?.property_photos?.find((slip) => slip?.active),
-        upload_selfie:
-          document_meta?.lo_selfie?.find((slip) => slip?.active) &&
-          extra_params?.is_upload_otp_verified,
-      };
 
-      setRequiredFieldsStatus((prev) => {
-        if (
-          values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
-          document_meta?.salary_slip_photos?.find((slip) => slip?.active) ||
-          isCoApplicant
-        ) {
-          requiredFields = {
-            ...requiredFields,
-            salary_slip: true,
-          };
-        } else {
-          requiredFields = {
-            ...requiredFields,
-            salary_slip: false,
-          };
-        }
+        ...(values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' &&
+          !isCoApplicant && {
+            salary_slip: !!document_meta?.salary_slip_photos?.find((slip) => slip?.active),
+          }),
 
-        if (
-          values?.property_details?.property_identification_is === 'not-yet' ||
-          document_meta?.property_photos?.find((slip) => slip?.active) ||
-          isCoApplicant
-        ) {
-          requiredFields = {
-            ...requiredFields,
-            property_image: true,
-          };
-        } else {
-          requiredFields = {
-            ...requiredFields,
-            property_image: false,
-          };
-        }
+        ...(values?.property_details?.property_identification_is === 'done' &&
+          !isCoApplicant && {
+            property_paper: !!document_meta?.property_paper_photos?.find((slip) => slip?.active),
+            property_image: !!document_meta?.property_photos?.find((slip) => slip?.active),
+          }),
 
-        if (
-          values?.property_details?.property_identification_is === 'not-yet' ||
-          document_meta?.property_paper_photos?.find((slip) => slip?.active) ||
-          isCoApplicant
-        ) {
-          requiredFields = {
-            ...requiredFields,
-            property_paper: true,
-          };
-        } else {
-          requiredFields = {
-            ...requiredFields,
-            property_paper: false,
-          };
-        }
-
-        if (
-          (document_meta?.lo_selfie?.find((slip) => slip?.active) &&
-            extra_params?.is_upload_otp_verified) ||
-          isCoApplicant
-        ) {
-          requiredFields = {
-            ...requiredFields,
-            upload_selfie: true,
-          };
-        } else {
-          requiredFields = {
-            ...requiredFields,
-            upload_selfie: false,
-          };
-        }
-        return requiredFields;
+        ...(!isCoApplicant && {
+          upload_selfie: !!(
+            document_meta?.lo_selfie?.find((slip) => slip?.active) &&
+            extra_params?.is_upload_otp_verified
+          ),
+        }),
       });
     }
     getRequiredFields();

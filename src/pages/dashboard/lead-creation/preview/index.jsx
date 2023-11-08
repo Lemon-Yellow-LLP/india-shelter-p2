@@ -51,9 +51,7 @@ export default function Preview() {
   const [coApplicantIndexes, setCoApplicantIndexes] = useState([]);
   const [flattedErrors, setFlattedErrors] = useState({});
 
-  const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(
-    !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier,
-  );
+  const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(false);
 
   const handleCloseQualifierNotActivePopup = () => {
     setOpenQualifierNotActivePopup(false);
@@ -357,6 +355,9 @@ export default function Preview() {
     setPrimaryIndex(_primaryIndex);
     setCoApplicantIndex(0);
     setCoApplicantIndexes(_coApplicantIndexes);
+    setOpenQualifierNotActivePopup(
+      !values?.applicants?.[_primaryIndex]?.applicant_details?.extra_params?.qualifier,
+    );
 
     // To show errors
     handleSubmit();
@@ -364,6 +365,16 @@ export default function Preview() {
 
   useEffect(() => {
     setCoApplicantIndex(activeStep ? activeStep - 1 : 0);
+    if (activeStep == 0 && primaryIndex != null) {
+      setOpenQualifierNotActivePopup(
+        !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.qualifier,
+      );
+    } else if (activeStep != 0 && coApplicantIndexes[coApplicantIndex] != null) {
+      setOpenQualifierNotActivePopup(
+        !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.applicant_details?.extra_params
+          ?.qualifier,
+      );
+    }
   }, [activeStep]);
 
   useEffect(() => {
@@ -377,84 +388,30 @@ export default function Preview() {
         },
       );
       setFieldValue(`applicants.[${activeIndex}].applicant_details.document_meta`, document_meta);
-      let requiredFields = {
+      setRequiredFieldsStatus({
         customer_photo: !!document_meta?.customer_photos?.find((slip) => slip?.active),
         id_proof: !!document_meta?.id_proof_photos?.find((slip) => slip?.active),
         address_proof: !!document_meta?.address_proof_photos?.find((slip) => slip?.active),
-        property_paper: !!document_meta?.property_paper_photos?.find((slip) => slip?.active),
-        salary_slip: !!document_meta?.salary_slip_photos?.find((slip) => slip?.active),
+
         form_60: !!document_meta?.form_60_photos?.find((slip) => slip?.active),
-        property_image: !!document_meta?.property_photos?.find((slip) => slip?.active),
-        upload_selfie:
-          document_meta?.lo_selfie?.find((slip) => slip?.active) &&
-          extra_params?.is_upload_otp_verified,
-      };
 
-      setRequiredFieldsStatus((prev) => {
-        if (
-          values?.applicants[activeIndex]?.work_income_detail?.profession !== 'Salaried' ||
-          document_meta?.salary_slip_photos?.find((slip) => slip?.active) ||
-          isCoApplicant
-        ) {
-          requiredFields = {
-            ...requiredFields,
-            salary_slip: true,
-          };
-        } else {
-          requiredFields = {
-            ...requiredFields,
-            salary_slip: false,
-          };
-        }
+        ...(values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' &&
+          !isCoApplicant && {
+            salary_slip: !!document_meta?.salary_slip_photos?.find((slip) => slip?.active),
+          }),
 
-        if (
-          values?.property_details?.property_identification_is === 'not-yet' ||
-          document_meta?.property_photos?.find((slip) => slip?.active) ||
-          isCoApplicant
-        ) {
-          requiredFields = {
-            ...requiredFields,
-            property_image: true,
-          };
-        } else {
-          requiredFields = {
-            ...requiredFields,
-            property_image: false,
-          };
-        }
+        ...(values?.property_details?.property_identification_is === 'done' &&
+          !isCoApplicant && {
+            property_paper: !!document_meta?.property_paper_photos?.find((slip) => slip?.active),
+            property_image: !!document_meta?.property_photos?.find((slip) => slip?.active),
+          }),
 
-        if (
-          values?.property_details?.property_identification_is === 'not-yet' ||
-          document_meta?.property_paper_photos?.find((slip) => slip?.active) ||
-          isCoApplicant
-        ) {
-          requiredFields = {
-            ...requiredFields,
-            property_paper: true,
-          };
-        } else {
-          requiredFields = {
-            ...requiredFields,
-            property_paper: false,
-          };
-        }
-
-        if (
-          (document_meta?.lo_selfie?.find((slip) => slip?.active) &&
-            extra_params?.is_upload_otp_verified) ||
-          isCoApplicant
-        ) {
-          requiredFields = {
-            ...requiredFields,
-            upload_selfie: true,
-          };
-        } else {
-          requiredFields = {
-            ...requiredFields,
-            upload_selfie: false,
-          };
-        }
-        return requiredFields;
+        ...(!isCoApplicant && {
+          upload_selfie: !!(
+            document_meta?.lo_selfie?.find((slip) => slip?.active) &&
+            extra_params?.is_upload_otp_verified
+          ),
+        }),
       });
     }
     getRequiredFields();
@@ -759,7 +716,10 @@ export default function Preview() {
               count={
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.applicant_details.name
-                ]?.extra_params?.upload_required_fields_status
+                ]?.extra_params?.upload_required_fields_status &&
+                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  pages.applicant_details.name
+                ]?.extra_params?.upload_progress != 0
                   ? Object.keys(
                       values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                         pages.applicant_details.name
@@ -770,7 +730,7 @@ export default function Preview() {
                           pages.applicant_details.name
                         ]?.extra_params?.upload_required_fields_status[k],
                     )?.length
-                  : 'All'
+                  : 'ALL'
               }
             >
               {values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
@@ -1083,7 +1043,9 @@ export default function Preview() {
               link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
               count={
                 values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.upload_required_fields_status
+                  ?.upload_required_fields_status &&
+                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                  ?.upload_progress != 0
                   ? Object.keys(
                       values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
                         ?.extra_params?.upload_required_fields_status,
@@ -1092,7 +1054,7 @@ export default function Preview() {
                         !values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
                           ?.extra_params?.upload_required_fields_status[k],
                     )?.length
-                  : 'All'
+                  : 'ALL'
               }
             >
               {values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
@@ -1203,19 +1165,23 @@ export default function Preview() {
           <Button
             link={
               activeStep === coApplicantIndexes.length &&
-              values?.lead?.extra_params?.progress_without_eligibility === 100
+              values?.lead?.extra_params?.progress_without_eligibility === 100 &&
+              values?.lt_charges?.find((e) => e.status === 'Completed')
                 ? '/lead/eligibility'
                 : null
             }
             primary={true}
             disabled={
-              (activeStep === 0
+              ((activeStep === 0
                 ? !checkTotalProgress(values?.applicants?.[primaryIndex]) ||
                   values?.property_details?.extra_params?.progress != 100 ||
                   values?.reference_details?.extra_params?.progress != 100
                 : !checkTotalProgress(
                     values?.applicants?.[coApplicantIndexes[coApplicantIndex]],
-                  )) && values?.lead?.extra_params?.progress_without_eligibility !== 100
+                  )) &&
+                values?.lead?.extra_params?.progress_without_eligibility !== 100) ||
+              (activeStep === coApplicantIndexes.length &&
+                !values?.lt_charges?.find((e) => e.status === 'Completed'))
             }
             inputClasses='w-1/2 h-[46px]'
             onClick={nextStep}
@@ -1227,7 +1193,40 @@ export default function Preview() {
       </div>
 
       {/* Lnt Charges */}
-      {values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ? (
+      {activeStep == 0 &&
+      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.qualifier ? (
+        <Snackbar
+          sx={{
+            '& .MuiPaper-root': {
+              backgroundColor: '#000000F2',
+              fontFamily: 'Poppins',
+            },
+
+            '& .MuiPaper-root .MuiSnackbarContent-message': {
+              color: '#FEFEFE',
+
+              fontSize: '14px',
+              fontStyle: 'normal',
+              fontWeight: 400,
+            },
+          }}
+          className='-translate-y-32 m-[10px]'
+          open={!values?.lt_charges?.find((e) => e.status === 'Completed')}
+          onClose={() => {}}
+          message='L&T charges is pending'
+          action={
+            <button onClick={gotoLntCharges} className='mr-3'>
+              <span className='text-right text-sm not-italic font-semibold text-primary-red'>
+                Pay now
+              </span>
+            </button>
+          }
+        />
+      ) : null}
+
+      {activeStep != 0 &&
+      values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.applicant_details?.extra_params
+        ?.qualifier ? (
         <Snackbar
           sx={{
             '& .MuiPaper-root': {
