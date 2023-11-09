@@ -140,6 +140,10 @@ export const newCoApplicantValues = {
   },
   work_income_detail: {
     profession: '',
+    pan_number: '',
+    udyam_number: '',
+    income_proof: '',
+    no_of_employees: '',
     company_name: '',
     total_income: '',
     pf_uan: '',
