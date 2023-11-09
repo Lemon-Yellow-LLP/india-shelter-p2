@@ -1628,7 +1628,7 @@ const FormDetails = React.forwardRef(function FormDetails(
                   <div className='w-full flex gap-4' key={i}>
                     <p className='w-1/2 text-xs not-italic font-normal text-dark-grey'>{label}</p>
                     <p className='w-1/2 text-xs not-italic font-medium text-primary-black'>
-                      {value || '-'}
+                      {value || (value === 0 ? value : '-')}
                     </p>
                   </div>
                 ) : null}

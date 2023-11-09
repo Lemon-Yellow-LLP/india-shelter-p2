@@ -509,7 +509,7 @@ export default function AddressDetails() {
     values?.applicants?.[activeIndex]?.address_detail?.extra_params?.is_existing_done,
   ]);
 
-  console.log(openExistingPopup);
+  // console.log(openExistingPopup);
 
   const handleAutofill = async () => {
     const fillData = { ...values.applicants?.[activeIndex]?.applicant_details };

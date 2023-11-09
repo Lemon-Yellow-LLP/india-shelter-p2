@@ -28,6 +28,7 @@ const LeadContextProvider = ({ children }) => {
   const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
   const [coApplicants, setCoApplicants] = useState([]);
   const [pincodeErr, setPincodeErr] = useState({});
+  const [propertyValueEstimateError, setPropertyValueEstimateError] = useState('');
 
   const { token } = useContext(AuthContext);
 
@@ -371,6 +372,8 @@ const LeadContextProvider = ({ children }) => {
         setCoApplicants,
         pincodeErr,
         setPincodeErr,
+        propertyValueEstimateError,
+        setPropertyValueEstimateError,
       }}
     >
       {children}
