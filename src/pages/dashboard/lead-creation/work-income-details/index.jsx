@@ -73,6 +73,7 @@ const WorkIncomeDetails = () => {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
               profession: true,
+              pan_number: false,
               company_name: false,
               total_income: false,
               working_since: false,
@@ -91,6 +92,7 @@ const WorkIncomeDetails = () => {
           } else {
             _requiredFieldStatus = {
               profession: true,
+              pan_number: false,
               company_name: false,
               total_income: false,
               working_since: false,
@@ -110,6 +112,8 @@ const WorkIncomeDetails = () => {
         } else if (e.value === 'Self-employed') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
+              pan_number: false,
+              no_of_employees: false,
               profession: true,
               business_name: false,
               industries: false,
@@ -126,6 +130,8 @@ const WorkIncomeDetails = () => {
             };
           } else {
             _requiredFieldStatus = {
+              pan_number: false,
+              no_of_employees: false,
               profession: true,
               business_name: false,
               industries: false,
@@ -144,6 +150,7 @@ const WorkIncomeDetails = () => {
         } else if (e.value === 'Unemployed') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
+              income_proof: false,
               profession: true,
               no_current_loan: false,
               ongoing_emi: false,
@@ -153,6 +160,7 @@ const WorkIncomeDetails = () => {
             };
           } else {
             _requiredFieldStatus = {
+              income_proof: false,
               profession: true,
               no_current_loan: false,
               ongoing_emi: false,
@@ -164,6 +172,7 @@ const WorkIncomeDetails = () => {
         } else if (e.value === 'Retired') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
+              pan_number: false,
               profession: true,
               no_current_loan: false,
               ongoing_emi: false,
@@ -174,6 +183,7 @@ const WorkIncomeDetails = () => {
             };
           } else {
             _requiredFieldStatus = {
+              pan_number: false,
               profession: true,
               no_current_loan: false,
               ongoing_emi: false,
@@ -193,6 +203,10 @@ const WorkIncomeDetails = () => {
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
           profession: e.value,
           company_name: '',
+          pan_number: '',
+          no_of_employees: '',
+          income_proof: '',
+          udyam_number: '',
           total_income: '',
           pf_uan: '',
           no_current_loan: null,
@@ -437,16 +451,19 @@ const WorkIncomeDetails = () => {
         },
       );
     }
-  }, [
-    values?.applicants?.[activeIndex]?.personal_details?.id_type,
-    values?.applicants?.[activeIndex]?.personal_details?.id_number,
-    values?.applicants?.[activeIndex]?.work_income_detail?.profession,
-  ]);
+  }, [values?.applicants?.[activeIndex]?.personal_details?.id_type]);
 
-  // setFieldValue(
-  //   `applicants[${activeIndex}].work_income_detail.pan_number`,
-  //   values?.applicants?.[activeIndex]?.personal_details?.id_number,
-  // );
+  useEffect(() => {
+    if (
+      values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+      values?.applicants?.[activeIndex]?.personal_details?.id_number
+    ) {
+      setFieldValue(
+        `applicants[${activeIndex}].work_income_detail.pan_number`,
+        values?.applicants?.[activeIndex]?.personal_details?.id_number,
+      );
+    }
+  }, [values?.applicants?.[activeIndex]?.work_income_detail.pan_number]);
 
   return (
     <>
@@ -507,7 +524,9 @@ const WorkIncomeDetails = () => {
                 onChange={(e) => {
                   // e.target.value = e.target.value.toUpperCase();
                   // handleTextInputChange(e);
-                  handleChange(e);
+
+                  setFieldValue(e.target.name, e.target.value.toUpperCase());
+                  // handleChange(e);
                 }}
                 inputClasses='capitalize'
                 error={errors.applicants?.[activeIndex]?.work_income_detail?.pan_number}
@@ -524,18 +543,28 @@ const WorkIncomeDetails = () => {
                 onBlur={(e) => {
                   handleBlur(e);
 
-                  editFieldsById(
-                    values?.applicants?.[activeIndex]?.work_income_detail.id,
-                    'work-income',
-                    {
-                      pan_number: e.target.value,
-                    },
-                    {
-                      headers: {
-                        Authorization: token,
+                  if (
+                    !errors.applicants?.[activeIndex]?.work_income_detail?.pan_number &&
+                    values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ) {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail.id,
+                      'work-income',
+                      {
+                        pan_number: e.target.value,
                       },
-                    },
-                  );
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+                    const name = e.target.name.split('.')[2];
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                  } else {
+                    const name = e.target.name.split('.')[2];
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                  }
                   // const name = e.target.name.split('.')[2];
                   // if (
                   //   !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
@@ -571,14 +600,13 @@ const WorkIncomeDetails = () => {
                 }}
                 // onKeyDown={(e) => {
                 //   if (
-                //     values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
-                //     (e.key === 'ArrowUp' ||
-                //       e.key === 'ArrowDown' ||
-                //       e.key === 'ArrowLeft' ||
-                //       e.key === 'ArrowRight' ||
-                //       e.key === ' ' ||
-                //       e.keyCode === 32 ||
-                //       (e.keyCode >= 65 && e.keyCode <= 90))
+                //     e.key === 'ArrowUp' ||
+                //     e.key === 'ArrowDown' ||
+                //     e.key === 'ArrowLeft' ||
+                //     e.key === 'ArrowRight' ||
+                //     e.key === ' ' ||
+                //     e.keyCode === 32 ||
+                //     (e.keyCode >= 65 && e.keyCode <= 90)
                 //   ) {
                 //     e.preventDefault();
                 //   }

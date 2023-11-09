@@ -252,8 +252,10 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
           />
 
           <TextInput
-            label='No.of employees'
+            type='number'
+            pattern='\d*'
             required
+            label='No.of employees'
             placeholder='Eg: 50'
             name={`applicants[${activeIndex}].work_income_detail.no_of_employees`}
             value={values?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees}
@@ -261,6 +263,30 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
             touched={touched?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees}
             onBlur={(e) => {
               handleBlur(e);
+
+              if (
+                !errors.applicants?.[activeIndex]?.work_income_detail?.no_of_employees &&
+                values?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees
+              ) {
+                console.log(true);
+                editFieldsById(
+                  values?.applicants?.[activeIndex]?.work_income_detail.id,
+                  'work-income',
+                  {
+                    no_of_employees: e.target.value,
+                  },
+                  {
+                    headers: {
+                      Authorization: token,
+                    },
+                  },
+                );
+                const name = e.target.name.split('.')[2];
+                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+              } else {
+                const name = e.target.name.split('.')[2];
+                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+              }
 
               // if (
               //   !errors?.applicants?.[activeIndex]?.work_income_detail?.extra_params

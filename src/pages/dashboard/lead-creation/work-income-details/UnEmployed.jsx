@@ -28,21 +28,6 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
 
   const handleRadioChange = useCallback(
     (e) => {
-      if (e.value === 'Form 60') {
-        setFieldValue(`applicants[${activeIndex}].work_income_detail.pan_number`, '');
-        editFieldsById(
-          values?.applicants?.[activeIndex]?.work_income_detail.id,
-          'work-income',
-          {
-            pan_number: null,
-          },
-          {
-            headers: {
-              Authorization: token,
-            },
-          },
-        );
-      }
       setFieldValue(e.name, e.value);
       // const name = e.name.split('.')[2];
       // updateFields(name, e.value);
@@ -91,7 +76,9 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
           onChange={(e) => {
             // e.target.value = e.target.value.toUpperCase();
             // handleTextInputChange(e);
-            handleChange(e);
+
+            setFieldValue(e.target.name, e.target.value.toUpperCase());
+            // handleChange(e);
           }}
           inputClasses='capitalize'
           error={errors.applicants?.[activeIndex]?.work_income_detail?.pan_number}
@@ -108,18 +95,28 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
           onBlur={(e) => {
             handleBlur(e);
 
-            editFieldsById(
-              values?.applicants?.[activeIndex]?.work_income_detail.id,
-              'work-income',
-              {
-                pan_number: e.value,
-              },
-              {
-                headers: {
-                  Authorization: token,
+            if (
+              !errors.applicants?.[activeIndex]?.work_income_detail?.pan_number &&
+              values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+            ) {
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail.id,
+                'work-income',
+                {
+                  pan_number: e.target.value,
                 },
-              },
-            );
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
+              const name = e.target.name.split('.')[2];
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            } else {
+              const name = e.target.name.split('.')[2];
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            }
             // const name = e.target.name.split('.')[2];
             // if (
             //   !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
@@ -153,20 +150,19 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
             //   updateFields(name, '');
             // }
           }}
-          onKeyDown={(e) => {
-            if (
-              values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
-              (e.key === 'ArrowUp' ||
-                e.key === 'ArrowDown' ||
-                e.key === 'ArrowLeft' ||
-                e.key === 'ArrowRight' ||
-                e.key === ' ' ||
-                e.keyCode === 32 ||
-                (e.keyCode >= 65 && e.keyCode <= 90))
-            ) {
-              e.preventDefault();
-            }
-          }}
+          // onKeyDown={(e) => {
+          //   if (
+          //     e.key === 'ArrowUp' ||
+          //     e.key === 'ArrowDown' ||
+          //     e.key === 'ArrowLeft' ||
+          //     e.key === 'ArrowRight' ||
+          //     e.key === ' ' ||
+          //     e.keyCode === 32 ||
+          //     (e.keyCode >= 65 && e.keyCode <= 90)
+          //   ) {
+          //     e.preventDefault();
+          //   }
+          // }}
         />
       )}
 
