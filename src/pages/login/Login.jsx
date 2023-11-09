@@ -121,6 +121,8 @@ export default function Login() {
     }
   };
 
+  console.log(import.meta.env);
+
   const verifyOTP = useCallback(
     async (loginotp) => {
       const otp = parseInt(loginotp);
