@@ -1,10 +1,8 @@
-import React, { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import TextInputWithSendOtp from '../../components/TextInput/TextInputWithSendOtp';
-import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
-import { OtpInput, ToastMessage, Button } from '../../components';
+import { ToastMessage, Button } from '../../components';
 import { getAllLoanOfficers, getLoginOtp, logout, verifyLoginOtp } from '../../global';
-import otpVerified from '../../assets/icons/otp-verified.svg';
 import DynamicDrawer from '../../components/SwipeableDrawer/DynamicDrawer';
 import { Header } from '../../components';
 import { useNavigate } from 'react-router-dom';
@@ -21,10 +19,8 @@ export default function Login() {
     handleBlur,
     setFieldValue,
     setFieldError,
-    isAuthenticated,
     setIsAuthenticated,
     setOtpFailCount,
-    otpFailCount,
     token,
     setToken,
     toastMessage,
@@ -120,8 +116,6 @@ export default function Login() {
       }
     }
   };
-
-  console.log(import.meta.env);
 
   const verifyOTP = useCallback(
     async (loginotp) => {

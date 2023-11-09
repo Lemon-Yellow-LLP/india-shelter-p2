@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { signInSchema } from '../schemas/index';
 import PropTypes from 'prop-types';
@@ -36,7 +36,9 @@ const AuthContextProvider = ({ children }) => {
     validationSchema: signInSchema,
   });
 
-  // console.log(formik.values);
+  useEffect(() => {
+    console.log('Lo Data', { loData, token, isAuthenticated });
+  }, [loData, token, isAuthenticated]);
 
   return (
     <AuthContext.Provider

@@ -309,10 +309,6 @@ const LeadContextProvider = ({ children }) => {
   }, [location.pathname]);
 
   useEffect(() => {
-    console.log(formik.values);
-  }, [formik.values]);
-
-  useEffect(() => {
     let newData = [];
 
     formik.values.applicants.map((e, index) => {
@@ -334,6 +330,10 @@ const LeadContextProvider = ({ children }) => {
       }
     });
   }, [formik.values.applicants]);
+
+  useEffect(() => {
+    console.log('Lead Context Values', formik.values);
+  }, [formik.values]);
 
   return (
     <LeadContext.Provider
