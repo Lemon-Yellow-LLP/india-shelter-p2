@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 export const defaultValues = {
   employee_code: '',
-  username: import.meta.env.DEV ? '9876543210' : '',
+  username: import.meta.env.DEV || import.meta.env.VITE_DEV === 'true' ? '9876543210' : '',
   password: '',
   role: '',
   first_name: '',
