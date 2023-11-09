@@ -34,6 +34,7 @@ const PropertyDetails = () => {
     activeIndex,
     setCurrentStepIndex,
   } = useContext(LeadContext);
+
   const { token } = useContext(AuthContext);
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.property_details?.extra_params?.required_fields_status,
@@ -42,9 +43,15 @@ const PropertyDetails = () => {
   const handleCloseQualifierNotActivePopup = () => {
     setOpenQualifierNotActivePopup(false);
   };
+
+  useEffect(() => {
+    setRequiredFieldsStatus(values?.property_details?.extra_params?.required_fields_status);
+  }, [activeIndex]);
+
   useEffect(() => {
     updateProgressApplicantSteps('property_details', requiredFieldsStatus, 'property');
   }, [requiredFieldsStatus]);
+
   const handleRadioChange = useCallback(
     async (e) => {
       const name = e.name;

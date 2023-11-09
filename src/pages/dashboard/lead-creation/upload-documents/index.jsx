@@ -160,6 +160,10 @@ const UploadDocuments = () => {
   });
 
   useEffect(() => {
+    setRequiredFieldsStatus(values?.applicant_details?.extra_params?.upload_required_fields_status);
+  }, [activeIndex]);
+
+  useEffect(() => {
     updateProgressUploadDocumentSteps(requiredFieldsStatus);
   }, [requiredFieldsStatus]);
 
