@@ -1,6 +1,5 @@
-import React, { lazy, useEffect, useState } from 'react';
-import { Route, Routes, useParams, useNavigate } from 'react-router-dom';
-import SwipeableDrawerComponent from '../../../components/SwipeableDrawer/LeadDrawer';
+import { lazy, useEffect, useState } from 'react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import Qualifier from './Qualifier';
 import Eligibility from './Eligibility';
 import Preview from './preview';
