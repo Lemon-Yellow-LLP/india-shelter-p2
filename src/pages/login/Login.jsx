@@ -13,13 +13,6 @@ import ErrorTost from '../../components/ToastMessage/ErrorTost';
 
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
-const process = {
-  env: {
-    NODE_ENV: 'development',
-    DEV: 'true',
-  },
-};
-
 export default function Login() {
   const {
     values,
@@ -129,14 +122,13 @@ export default function Login() {
   };
 
   console.log(import.meta.env);
-  console.log(process.env);
 
   const verifyOTP = useCallback(
     async (loginotp) => {
       const otp = parseInt(loginotp);
 
       //For bypass
-      if (import.meta.env.DEV || process.env.DEV || process.env.DEV === 'true') {
+      if (import.meta.env.DEV) {
         if (values.username.toString() === '9876543210' && otp === 12345) {
           setDisablePhoneNumber(false);
           setMobileVerified(true);
