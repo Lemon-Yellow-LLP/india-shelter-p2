@@ -128,7 +128,7 @@ export default function Login() {
       const otp = parseInt(loginotp);
 
       //For bypass
-      if (import.meta.env.DEV) {
+      if (import.meta.env.VITE_DEV) {
         if (values.username.toString() === '9876543210' && otp === 12345) {
           setDisablePhoneNumber(false);
           setMobileVerified(true);
