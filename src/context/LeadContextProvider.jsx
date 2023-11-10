@@ -28,6 +28,7 @@ const LeadContextProvider = ({ children }) => {
   const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
   const [coApplicants, setCoApplicants] = useState([]);
   const [pincodeErr, setPincodeErr] = useState({});
+  const [propertyValueEstimateError, setPropertyValueEstimateError] = useState('');
 
   const { token } = useContext(AuthContext);
 
@@ -308,10 +309,6 @@ const LeadContextProvider = ({ children }) => {
   }, [location.pathname]);
 
   useEffect(() => {
-    console.log(formik.values);
-  }, [formik.values]);
-
-  useEffect(() => {
     let newData = [];
 
     formik.values.applicants.map((e, index) => {
@@ -333,6 +330,10 @@ const LeadContextProvider = ({ children }) => {
       }
     });
   }, [formik.values.applicants]);
+
+  useEffect(() => {
+    console.log('Lead Context Values', formik.values);
+  }, [formik.values]);
 
   return (
     <LeadContext.Provider
@@ -371,6 +372,8 @@ const LeadContextProvider = ({ children }) => {
         setCoApplicants,
         pincodeErr,
         setPincodeErr,
+        propertyValueEstimateError,
+        setPropertyValueEstimateError,
       }}
     >
       {children}
