@@ -196,6 +196,7 @@ export const defaultValuesLead = {
         permanent_city: '',
         permanent_state: '',
         permanent_no_of_year_residing: null,
+        type_of_address: '',
         extra_params: {
           permanent_address_same_as_current: false,
           progress: 0,
@@ -214,6 +215,7 @@ export const defaultValuesLead = {
             permanent_landmark: false,
             permanent_pincode: false,
             permanent_no_of_year_residing: false,
+            type_of_address: false,
           },
         },
       },

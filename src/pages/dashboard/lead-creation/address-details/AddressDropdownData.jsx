@@ -1,5 +1,7 @@
 import IconSelfOwned from '../../../../assets/icons/self-owned';
 import IconRent from '../../../../assets/icons/rent';
+import CommunicationIcon from '../../../../assets/icons/communication';
+import PermanentIcon from '../../../../assets/icons/permanent';
 
 export const residenceData = [
   {
@@ -30,5 +32,18 @@ export const yearsResidingData = [
   {
     label: '10+',
     value: '10+',
+  },
+];
+
+export const typeOfAddressData = [
+  {
+    label: 'Communication',
+    value: 'Communication',
+    icon: <CommunicationIcon />,
+  },
+  {
+    label: 'Permanent',
+    value: 'Permanent',
+    icon: <PermanentIcon />,
   },
 ];

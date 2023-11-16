@@ -9,7 +9,7 @@ import {
 } from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import Checkbox from '../../../../components/Checkbox';
-import { residenceData, yearsResidingData } from './AddressDropdownData';
+import { residenceData, typeOfAddressData, yearsResidingData } from './AddressDropdownData';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
@@ -66,7 +66,7 @@ export default function AddressDetails() {
         values?.applicants?.[activeIndex]?.address_detail?.extra_params
           ?.permanent_address_same_as_current
       ) {
-        handlePermanentSameAsCurrentAddress(false, e.value);
+        handleAdditionalSameAsCurrentAddress(false, e.value);
       }
 
       setFieldValue(e.name, e.value);
@@ -304,7 +304,7 @@ export default function AddressDetails() {
     setFieldValue,
   ]);
 
-  const handlePermanentSameAsCurrentAddress = (isChecked, current_type_of_residence) => {
+  const handleAdditionalSameAsCurrentAddress = (isChecked, current_type_of_residence) => {
     if (isChecked) {
       let newData = structuredClone(values);
 
@@ -396,7 +396,7 @@ export default function AddressDetails() {
     }
   };
 
-  const handlePermanentPincodeChange = useCallback(async () => {
+  const handleAdditionalPincodeChange = useCallback(async () => {
     if (
       !values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode ||
       values?.applicants?.[activeIndex]?.address_detail?.permanent_pincode.toString().length < 5
@@ -1241,7 +1241,7 @@ export default function AddressDetails() {
                     onTouchEnd={() => {}}
                     onChange={(e) => {
                       let isChecked = !!e.target.checked;
-                      handlePermanentSameAsCurrentAddress(
+                      handleAdditionalSameAsCurrentAddress(
                         isChecked,
                         values?.applicants?.[activeIndex]?.address_detail
                           ?.current_type_of_residence,
@@ -1255,19 +1255,40 @@ export default function AddressDetails() {
                   />
 
                   <span className='text-[#373435] text-xs font-normal'>
-                    Permanent address is same as Current address
+                    Additional address is same as Current address
                   </span>
                 </div>
               ) : null}
 
-              {/* Permanent Address */}
+              {/* Additional Address */}
               <label
                 htmlFor='loan-purpose'
                 className='flex gap-0.5 font-medium text-primary-black text-xl mt-3'
               >
-                Permanent Address
+                Additional Address
               </label>
 
+              <div
+                className={`flex gap-4 w-full ${
+                  inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
+                }`}
+              >
+                {typeOfAddressData.map((type, index) => (
+                  <CardRadio
+                    key={index}
+                    label={type.label}
+                    name={`applicants[${activeIndex}].address_detail.type_of_address`}
+                    value={type.value}
+                    current={values?.applicants?.[activeIndex]?.address_detail?.type_of_address}
+                    onChange={handleRadioChange}
+                    disabled={
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                    }
+                  >
+                    {type.icon}
+                  </CardRadio>
+                ))}
+              </div>
               <TextInput
                 label='Flat no/Building name'
                 placeholder='Eg: C-101'
@@ -1580,7 +1601,7 @@ export default function AddressDetails() {
                 }
                 onBlur={(e) => {
                   handleBlur(e);
-                  handlePermanentPincodeChange();
+                  handleAdditionalPincodeChange();
 
                   if (
                     errors?.applicants?.[activeIndex]?.address_detail?.permanent_landmark ||
@@ -1847,7 +1868,7 @@ export default function AddressDetails() {
                   disabled={true}
                 />
                 <span className='text-[#373435] text-xs font-normal'>
-                  Permanent address is same as Current address
+                  Additional address is same as Current address
                 </span>
               </div>
               <div className='flex justify-between w-full'>

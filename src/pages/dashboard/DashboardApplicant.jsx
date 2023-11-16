@@ -408,7 +408,7 @@ export default function DashboardApplicant() {
                       disabled={true}
                     />
                     <p className='text-xs not-italic font-medium text-primary-black'>
-                      Permanent address is same as Current address
+                      Additional address is same as Current address
                     </p>
                   </div>
                 ),
@@ -1028,7 +1028,7 @@ export default function DashboardApplicant() {
                       disabled={true}
                     />
                     <p className='text-xs not-italic font-medium text-primary-black'>
-                      Permanent address is same as Current address
+                      Additional address is same as Current address
                     </p>
                   </div>
                 ),
