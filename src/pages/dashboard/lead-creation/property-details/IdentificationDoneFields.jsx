@@ -226,23 +226,26 @@ const IdentificationDoneFields = ({
       ) : null}
 
       <TextInput
-        name='property_details.owner_name'
-        label='Owner name'
+        name='property_details.current_owner_name'
+        label='Current Owner name'
         required
         placeholder='Eg: Sanjay'
-        value={values?.property_details?.owner_name}
-        error={errors?.property_details?.owner_name}
-        touched={touched.property_details?.owner_name}
+        value={values?.property_details?.current_owner_name}
+        error={errors?.property_details?.current_owner_name}
+        touched={touched.property_details?.current_owner_name}
         onChange={handleTextInputChange}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.currentTarget.name.split('.')[1];
 
-          if (!errors?.property_details?.owner_name && values?.property_details?.owner_name) {
+          if (
+            !errors?.property_details?.current_owner_name &&
+            values?.property_details?.current_owner_name
+          ) {
             editPropertyById(
               values?.property_details?.id,
               {
-                owner_name: values?.property_details?.owner_name,
+                current_owner_name: values?.property_details?.current_owner_name,
               },
               {
                 headers: {
@@ -261,7 +264,7 @@ const IdentificationDoneFields = ({
             editPropertyById(
               values?.property_details?.id,
               {
-                owner_name: '',
+                current_owner_name: '',
               },
               {
                 headers: {

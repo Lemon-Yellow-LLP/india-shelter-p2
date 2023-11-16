@@ -14,7 +14,7 @@ export const defaultValuesLead = {
   property_details: {
     property_identification_is: '',
     property_value_estimate: '',
-    owner_name: '',
+    current_owner_name: '',
     plot_house_flat: '',
     project_society_colony: '',
     pincode: null,
