@@ -105,8 +105,8 @@ export default function Preview() {
                 errors?.applicants?.[idx]?.work_income_detail?.extra_params?.extra_company_name,
             }),
 
-          ...(errors?.applicants?.[idx]?.work_income_detail?.total_income && {
-            total_income: errors?.applicants?.[idx]?.work_income_detail?.total_income,
+          ...(errors?.applicants?.[idx]?.work_income_detail?.salary_per_month && {
+            salary_per_month: errors?.applicants?.[idx]?.work_income_detail?.salary_per_month,
           }),
 
           ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {

@@ -469,7 +469,7 @@ export default function DashboardApplicant() {
               },
               {
                 label: 'Total income',
-                value: primaryApplicant?.work_income_detail?.total_income,
+                value: primaryApplicant?.work_income_detail?.salary_per_month,
               },
               {
                 label: 'PF UAN',
@@ -1091,7 +1091,7 @@ export default function DashboardApplicant() {
               },
               {
                 label: 'Total income',
-                value: activeCoApplicant?.work_income_detail?.total_income,
+                value: activeCoApplicant?.work_income_detail?.salary_per_month,
               },
               {
                 label: 'PF UAN',

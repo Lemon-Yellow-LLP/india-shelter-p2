@@ -221,7 +221,7 @@ export const defaultValuesLead = {
         profession: '',
         company_name: '',
         no_of_employees: '',
-        total_income: '',
+        salary_per_month: '',
         pf_uan: '',
         no_current_loan: null,
         ongoing_emi: '',

@@ -145,7 +145,7 @@ export const newCoApplicantValues = {
     income_proof: '',
     no_of_employees: '',
     company_name: '',
-    total_income: '',
+    salary_per_month: '',
     pf_uan: '',
     no_current_loan: null,
     ongoing_emi: '',
