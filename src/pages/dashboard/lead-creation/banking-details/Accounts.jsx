@@ -66,26 +66,28 @@ export default function Accounts({
                 </span>
               </div>
             </div>
-            <div className='flex justify-between pr-[10px]'>
-              {data?.penny_drop_response?.result?.active === 'yes' ? (
-                <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[19px] pl-[10px] pr-[10px] flex items-center justify-center'>
-                  Penny drop successful
-                </span>
-              ) : (
-                <>
-                  <span className='text-[#E33439] text-[10px] font-medium border border-[#E33439] bg-[#FFD6D7] rounded-[12px] h-[19px] pl-[10px] pr-[10px] flex items-center justify-center'>
-                    Penny drop failed
+            {!data?.account_aggregator_response ? (
+              <div className='flex justify-between pr-[10px]'>
+                {data?.penny_drop_response?.result?.active === 'yes' ? (
+                  <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[19px] pl-[10px] pr-[10px] flex items-center justify-center'>
+                    Penny drop successful
                   </span>
+                ) : (
+                  <>
+                    <span className='text-[#E33439] text-[10px] font-medium border border-[#E33439] bg-[#FFD6D7] rounded-[12px] h-[19px] pl-[10px] pr-[10px] flex items-center justify-center'>
+                      Penny drop failed
+                    </span>
 
-                  <button
-                    className='text-[#E33439] text-[14px] font-medium'
-                    onClick={() => handleRetry(data.id)}
-                  >
-                    Retry
-                  </button>
-                </>
-              )}
-            </div>
+                    <button
+                      className='text-[#E33439] text-[14px] font-medium'
+                      onClick={() => handleRetry(data.id)}
+                    >
+                      Retry
+                    </button>
+                  </>
+                )}
+              </div>
+            ) : null}
           </div>
         </AccordionSummary>
 
@@ -112,7 +114,8 @@ export default function Accounts({
                 onChange={(e) => handlePrimaryChange(data.id, e.currentTarget.checked)}
               />
             </div>
-            {!data?.penny_drop_response || data?.penny_drop_response?.result?.active === 'no' ? (
+            {!data?.account_aggregator_response &&
+            (!data?.penny_drop_response || data?.penny_drop_response?.result?.active === 'no') ? (
               <div className='flex gap-[10px] mt-[10px]'>
                 <Button inputClasses='w-full h-[46px]' onClick={() => handleDelete(data.id)}>
                   Delete
