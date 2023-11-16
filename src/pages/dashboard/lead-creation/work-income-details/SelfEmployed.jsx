@@ -151,89 +151,41 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
             !errors.applicants?.[activeIndex]?.work_income_detail?.no_of_employees &&
             values?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees
           ) {
-            // editFieldsById(
-            //   values?.applicants?.[activeIndex]?.work_income_detail.id,
-            //   'work-income',
-            //   {
-            //     no_of_employees: e.target.value,
-            //   },
-            //   {
-            //     headers: {
-            //       Authorization: token,
-            //     },
-            //   },
-            // );
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail.id,
+              'work-income',
+              {
+                no_of_employees: e.target.value,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
             const name = e.target.name.split('.')[2];
-            console.log(name);
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
           } else {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail.id,
+              'work-income',
+              {
+                no_of_employees: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
             const name = e.target.name.split('.')[2];
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
           }
-
-          // if (
-          //   !errors?.applicants?.[activeIndex]?.work_income_detail?.extra_params
-          //     ?.extra_company_name &&
-          //   values?.applicants?.[activeIndex]?.work_income_detail?.extra_params
-          //     ?.extra_company_name
-          // ) {
-          //   editFieldsById(
-          //     values?.applicants?.[activeIndex]?.work_income_detail?.id,
-          //     'work-income',
-          //     {
-          //       company_name:
-          //         values?.applicants?.[activeIndex]?.work_income_detail?.extra_params
-          //           ?.extra_company_name,
-          //       extra_params: {
-          //         extra_company_name: 'Others',
-          //       },
-          //     },
-          //     {
-          //       headers: {
-          //         Authorization: token,
-          //       },
-          //     },
-          //   );
-          // } else {
-          //   setRequiredFieldsStatus((prev) => ({
-          //     ...prev,
-          //     ['company_name']: false,
-          //   }));
-
-          //   editFieldsById(
-          //     values?.applicants?.[activeIndex]?.work_income_detail?.id,
-          //     'work-income',
-          //     {
-          //       company_name: '',
-          //       extra_params: {
-          //         extra_company_name: '',
-          //       },
-          //     },
-          //     {
-          //       headers: {
-          //         Authorization: token,
-          //       },
-          //     },
-          //   );
-          // }
         }}
         onChange={(e) => {
           handleChange(e);
-          // const value = e.currentTarget.value;
-          // const pattern = /^[a-zA-Z\s]+$/;
-          // if (!pattern.test(value) && value.length != 0) {
-          //   return;
-          // }
-          // if (pattern.exec(value[value.length - 1])) {
-          //   setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-
-          //   if (!requiredFieldsStatus['company_name']) {
-          //     setRequiredFieldsStatus((prev) => ({
-          //       ...prev,
-          //       ['company_name']: true,
-          //     }));
-          //   }
-          // }
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
@@ -405,63 +357,41 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
         error={errors?.applicants?.[activeIndex]?.work_income_detail?.udyam_number}
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.udyam_number}
         onBlur={(e) => {
-          // const gstPattern =
-          //   /^([0-9]{2}[a-zA-Z]{4}([a-zA-Z]{1}|[0-9]{1})[0-9]{4}[a-zA-Z]{1}([a-zA-Z]|[0-9]){3}){0,15}$/;
-          // const cleanedGSTNumber = values?.applicants?.[
-          //   activeIndex
-          // ]?.work_income_detail?.gst_number.replace(/\s/g, '');
-          // if (
-          //   !gstPattern.test(cleanedGSTNumber) &&
-          //   values?.applicants?.[activeIndex]?.work_income_detail?.gst_number
-          // ) {
-          //   setFieldError('work_income_detail.gst_number', 'Inavlid gst number');
-          // } else {
-          //   handleBlur(e);
-          // }
           handleBlur(e);
 
-          // if (
-          //   !errors?.applicants?.[activeIndex]?.work_income_detail?.gst_number &&
-          //   values?.applicants?.[activeIndex]?.work_income_detail?.gst_number
-          // ) {
-          //   editFieldsById(
-          //     values?.applicants?.[activeIndex]?.work_income_detail?.id,
-          //     'work-income',
-          //     {
-          //       gst_number: values?.applicants?.[activeIndex]?.work_income_detail?.gst_number,
-          //     },
-          //     {
-          //       headers: {
-          //         Authorization: token,
-          //       },
-          //     },
-          //   );
-          // } else {
-          //   editFieldsById(
-          //     values?.applicants?.[activeIndex]?.work_income_detail?.id,
-          //     'work-income',
-          //     {
-          //       gst_number: '',
-          //     },
-          //     {
-          //       headers: {
-          //         Authorization: token,
-          //       },
-          //     },
-          //   );
-          // }
+          if (
+            !errors?.applicants?.[activeIndex]?.work_income_detail?.udyam_number &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number
+          ) {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number,
+              'work-income',
+              {
+                udyam_number: values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+          } else {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number,
+              'work-income',
+              {
+                udyam_number: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+          }
         }}
         onChange={(e) => {
-          handleChange(e);
-          // e.target.value = e.target.value.toUpperCase();
-          // const value = e.currentTarget.value;
-          // const pattern = /^[a-zA-Z0-9]+$/;
-          // if (!pattern.test(value) && value.length > 0) {
-          //   return;
-          // }
-          // if (pattern.exec(value[value.length - 1])) {
-          //   setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-          // }
+          setFieldValue(e.target.name, e.target.value.toUpperCase());
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />

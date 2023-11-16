@@ -75,7 +75,7 @@ const WorkIncomeDetails = () => {
               profession: true,
               pan_number: false,
               company_name: false,
-              total_income: false,
+              salary_per_month: false,
               working_since: false,
               mode_of_salary: false,
               flat_no_building_name: false,
@@ -94,7 +94,7 @@ const WorkIncomeDetails = () => {
               profession: true,
               pan_number: false,
               company_name: false,
-              total_income: false,
+              salary_per_month: false,
               working_since: false,
               mode_of_salary: false,
               flat_no_building_name: false,
@@ -207,7 +207,7 @@ const WorkIncomeDetails = () => {
           no_of_employees: '',
           income_proof: '',
           udyam_number: '',
-          total_income: '',
+          salary_per_month: '',
           pf_uan: '',
           no_current_loan: null,
           ongoing_emi: '',
@@ -463,7 +463,7 @@ const WorkIncomeDetails = () => {
         values?.applicants?.[activeIndex]?.personal_details?.id_number,
       );
     }
-  }, [values?.applicants?.[activeIndex]?.work_income_detail.pan_number]);
+  }, [values?.applicants?.[activeIndex]?.work_income_detail?.pan_number]);
 
   return (
     <>
@@ -522,11 +522,7 @@ const WorkIncomeDetails = () => {
                 name={`applicants[${activeIndex}].work_income_detail.pan_number`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.pan_number}
                 onChange={(e) => {
-                  // e.target.value = e.target.value.toUpperCase();
-                  // handleTextInputChange(e);
-
                   setFieldValue(e.target.name, e.target.value.toUpperCase());
-                  // handleChange(e);
                 }}
                 inputClasses='capitalize'
                 error={errors.applicants?.[activeIndex]?.work_income_detail?.pan_number}
@@ -560,43 +556,25 @@ const WorkIncomeDetails = () => {
                       },
                     );
                     const name = e.target.name.split('.')[2];
+
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   } else {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail.id,
+                      'work-income',
+                      {
+                        pan_number: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
                     const name = e.target.name.split('.')[2];
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
-                  // const name = e.target.name.split('.')[2];
-                  // if (
-                  //   !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
-                  //   values?.applicants?.[activeIndex]?.personal_details?.[name]
-                  // ) {
-                  //   updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
-                  //   if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
-                  //     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                  //   }
-
-                  //   if (
-                  //     values?.applicants?.[activeIndex]?.personal_details?.extra_params
-                  //       ?.same_as_id_type
-                  //   ) {
-                  //     updateFields(
-                  //       'address_proof_number',
-                  //       values?.applicants?.[activeIndex]?.personal_details?.[name],
-                  //     );
-                  //     if (
-                  //       requiredFieldsStatus.address_proof_number !== undefined &&
-                  //       !requiredFieldsStatus.address_proof_number
-                  //     ) {
-                  //       setRequiredFieldsStatus((prev) => ({
-                  //         ...prev,
-                  //         address_proof_number: true,
-                  //       }));
-                  //     }
-                  //   }
-                  // } else {
-                  //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
-                  //   updateFields(name, '');
-                  // }
                 }}
                 // onKeyDown={(e) => {
                 //   if (
@@ -660,7 +638,7 @@ const WorkIncomeDetails = () => {
           values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Self-employed' ? (
             <>
               <TextInput
-                label='Flat no/Building name'
+                label='Plot no/Building name'
                 placeholder='Eg: C-101'
                 required
                 name={`applicants[${activeIndex}].work_income_detail.flat_no_building_name`}

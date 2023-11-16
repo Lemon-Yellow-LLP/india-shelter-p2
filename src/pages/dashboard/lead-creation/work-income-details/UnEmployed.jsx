@@ -29,12 +29,31 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
   const handleRadioChange = useCallback(
     (e) => {
       setFieldValue(e.name, e.value);
-      // const name = e.name.split('.')[2];
-      // updateFields(name, e.value);
-      // if (!requiredFieldsStatus[name]) {
-      //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-      // }
-      //requiredFieldsStatus
+
+      if (!errors.applicants?.[activeIndex]?.work_income_detail?.income_proof) {
+        editFieldsById(
+          values?.applicants?.[activeIndex]?.work_income_detail.id,
+          'work-income',
+          {
+            income_proof: e.value,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+        const name = e.name.split('.')[2];
+
+        if (e.value !== 'PAN ID') {
+          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+        } else {
+          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+        }
+      } else {
+        const name = e.name.split('.')[2];
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+      }
     },
     [values],
   );
@@ -42,7 +61,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
   return (
     <>
       <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
-        Profession <span className='text-primary-red text-xs'>*</span>
+        Income proof <span className='text-primary-red text-xs'>*</span>
       </label>
 
       <div className={`flex gap-4 w-full`}>
@@ -74,11 +93,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
           name={`applicants[${activeIndex}].work_income_detail.pan_number`}
           value={values?.applicants?.[activeIndex]?.work_income_detail?.pan_number}
           onChange={(e) => {
-            // e.target.value = e.target.value.toUpperCase();
-            // handleTextInputChange(e);
-
             setFieldValue(e.target.name, e.target.value.toUpperCase());
-            // handleChange(e);
           }}
           inputClasses='capitalize'
           error={errors.applicants?.[activeIndex]?.work_income_detail?.pan_number}
@@ -113,42 +128,25 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
               );
               const name = e.target.name.split('.')[2];
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+              setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: true }));
             } else {
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail.id,
+                'work-income',
+                {
+                  pan_number: '',
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
+
               const name = e.target.name.split('.')[2];
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+              setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: false }));
             }
-            // const name = e.target.name.split('.')[2];
-            // if (
-            //   !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
-            //   values?.applicants?.[activeIndex]?.personal_details?.[name]
-            // ) {
-            //   updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
-            //   if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
-            //     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-            //   }
-
-            //   if (
-            //     values?.applicants?.[activeIndex]?.personal_details?.extra_params
-            //       ?.same_as_id_type
-            //   ) {
-            //     updateFields(
-            //       'address_proof_number',
-            //       values?.applicants?.[activeIndex]?.personal_details?.[name],
-            //     );
-            //     if (
-            //       requiredFieldsStatus.address_proof_number !== undefined &&
-            //       !requiredFieldsStatus.address_proof_number
-            //     ) {
-            //       setRequiredFieldsStatus((prev) => ({
-            //         ...prev,
-            //         address_proof_number: true,
-            //       }));
-            //     }
-            //   }
-            // } else {
-            //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
-            //   updateFields(name, '');
-            // }
           }}
           // onKeyDown={(e) => {
           //   if (
