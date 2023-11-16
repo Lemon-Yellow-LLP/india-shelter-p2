@@ -321,7 +321,7 @@ export default function DashboardApplicant() {
               },
               {
                 label: 'Father/Husband’s name',
-                value: primaryApplicant?.personal_details?.father_husband_name,
+                value: primaryApplicant?.personal_details?.father_name,
               },
               {
                 label: 'Mother’s name',
@@ -941,7 +941,7 @@ export default function DashboardApplicant() {
               },
               {
                 label: 'Father/Husband’s name',
-                value: activeCoApplicant?.personal_details?.father_husband_name,
+                value: activeCoApplicant?.personal_details?.father_name,
               },
               {
                 label: 'Mother’s name',

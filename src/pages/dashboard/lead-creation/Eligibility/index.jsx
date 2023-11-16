@@ -110,7 +110,6 @@ const Eligibility = () => {
 
       if (res.bre_101_response && lead.bre_201_response) {
         setBre101(res);
-        setSdfcResponse(true);
         setProgress(
           values?.applicants?.[activeIndex]?.applicant_details.extra_params
             .eligibility_api_progress,
@@ -119,7 +118,6 @@ const Eligibility = () => {
           values?.applicants?.[activeIndex]?.applicant_details.extra_params
             .eligibility_api_progress,
         );
-
         setDL((prev) => ({
           ...prev,
           loader: false,
@@ -190,9 +188,9 @@ const Eligibility = () => {
             res: res.bre_101_response.body.Display.Bureau_Status,
           }));
         }
-
         setBre201(lead);
-
+        updateCompleteFormProgress();
+        setSdfcResponse(true);
         return;
       }
 
@@ -1455,9 +1453,6 @@ const Eligibility = () => {
           inputClasses={`w-full h-12 ${sdfcResponse ? 'font-semibold' : 'font-normal'}`}
           primary={true}
           link='/'
-          onClick={() => {
-            updateCompleteFormProgress();
-          }}
         >
           Go to Dashboard
         </Button>
