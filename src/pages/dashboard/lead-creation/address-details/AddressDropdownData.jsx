@@ -1,7 +1,7 @@
 import IconSelfOwned from '../../../../assets/icons/self-owned';
 import IconRent from '../../../../assets/icons/rent';
 import CommunicationIcon from '../../../../assets/icons/communication';
-import PermanentIcon from '../../../../assets/icons/permanent';
+import PermanentIcon from '../../../../assets/icons/additional';
 
 export const residenceData = [
   {

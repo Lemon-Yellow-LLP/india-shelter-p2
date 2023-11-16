@@ -291,10 +291,10 @@ export default function Preview() {
         delete _errors.applicants[idx];
       }
 
-      if (pincodeErr?.[`address_permanent_${idx}`] && _errors.applicants[idx]) {
+      if (pincodeErr?.[`address_additional_${idx}`] && _errors.applicants[idx]) {
         _errors.applicants[idx].address_detail = {
           ..._errors?.applicants[idx]?.address_detail,
-          permanent_pincode: true,
+          additional_pincode: true,
         };
       }
       if (pincodeErr?.[`address_current_${idx}`] && _errors.applicants[idx]) {

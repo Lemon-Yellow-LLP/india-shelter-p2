@@ -266,37 +266,37 @@ const applicantSchema = Yup.object().shape({
       .max(6, 'Pincode a valid Pincode'),
     current_no_of_year_residing: Yup.string().required('This field is mandatory'),
 
-    permanent_flat_no_building_name: Yup.string()
+    additional_flat_no_building_name: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Flat no/Building name must be atleast 2 characters long')
       .max(90, 'Flat no/Building name can be max 90 characters long')
       .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
-    permanent_street_area_locality: Yup.string()
+    additional_street_area_locality: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Street/Area/Locality must be atleast 2 characters long')
       .max(90, 'Street/Area/Locality can be max 90 characters long')
       .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
-    permanent_town: Yup.string()
+    additional_town: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Town must be atleast 2 characters long')
       .max(90, 'Town can be max 90 characters long')
       .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
-    permanent_landmark: Yup.string()
+    additional_landmark: Yup.string()
       .trim()
       .required('This field is mandatory')
       .min(2, 'Landmark must be atleast 2 characters long')
       .max(90, 'Landmark can be max 90 characters long')
       .matches(/^[a-zA-Z0-9.,/ -]+$/, 'Invalid characters'),
-    permanent_pincode: Yup.string()
+    additional_pincode: Yup.string()
       .trim()
       .required('This field is mandatory')
       .matches(/^(0|[1-9]\d*)$/, 'Enter a valid Pincode')
       .min(6, 'Pincode a valid Pincode')
       .max(6, 'Pincode a valid Pincode'),
-    permanent_no_of_year_residing: Yup.string().required('This field is mandatory'),
+    additional_no_of_year_residing: Yup.string().required('This field is mandatory'),
   }),
 });
 
