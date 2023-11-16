@@ -54,7 +54,7 @@ export const fieldLabels = {
 
   profession: 'Profession',
   company_name: 'Company Name',
-  total_income: 'Total Income',
+  salary_per_month: 'Total Income',
   pf_uan: 'PF UAN',
   no_current_loan: 'No. of Current Loan',
   ongoing_emi: 'Ongoing EMI',

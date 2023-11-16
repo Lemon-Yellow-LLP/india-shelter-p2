@@ -204,7 +204,7 @@ const applicantSchema = Yup.object().shape({
       .max(6, 'Enter a valid Pincode'),
     //Salaried
     company_name: Yup.string().required('This field is mandatory'),
-    total_income: Yup.number()
+    salary_per_month: Yup.number()
       .required('This field is mandatory')
       .required('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
       .typeError('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
