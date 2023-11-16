@@ -403,12 +403,12 @@ export default function DashboardApplicant() {
                       name=''
                       checked={
                         primaryApplicant?.address_detail?.extra_params
-                          ?.permanent_address_same_as_current
+                          ?.additional_address_same_as_current
                       }
                       disabled={true}
                     />
                     <p className='text-xs not-italic font-medium text-primary-black'>
-                      Permanent address is same as Current address
+                      Additional address is same as Current address
                     </p>
                   </div>
                 ),
@@ -420,35 +420,35 @@ export default function DashboardApplicant() {
               },
               {
                 label: 'Flat no/Building name',
-                value: primaryApplicant?.address_detail?.permanent_flat_no_building_name,
+                value: primaryApplicant?.address_detail?.additional_flat_no_building_name,
               },
               {
                 label: 'Street/Area/Locality',
-                value: primaryApplicant?.address_detail?.permanent_street_area_locality,
+                value: primaryApplicant?.address_detail?.additional_street_area_locality,
               },
               {
                 label: 'Town',
-                value: primaryApplicant?.address_detail?.permanent_town,
+                value: primaryApplicant?.address_detail?.additional_town,
               },
               {
                 label: 'Landmark',
-                value: primaryApplicant?.address_detail?.permanent_landmark,
+                value: primaryApplicant?.address_detail?.additional_landmark,
               },
               {
                 label: 'Pincode',
-                value: primaryApplicant?.address_detail?.permanent_pincode,
+                value: primaryApplicant?.address_detail?.additional_pincode,
               },
               {
                 label: 'City',
-                value: primaryApplicant?.address_detail?.permanent_city,
+                value: primaryApplicant?.address_detail?.additional_city,
               },
               {
                 label: 'State',
-                value: primaryApplicant?.address_detail?.permanent_state,
+                value: primaryApplicant?.address_detail?.additional_state,
               },
               {
                 label: 'No. of years residing',
-                value: primaryApplicant?.address_detail?.permanent_no_of_year_residing,
+                value: primaryApplicant?.address_detail?.additional_no_of_year_residing,
               },
             ]}
           />
@@ -1023,12 +1023,12 @@ export default function DashboardApplicant() {
                       name=''
                       checked={
                         primaryApplicant?.address_detail?.extra_params
-                          ?.permanent_address_same_as_current
+                          ?.additional_address_same_as_current
                       }
                       disabled={true}
                     />
                     <p className='text-xs not-italic font-medium text-primary-black'>
-                      Permanent address is same as Current address
+                      Additional address is same as Current address
                     </p>
                   </div>
                 ),
@@ -1040,35 +1040,35 @@ export default function DashboardApplicant() {
               },
               {
                 label: 'Flat no/Building name',
-                value: activeCoApplicant?.address_detail?.permanent_flat_no_building_name,
+                value: activeCoApplicant?.address_detail?.additional_flat_no_building_name,
               },
               {
                 label: 'Street/Area/Locality',
-                value: activeCoApplicant?.address_detail?.permanent_street_area_locality,
+                value: activeCoApplicant?.address_detail?.additional_street_area_locality,
               },
               {
                 label: 'Town',
-                value: activeCoApplicant?.address_detail?.permanent_town,
+                value: activeCoApplicant?.address_detail?.additional_town,
               },
               {
                 label: 'Landmark',
-                value: activeCoApplicant?.address_detail?.permanent_landmark,
+                value: activeCoApplicant?.address_detail?.additional_landmark,
               },
               {
                 label: 'Pincode',
-                value: activeCoApplicant?.address_detail?.permanent_pincode,
+                value: activeCoApplicant?.address_detail?.additional_pincode,
               },
               {
                 label: 'City',
-                value: activeCoApplicant?.address_detail?.permanent_city,
+                value: activeCoApplicant?.address_detail?.additional_city,
               },
               {
                 label: 'State',
-                value: activeCoApplicant?.address_detail?.permanent_state,
+                value: activeCoApplicant?.address_detail?.additional_state,
               },
               {
                 label: 'No. of years residing',
-                value: activeCoApplicant?.address_detail?.permanent_no_of_year_residing,
+                value: activeCoApplicant?.address_detail?.additional_no_of_year_residing,
               },
             ]}
           />
