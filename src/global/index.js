@@ -2,7 +2,7 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://lo.scotttiger.in/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://uatagile.indiashelter.in/api';
 
 const requestOptions = {};
 
