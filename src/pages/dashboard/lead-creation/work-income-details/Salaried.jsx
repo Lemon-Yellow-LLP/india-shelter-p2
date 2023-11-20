@@ -42,6 +42,15 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
         },
       );
 
+      if (new_name !== 'company_name') {
+        setRequiredFieldsStatus((prev) => ({
+          ...prev,
+          [new_name]: true,
+        }));
+
+        return;
+      }
+
       if (new_name === 'company_name' && value?.value !== 'Others') {
         setRequiredFieldsStatus((prev) => ({
           ...prev,
@@ -53,13 +62,6 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
           ...prev,
           [new_name]: false,
           no_of_employees: false,
-        }));
-      }
-
-      if (new_name !== 'company_name') {
-        setRequiredFieldsStatus((prev) => ({
-          ...prev,
-          [new_name]: true,
         }));
       }
     },
