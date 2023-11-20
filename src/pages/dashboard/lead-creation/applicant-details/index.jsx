@@ -398,7 +398,7 @@ const ApplicantDetails = () => {
             },
           };
 
-          await checkExistingCustomer(bodyForExistingCustomer, token)
+          await checkExistingCustomer(bodyForExistingCustomer)
             .then((body) => {
               if (body && body?.length !== 0) {
                 const { existing_customer_is_existing_customer } = body[0];

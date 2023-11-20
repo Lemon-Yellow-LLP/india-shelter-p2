@@ -50,6 +50,10 @@ const ReferenceDetails = () => {
   };
 
   useEffect(() => {
+    setRequiredFieldsStatus(values?.reference_details?.extra_params?.required_fields_status);
+  }, [activeIndex]);
+
+  useEffect(() => {
     updateProgressApplicantSteps('reference_details', requiredFieldsStatus, 'reference');
   }, [requiredFieldsStatus]);
 

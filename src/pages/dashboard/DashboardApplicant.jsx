@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EditIcon from '../../assets/icons/edit';
-import BackIcon2 from '../../assets/icons/back-2';
 import { AuthContext } from '../../context/AuthContextProvider';
-import { Box, Button, Tabs, Tab } from '@mui/material';
+import { Box, Tabs, Tab } from '@mui/material';
 import ProgressBadge from '../../components/ProgressBadge';
 import { getDashboardLeadById, pushToSalesforce } from '../../global';
 import { CheckBox, DropDown, ToastMessage } from '../../components';
@@ -320,8 +319,8 @@ export default function DashboardApplicant() {
                 value: primaryApplicant?.personal_details?.mobile_number,
               },
               {
-                label: 'Father/Husband’s name',
-                value: primaryApplicant?.personal_details?.father_husband_name,
+                label: 'Father’s name',
+                value: primaryApplicant?.personal_details?.father_name,
               },
               {
                 label: 'Mother’s name',
@@ -331,6 +330,12 @@ export default function DashboardApplicant() {
                 label: 'Marital status',
                 value: primaryApplicant?.personal_details?.marital_status,
               },
+              primaryApplicant?.personal_details?.marital_status === 'Married'
+                ? {
+                    label: 'Spouse name',
+                    value: primaryApplicant?.personal_details?.spouse_name,
+                  }
+                : null,
               {
                 label: 'Religion',
                 value: primaryApplicant?.personal_details?.religion,
@@ -396,59 +401,59 @@ export default function DashboardApplicant() {
               {
                 label: '',
                 value: '',
-                subtitle: 'PERMANENT ADDRESS',
+                subtitle: 'ADDITIONAL ADDRESS',
                 children: (
                   <div className='flex gap-2'>
                     <CheckBox
                       name=''
                       checked={
                         primaryApplicant?.address_detail?.extra_params
-                          ?.permanent_address_same_as_current
+                          ?.additional_address_same_as_current
                       }
                       disabled={true}
                     />
                     <p className='text-xs not-italic font-medium text-primary-black'>
-                      Permanent address is same as Current address
+                      Additional address is same as Current address
                     </p>
                   </div>
                 ),
               },
 
               {
-                label: 'Type of residence',
-                value: primaryApplicant?.address_detail?.current_type_of_residence,
+                label: 'Type of address',
+                value: primaryApplicant?.address_detail?.additional_type_of_residence,
               },
               {
                 label: 'Flat no/Building name',
-                value: primaryApplicant?.address_detail?.permanent_flat_no_building_name,
+                value: primaryApplicant?.address_detail?.additional_flat_no_building_name,
               },
               {
                 label: 'Street/Area/Locality',
-                value: primaryApplicant?.address_detail?.permanent_street_area_locality,
+                value: primaryApplicant?.address_detail?.additional_street_area_locality,
               },
               {
                 label: 'Town',
-                value: primaryApplicant?.address_detail?.permanent_town,
+                value: primaryApplicant?.address_detail?.additional_town,
               },
               {
                 label: 'Landmark',
-                value: primaryApplicant?.address_detail?.permanent_landmark,
+                value: primaryApplicant?.address_detail?.additional_landmark,
               },
               {
                 label: 'Pincode',
-                value: primaryApplicant?.address_detail?.permanent_pincode,
+                value: primaryApplicant?.address_detail?.additional_pincode,
               },
               {
                 label: 'City',
-                value: primaryApplicant?.address_detail?.permanent_city,
+                value: primaryApplicant?.address_detail?.additional_city,
               },
               {
                 label: 'State',
-                value: primaryApplicant?.address_detail?.permanent_state,
+                value: primaryApplicant?.address_detail?.additional_state,
               },
               {
                 label: 'No. of years residing',
-                value: primaryApplicant?.address_detail?.permanent_no_of_year_residing,
+                value: primaryApplicant?.address_detail?.additional_no_of_year_residing,
               },
             ]}
           />
@@ -940,17 +945,24 @@ export default function DashboardApplicant() {
                 value: activeCoApplicant?.personal_details?.mobile_number,
               },
               {
-                label: 'Father/Husband’s name',
-                value: activeCoApplicant?.personal_details?.father_husband_name,
+                label: 'Father’s name',
+                value: activeCoApplicant?.personal_details?.father_name,
               },
               {
                 label: 'Mother’s name',
                 value: activeCoApplicant?.personal_details?.mother_name,
               },
+
               {
                 label: 'Marital status',
                 value: activeCoApplicant?.personal_details?.marital_status,
               },
+
+              activeCoApplicant?.personal_details?.marital_status === 'Married' && {
+                label: 'Spouse name',
+                value: activeCoApplicant?.personal_details?.spouse_name,
+              },
+
               {
                 label: 'Religion',
                 value: activeCoApplicant?.personal_details?.religion,
@@ -1016,59 +1028,58 @@ export default function DashboardApplicant() {
               {
                 label: '',
                 value: '',
-                subtitle: 'PERMANENT ADDRESS',
+                subtitle: 'ADDITIONAL ADDRESS',
                 children: (
                   <div className='flex gap-2'>
                     <CheckBox
                       name=''
                       checked={
                         primaryApplicant?.address_detail?.extra_params
-                          ?.permanent_address_same_as_current
+                          ?.additional_address_same_as_current
                       }
                       disabled={true}
                     />
                     <p className='text-xs not-italic font-medium text-primary-black'>
-                      Permanent address is same as Current address
+                      Additional address is same as Current address
                     </p>
                   </div>
                 ),
               },
-
               {
-                label: 'Type of residence',
-                value: activeCoApplicant?.address_detail?.current_type_of_residence,
+                label: 'Type of address',
+                value: activeCoApplicant?.address_detail?.additional_type_of_residence,
               },
               {
                 label: 'Flat no/Building name',
-                value: activeCoApplicant?.address_detail?.permanent_flat_no_building_name,
+                value: activeCoApplicant?.address_detail?.additional_flat_no_building_name,
               },
               {
                 label: 'Street/Area/Locality',
-                value: activeCoApplicant?.address_detail?.permanent_street_area_locality,
+                value: activeCoApplicant?.address_detail?.additional_street_area_locality,
               },
               {
                 label: 'Town',
-                value: activeCoApplicant?.address_detail?.permanent_town,
+                value: activeCoApplicant?.address_detail?.additional_town,
               },
               {
                 label: 'Landmark',
-                value: activeCoApplicant?.address_detail?.permanent_landmark,
+                value: activeCoApplicant?.address_detail?.additional_landmark,
               },
               {
                 label: 'Pincode',
-                value: activeCoApplicant?.address_detail?.permanent_pincode,
+                value: activeCoApplicant?.address_detail?.additional_pincode,
               },
               {
                 label: 'City',
-                value: activeCoApplicant?.address_detail?.permanent_city,
+                value: activeCoApplicant?.address_detail?.additional_city,
               },
               {
                 label: 'State',
-                value: activeCoApplicant?.address_detail?.permanent_state,
+                value: activeCoApplicant?.address_detail?.additional_state,
               },
               {
                 label: 'No. of years residing',
-                value: activeCoApplicant?.address_detail?.permanent_no_of_year_residing,
+                value: activeCoApplicant?.address_detail?.additional_no_of_year_residing,
               },
             ]}
           />
@@ -1606,6 +1617,7 @@ const FormDetails = React.forwardRef(function FormDetails(
   { title, progress = 0, data, message, className },
   ref,
 ) {
+  console.log(data);
   return (
     <div ref={ref} className={className}>
       <div className='flex justify-between items-center mb-3'>
@@ -1617,24 +1629,28 @@ const FormDetails = React.forwardRef(function FormDetails(
       ) : (
         <div className='flex flex-col gap-2'>
           {data && data.length ? (
-            data.map(({ label, value, subtitle, children }, i) => (
-              <div key={i} className='flex flex-col gap-4'>
-                {subtitle ? (
-                  <p className='text-xs not-italic font-semibold text-primary-black mt-1'>
-                    {subtitle}
-                  </p>
-                ) : null}
-                {label ? (
-                  <div className='w-full flex gap-4' key={i}>
-                    <p className='w-1/2 text-xs not-italic font-normal text-dark-grey'>{label}</p>
-                    <p className='w-1/2 text-xs not-italic font-medium text-primary-black'>
-                      {value || '-'}
+            data.map((e, i) =>
+              e ? (
+                <div key={i} className='flex flex-col gap-4'>
+                  {e?.subtitle ? (
+                    <p className='text-xs not-italic font-semibold text-primary-black mt-1'>
+                      {e?.subtitle}
                     </p>
-                  </div>
-                ) : null}
-                {children ? children : null}
-              </div>
-            ))
+                  ) : null}
+                  {e?.label ? (
+                    <div className='w-full flex gap-4' key={i}>
+                      <p className='w-1/2 text-xs not-italic font-normal text-dark-grey'>
+                        {e?.label}
+                      </p>
+                      <p className='w-1/2 text-xs not-italic font-medium text-primary-black'>
+                        {e?.value || (e?.value === 0 ? e?.value : '-')}
+                      </p>
+                    </div>
+                  ) : null}
+                  {e?.children ? e?.children : null}
+                </div>
+              ) : null,
+            )
           ) : (
             <p className='text-xs not-italic font-medium text-primary-black'>
               This section is not done yet
