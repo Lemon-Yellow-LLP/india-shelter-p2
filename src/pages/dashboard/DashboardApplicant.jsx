@@ -401,7 +401,7 @@ export default function DashboardApplicant() {
               {
                 label: '',
                 value: '',
-                subtitle: 'PERMANENT ADDRESS',
+                subtitle: 'ADDITIONAL ADDRESS',
                 children: (
                   <div className='flex gap-2'>
                     <CheckBox
@@ -420,8 +420,8 @@ export default function DashboardApplicant() {
               },
 
               {
-                label: 'Type of residence',
-                value: primaryApplicant?.address_detail?.current_type_of_residence,
+                label: 'Type of address',
+                value: primaryApplicant?.address_detail?.additional_type_of_residence,
               },
               {
                 label: 'Flat no/Building name',
@@ -1028,7 +1028,7 @@ export default function DashboardApplicant() {
               {
                 label: '',
                 value: '',
-                subtitle: 'PERMANENT ADDRESS',
+                subtitle: 'ADDITIONAL ADDRESS',
                 children: (
                   <div className='flex gap-2'>
                     <CheckBox
@@ -1045,10 +1045,9 @@ export default function DashboardApplicant() {
                   </div>
                 ),
               },
-
               {
-                label: 'Type of residence',
-                value: activeCoApplicant?.address_detail?.current_type_of_residence,
+                label: 'Type of address',
+                value: activeCoApplicant?.address_detail?.additional_type_of_residence,
               },
               {
                 label: 'Flat no/Building name',

@@ -1268,27 +1268,41 @@ export default function AddressDetails() {
                 Additional Address
               </label>
 
-              <div
-                className={`flex gap-4 w-full ${
-                  inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
-                }`}
-              >
-                {typeOfAddressData.map((type, index) => (
-                  <CardRadio
-                    key={index}
-                    label={type.label}
-                    name={`applicants[${activeIndex}].address_detail.type_of_address`}
-                    value={type.value}
-                    current={values?.applicants?.[activeIndex]?.address_detail?.type_of_address}
-                    onChange={handleRadioChange}
-                    disabled={
-                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
-                    }
-                  >
-                    {type.icon}
-                  </CardRadio>
-                ))}
+              <div className='flex flex-col gap-2'>
+                <label
+                  htmlFor='loan-purpose'
+                  className='flex gap-0.5 font-medium text-primary-black'
+                >
+                  Type of address <span className='text-primary-red text-xs'>*</span>
+                </label>
+
+                <div
+                  className={`flex gap-4 w-full ${
+                    inputDisabled ? 'pointer-events-none cursor-not-allowed' : 'pointer-events-auto'
+                  }`}
+                >
+                  {typeOfAddressData.map((type, index) => (
+                    <CardRadio
+                      key={index}
+                      label={type.label}
+                      name={`applicants[${activeIndex}].address_detail.additional_type_of_residence`}
+                      value={type.value}
+                      current={
+                        values?.applicants?.[activeIndex]?.address_detail
+                          ?.additional_type_of_residence
+                      }
+                      onChange={handleRadioChange}
+                      disabled={
+                        values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                          ?.qualifier
+                      }
+                    >
+                      {type.icon}
+                    </CardRadio>
+                  ))}
+                </div>
               </div>
+
               <TextInput
                 label='Flat no/Building name'
                 placeholder='Eg: C-101'
