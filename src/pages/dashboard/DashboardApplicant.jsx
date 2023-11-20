@@ -469,12 +469,29 @@ export default function DashboardApplicant() {
                 value: primaryApplicant?.work_income_detail?.profession,
               },
               {
+                label: 'PAN number',
+                value: primaryApplicant?.work_income_detail?.pan_number,
+              },
+              ,
+              {
                 label: 'Company name',
                 value: primaryApplicant?.work_income_detail?.company_name,
               },
               {
-                label: 'Total income',
+                label: 'No. of employees',
+                value: primaryApplicant?.work_income_detail?.no_of_employees,
+              },
+              {
+                label: 'Udyam number',
+                value: primaryApplicant?.work_income_detail?.udyam_number,
+              },
+              {
+                label: 'Salary per month',
                 value: primaryApplicant?.work_income_detail?.salary_per_month,
+              },
+              {
+                label: 'Income proof',
+                value: primaryApplicant?.work_income_detail?.income_proof,
               },
               {
                 label: 'PF UAN',
@@ -497,7 +514,7 @@ export default function DashboardApplicant() {
                 value: primaryApplicant?.work_income_detail?.mode_of_salary,
               },
               {
-                label: 'Flat no/Building name',
+                label: 'Plot no/Building name',
                 value: primaryApplicant?.work_income_detail?.flat_no_building_name,
               },
 
@@ -549,6 +566,7 @@ export default function DashboardApplicant() {
                 label: 'GST Number',
                 value: primaryApplicant?.work_income_detail?.gst_number,
               },
+
               {
                 label: 'Pension amount',
                 value: primaryApplicant?.work_income_detail?.pention_amount,
@@ -1097,12 +1115,28 @@ export default function DashboardApplicant() {
                 value: activeCoApplicant?.work_income_detail?.profession,
               },
               {
+                label: 'PAN number',
+                value: activeCoApplicant?.work_income_detail?.pan_number,
+              },
+              {
                 label: 'Company name',
                 value: activeCoApplicant?.work_income_detail?.company_name,
               },
               {
-                label: 'Total income',
+                label: 'No. of employees',
+                value: activeCoApplicant?.work_income_detail?.no_of_employees,
+              },
+              {
+                label: 'Udyam number',
+                value: activeCoApplicant?.work_income_detail?.udyam_number,
+              },
+              {
+                label: 'Salary per month',
                 value: activeCoApplicant?.work_income_detail?.salary_per_month,
+              },
+              {
+                label: 'Income proof',
+                value: activeCoApplicant?.work_income_detail?.income_proof,
               },
               {
                 label: 'PF UAN',
@@ -1125,7 +1159,7 @@ export default function DashboardApplicant() {
                 value: activeCoApplicant?.work_income_detail?.mode_of_salary,
               },
               {
-                label: 'Flat no/Building name',
+                label: 'Plot no/Building name',
                 value: activeCoApplicant?.work_income_detail?.flat_no_building_name,
               },
 
@@ -1617,7 +1651,6 @@ const FormDetails = React.forwardRef(function FormDetails(
   { title, progress = 0, data, message, className },
   ref,
 ) {
-  console.log(data);
   return (
     <div ref={ref} className={className}>
       <div className='flex justify-between items-center mb-3'>
