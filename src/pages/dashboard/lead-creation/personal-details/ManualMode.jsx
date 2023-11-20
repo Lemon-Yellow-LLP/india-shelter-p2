@@ -62,21 +62,15 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       setFieldValue(e.name, e.value);
       const name = e.name.split('.')[2];
       updateFields(name, e.value);
-      // if (!requiredFieldsStatus[name]) {
-      //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-      // }
       if (e.value === 'Married') {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true, spouse_name: false }));
       } else if (e.value === 'Single') {
         let newRequiredFields = {};
         Object.keys(requiredFieldsStatus).reduce((newObject, key) => {
-          // Check if the current key is not the key to remove
           if (key !== 'spouse_name') {
-            // Add the key-value pair to the new object
             newRequiredFields[key] = requiredFieldsStatus[key];
           }
         });
-        console.log(newRequiredFields);
         setRequiredFieldsStatus({ ...newRequiredFields, [name]: true });
       } else {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
