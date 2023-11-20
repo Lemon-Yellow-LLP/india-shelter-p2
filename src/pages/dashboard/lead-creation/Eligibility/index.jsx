@@ -1364,7 +1364,7 @@ const Eligibility = () => {
             !data?.applicant_details?.is_primary ? (
               <div key={index}>
                 <p className='text-sm text-primary-black'>
-                  {data?.applicant_details?.applicant_type}
+                  {data?.applicant_details?.applicant_type + ' ' + (index + 1)}
                 </p>
 
                 <div className='flex justify-between items-center rounded-lg border-stroke bg-neutral-50 border-x border-y px-2 py-1.5 mt-2'>
