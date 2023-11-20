@@ -30,7 +30,7 @@ export const applicantSteps = [
   },
   {
     title: 'Address Details',
-    description: 'Current / Permanent / Communication Address',
+    description: 'Current / Additional / Communication Address',
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,
@@ -127,7 +127,7 @@ export const coApplicantSteps = [
   },
   {
     title: 'Address Details',
-    description: 'Current / Permanent / Communication Address',
+    description: 'Current / Additional / Communication Address',
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,

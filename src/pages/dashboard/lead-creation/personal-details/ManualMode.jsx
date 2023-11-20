@@ -62,7 +62,23 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       setFieldValue(e.name, e.value);
       const name = e.name.split('.')[2];
       updateFields(name, e.value);
-      if (!requiredFieldsStatus[name]) {
+      // if (!requiredFieldsStatus[name]) {
+      //   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+      // }
+      if (e.value === 'Married') {
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true, spouse_name: false }));
+      } else if (e.value === 'Single') {
+        let newRequiredFields = {};
+        Object.keys(requiredFieldsStatus).reduce((newObject, key) => {
+          // Check if the current key is not the key to remove
+          if (key !== 'spouse_name') {
+            // Add the key-value pair to the new object
+            newRequiredFields[key] = requiredFieldsStatus[key];
+          }
+        });
+        console.log(newRequiredFields);
+        setRequiredFieldsStatus({ ...newRequiredFields, [name]: true });
+      } else {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
@@ -134,7 +150,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
       if (
         pattern2.test(value) &&
-        (e.target.name == `applicants[${activeIndex}].personal_details.father_husband_name` ||
+        (e.target.name == `applicants[${activeIndex}].personal_details.father_name` ||
           e.target.name == `applicants[${activeIndex}].personal_details.mother_name`)
       ) {
         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
@@ -736,16 +752,15 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       />
 
       <TextInput
-        label={`Father/Husband’s name`}
+        label={`Father's name`}
         placeholder='Eg: Akash'
         required
-        name={`applicants[${activeIndex}].personal_details.father_husband_name`}
-        value={values?.applicants?.[activeIndex]?.personal_details?.father_husband_name}
+        name={`applicants[${activeIndex}].personal_details.father_name`}
+        value={values?.applicants?.[activeIndex]?.personal_details?.father_name}
         onChange={handleTextInputChange}
-        error={errors.applicants?.[activeIndex]?.personal_details?.father_husband_name}
+        error={errors.applicants?.[activeIndex]?.personal_details?.father_name}
         touched={
-          touched?.applicants &&
-          touched.applicants?.[activeIndex]?.personal_details?.father_husband_name
+          touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.father_name
         }
         onBlur={(e) => {
           handleBlur(e);
@@ -831,6 +846,38 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       ) : (
         ''
       )}
+
+      {values?.applicants?.[activeIndex]?.personal_details?.marital_status === 'Married' ? (
+        <TextInput
+          label={`Spouse name`}
+          placeholder='Eg: Rupali'
+          required
+          name={`applicants[${activeIndex}].personal_details.spouse_name`}
+          value={values?.applicants?.[activeIndex]?.personal_details?.spouse_name}
+          onChange={handleTextInputChange}
+          error={errors.applicants?.[activeIndex]?.personal_details?.spouse_name}
+          touched={
+            touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.spouse_name
+          }
+          onBlur={(e) => {
+            handleBlur(e);
+            const name = e.target.name.split('.')[2];
+            if (
+              !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
+              values?.applicants?.[activeIndex]?.personal_details?.[name]
+            ) {
+              updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+              if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+              }
+            } else {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+              updateFields(name, '');
+            }
+          }}
+          disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        />
+      ) : null}
 
       <DropDown
         label='Religion'
