@@ -1844,6 +1844,9 @@ const UploadDocuments = () => {
         if (active_uploads.length) {
           setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
           setIdProofPhotos(active_uploads);
+        } else {
+          setIdProofUploads(null);
+          setIdProofPhotos([]);
         }
       }
 
@@ -1881,6 +1884,9 @@ const UploadDocuments = () => {
         if (active_uploads.length) {
           setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
           setAddressProofPhotos(active_uploads);
+        } else {
+          setAddressProofUploads(null);
+          setAddressProofPhotos([]);
         }
       }
 
@@ -2042,7 +2048,7 @@ const UploadDocuments = () => {
               touched={
                 touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.id_type
               }
-              disabled={values?.applicants?.[activeIndex]?.personal_details?.id_type ? true : false}
+              disabled={!!isQaulifierActivated}
               disableOption={
                 values?.applicants[activeIndex]?.personal_details?.selected_address_proof
               }
@@ -2300,11 +2306,7 @@ const UploadDocuments = () => {
                 touched?.applicants &&
                 touched.applicants?.[activeIndex]?.personal_details?.selected_address_proof
               }
-              disabled={
-                values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
-                  ? true
-                  : false
-              }
+              disabled={!!isQaulifierActivated}
               disableOption={values?.applicants?.[activeIndex]?.personal_details?.id_type}
               onBlur={(e) => {
                 handleBlur(e);
