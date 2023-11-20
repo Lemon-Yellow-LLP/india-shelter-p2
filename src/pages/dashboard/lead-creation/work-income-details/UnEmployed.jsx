@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useState, useEffect } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInput from '../../../../components/TextInput';
 import { CardRadio, CurrencyInput } from '../../../../components';
@@ -45,10 +45,8 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
         );
         const name = e.name.split('.')[2];
 
-        if (e.value !== 'PAN ID') {
+        if (!values?.applicants?.[activeIndex]?.work_income_detail.income_proof) {
           setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-        } else {
-          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
         }
       } else {
         const name = e.name.split('.')[2];
@@ -57,6 +55,21 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
     },
     [values],
   );
+
+  useEffect(() => {
+    if (
+      values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+      values?.applicants?.[activeIndex]?.personal_details?.id_number
+    ) {
+      if (values?.applicants?.[activeIndex]?.work_income_detail.income_proof) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: true }));
+      } else {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: false }));
+      }
+    } else {
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
+    }
+  }, [values?.applicants?.[activeIndex]?.work_income_detail?.income_proof]);
 
   return (
     <>
@@ -93,7 +106,20 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
           name={`applicants[${activeIndex}].work_income_detail.pan_number`}
           value={values?.applicants?.[activeIndex]?.work_income_detail?.pan_number}
           onChange={(e) => {
-            setFieldValue(e.target.name, e.target.value.toUpperCase());
+            if (e.target.value === ' ') {
+              return;
+            }
+            let value = e.target.value;
+            value = value.trimStart().replace(/\s\s+/g, ' ');
+            const pattern = /^[A-Za-z0-9]+$/;
+
+            if (value?.trim() == '') {
+              setFieldValue(e.target.name, value);
+            }
+
+            if (pattern.test(value)) {
+              setFieldValue(e.target.name, value.toUpperCase());
+            }
           }}
           inputClasses='capitalize'
           error={errors.applicants?.[activeIndex]?.work_income_detail?.pan_number}
@@ -127,8 +153,8 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
                 },
               );
               const name = e.target.name.split('.')[2];
+
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-              setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: true }));
             } else {
               editFieldsById(
                 values?.applicants?.[activeIndex]?.work_income_detail.id,
@@ -145,22 +171,8 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
 
               const name = e.target.name.split('.')[2];
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
-              setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: false }));
             }
           }}
-          // onKeyDown={(e) => {
-          //   if (
-          //     e.key === 'ArrowUp' ||
-          //     e.key === 'ArrowDown' ||
-          //     e.key === 'ArrowLeft' ||
-          //     e.key === 'ArrowRight' ||
-          //     e.key === ' ' ||
-          //     e.keyCode === 32 ||
-          //     (e.keyCode >= 65 && e.keyCode <= 90)
-          //   ) {
-          //     e.preventDefault();
-          //   }
-          // }}
         />
       )}
 
