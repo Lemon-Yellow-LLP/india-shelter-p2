@@ -144,7 +144,9 @@ const applicantSchema = Yup.object().shape({
 
   work_income_detail: Yup.object().shape({
     profession: Yup.string().required('This field is mandatory'),
-    pan_number: Yup.string().required('This field is mandatory'),
+    pan_number: Yup.string()
+      .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid Pan number. Format should be AAAPB2117A')
+      .required('This field is mandatory'),
     no_of_employees: Yup.number()
       .required('This field is mandatory')
       .min(1, 'Minimum employee count is 1')
@@ -228,7 +230,7 @@ const applicantSchema = Yup.object().shape({
       .required('This field is mandatory'),
     industries: Yup.string().required('This field is mandatory'),
     udyam_number: Yup.string().matches(
-      /^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/,
+      /^UDYAM-[A-Z]{2}-00-\d{7}$/,
       'Invalid Udyam Number Eg: UDYAM-XX-00-0000000',
     ),
     gst_number: Yup.string().matches(
