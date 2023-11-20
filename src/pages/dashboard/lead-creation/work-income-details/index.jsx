@@ -73,7 +73,12 @@ const WorkIncomeDetails = () => {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
               profession: true,
-              pan_number: false,
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
               company_name: false,
               salary_per_month: false,
               working_since: false,
@@ -92,7 +97,12 @@ const WorkIncomeDetails = () => {
           } else {
             _requiredFieldStatus = {
               profession: true,
-              pan_number: false,
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
               company_name: false,
               salary_per_month: false,
               working_since: false,
@@ -112,7 +122,12 @@ const WorkIncomeDetails = () => {
         } else if (e.value === 'Self-employed') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
-              pan_number: false,
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
               no_of_employees: false,
               profession: true,
               business_name: false,
@@ -130,7 +145,12 @@ const WorkIncomeDetails = () => {
             };
           } else {
             _requiredFieldStatus = {
-              pan_number: false,
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
               no_of_employees: false,
               profession: true,
               business_name: false,
@@ -172,7 +192,12 @@ const WorkIncomeDetails = () => {
         } else if (e.value === 'Retired') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
-              pan_number: false,
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
               profession: true,
               no_current_loan: false,
               ongoing_emi: false,
@@ -183,7 +208,12 @@ const WorkIncomeDetails = () => {
             };
           } else {
             _requiredFieldStatus = {
-              pan_number: false,
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
               profession: true,
               no_current_loan: false,
               ongoing_emi: false,
@@ -203,7 +233,6 @@ const WorkIncomeDetails = () => {
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
           profession: e.value,
           company_name: '',
-          pan_number: '',
           no_of_employees: '',
           income_proof: '',
           udyam_number: '',
@@ -450,8 +479,27 @@ const WorkIncomeDetails = () => {
           },
         },
       );
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
+    } else {
+      setFieldValue(`applicants[${activeIndex}].work_income_detail.pan_number`, '');
+
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.work_income_detail.id,
+        'work-income',
+        {
+          pan_number: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: false }));
     }
-  }, [values?.applicants?.[activeIndex]?.personal_details?.id_type]);
+  }, []);
 
   useEffect(() => {
     if (
@@ -522,7 +570,20 @@ const WorkIncomeDetails = () => {
                 name={`applicants[${activeIndex}].work_income_detail.pan_number`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.pan_number}
                 onChange={(e) => {
-                  setFieldValue(e.target.name, e.target.value.toUpperCase());
+                  if (e.target.value === ' ') {
+                    return;
+                  }
+                  let value = e.target.value;
+                  value = value.trimStart().replace(/\s\s+/g, ' ');
+                  const pattern = /^[A-Za-z0-9]+$/;
+
+                  if (value?.trim() == '') {
+                    setFieldValue(e.target.name, value);
+                  }
+
+                  if (pattern.test(value)) {
+                    setFieldValue(e.target.name, value.toUpperCase());
+                  }
                 }}
                 inputClasses='capitalize'
                 error={errors.applicants?.[activeIndex]?.work_income_detail?.pan_number}
@@ -543,6 +604,7 @@ const WorkIncomeDetails = () => {
                     !errors.applicants?.[activeIndex]?.work_income_detail?.pan_number &&
                     values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
                   ) {
+                    console.log('---', 'on blur');
                     editFieldsById(
                       values?.applicants?.[activeIndex]?.work_income_detail.id,
                       'work-income',
@@ -576,19 +638,6 @@ const WorkIncomeDetails = () => {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                   }
                 }}
-                // onKeyDown={(e) => {
-                //   if (
-                //     e.key === 'ArrowUp' ||
-                //     e.key === 'ArrowDown' ||
-                //     e.key === 'ArrowLeft' ||
-                //     e.key === 'ArrowRight' ||
-                //     e.key === ' ' ||
-                //     e.keyCode === 32 ||
-                //     (e.keyCode >= 65 && e.keyCode <= 90)
-                //   ) {
-                //     e.preventDefault();
-                //   }
-                // }}
               />
             ) : null}
 
