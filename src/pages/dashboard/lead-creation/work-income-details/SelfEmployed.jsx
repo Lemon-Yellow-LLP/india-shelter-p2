@@ -364,7 +364,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
             values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number
           ) {
             editFieldsById(
-              values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number,
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
               'work-income',
               {
                 udyam_number: values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number,
@@ -377,7 +377,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
             );
           } else {
             editFieldsById(
-              values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number,
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
               'work-income',
               {
                 udyam_number: '',
@@ -391,7 +391,20 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
           }
         }}
         onChange={(e) => {
-          setFieldValue(e.target.name, e.target.value.toUpperCase());
+          if (e.target.value === ' ') {
+            return;
+          }
+          let value = e.target.value;
+          value = value.trimStart().replace(/\s\s+/g, ' ');
+          const pattern = /^[A-Za-z0-9-]+$/;
+
+          if (value?.trim() == '') {
+            setFieldValue(e.target.name, value);
+          }
+
+          if (pattern.test(value)) {
+            setFieldValue(e.target.name, value.toUpperCase());
+          }
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
