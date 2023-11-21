@@ -63,6 +63,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       const name = e.name.split('.')[2];
       updateFields(name, e.value);
       if (e.value === 'Married') {
+        setFieldValue(`applicants[${activeIndex}].personal_details.spouse_name`, null);
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true, spouse_name: false }));
       } else if (e.value === 'Single') {
         let newRequiredFields = {};
@@ -71,6 +72,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             newRequiredFields[key] = requiredFieldsStatus[key];
           }
         });
+        setFieldValue(`applicants[${activeIndex}].personal_details.spouse_name`, null);
         setRequiredFieldsStatus({ ...newRequiredFields, [name]: true });
       } else {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
