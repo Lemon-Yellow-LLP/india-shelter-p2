@@ -28,18 +28,7 @@ import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import Popup from '../../../../components/Popup';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
-const UploadDocuments = () => {
-  const {
-    activeIndex,
-    values,
-    errors,
-    touched,
-    handleBlur,
-    setFieldValue,
-    setFieldError,
-    updateProgressUploadDocumentSteps,
-    setCurrentStepIndex,
-  } = useContext(LeadContext);
+const UploadDocuments = ({ activeIndex }) => {
   const {
     toastMessage,
     setToastMessage,
@@ -49,6 +38,17 @@ const UploadDocuments = () => {
     setOtpFailCount,
     token,
   } = useContext(AuthContext);
+  const {
+    // activeIndex,
+    values,
+    errors,
+    touched,
+    handleBlur,
+    setFieldValue,
+    setFieldError,
+    updateProgressUploadDocumentSteps,
+    setCurrentStepIndex,
+  } = useContext(LeadContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
   const [customerPhotos, setCustomerPhotos] = useState([]);
   const [customerPhotosFile, setCustomerPhotosFile] = useState(null);
@@ -1830,7 +1830,13 @@ const UploadDocuments = () => {
         if (active_upload) {
           setCustomerUploads({ type: 'customer_photos', data: active_upload });
           setCustomerPhotos([1]);
+        } else {
+          setCustomerUploads(null);
+          setCustomerPhotos([]);
         }
+      } else {
+        setCustomerUploads(null);
+        setCustomerPhotos([]);
       }
 
       if (res.document_meta.id_proof_photos) {
@@ -1848,6 +1854,9 @@ const UploadDocuments = () => {
           setIdProofUploads(null);
           setIdProofPhotos([]);
         }
+      } else {
+        setIdProofUploads(null);
+        setIdProofPhotos([]);
       }
 
       if (res.document_meta.property_paper_photos) {
@@ -1868,8 +1877,14 @@ const UploadDocuments = () => {
           if (active_uploads.length) {
             setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
             setPropertyPapers(active_uploads);
+          } else {
+            setPropertyPaperUploads(null);
+            setPropertyPapers([]);
           }
         }
+      } else {
+        setPropertyPaperUploads(null);
+        setPropertyPapers([]);
       }
 
       if (res.document_meta.address_proof_photos) {
@@ -1888,6 +1903,9 @@ const UploadDocuments = () => {
           setAddressProofUploads(null);
           setAddressProofPhotos([]);
         }
+      } else {
+        setAddressProofUploads(null);
+        setAddressProofPhotos([]);
       }
 
       if (res.document_meta.salary_slip_photos) {
@@ -1898,7 +1916,13 @@ const UploadDocuments = () => {
         if (active_uploads.length) {
           setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
           setSalarySlipPhotos(active_uploads);
+        } else {
+          setSalarySlipUploads(null);
+          setSalarySlipPhotos([]);
         }
+      } else {
+        setSalarySlipUploads(null);
+        setSalarySlipPhotos([]);
       }
 
       if (res.document_meta.form_60_photos) {
@@ -1909,7 +1933,13 @@ const UploadDocuments = () => {
         if (active_uploads.length) {
           setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
           setForm60photos(active_uploads);
+        } else {
+          setForm60Uploads(null);
+          setForm60photos([]);
         }
+      } else {
+        setForm60Uploads(null);
+        setForm60photos([]);
       }
 
       if (res.document_meta.property_photos) {
@@ -1920,7 +1950,13 @@ const UploadDocuments = () => {
         if (active_uploads.length) {
           setPropertyUploads({ type: 'property_photos', data: active_uploads });
           setPropertyPhotos(active_uploads);
+        } else {
+          setPropertyUploads(null);
+          setPropertyPhotos([]);
         }
+      } else {
+        setPropertyUploads(null);
+        setPropertyPhotos([]);
       }
 
       if (res.document_meta.lo_selfie) {
@@ -1931,7 +1967,13 @@ const UploadDocuments = () => {
         if (active_upload) {
           setSelfieUploads({ type: 'lo_selfie', data: active_upload });
           setSelfie([1]);
+        } else {
+          setSelfieUploads(null);
+          setSelfie([]);
         }
+      } else {
+        setSelfieUploads(null);
+        setSelfie([]);
       }
 
       if (res.document_meta.other_docs) {
@@ -1942,7 +1984,13 @@ const UploadDocuments = () => {
         if (active_uploads.length) {
           setDocUploads({ type: 'other_docs', data: active_uploads });
           setDocs(active_uploads);
+        } else {
+          setDocUploads(null);
+          setDocs([]);
         }
+      } else {
+        setDocUploads(null);
+        setDocs([]);
       }
     }
     getPreviousUploads();
@@ -3031,4 +3079,10 @@ const UploadDocuments = () => {
   );
 };
 
-export default UploadDocuments;
+const UploadDocumentWrapper = () => {
+  const { activeIndex } = useContext(LeadContext);
+
+  return <UploadDocuments activeIndex={activeIndex} />;
+};
+
+export default UploadDocumentWrapper;
