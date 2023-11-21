@@ -7,7 +7,7 @@ export const fieldLabels = {
 
   property_identification_is: 'Property identification is',
   property_value_estimate: 'Property value estimate',
-  owner_name: 'Owner name',
+  current_owner_name: 'Owner name',
   current_owner_name: 'Current owner name',
   plot_house_flat: 'Plot/House/Flat no.',
   project_society_colony: 'Project Society Colony',

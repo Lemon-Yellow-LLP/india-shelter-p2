@@ -63,7 +63,7 @@ const PropertyDetails = () => {
             {
               property_identification_is: e.value,
               property_value_estimate: '',
-              owner_name: '',
+              current_owner_name: '',
               plot_house_flat: '',
               project_society_colony: '',
               pincode: null,
@@ -89,7 +89,7 @@ const PropertyDetails = () => {
               ...values.property_details,
               property_identification_is: e.value,
               property_value_estimate: '',
-              owner_name: '',
+              current_owner_name: '',
               plot_house_flat: '',
               project_society_colony: '',
               pincode: null,
@@ -113,7 +113,7 @@ const PropertyDetails = () => {
             {
               property_identification_is: e.value,
               property_value_estimate: '',
-              owner_name: '',
+              current_owner_name: '',
               plot_house_flat: '',
               project_society_colony: '',
               pincode: null,
@@ -123,7 +123,7 @@ const PropertyDetails = () => {
                 ...values?.property_details?.extra_params,
                 progress: 16,
                 required_fields_status: {
-                  owner_name: false,
+                  current_owner_name: false,
                   pincode: false,
                   plot_house_flat: false,
                   project_society_colony: false,
@@ -139,7 +139,7 @@ const PropertyDetails = () => {
             },
           );
           setRequiredFieldsStatus({
-            owner_name: false,
+            current_owner_name: false,
             pincode: false,
             plot_house_flat: false,
             project_society_colony: false,
@@ -165,7 +165,7 @@ const PropertyDetails = () => {
             required_fields_status: {
               property_identification_is: true,
               property_value_estimate: false,
-              owner_name: false,
+              current_owner_name: false,
               plot_house_flat: false,
               project_society_colony: false,
               pincode: false,

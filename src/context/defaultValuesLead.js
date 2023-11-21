@@ -27,7 +27,7 @@ export const defaultValuesLead = {
       required_fields_status: {
         property_identification_is: false,
         property_value_estimate: false,
-        owner_name: false,
+        current_owner_name: false,
         plot_house_flat: false,
         project_society_colony: false,
         pincode: false,

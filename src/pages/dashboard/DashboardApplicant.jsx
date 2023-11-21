@@ -616,7 +616,7 @@ export default function DashboardApplicant() {
               },
               {
                 label: 'Owner name',
-                value: leadData?.property_details?.owner_name,
+                value: leadData?.property_details?.current_owner_name,
               },
               {
                 label: 'Plot/House/Flat no',

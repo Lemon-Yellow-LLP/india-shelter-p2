@@ -324,11 +324,11 @@ export const validationSchemaLead = Yup.object().shape({
   property_details: Yup.object().shape({
     property_identification_is: Yup.string().required('This field is mandatory'),
     property_value_estimate: Yup.string().trim().required('This field is mandatory'),
-    owner_name: Yup.string()
+    current_owner_name: Yup.string()
       .trim()
       .required('This field is mandatory')
-      .min(2, 'Name must be atleast 2 characters long')
-      .max(90, 'Name can be max 90 characters long')
+      .min(2, 'Current owner name must be atleast 2 characters long')
+      .max(90, 'Current owner name can be max 90 characters long')
       .matches(/^[a-zA-Z ]+$/, 'Invalid characters'),
     plot_house_flat: Yup.string()
       .trim()

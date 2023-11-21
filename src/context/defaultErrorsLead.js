@@ -9,7 +9,7 @@ export const defaultErrorsLead = {
   property_details: {
     property_identification_is: null,
     property_value_estimate: null,
-    owner_name: null,
+    current_owner_name: null,
     plot_house_flat: null,
     project_society_colony: null,
     pincode: null,
