@@ -205,7 +205,7 @@ const BankingDetails = () => {
     };
     await axios
       .post(
-        `https://lo.scotttiger.in/api/applicant/penny-drop/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+        `https://uatagile.indiashelter.in/api/applicant/penny-drop/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         { ...data },
         {
           headers: {
@@ -235,7 +235,7 @@ const BankingDetails = () => {
     if (values?.applicants?.[activeIndex]?.applicant_details?.id) {
       await axios
         .get(
-          `https://lo.scotttiger.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+          `https://uatagile.indiashelter.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
           {
             headers: {
               Authorization: token,
