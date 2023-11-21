@@ -285,7 +285,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                 values?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees
               ) {
                 editFieldsById(
-                  values?.applicants?.[activeIndex]?.work_income_detail.id,
+                  values?.applicants?.[activeIndex]?.work_income_detail?.id,
                   'work-income',
                   {
                     no_of_employees: e.target.value,
@@ -301,7 +301,7 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                 setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
               } else {
                 editFieldsById(
-                  values?.applicants?.[activeIndex]?.work_income_detail.id,
+                  values?.applicants?.[activeIndex]?.work_income_detail?.id,
                   'work-income',
                   {
                     no_of_employees: '',

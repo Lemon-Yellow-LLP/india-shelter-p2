@@ -181,7 +181,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
   useEffect(() => {
     async function getQualifierResponse() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
         headers: {
           Authorization: token,
         },
@@ -241,10 +241,10 @@ const UploadDocuments = ({ activeIndex }) => {
   //     setMobileVerified(false);
   //     setDisablePhoneNumber(true);
 
-  //     const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
+  //     const extra_params = values?.applicants?.[activeIndex]?.applicant_details?.extra_params;
 
   //     editFieldsById(
-  //       values?.applicants?.[activeIndex]?.applicant_details.id,
+  //       values?.applicants?.[activeIndex]?.applicant_details?.id,
   //       'applicant',
   //       {
   //         extra_params: { ...extra_params, is_upload_otp_verified: false },
@@ -475,10 +475,10 @@ const UploadDocuments = ({ activeIndex }) => {
 
         if (!res) return;
 
-        const extra_params = values?.applicants?.[activeIndex]?.applicant_details.extra_params;
+        const extra_params = values?.applicants?.[activeIndex]?.applicant_details?.extra_params;
 
         await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
           'applicant',
           {
             extra_params: { ...extra_params, is_upload_otp_verified: true },
@@ -510,7 +510,7 @@ const UploadDocuments = ({ activeIndex }) => {
     async function addPropertyPaperPhotos() {
       const data = new FormData();
       const filename = propertyPapersFile.name;
-      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'property_paper_photos');
       data.append('document_name', filename);
       data.append('geo_lat', propertyPapersLatLong.lat);
@@ -550,7 +550,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
         if (res) {
           const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -564,7 +564,7 @@ const UploadDocuments = ({ activeIndex }) => {
           document_meta['property_paper_photos'].push(res.document);
 
           const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               document_meta: document_meta,
@@ -645,7 +645,7 @@ const UploadDocuments = ({ activeIndex }) => {
         if (!res) return;
 
         const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
           {
             headers: {
               Authorization: token,
@@ -686,7 +686,7 @@ const UploadDocuments = ({ activeIndex }) => {
     async function addCustomerPhotos() {
       const data = new FormData();
       const filename = customerPhotosFile.name;
-      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'customer_photos');
       data.append('document_name', filename);
       data.append('geo_lat', customerLatLong.lat);
@@ -722,7 +722,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
         if (res) {
           const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -738,7 +738,7 @@ const UploadDocuments = ({ activeIndex }) => {
           document_meta['customer_photos'].push(res.document);
 
           const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               document_meta: document_meta,
@@ -784,7 +784,7 @@ const UploadDocuments = ({ activeIndex }) => {
     async function addIdProofPhotos() {
       const data = new FormData();
       const filename = idProofPhotosFile.name;
-      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', values?.applicants?.[activeIndex]?.personal_details?.id_type);
       data.append('document_name', filename);
       data.append('geo_lat', idProofLatLong.lat);
@@ -820,7 +820,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
         if (res) {
           const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -835,7 +835,7 @@ const UploadDocuments = ({ activeIndex }) => {
           document_meta['id_proof_photos'].push(res.document);
 
           const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               document_meta: document_meta,
@@ -903,7 +903,7 @@ const UploadDocuments = ({ activeIndex }) => {
         if (!res) return;
 
         const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
           {
             headers: {
               Authorization: token,
@@ -946,7 +946,7 @@ const UploadDocuments = ({ activeIndex }) => {
     async function addAddressProofPhotos() {
       const data = new FormData();
       const filename = addressProofPhotosFile.name;
-      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append(
         'document_type',
         values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof,
@@ -985,7 +985,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
         if (res) {
           const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -1000,7 +1000,7 @@ const UploadDocuments = ({ activeIndex }) => {
           document_meta['address_proof_photos'].push(res.document);
 
           const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               document_meta: document_meta,
@@ -1074,7 +1074,7 @@ const UploadDocuments = ({ activeIndex }) => {
         if (!res) return;
 
         const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
           {
             headers: {
               Authorization: token,
@@ -1118,7 +1118,7 @@ const UploadDocuments = ({ activeIndex }) => {
     async function addSalarySlipPhotos() {
       const data = new FormData();
       const filename = salarySlipPhotosFile.name;
-      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'salary_slip_photos');
       data.append('document_name', filename);
       data.append('geo_lat', salarySlipLatLong.lat);
@@ -1154,7 +1154,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
         if (res) {
           const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -1169,7 +1169,7 @@ const UploadDocuments = ({ activeIndex }) => {
           document_meta['salary_slip_photos'].push(res.document);
 
           const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               document_meta: document_meta,
@@ -1236,7 +1236,7 @@ const UploadDocuments = ({ activeIndex }) => {
         if (!res) return;
 
         const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
           {
             headers: {
               Authorization: token,
@@ -1276,7 +1276,7 @@ const UploadDocuments = ({ activeIndex }) => {
     async function addForm60Photos() {
       const data = new FormData();
       const filename = form60photosFile.name;
-      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'form_60_photos');
       data.append('document_name', filename);
       data.append('geo_lat', form60LatLong.lat);
@@ -1312,7 +1312,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
         if (res) {
           const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -1326,7 +1326,7 @@ const UploadDocuments = ({ activeIndex }) => {
           document_meta['form_60_photos'].push(res.document);
 
           const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               document_meta: document_meta,
@@ -1391,7 +1391,7 @@ const UploadDocuments = ({ activeIndex }) => {
         if (!res) return;
 
         const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
           {
             headers: {
               Authorization: token,
@@ -1431,7 +1431,7 @@ const UploadDocuments = ({ activeIndex }) => {
     async function addPropertyPhotos() {
       const data = new FormData();
       const filename = propertyPhotosFile.name;
-      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'property_photos');
       data.append('document_name', filename);
       data.append('geo_lat', propertyLatLong.lat);
@@ -1467,7 +1467,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
         if (res) {
           const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -1481,7 +1481,7 @@ const UploadDocuments = ({ activeIndex }) => {
           document_meta['property_photos'].push(res.document);
 
           const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               document_meta: document_meta,
@@ -1546,7 +1546,7 @@ const UploadDocuments = ({ activeIndex }) => {
         if (!res) return;
 
         const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
           {
             headers: {
               Authorization: token,
@@ -1586,7 +1586,7 @@ const UploadDocuments = ({ activeIndex }) => {
     async function addSelfiePhoto() {
       const data = new FormData();
       const filename = selfieFile.name;
-      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'lo_selfie');
       data.append('document_name', filename);
       data.append('geo_lat', loSelfieLatLong.lat);
@@ -1622,7 +1622,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
         if (res) {
           const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -1636,7 +1636,7 @@ const UploadDocuments = ({ activeIndex }) => {
           document_meta['lo_selfie'].push(res.document);
 
           const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               document_meta: document_meta,
@@ -1681,7 +1681,7 @@ const UploadDocuments = ({ activeIndex }) => {
     async function addOtherDocPhotos() {
       const data = new FormData();
       const filename = docsFile.name;
-      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details.id);
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'other_docs');
       data.append('document_name', filename);
       data.append('geo_lat', otherDocsLatLong.lat);
@@ -1717,7 +1717,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
         if (res) {
           const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -1731,7 +1731,7 @@ const UploadDocuments = ({ activeIndex }) => {
           document_meta['other_docs'].push(res.document);
 
           const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               document_meta: document_meta,
@@ -1794,7 +1794,7 @@ const UploadDocuments = ({ activeIndex }) => {
         if (!res) return;
 
         const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
           {
             headers: {
               Authorization: token,
@@ -1814,7 +1814,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
   useEffect(() => {
     async function getPreviousUploads() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
         headers: {
           Authorization: token,
         },
@@ -2175,7 +2175,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
                           if (!errors.applicants?.[activeIndex]?.personal_details?.id_number) {
                             editFieldsById(
-                              values?.applicants?.[activeIndex]?.personal_details.id,
+                              values?.applicants?.[activeIndex]?.personal_details?.id,
                               'personal',
                               {
                                 id_number: e.target.value,
@@ -2435,7 +2435,7 @@ const UploadDocuments = ({ activeIndex }) => {
                               ?.address_proof_number
                           ) {
                             editFieldsById(
-                              values?.applicants?.[activeIndex]?.personal_details.id,
+                              values?.applicants?.[activeIndex]?.personal_details?.id,
                               'personal',
                               {
                                 address_proof_number: e.target.value,

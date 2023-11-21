@@ -97,12 +97,15 @@ const Eligibility = () => {
 
   useEffect(() => {
     async function breTwo() {
-      const lead = await getLeadById(values?.applicants?.[activeIndex]?.applicant_details.lead_id, {
-        headers: {
-          Authorization: token,
+      const lead = await getLeadById(
+        values?.applicants?.[activeIndex]?.applicant_details?.lead_id,
+        {
+          headers: {
+            Authorization: token,
+          },
         },
-      });
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+      );
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
         headers: {
           Authorization: token,
         },
@@ -111,51 +114,51 @@ const Eligibility = () => {
       if (res.bre_101_response && lead.bre_201_response) {
         setBre101(res);
         setProgress(
-          values?.applicants?.[activeIndex]?.applicant_details.extra_params
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params
             .eligibility_api_progress,
         );
         setFinalApi(
-          values?.applicants?.[activeIndex]?.applicant_details.extra_params
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params
             .eligibility_api_progress,
         );
         setDL((prev) => ({
           ...prev,
           loader: false,
           ran: true,
-          res: values?.applicants?.[activeIndex]?.applicant_details.extra_params.DL_Status,
-          status: values?.applicants?.[activeIndex]?.applicant_details.extra_params.DL_Status,
+          res: values?.applicants?.[activeIndex]?.applicant_details?.extra_params.DL_Status,
+          status: values?.applicants?.[activeIndex]?.applicant_details?.extra_params.DL_Status,
         }));
 
         setVoterID((prev) => ({
           ...prev,
           loader: false,
           ran: true,
-          res: values?.applicants?.[activeIndex]?.applicant_details.extra_params.Voter_Status,
-          status: values?.applicants?.[activeIndex]?.applicant_details.extra_params.Voter_Status,
+          res: values?.applicants?.[activeIndex]?.applicant_details?.extra_params.Voter_Status,
+          status: values?.applicants?.[activeIndex]?.applicant_details?.extra_params.Voter_Status,
         }));
 
         setPfUAN((prev) => ({
           ...prev,
           loader: false,
           ran: true,
-          res: values?.applicants?.[activeIndex]?.applicant_details.extra_params.UAN_Status,
-          status: values?.applicants?.[activeIndex]?.applicant_details.extra_params.UAN_Status,
+          res: values?.applicants?.[activeIndex]?.applicant_details?.extra_params.UAN_Status,
+          status: values?.applicants?.[activeIndex]?.applicant_details?.extra_params.UAN_Status,
         }));
 
         setGST((prev) => ({
           ...prev,
           loader: false,
           ran: true,
-          res: values?.applicants?.[activeIndex]?.applicant_details.extra_params.GST_Status,
-          status: values?.applicants?.[activeIndex]?.applicant_details.extra_params.GST_Status,
+          res: values?.applicants?.[activeIndex]?.applicant_details?.extra_params.GST_Status,
+          status: values?.applicants?.[activeIndex]?.applicant_details?.extra_params.GST_Status,
         }));
 
         setPAN((prev) => ({
           ...prev,
           loader: false,
           ran: true,
-          res: values?.applicants?.[activeIndex]?.applicant_details.extra_params.PAN_status,
-          status: values?.applicants?.[activeIndex]?.applicant_details.extra_params.PAN_status,
+          res: values?.applicants?.[activeIndex]?.applicant_details?.extra_params.PAN_status,
+          status: values?.applicants?.[activeIndex]?.applicant_details?.extra_params.PAN_status,
         }));
 
         setFaceMatch((prev) => ({ ...prev, ran: true }));
@@ -214,7 +217,7 @@ const Eligibility = () => {
 
         final_api.push(
           verifyPan(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             { type: 'id' },
             {
               headers: {
@@ -243,7 +246,7 @@ const Eligibility = () => {
 
             final_api.push(
               verifyPan(
-                values?.applicants?.[activeIndex]?.applicant_details.id,
+                values?.applicants?.[activeIndex]?.applicant_details?.id,
                 { type: 'id' },
                 {
                   headers: {
@@ -276,7 +279,7 @@ const Eligibility = () => {
 
         final_api.push(
           verifyDL(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             { type: type },
             {
               headers: {
@@ -305,7 +308,7 @@ const Eligibility = () => {
 
             final_api.push(
               verifyDL(
-                values?.applicants?.[activeIndex]?.applicant_details.id,
+                values?.applicants?.[activeIndex]?.applicant_details?.id,
                 { type: 'id' },
                 {
                   headers: {
@@ -331,7 +334,7 @@ const Eligibility = () => {
 
             final_api.push(
               verifyDL(
-                values?.applicants?.[activeIndex]?.applicant_details.id,
+                values?.applicants?.[activeIndex]?.applicant_details?.id,
                 { type: 'address' },
                 {
                   headers: {
@@ -364,7 +367,7 @@ const Eligibility = () => {
 
         final_api.push(
           verifyVoterID(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             { type: type },
             {
               headers: {
@@ -393,7 +396,7 @@ const Eligibility = () => {
 
             final_api.push(
               verifyVoterID(
-                values?.applicants?.[activeIndex]?.applicant_details.id,
+                values?.applicants?.[activeIndex]?.applicant_details?.id,
                 { type: 'id' },
                 {
                   headers: {
@@ -419,7 +422,7 @@ const Eligibility = () => {
 
             final_api.push(
               verifyVoterID(
-                values?.applicants?.[activeIndex]?.applicant_details.id,
+                values?.applicants?.[activeIndex]?.applicant_details?.id,
                 { type: 'address' },
                 {
                   headers: {
@@ -447,7 +450,7 @@ const Eligibility = () => {
         }));
 
         final_api.push(
-          verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {
+          verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details?.id, {
             headers: {
               Authorization: token,
             },
@@ -471,7 +474,7 @@ const Eligibility = () => {
           }));
 
           final_api.push(
-            verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {
+            verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details?.id, {
               headers: {
                 Authorization: token,
               },
@@ -495,7 +498,7 @@ const Eligibility = () => {
         }));
 
         final_api.push(
-          verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {
+          verifyGST(values?.applicants?.[activeIndex]?.applicant_details?.id, {
             headers: {
               Authorization: token,
             },
@@ -519,7 +522,7 @@ const Eligibility = () => {
           }));
 
           final_api.push(
-            verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {
+            verifyGST(values?.applicants?.[activeIndex]?.applicant_details?.id, {
               headers: {
                 Authorization: token,
               },
@@ -549,7 +552,7 @@ const Eligibility = () => {
           setProgress(final_api.length + values.applicants.length + 2);
 
           const bre99_res = await checkBre99(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -573,7 +576,7 @@ const Eligibility = () => {
         if (callCibilOrCrif.Rule_Value === 'CIBIL') {
           try {
             const cibil_res = await checkCibil(
-              values?.applicants?.[activeIndex]?.applicant_details.id,
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
               {
                 headers: {
                   Authorization: token,
@@ -598,7 +601,7 @@ const Eligibility = () => {
         } else {
           try {
             const crif_res = await checkCrif(
-              values?.applicants?.[activeIndex]?.applicant_details.id,
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
               {
                 headers: {
                   Authorization: token,
@@ -624,7 +627,7 @@ const Eligibility = () => {
 
         try {
           const bre_res = await checkBre101(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -648,7 +651,7 @@ const Eligibility = () => {
           };
 
           edited_bre = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               bre_101_response: bre_res.bre_101_response,
@@ -707,7 +710,7 @@ const Eligibility = () => {
 
       try {
         const bre_res = await checkBre201(
-          values?.applicants?.[activeIndex]?.applicant_details.lead_id,
+          values?.applicants?.[activeIndex]?.applicant_details?.lead_id,
           {
             headers: {
               Authorization: token,
@@ -746,7 +749,7 @@ const Eligibility = () => {
           };
 
           await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               extra_params: edited_extra_params,
@@ -777,7 +780,7 @@ const Eligibility = () => {
           };
 
           await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               extra_params: edited_extra_params,
@@ -800,7 +803,7 @@ const Eligibility = () => {
 
       try {
         const sdfc_res = await pushToSalesforce(
-          values?.applicants?.[activeIndex]?.applicant_details.lead_id,
+          values?.applicants?.[activeIndex]?.applicant_details?.lead_id,
           {
             headers: {
               Authorization: token,
@@ -847,11 +850,11 @@ const Eligibility = () => {
           <p className='text-xs text-primary-black font-normal'>
             Applicant name:
             {' ' +
-              values?.applicants?.[activeIndex]?.applicant_details.first_name +
+              values?.applicants?.[activeIndex]?.applicant_details?.first_name +
               ' ' +
-              values?.applicants?.[activeIndex]?.applicant_details.middle_name +
+              values?.applicants?.[activeIndex]?.applicant_details?.middle_name +
               ' ' +
-              values?.applicants?.[activeIndex]?.applicant_details.last_name}
+              values?.applicants?.[activeIndex]?.applicant_details?.last_name}
           </p>
           <p className='text-xs text-primary-black font-normal mt-0.5'>Salesforce ID: 1234567</p>
           <div className='flex justify-between text-primary-black font-medium mt-1'>

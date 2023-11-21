@@ -228,7 +228,7 @@ const LeadContextProvider = ({ children }) => {
     //    newData.applicants[activeIndex].applicant_details,
 
     const applicant = await getApplicantById(
-      formik.values?.applicants?.[activeIndex]?.applicant_details.id,
+      formik.values?.applicants?.[activeIndex]?.applicant_details?.id,
       {
         headers: {
           Authorization: token,

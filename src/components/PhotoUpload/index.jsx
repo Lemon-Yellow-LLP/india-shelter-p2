@@ -70,7 +70,7 @@ function PhotoUpload({
     );
 
     const applicant = await getApplicantById(
-      values?.applicants?.[activeIndex]?.applicant_details.id,
+      values?.applicants?.[activeIndex]?.applicant_details?.id,
       {
         headers: {
           Authorization: token,
@@ -94,7 +94,7 @@ function PhotoUpload({
     const edited_applicant = [...edited_photos, edited_photo];
 
     const new_edited_applicant = await editFieldsById(
-      values?.applicants?.[activeIndex]?.applicant_details.id,
+      values?.applicants?.[activeIndex]?.applicant_details?.id,
       'applicant',
       {
         document_meta: { ...document_meta, [type]: edited_applicant },
