@@ -82,10 +82,12 @@ const LeadContextProvider = ({ children }) => {
         progressMapTemp.applicants[index] = {};
         Object.keys(applicant).forEach((key) => {
           if (key === 'banking_details') {
-            progressMap.applicants[index][key] = applicant?.applicant_details?.extra_params
-              ?.banking_progress
-              ? 100
-              : 0;
+            if (applicant?.applicant_details?.is_primary) {
+              progressMap.applicants[index][key] = applicant?.applicant_details?.extra_params
+                ?.banking_progress
+                ? 100
+                : 0;
+            }
           } else {
             progressMap.applicants[index][key] = getProgress(applicant[key]);
           }
