@@ -88,6 +88,16 @@ export default function Preview() {
     );
   }
 
+  function checkCoApplicantTotalProgress(applicant) {
+    return (
+      applicant?.applicant_details?.extra_params?.progress == 100 &&
+      applicant?.personal_details?.extra_params?.progress == 100 &&
+      applicant?.address_detail?.extra_params?.progress == 100 &&
+      applicant?.work_income_detail?.extra_params?.progress == 100 &&
+      applicant?.applicant_details?.extra_params?.upload_progress == 100
+    );
+  }
+
   useEffect(() => {
     let _errors = Object.assign({}, errors);
     // console.error(errors);
@@ -230,7 +240,9 @@ export default function Preview() {
   const CoApplicantDetails = () => {
     return (
       <>
-        {checkTotalProgress(values?.applicants?.[coApplicantIndexes[coApplicantIndex]]) ? (
+        {checkCoApplicantTotalProgress(
+          values?.applicants?.[coApplicantIndexes[coApplicantIndex]],
+        ) ? (
           <StepCompleted />
         ) : (
           <div className='flex-1 flex flex-col gap-4 p-4 pb-[200px] overflow-auto bg-[##F9F9F9]'>
@@ -374,42 +386,50 @@ export default function Preview() {
               }
               link={pages.address_detail.url + '?preview=' + pages.address_detail.url}
               count={
-                flattedErrors &&
-                flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.address_detail.name
-                ] &&
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.address_detail.name
-                ] &&
+                ]?.extra_params?.required_fields_status &&
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.address_detail.name
                 ]?.extra_params?.progress != 0
                   ? Object.keys(
-                      flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                      values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                         pages.address_detail.name
-                      ],
-                    ).length
+                      ]?.extra_params?.required_fields_status,
+                    ).filter(
+                      (k) =>
+                        !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                          pages.address_detail.name
+                        ]?.extra_params?.required_fields_status[k],
+                    )?.length
                   : 'ALL'
               }
             >
-              {flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+              {values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                 pages.address_detail.name
-              ] &&
+              ]?.extra_params?.required_fields_status &&
                 Object.keys(
-                  flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                     pages.address_detail.name
-                  ],
-                ).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
+                  ]?.extra_params?.required_fields_status,
+                )
+                  .filter(
+                    (k) =>
+                      !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                        pages.address_detail.name
+                      ]?.extra_params?.required_fields_status[k],
+                  )
+                  .map((val, i) =>
+                    fieldLabels[val] ? (
+                      <p
+                        key={i}
+                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                      >
+                        {fieldLabels[val]}
+                        <span className='text-primary-red text-xs'>*</span>
+                      </p>
+                    ) : null,
+                  )}
             </PreviewCard>
 
             <PreviewCard
@@ -466,46 +486,6 @@ export default function Preview() {
                       </p>
                     ) : null,
                   )}
-            </PreviewCard>
-
-            <PreviewCard
-              index={coApplicantIndexes[coApplicantIndex]}
-              hide={
-                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.applicant_details.name
-                ]?.extra_params?.banking_progress == 100 ||
-                !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.applicant_details
-                  ?.extra_params?.qualifier
-              }
-              title={pages.banking_details.title}
-              link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
-              hideLabel={true}
-              count={
-                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.applicant_details.name
-                ]?.extra_params?.banking_progress == 100
-                  ? 'Banking completed'
-                  : 'No bank added'
-              }
-            >
-              {flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                pages.banking_details.name
-              ] &&
-                Object.keys(
-                  flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                    pages.banking_details.name
-                  ],
-                ).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
             </PreviewCard>
 
             <PreviewCard
@@ -698,31 +678,43 @@ export default function Preview() {
               title={pages.address_detail.title}
               link={pages.address_detail.url + '?preview=' + pages.address_detail.url}
               count={
-                flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.address_detail.name] &&
-                values?.applicants?.[primaryIndex]?.[pages.address_detail.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
+                  ?.required_fields_status &&
                 values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
                   ?.progress != 0
                   ? Object.keys(
-                      flattedErrors?.applicants?.[primaryIndex]?.[pages.address_detail.name],
-                    ).length
+                      values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
+                        ?.required_fields_status,
+                    ).filter(
+                      (k) =>
+                        !values?.applicants?.[primaryIndex]?.[pages.address_detail.name]
+                          ?.extra_params?.required_fields_status[k],
+                    )?.length
                   : 'ALL'
               }
             >
-              {flattedErrors?.applicants?.[primaryIndex]?.[pages.address_detail.name] &&
+              {values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
+                ?.required_fields_status &&
                 Object.keys(
-                  flattedErrors?.applicants?.[primaryIndex]?.[pages.address_detail.name],
-                ).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
+                  values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
+                    ?.required_fields_status,
+                )
+                  .filter(
+                    (k) =>
+                      !values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
+                        ?.required_fields_status[k],
+                  )
+                  .map((val, i) =>
+                    fieldLabels[val] ? (
+                      <p
+                        key={i}
+                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                      >
+                        {fieldLabels[val]}
+                        <span className='text-primary-red text-xs'>*</span>
+                      </p>
+                    ) : null,
+                  )}
             </PreviewCard>
 
             <PreviewCard
@@ -1005,7 +997,7 @@ export default function Preview() {
                 ? !checkTotalProgress(values?.applicants?.[primaryIndex]) ||
                   values?.property_details?.extra_params?.progress != 100 ||
                   values?.reference_details?.extra_params?.progress != 100
-                : !checkTotalProgress(
+                : !checkCoApplicantTotalProgress(
                     values?.applicants?.[coApplicantIndexes[coApplicantIndex]],
                   )) &&
                 values?.lead?.extra_params?.progress_without_eligibility !== 100) ||
