@@ -125,9 +125,9 @@ const applicantSchema = Yup.object().shape({
       .required('Mobile number is required'),
     father_name: Yup.string()
       .trim()
-      .min(2, 'Father/Husbands Name must be atleast 2 characters long')
-      .max(90, 'Father/Husbands Name can be max 90 characters long')
-      .required('Father/Husbands Name is required')
+      .min(2, 'Father Name must be atleast 2 characters long')
+      .max(90, 'Father Name can be max 90 characters long')
+      .required('Father Name is required')
       .matches(/^[a-zA-Z\s]*$/, 'Invalid characters'),
     mother_name: Yup.string()
       .trim()
@@ -136,6 +136,16 @@ const applicantSchema = Yup.object().shape({
       .required('Mother Name is required')
       .matches(/^[a-zA-Z\s]*$/, 'Invalid characters'),
     marital_status: Yup.string().required('This field is mandatory.'),
+    spouse_name: Yup.string()
+      .trim()
+      .min(2, 'Spouse Name must be atleast 2 characters long')
+      .max(90, 'Spouse Name can be max 90 characters long')
+      .matches(/^[a-zA-Z\s]*$/, 'Invalid characters')
+      .when('marital_status', (value, schema) => {
+        if (value[0] === 'Married') {
+          return schema.required('Spouse Name is required');
+        }
+      }),
     religion: Yup.string().required('Religion is required'),
     preferred_language: Yup.string().required('Preferred Language is required'),
     qualification: Yup.string().required('Qualification is required'),
