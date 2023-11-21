@@ -53,6 +53,7 @@ export const fieldLabels = {
   additional_state: 'Additional State',
   additional_no_of_year_residing: 'Additional No. of Year Residing',
   additional_address_same_as_current: ' Additional address is same as Current address',
+  additional_type_of_residence: 'Type of address',
 
   profession: 'Profession',
   company_name: 'Company Name',
