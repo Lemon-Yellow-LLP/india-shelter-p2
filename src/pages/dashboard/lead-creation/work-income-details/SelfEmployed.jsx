@@ -152,7 +152,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
             values?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees
           ) {
             editFieldsById(
-              values?.applicants?.[activeIndex]?.work_income_detail.id,
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
               'work-income',
               {
                 no_of_employees: e.target.value,
@@ -168,7 +168,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
           } else {
             editFieldsById(
-              values?.applicants?.[activeIndex]?.work_income_detail.id,
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
               'work-income',
               {
                 no_of_employees: '',

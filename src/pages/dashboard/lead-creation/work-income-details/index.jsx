@@ -468,7 +468,7 @@ const WorkIncomeDetails = () => {
       values?.applicants?.[activeIndex]?.personal_details?.id_number
     ) {
       editFieldsById(
-        values?.applicants?.[activeIndex]?.work_income_detail.id,
+        values?.applicants?.[activeIndex]?.work_income_detail?.id,
         'work-income',
         {
           pan_number: values?.applicants?.[activeIndex]?.personal_details?.id_number,
@@ -481,11 +481,11 @@ const WorkIncomeDetails = () => {
       );
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
-    } else {
+    } else if (!values?.applicants?.[activeIndex]?.work_income_detail?.pan_number) {
       setFieldValue(`applicants[${activeIndex}].work_income_detail.pan_number`, '');
 
       editFieldsById(
-        values?.applicants?.[activeIndex]?.work_income_detail.id,
+        values?.applicants?.[activeIndex]?.work_income_detail?.id,
         'work-income',
         {
           pan_number: '',
@@ -606,7 +606,7 @@ const WorkIncomeDetails = () => {
                   ) {
                     console.log('---', 'on blur');
                     editFieldsById(
-                      values?.applicants?.[activeIndex]?.work_income_detail.id,
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
                       'work-income',
                       {
                         pan_number: e.target.value,
@@ -622,7 +622,7 @@ const WorkIncomeDetails = () => {
                     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   } else {
                     editFieldsById(
-                      values?.applicants?.[activeIndex]?.work_income_detail.id,
+                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
                       'work-income',
                       {
                         pan_number: '',
@@ -1138,7 +1138,7 @@ const WorkIncomeDetails = () => {
           ) : null}
 
           {professionOptions.length &&
-          values?.applicants?.[activeIndex]?.applicant_details.is_primary &&
+          values?.applicants?.[activeIndex]?.applicant_details?.is_primary &&
           values?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
             <>
               <div className='flex flex-col gap-2'>

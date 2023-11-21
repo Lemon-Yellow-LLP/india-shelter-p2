@@ -27,7 +27,7 @@ export const defaultValuesLead = {
       required_fields_status: {
         property_identification_is: false,
         property_value_estimate: false,
-        owner_name: false,
+        current_owner_name: false,
         plot_house_flat: false,
         project_society_colony: false,
         pincode: false,
@@ -188,7 +188,6 @@ export const defaultValuesLead = {
         current_city: '',
         current_state: '',
         current_no_of_year_residing: null,
-        additional_type_of_residence: '',
         additional_flat_no_building_name: '',
         additional_street_area_locality: '',
         additional_town: '',

@@ -32,7 +32,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
 
       if (!errors.applicants?.[activeIndex]?.work_income_detail?.income_proof) {
         editFieldsById(
-          values?.applicants?.[activeIndex]?.work_income_detail.id,
+          values?.applicants?.[activeIndex]?.work_income_detail?.id,
           'work-income',
           {
             income_proof: e.value,
@@ -45,7 +45,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
         );
         const name = e.name.split('.')[2];
 
-        if (!values?.applicants?.[activeIndex]?.work_income_detail.income_proof) {
+        if (!values?.applicants?.[activeIndex]?.work_income_detail?.income_proof) {
           setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
         }
       } else {
@@ -61,7 +61,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
       values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
       values?.applicants?.[activeIndex]?.personal_details?.id_number
     ) {
-      if (values?.applicants?.[activeIndex]?.work_income_detail.income_proof) {
+      if (values?.applicants?.[activeIndex]?.work_income_detail?.income_proof) {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: true }));
       } else {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: false }));
@@ -141,7 +141,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
               values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
             ) {
               editFieldsById(
-                values?.applicants?.[activeIndex]?.work_income_detail.id,
+                values?.applicants?.[activeIndex]?.work_income_detail?.id,
                 'work-income',
                 {
                   pan_number: e.target.value,
@@ -157,7 +157,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
             } else {
               editFieldsById(
-                values?.applicants?.[activeIndex]?.work_income_detail.id,
+                values?.applicants?.[activeIndex]?.work_income_detail?.id,
                 'work-income',
                 {
                   pan_number: '',

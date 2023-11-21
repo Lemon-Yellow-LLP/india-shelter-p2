@@ -82,10 +82,12 @@ const LeadContextProvider = ({ children }) => {
         progressMapTemp.applicants[index] = {};
         Object.keys(applicant).forEach((key) => {
           if (key === 'banking_details') {
-            progressMap.applicants[index][key] = applicant?.applicant_details?.extra_params
-              ?.banking_progress
-              ? 100
-              : 0;
+            if (applicant?.applicant_details?.is_primary) {
+              progressMap.applicants[index][key] = applicant?.applicant_details?.extra_params
+                ?.banking_progress
+                ? 100
+                : 0;
+            }
           } else {
             progressMap.applicants[index][key] = getProgress(applicant[key]);
           }
@@ -226,7 +228,7 @@ const LeadContextProvider = ({ children }) => {
     //    newData.applicants[activeIndex].applicant_details,
 
     const applicant = await getApplicantById(
-      formik.values?.applicants?.[activeIndex]?.applicant_details.id,
+      formik.values?.applicants?.[activeIndex]?.applicant_details?.id,
       {
         headers: {
           Authorization: token,

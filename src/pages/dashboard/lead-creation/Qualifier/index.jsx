@@ -92,7 +92,7 @@ const Qualifier = () => {
 
   useEffect(() => {
     async function breOne() {
-      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details.id, {
+      const res = await getApplicantById(values?.applicants?.[activeIndex]?.applicant_details?.id, {
         headers: {
           Authorization: token,
         },
@@ -176,7 +176,7 @@ const Qualifier = () => {
 
         final_api.push(
           verifyPan(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             { type: 'id' },
             {
               headers: {
@@ -194,7 +194,7 @@ const Qualifier = () => {
 
         final_api.push(
           verifyDL(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             { type: 'id' },
             {
               headers: {
@@ -212,7 +212,7 @@ const Qualifier = () => {
 
         final_api.push(
           verifyVoterID(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             { type: 'id' },
             {
               headers: {
@@ -236,7 +236,7 @@ const Qualifier = () => {
 
           final_api.push(
             verifyDL(
-              values?.applicants?.[activeIndex]?.applicant_details.id,
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
               { type: 'address' },
               {
                 headers: {
@@ -256,7 +256,7 @@ const Qualifier = () => {
 
           final_api.push(
             verifyVoterID(
-              values?.applicants?.[activeIndex]?.applicant_details.id,
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
               { type: 'address' },
               {
                 headers: {
@@ -272,7 +272,7 @@ const Qualifier = () => {
         setPfUAN((prev) => ({ ...prev, loader: true, ran: true }));
 
         final_api.push(
-          verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details.id, {
+          verifyPFUAN(values?.applicants?.[activeIndex]?.applicant_details?.id, {
             headers: {
               Authorization: token,
             },
@@ -282,7 +282,7 @@ const Qualifier = () => {
         setGST((prev) => ({ ...prev, loader: true, ran: true }));
 
         final_api.push(
-          verifyGST(values?.applicants?.[activeIndex]?.applicant_details.id, {
+          verifyGST(values?.applicants?.[activeIndex]?.applicant_details?.id, {
             headers: {
               Authorization: token,
             },
@@ -292,7 +292,7 @@ const Qualifier = () => {
 
       setDedupe((prev) => ({ ...prev, loader: true, ran: true }));
       final_api.push(
-        checkDedupe(values?.applicants?.[activeIndex]?.applicant_details.id, {
+        checkDedupe(values?.applicants?.[activeIndex]?.applicant_details?.id, {
           headers: {
             Authorization: token,
           },
@@ -326,7 +326,7 @@ const Qualifier = () => {
         setProgress(final_api.length + 1);
 
         const bre99_res = await checkBre99(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
           {
             headers: {
               Authorization: token,
@@ -350,7 +350,7 @@ const Qualifier = () => {
       if (callCibilOrCrif.Rule_Value === 'CIBIL') {
         try {
           const cibil_res = await checkCibil(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -375,7 +375,7 @@ const Qualifier = () => {
       } else {
         try {
           const crif_res = await checkCrif(
-            values?.applicants?.[activeIndex]?.applicant_details.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             {
               headers: {
                 Authorization: token,
@@ -400,11 +400,14 @@ const Qualifier = () => {
       }
 
       try {
-        const bre_res = await checkBre101(values?.applicants?.[activeIndex]?.applicant_details.id, {
-          headers: {
-            Authorization: token,
+        const bre_res = await checkBre101(
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
+          {
+            headers: {
+              Authorization: token,
+            },
           },
-        });
+        );
 
         if (bre_res.bre_101_response.statusCode != 200) return;
 
@@ -428,7 +431,7 @@ const Qualifier = () => {
         };
 
         await editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details.id,
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
           'applicant',
           {
             bre_101_response: bre_res.bre_101_response,

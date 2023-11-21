@@ -116,7 +116,7 @@ function PdfAndImageUpload({
     );
 
     const applicant = await getApplicantById(
-      values?.applicants?.[activeIndex]?.applicant_details.id,
+      values?.applicants?.[activeIndex]?.applicant_details?.id,
       {
         headers: {
           Authorization: token,
@@ -140,7 +140,7 @@ function PdfAndImageUpload({
     const edited_applicant = [...edited_property_papers, edited_property_pdf];
 
     const new_edited_applicant = await editFieldsById(
-      values?.applicants?.[activeIndex]?.applicant_details.id,
+      values?.applicants?.[activeIndex]?.applicant_details?.id,
       'applicant',
       {
         document_meta: { ...document_meta, property_paper_photos: edited_applicant },
@@ -173,7 +173,7 @@ function PdfAndImageUpload({
     );
 
     const applicant = await getApplicantById(
-      values?.applicants?.[activeIndex]?.applicant_details.id,
+      values?.applicants?.[activeIndex]?.applicant_details?.id,
       {
         headers: {
           Authorization: token,
@@ -197,7 +197,7 @@ function PdfAndImageUpload({
     const edited_applicant = [...edited_property_papers, edited_property_pdf];
 
     const new_edited_applicant = await editFieldsById(
-      values?.applicants?.[activeIndex]?.applicant_details.id,
+      values?.applicants?.[activeIndex]?.applicant_details?.id,
       'applicant',
       {
         document_meta: { ...document_meta, property_paper_photos: edited_applicant },
