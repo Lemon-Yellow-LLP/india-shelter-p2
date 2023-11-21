@@ -91,218 +91,6 @@ export default function Preview() {
   useEffect(() => {
     let _errors = Object.assign({}, errors);
     // console.error(errors);
-    errors?.applicants?.map((applicant, idx) => {
-      let work_income_detail = {};
-      let value = values?.applicants?.[idx]?.work_income_detail?.profession;
-
-      if (value === 'Salaried') {
-        work_income_detail = {
-          ...(errors?.applicants?.[idx]?.work_income_detail?.company_name && {
-            company_name: errors?.applicants?.[idx]?.work_income_detail?.company_name,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.extra_params?.extra_company_name &&
-            values?.applicants?.[idx]?.work_income_detail?.company_name == 'Others' && {
-              extra_company_name:
-                errors?.applicants?.[idx]?.work_income_detail?.extra_params?.extra_company_name,
-            }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.salary_per_month && {
-            salary_per_month: errors?.applicants?.[idx]?.work_income_detail?.salary_per_month,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
-            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.working_since && {
-            working_since: errors?.applicants?.[idx]?.work_income_detail?.working_since,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.mode_of_salary && {
-            mode_of_salary: errors?.applicants?.[idx]?.work_income_detail?.mode_of_salary,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi &&
-            values?.applicants?.[idx]?.work_income_detail?.no_current_loan > 0 && {
-              ongoing_emi: errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi,
-            }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.flat_no_building_name && {
-            flat_no_building_name:
-              errors?.applicants?.[idx]?.work_income_detail?.flat_no_building_name,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.street_area_locality && {
-            street_area_locality:
-              errors?.applicants?.[idx]?.work_income_detail?.street_area_locality,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.town && {
-            town: errors?.applicants?.[idx]?.work_income_detail?.town,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.landmark && {
-            landmark: errors?.applicants?.[idx]?.work_income_detail?.landmark,
-          }),
-
-          ...((errors?.applicants?.[idx]?.work_income_detail?.pincode ||
-            pincodeErr?.[`work_income_detail_${idx}`]) && {
-            pincode:
-              errors?.applicants?.[idx]?.work_income_detail?.pincode ||
-              pincodeErr?.[`work_income_detail_${idx}`],
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
-            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.total_family_number && {
-            total_family_number: errors?.applicants?.[idx]?.work_income_detail?.total_family_number,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.total_household_income && {
-            total_household_income:
-              errors?.applicants?.[idx]?.work_income_detail?.total_household_income,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents && {
-            no_of_dependents: errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents,
-          }),
-        };
-      } else if (value === 'Self-employed') {
-        work_income_detail = {
-          ...(errors?.applicants?.[idx]?.work_income_detail?.business_name && {
-            business_name: errors?.applicants?.[idx]?.work_income_detail?.business_name,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.industries && {
-            industries: errors?.applicants?.[idx]?.work_income_detail?.industries,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
-            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi &&
-            values?.applicants?.[idx]?.work_income_detail?.no_current_loan > 0 && {
-              ongoing_emi: errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi,
-            }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.flat_no_building_name && {
-            flat_no_building_name:
-              errors?.applicants?.[idx]?.work_income_detail?.flat_no_building_name,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.street_area_locality && {
-            street_area_locality:
-              errors?.applicants?.[idx]?.work_income_detail?.street_area_locality,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.town && {
-            town: errors?.applicants?.[idx]?.work_income_detail?.town,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.landmark && {
-            landmark: errors?.applicants?.[idx]?.work_income_detail?.landmark,
-          }),
-
-          ...((errors?.applicants?.[idx]?.work_income_detail?.pincode ||
-            pincodeErr?.[`work_income_detail_${idx}`]) && {
-            pincode:
-              errors?.applicants?.[idx]?.work_income_detail?.pincode ||
-              pincodeErr?.[`work_income_detail_${idx}`],
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
-            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.total_family_number && {
-            total_family_number: errors?.applicants?.[idx]?.work_income_detail?.total_family_number,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.total_household_income && {
-            total_household_income:
-              errors?.applicants?.[idx]?.work_income_detail?.total_household_income,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents && {
-            no_of_dependents: errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents,
-          }),
-        };
-      } else if (value === 'Unemployed') {
-        work_income_detail = {
-          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
-            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi &&
-            values?.applicants?.[idx]?.work_income_detail?.no_current_loan > 0 && {
-              ongoing_emi: errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi,
-            }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.total_family_number && {
-            total_family_number: errors?.applicants?.[idx]?.work_income_detail?.total_family_number,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.total_household_income && {
-            total_household_income:
-              errors?.applicants?.[idx]?.work_income_detail?.total_household_income,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents && {
-            no_of_dependents: errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents,
-          }),
-        };
-      } else if (value === 'Retired') {
-        work_income_detail = {
-          ...(errors?.applicants?.[idx]?.work_income_detail?.pention_amount && {
-            pention_amount: errors?.applicants?.[idx]?.work_income_detail?.pention_amount,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
-            no_current_loan: errors?.applicants?.[idx]?.work_income_detail?.no_current_loan,
-          }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi &&
-            values?.applicants?.[idx]?.work_income_detail?.no_current_loan > 0 && {
-              ongoing_emi: errors?.applicants?.[idx]?.work_income_detail?.ongoing_emi,
-            }),
-
-          ...(errors?.applicants?.[idx]?.work_income_detail?.total_family_number && {
-            total_family_number: errors?.applicants?.[idx]?.work_income_detail?.total_family_number,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.total_household_income && {
-            total_household_income:
-              errors?.applicants?.[idx]?.work_income_detail?.total_household_income,
-          }),
-          ...(errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents && {
-            no_of_dependents: errors?.applicants?.[idx]?.work_income_detail?.no_of_dependents,
-          }),
-        };
-      } else {
-        work_income_detail = applicant?.work_income_detail;
-      }
-
-      if (_errors?.applicants?.[idx]?.work_income_detail) {
-        _errors.applicants[idx].work_income_detail = work_income_detail;
-      }
-
-      if (
-        _errors?.applicants?.[idx]?.work_income_detail &&
-        Object.keys(_errors?.applicants?.[idx]?.work_income_detail)?.length == 0
-      ) {
-        delete _errors.applicants[idx].work_income_detail;
-      }
-
-      if (_errors?.applicants?.[idx] && Object.keys(_errors?.applicants?.[idx])?.length == 0) {
-        delete _errors.applicants[idx];
-      }
-
-      if (pincodeErr?.[`address_additional_${idx}`] && _errors.applicants[idx]) {
-        _errors.applicants[idx].address_detail = {
-          ..._errors?.applicants[idx]?.address_detail,
-          additional_pincode: true,
-        };
-      }
-      if (pincodeErr?.[`address_current_${idx}`] && _errors.applicants[idx]) {
-        _errors.applicants[idx].address_detail = {
-          ..._errors?.applicants[idx]?.address_detail,
-          current_pincode: true,
-        };
-      }
-    });
 
     if (
       _errors?.property_details &&
@@ -392,7 +180,9 @@ export default function Preview() {
         id_proof: !!document_meta?.id_proof_photos?.find((slip) => slip?.active),
         address_proof: !!document_meta?.address_proof_photos?.find((slip) => slip?.active),
 
-        form_60: !!document_meta?.form_60_photos?.find((slip) => slip?.active),
+        ...(values?.applicants[activeIndex]?.work_income_detail?.income_proof === 'Form 60' && {
+          form_60: !!document_meta?.form_60_photos?.find((slip) => slip?.active),
+        }),
 
         ...(values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' &&
           !isCoApplicant && {
@@ -528,42 +318,50 @@ export default function Preview() {
               title={pages.personal_details.title}
               link={pages.personal_details.url + '?preview=' + pages.personal_details.url}
               count={
-                flattedErrors &&
-                flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.personal_details.name
-                ] &&
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.personal_details.name
-                ] &&
+                ]?.extra_params?.required_fields_status &&
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.personal_details.name
                 ]?.extra_params?.progress != 0
                   ? Object.keys(
-                      flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                      values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                         pages.personal_details.name
-                      ],
-                    ).length
+                      ]?.extra_params?.required_fields_status,
+                    ).filter(
+                      (k) =>
+                        !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                          pages.personal_details.name
+                        ]?.extra_params?.required_fields_status[k],
+                    )?.length
                   : 'ALL'
               }
             >
-              {flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+              {values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                 pages.personal_details.name
-              ] &&
+              ]?.extra_params?.required_fields_status &&
                 Object.keys(
-                  flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                     pages.personal_details.name
-                  ],
-                ).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
+                  ]?.extra_params?.required_fields_status,
+                )
+                  .filter(
+                    (k) =>
+                      !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                        pages.personal_details.name
+                      ]?.extra_params?.required_fields_status[k],
+                  )
+                  .map((val, i) =>
+                    fieldLabels[val] ? (
+                      <p
+                        key={i}
+                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                      >
+                        {fieldLabels[val]}
+                        <span className='text-primary-red text-xs'>*</span>
+                      </p>
+                    ) : null,
+                  )}
             </PreviewCard>
 
             <PreviewCard
@@ -624,42 +422,50 @@ export default function Preview() {
               title={pages.work_income_detail.title}
               link={pages.work_income_detail.url + '?preview=' + pages.work_income_detail.url}
               count={
-                flattedErrors &&
-                flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.work_income_detail.name
-                ] &&
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.work_income_detail.name
-                ] &&
+                ]?.extra_params?.required_fields_status &&
                 values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.work_income_detail.name
                 ]?.extra_params?.progress != 0
                   ? Object.keys(
-                      flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                      values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                         pages.work_income_detail.name
-                      ],
-                    ).length
+                      ]?.extra_params?.required_fields_status,
+                    ).filter(
+                      (k) =>
+                        !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                          pages.work_income_detail.name
+                        ]?.extra_params?.required_fields_status[k],
+                    )?.length
                   : 'ALL'
               }
             >
-              {flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+              {values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                 pages.work_income_detail.name
-              ] &&
+              ]?.extra_params?.required_fields_status &&
                 Object.keys(
-                  flattedErrors?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                  values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                     pages.work_income_detail.name
-                  ],
-                ).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
+                  ]?.extra_params?.required_fields_status,
+                )
+                  .filter(
+                    (k) =>
+                      !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                        pages.work_income_detail.name
+                      ]?.extra_params?.required_fields_status[k],
+                  )
+                  .map((val, i) =>
+                    fieldLabels[val] ? (
+                      <p
+                        key={i}
+                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                      >
+                        {fieldLabels[val]}
+                        <span className='text-primary-red text-xs'>*</span>
+                      </p>
+                    ) : null,
+                  )}
             </PreviewCard>
 
             <PreviewCard
@@ -844,31 +650,43 @@ export default function Preview() {
               title={pages.personal_details.title}
               link={pages.personal_details.url + '?preview=' + pages.personal_details.url}
               count={
-                flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.personal_details.name] &&
-                values?.applicants?.[primaryIndex]?.[pages.personal_details.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
+                  ?.required_fields_status &&
                 values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
                   ?.progress != 0
                   ? Object.keys(
-                      flattedErrors?.applicants?.[primaryIndex]?.[pages.personal_details.name],
-                    ).length
+                      values?.applicants?.[primaryIndex]?.[pages.personal_details.name]
+                        ?.extra_params?.required_fields_status,
+                    ).filter(
+                      (k) =>
+                        !values?.applicants?.[primaryIndex]?.[pages.personal_details.name]
+                          ?.extra_params?.required_fields_status[k],
+                    )?.length
                   : 'ALL'
               }
             >
-              {flattedErrors?.applicants?.[primaryIndex]?.[pages.personal_details.name] &&
+              {values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
+                ?.required_fields_status &&
                 Object.keys(
-                  flattedErrors?.applicants?.[primaryIndex]?.[pages.personal_details.name],
-                ).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
+                  values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
+                    ?.required_fields_status,
+                )
+                  .filter(
+                    (k) =>
+                      !values?.applicants?.[primaryIndex]?.[pages.personal_details.name]
+                        ?.extra_params?.required_fields_status[k],
+                  )
+                  .map((val, i) =>
+                    fieldLabels[val] ? (
+                      <p
+                        key={i}
+                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                      >
+                        {fieldLabels[val]}
+                        <span className='text-primary-red text-xs'>*</span>
+                      </p>
+                    ) : null,
+                  )}
             </PreviewCard>
 
             <PreviewCard
@@ -916,31 +734,43 @@ export default function Preview() {
               title={pages.work_income_detail.title}
               link={pages.work_income_detail.url + '?preview=' + pages.work_income_detail.url}
               count={
-                flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.work_income_detail.name] &&
-                values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name] &&
+                values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
+                  ?.required_fields_status &&
                 values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
                   ?.progress != 0
                   ? Object.keys(
-                      flattedErrors?.applicants?.[primaryIndex]?.[pages.work_income_detail.name],
-                    ).length
+                      values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]
+                        ?.extra_params?.required_fields_status,
+                    ).filter(
+                      (k) =>
+                        !values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]
+                          ?.extra_params?.required_fields_status[k],
+                    )?.length
                   : 'ALL'
               }
             >
-              {flattedErrors?.applicants?.[primaryIndex]?.[pages.work_income_detail.name] &&
+              {values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
+                ?.required_fields_status &&
                 Object.keys(
-                  flattedErrors?.applicants?.[primaryIndex]?.[pages.work_income_detail.name],
-                ).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
+                  values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
+                    ?.required_fields_status,
+                )
+                  .filter(
+                    (k) =>
+                      !values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]
+                        ?.extra_params?.required_fields_status[k],
+                  )
+                  .map((val, i) =>
+                    fieldLabels[val] ? (
+                      <p
+                        key={i}
+                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                      >
+                        {fieldLabels[val]}
+                        <span className='text-primary-red text-xs'>*</span>
+                      </p>
+                    ) : null,
+                  )}
             </PreviewCard>
 
             <PreviewCard

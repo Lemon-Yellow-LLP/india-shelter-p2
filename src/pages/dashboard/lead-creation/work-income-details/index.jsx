@@ -481,11 +481,11 @@ const WorkIncomeDetails = () => {
       );
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
-    } else {
+    } else if (!values?.applicants?.[activeIndex]?.work_income_detail?.pan_number) {
       setFieldValue(`applicants[${activeIndex}].work_income_detail.pan_number`, '');
 
       editFieldsById(
-        values?.applicants?.[activeIndex]?.work_income_detail.id,
+        values?.applicants?.[activeIndex]?.work_income_detail?.id,
         'work-income',
         {
           pan_number: '',
