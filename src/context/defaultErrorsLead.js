@@ -50,7 +50,7 @@ export const defaultErrorsLead = {
   work_income_detail: {
     profession: null,
     company_name: null,
-    total_income: null,
+    salary_per_month: null,
     pf_uan: null,
     no_current_loan: null,
     ongoing_emi: null,

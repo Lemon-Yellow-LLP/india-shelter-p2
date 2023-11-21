@@ -353,7 +353,7 @@ function ImageUpload({
                 {uploads.data.map((upload, index) => {
                   return (
                     <div key={index} className='rounded-lg relative w-[68px]'>
-                      <button className='absolute right-[-4px] top-[-4px] z-20 w-4 h-4'>
+                      <button className='absolute right-[-4px] top-[-4px] z-10 w-4 h-4'>
                         <svg
                           width='16'
                           height='16'

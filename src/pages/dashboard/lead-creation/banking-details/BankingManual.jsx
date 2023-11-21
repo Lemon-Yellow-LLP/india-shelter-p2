@@ -225,7 +225,7 @@ export default function BankingManual() {
 
     await axios
       .post(
-        `https://lo.scotttiger.in/api/applicant/penny-drop/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+        `https://uatagile.indiashelter.in/api/applicant/penny-drop/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
         {
           ...valuesData,
         },
@@ -238,7 +238,7 @@ export default function BankingManual() {
       .then(async (res) => {
         await axios
           .get(
-            `https://lo.scotttiger.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            `https://uatagile.indiashelter.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
             {
               headers: {
                 Authorization: token,
@@ -261,7 +261,7 @@ export default function BankingManual() {
 
         await axios
           .get(
-            `https://lo.scotttiger.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            `https://uatagile.indiashelter.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
             {
               headers: {
                 Authorization: token,
@@ -288,7 +288,7 @@ export default function BankingManual() {
   const getIfsc = async () => {
     axios
       .post(
-        `https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`,
+        `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
         {
           bank: searchedBank,
           branch: searchedBranch,
@@ -310,7 +310,7 @@ export default function BankingManual() {
   const getBankFromIfsc = async () => {
     axios
       .post(
-        `https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`,
+        `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
         {
           ifsc: values?.ifsc_code,
         },
@@ -334,7 +334,7 @@ export default function BankingManual() {
   const getBranchesFromBankName = async (value) => {
     axios
       .post(
-        `https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`,
+        `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
         {
           bank: value,
         },
@@ -358,7 +358,7 @@ export default function BankingManual() {
 
   const getAllBanks = async () => {
     axios
-      .get(`https://lo.scotttiger.in/api/ifsc/r/get-all-bank`, {
+      .get(`https://uatagile.indiashelter.in/api/ifsc/r/get-all-bank`, {
         headers: {
           Authorization: token,
         },

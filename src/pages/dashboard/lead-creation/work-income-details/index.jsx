@@ -33,6 +33,7 @@ const WorkIncomeDetails = () => {
     updateProgressApplicantSteps,
     pincodeErr,
     setPincodeErr,
+    handleChange,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
@@ -72,8 +73,14 @@ const WorkIncomeDetails = () => {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
               profession: true,
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
               company_name: false,
-              total_income: false,
+              salary_per_month: false,
               working_since: false,
               mode_of_salary: false,
               flat_no_building_name: false,
@@ -90,8 +97,14 @@ const WorkIncomeDetails = () => {
           } else {
             _requiredFieldStatus = {
               profession: true,
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
               company_name: false,
-              total_income: false,
+              salary_per_month: false,
               working_since: false,
               mode_of_salary: false,
               flat_no_building_name: false,
@@ -109,6 +122,13 @@ const WorkIncomeDetails = () => {
         } else if (e.value === 'Self-employed') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
+              no_of_employees: false,
               profession: true,
               business_name: false,
               industries: false,
@@ -125,6 +145,13 @@ const WorkIncomeDetails = () => {
             };
           } else {
             _requiredFieldStatus = {
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
+              no_of_employees: false,
               profession: true,
               business_name: false,
               industries: false,
@@ -143,6 +170,7 @@ const WorkIncomeDetails = () => {
         } else if (e.value === 'Unemployed') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
+              income_proof: false,
               profession: true,
               no_current_loan: false,
               ongoing_emi: false,
@@ -152,6 +180,7 @@ const WorkIncomeDetails = () => {
             };
           } else {
             _requiredFieldStatus = {
+              income_proof: false,
               profession: true,
               no_current_loan: false,
               ongoing_emi: false,
@@ -163,6 +192,12 @@ const WorkIncomeDetails = () => {
         } else if (e.value === 'Retired') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
               profession: true,
               no_current_loan: false,
               ongoing_emi: false,
@@ -173,6 +208,12 @@ const WorkIncomeDetails = () => {
             };
           } else {
             _requiredFieldStatus = {
+              pan_number:
+                (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ? true
+                  : false,
               profession: true,
               no_current_loan: false,
               ongoing_emi: false,
@@ -192,7 +233,10 @@ const WorkIncomeDetails = () => {
           applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
           profession: e.value,
           company_name: '',
-          total_income: '',
+          no_of_employees: '',
+          income_proof: '',
+          udyam_number: '',
+          salary_per_month: '',
           pf_uan: '',
           no_current_loan: null,
           ongoing_emi: '',
@@ -418,6 +462,57 @@ const WorkIncomeDetails = () => {
     console.log('autofill work-income');
   };
 
+  useEffect(() => {
+    if (
+      values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+      values?.applicants?.[activeIndex]?.personal_details?.id_number
+    ) {
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.work_income_detail.id,
+        'work-income',
+        {
+          pan_number: values?.applicants?.[activeIndex]?.personal_details?.id_number,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
+    } else {
+      setFieldValue(`applicants[${activeIndex}].work_income_detail.pan_number`, '');
+
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.work_income_detail.id,
+        'work-income',
+        {
+          pan_number: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: false }));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (
+      values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+      values?.applicants?.[activeIndex]?.personal_details?.id_number
+    ) {
+      setFieldValue(
+        `applicants[${activeIndex}].work_income_detail.pan_number`,
+        values?.applicants?.[activeIndex]?.personal_details?.id_number,
+      );
+    }
+  }, [values?.applicants?.[activeIndex]?.work_income_detail?.pan_number]);
+
   return (
     <>
       <Popup
@@ -466,6 +561,86 @@ const WorkIncomeDetails = () => {
               })}
             </div>
 
+            {values?.applicants?.[activeIndex]?.work_income_detail?.profession !== 'Unemployed' &&
+            !!values?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
+              <TextInput
+                label='Enter PAN number'
+                placeholder='EG ABCD1256D'
+                required
+                name={`applicants[${activeIndex}].work_income_detail.pan_number`}
+                value={values?.applicants?.[activeIndex]?.work_income_detail?.pan_number}
+                onChange={(e) => {
+                  if (e.target.value === ' ') {
+                    return;
+                  }
+                  let value = e.target.value;
+                  value = value.trimStart().replace(/\s\s+/g, ' ');
+                  const pattern = /^[A-Za-z0-9]+$/;
+
+                  if (value?.trim() == '') {
+                    setFieldValue(e.target.name, value);
+                  }
+
+                  if (pattern.test(value)) {
+                    setFieldValue(e.target.name, value.toUpperCase());
+                  }
+                }}
+                inputClasses='capitalize'
+                error={errors.applicants?.[activeIndex]?.work_income_detail?.pan_number}
+                touched={
+                  touched?.applicants &&
+                  touched?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                }
+                disabled={
+                  (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                    values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
+                // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
+                onBlur={(e) => {
+                  handleBlur(e);
+
+                  if (
+                    !errors.applicants?.[activeIndex]?.work_income_detail?.pan_number &&
+                    values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+                  ) {
+                    console.log('---', 'on blur');
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail.id,
+                      'work-income',
+                      {
+                        pan_number: e.target.value,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+                    const name = e.target.name.split('.')[2];
+
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                  } else {
+                    editFieldsById(
+                      values?.applicants?.[activeIndex]?.work_income_detail.id,
+                      'work-income',
+                      {
+                        pan_number: '',
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
+                    const name = e.target.name.split('.')[2];
+                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                  }
+                }}
+              />
+            ) : null}
+
             {errors?.applicants?.[activeIndex]?.work_income_detail?.profession &&
             touched?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
               <span
@@ -478,12 +653,14 @@ const WorkIncomeDetails = () => {
               ''
             )}
           </div>
+
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Salaried' && (
             <Salaried
               requiredFieldsStatus={requiredFieldsStatus}
               setRequiredFieldsStatus={setRequiredFieldsStatus}
             />
           )}
+
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession ===
             'Self-employed' && (
             <SelfEmployed
@@ -491,23 +668,26 @@ const WorkIncomeDetails = () => {
               setRequiredFieldsStatus={setRequiredFieldsStatus}
             />
           )}
+
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Unemployed' && (
             <UnEmployed
               requiredFieldsStatus={requiredFieldsStatus}
               setRequiredFieldsStatus={setRequiredFieldsStatus}
             />
           )}
+
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Retired' && (
             <Retired
               requiredFieldsStatus={requiredFieldsStatus}
               setRequiredFieldsStatus={setRequiredFieldsStatus}
             />
           )}
+
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Salaried' ||
           values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Self-employed' ? (
             <>
               <TextInput
-                label='Flat no/Building name'
+                label='Plot no/Building name'
                 placeholder='Eg: C-101'
                 required
                 name={`applicants[${activeIndex}].work_income_detail.flat_no_building_name`}

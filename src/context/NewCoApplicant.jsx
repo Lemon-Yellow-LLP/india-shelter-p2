@@ -118,6 +118,8 @@ export const newCoApplicantValues = {
     additional_city: '',
     additional_state: '',
     additional_no_of_year_residing: null,
+    additional_type_of_residence: '',
+
     extra_params: {
       additional_address_same_as_current: false,
       progress: 0,
@@ -136,13 +138,18 @@ export const newCoApplicantValues = {
         additional_landmark: false,
         additional_pincode: false,
         additional_no_of_year_residing: false,
+        additional_type_of_residence: false,
       },
     },
   },
   work_income_detail: {
     profession: '',
+    pan_number: '',
+    udyam_number: '',
+    income_proof: '',
+    no_of_employees: '',
     company_name: '',
-    total_income: '',
+    salary_per_month: '',
     pf_uan: '',
     no_current_loan: null,
     ongoing_emi: '',

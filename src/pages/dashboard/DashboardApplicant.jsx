@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EditIcon from '../../assets/icons/edit';
-import BackIcon2 from '../../assets/icons/back-2';
 import { AuthContext } from '../../context/AuthContextProvider';
-import { Box, Button, Tabs, Tab } from '@mui/material';
+import { Box, Tabs, Tab } from '@mui/material';
 import ProgressBadge from '../../components/ProgressBadge';
 import { getDashboardLeadById, pushToSalesforce } from '../../global';
 import { CheckBox, DropDown, ToastMessage } from '../../components';
@@ -320,7 +319,7 @@ export default function DashboardApplicant() {
                 value: primaryApplicant?.personal_details?.mobile_number,
               },
               {
-                label: 'Father/Husband’s name',
+                label: 'Father’s name',
                 value: primaryApplicant?.personal_details?.father_name,
               },
               {
@@ -331,6 +330,12 @@ export default function DashboardApplicant() {
                 label: 'Marital status',
                 value: primaryApplicant?.personal_details?.marital_status,
               },
+              primaryApplicant?.personal_details?.marital_status === 'Married'
+                ? {
+                    label: 'Spouse name',
+                    value: primaryApplicant?.personal_details?.spouse_name,
+                  }
+                : null,
               {
                 label: 'Religion',
                 value: primaryApplicant?.personal_details?.religion,
@@ -396,7 +401,7 @@ export default function DashboardApplicant() {
               {
                 label: '',
                 value: '',
-                subtitle: 'PERMANENT ADDRESS',
+                subtitle: 'ADDITIONAL ADDRESS',
                 children: (
                   <div className='flex gap-2'>
                     <CheckBox
@@ -415,8 +420,8 @@ export default function DashboardApplicant() {
               },
 
               {
-                label: 'Type of residence',
-                value: primaryApplicant?.address_detail?.current_type_of_residence,
+                label: 'Type of address',
+                value: primaryApplicant?.address_detail?.additional_type_of_residence,
               },
               {
                 label: 'Flat no/Building name',
@@ -464,12 +469,29 @@ export default function DashboardApplicant() {
                 value: primaryApplicant?.work_income_detail?.profession,
               },
               {
+                label: 'PAN number',
+                value: primaryApplicant?.work_income_detail?.pan_number,
+              },
+              ,
+              {
                 label: 'Company name',
                 value: primaryApplicant?.work_income_detail?.company_name,
               },
               {
-                label: 'Total income',
-                value: primaryApplicant?.work_income_detail?.total_income,
+                label: 'No. of employees',
+                value: primaryApplicant?.work_income_detail?.no_of_employees,
+              },
+              {
+                label: 'Udyam number',
+                value: primaryApplicant?.work_income_detail?.udyam_number,
+              },
+              {
+                label: 'Salary per month',
+                value: primaryApplicant?.work_income_detail?.salary_per_month,
+              },
+              {
+                label: 'Income proof',
+                value: primaryApplicant?.work_income_detail?.income_proof,
               },
               {
                 label: 'PF UAN',
@@ -492,7 +514,7 @@ export default function DashboardApplicant() {
                 value: primaryApplicant?.work_income_detail?.mode_of_salary,
               },
               {
-                label: 'Flat no/Building name',
+                label: 'Plot no/Building name',
                 value: primaryApplicant?.work_income_detail?.flat_no_building_name,
               },
 
@@ -544,6 +566,7 @@ export default function DashboardApplicant() {
                 label: 'GST Number',
                 value: primaryApplicant?.work_income_detail?.gst_number,
               },
+
               {
                 label: 'Pension amount',
                 value: primaryApplicant?.work_income_detail?.pention_amount,
@@ -940,17 +963,24 @@ export default function DashboardApplicant() {
                 value: activeCoApplicant?.personal_details?.mobile_number,
               },
               {
-                label: 'Father/Husband’s name',
+                label: 'Father’s name',
                 value: activeCoApplicant?.personal_details?.father_name,
               },
               {
                 label: 'Mother’s name',
                 value: activeCoApplicant?.personal_details?.mother_name,
               },
+
               {
                 label: 'Marital status',
                 value: activeCoApplicant?.personal_details?.marital_status,
               },
+
+              activeCoApplicant?.personal_details?.marital_status === 'Married' && {
+                label: 'Spouse name',
+                value: activeCoApplicant?.personal_details?.spouse_name,
+              },
+
               {
                 label: 'Religion',
                 value: activeCoApplicant?.personal_details?.religion,
@@ -1016,7 +1046,7 @@ export default function DashboardApplicant() {
               {
                 label: '',
                 value: '',
-                subtitle: 'PERMANENT ADDRESS',
+                subtitle: 'ADDITIONAL ADDRESS',
                 children: (
                   <div className='flex gap-2'>
                     <CheckBox
@@ -1033,10 +1063,9 @@ export default function DashboardApplicant() {
                   </div>
                 ),
               },
-
               {
-                label: 'Type of residence',
-                value: activeCoApplicant?.address_detail?.current_type_of_residence,
+                label: 'Type of address',
+                value: activeCoApplicant?.address_detail?.additional_type_of_residence,
               },
               {
                 label: 'Flat no/Building name',
@@ -1086,12 +1115,28 @@ export default function DashboardApplicant() {
                 value: activeCoApplicant?.work_income_detail?.profession,
               },
               {
+                label: 'PAN number',
+                value: activeCoApplicant?.work_income_detail?.pan_number,
+              },
+              {
                 label: 'Company name',
                 value: activeCoApplicant?.work_income_detail?.company_name,
               },
               {
-                label: 'Total income',
-                value: activeCoApplicant?.work_income_detail?.total_income,
+                label: 'No. of employees',
+                value: activeCoApplicant?.work_income_detail?.no_of_employees,
+              },
+              {
+                label: 'Udyam number',
+                value: activeCoApplicant?.work_income_detail?.udyam_number,
+              },
+              {
+                label: 'Salary per month',
+                value: activeCoApplicant?.work_income_detail?.salary_per_month,
+              },
+              {
+                label: 'Income proof',
+                value: activeCoApplicant?.work_income_detail?.income_proof,
               },
               {
                 label: 'PF UAN',
@@ -1114,7 +1159,7 @@ export default function DashboardApplicant() {
                 value: activeCoApplicant?.work_income_detail?.mode_of_salary,
               },
               {
-                label: 'Flat no/Building name',
+                label: 'Plot no/Building name',
                 value: activeCoApplicant?.work_income_detail?.flat_no_building_name,
               },
 
@@ -1617,24 +1662,28 @@ const FormDetails = React.forwardRef(function FormDetails(
       ) : (
         <div className='flex flex-col gap-2'>
           {data && data.length ? (
-            data.map(({ label, value, subtitle, children }, i) => (
-              <div key={i} className='flex flex-col gap-4'>
-                {subtitle ? (
-                  <p className='text-xs not-italic font-semibold text-primary-black mt-1'>
-                    {subtitle}
-                  </p>
-                ) : null}
-                {label ? (
-                  <div className='w-full flex gap-4' key={i}>
-                    <p className='w-1/2 text-xs not-italic font-normal text-dark-grey'>{label}</p>
-                    <p className='w-1/2 text-xs not-italic font-medium text-primary-black'>
-                      {value || (value === 0 ? value : '-')}
+            data.map((e, i) =>
+              e ? (
+                <div key={i} className='flex flex-col gap-4'>
+                  {e?.subtitle ? (
+                    <p className='text-xs not-italic font-semibold text-primary-black mt-1'>
+                      {e?.subtitle}
                     </p>
-                  </div>
-                ) : null}
-                {children ? children : null}
-              </div>
-            ))
+                  ) : null}
+                  {e?.label ? (
+                    <div className='w-full flex gap-4' key={i}>
+                      <p className='w-1/2 text-xs not-italic font-normal text-dark-grey'>
+                        {e?.label}
+                      </p>
+                      <p className='w-1/2 text-xs not-italic font-medium text-primary-black'>
+                        {e?.value || (e?.value === 0 ? e?.value : '-')}
+                      </p>
+                    </div>
+                  ) : null}
+                  {e?.children ? e?.children : null}
+                </div>
+              ) : null,
+            )
           ) : (
             <p className='text-xs not-italic font-medium text-primary-black'>
               This section is not done yet

@@ -8,8 +8,16 @@ import { industriesOptions } from './WorkIncomeDropdownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsStatus }) {
-  const { values, errors, handleBlur, touched, setFieldValue, setFieldError, activeIndex } =
-    useContext(LeadContext);
+  const {
+    values,
+    errors,
+    handleBlur,
+    touched,
+    setFieldValue,
+    setFieldError,
+    activeIndex,
+    handleChange,
+  } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
 
@@ -122,6 +130,62 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
               }));
             }
           }
+        }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+      />
+
+      <TextInput
+        type='number'
+        pattern='\d*'
+        required
+        label='No.of employees'
+        placeholder='Eg: 50'
+        name={`applicants[${activeIndex}].work_income_detail.no_of_employees`}
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees}
+        error={errors?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees}
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (
+            !errors.applicants?.[activeIndex]?.work_income_detail?.no_of_employees &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.no_of_employees
+          ) {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail.id,
+              'work-income',
+              {
+                no_of_employees: e.target.value,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
+            const name = e.target.name.split('.')[2];
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+          } else {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail.id,
+              'work-income',
+              {
+                no_of_employees: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
+            const name = e.target.name.split('.')[2];
+            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+          }
+        }}
+        onChange={(e) => {
+          handleChange(e);
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
@@ -285,6 +349,67 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
       />
 
       <TextInput
+        label='Udyam number'
+        placeholder='Eg: UDYAM-XX-00-0000000'
+        // className='uppercase'
+        name={`applicants[${activeIndex}].work_income_detail.udyam_number`}
+        value={values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number}
+        error={errors?.applicants?.[activeIndex]?.work_income_detail?.udyam_number}
+        touched={touched?.applicants?.[activeIndex]?.work_income_detail?.udyam_number}
+        onBlur={(e) => {
+          handleBlur(e);
+
+          if (
+            !errors?.applicants?.[activeIndex]?.work_income_detail?.udyam_number &&
+            values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number
+          ) {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                udyam_number: values?.applicants?.[activeIndex]?.work_income_detail?.udyam_number,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+          } else {
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                udyam_number: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+          }
+        }}
+        onChange={(e) => {
+          if (e.target.value === ' ') {
+            return;
+          }
+          let value = e.target.value;
+          value = value.trimStart().replace(/\s\s+/g, ' ');
+          const pattern = /^[A-Za-z0-9-]+$/;
+
+          if (value?.trim() == '') {
+            setFieldValue(e.target.name, value);
+          }
+
+          if (pattern.test(value)) {
+            setFieldValue(e.target.name, value.toUpperCase());
+          }
+        }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+      />
+
+      <TextInput
         type='number'
         label='No. of current loan(s)'
         placeholder='Eg: 1'
@@ -389,6 +514,7 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
+
       <CurrencyInput
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'

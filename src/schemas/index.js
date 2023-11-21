@@ -144,6 +144,13 @@ const applicantSchema = Yup.object().shape({
 
   work_income_detail: Yup.object().shape({
     profession: Yup.string().required('This field is mandatory'),
+    pan_number: Yup.string()
+      .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid Pan number. Format should be AAAPB2117A')
+      .required('This field is mandatory'),
+    no_of_employees: Yup.number()
+      .required('This field is mandatory')
+      .min(1, 'Minimum employee count is 1')
+      .max(5000000, 'Maximum employee count is 50 lakhs'),
     no_current_loan: Yup.number()
       .required('This field is mandatory')
       .min(0, 'No. of Current loan(s) can be min 0')
@@ -199,7 +206,7 @@ const applicantSchema = Yup.object().shape({
       .max(6, 'Enter a valid Pincode'),
     //Salaried
     company_name: Yup.string().required('This field is mandatory'),
-    total_income: Yup.number()
+    salary_per_month: Yup.number()
       .required('This field is mandatory')
       .required('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
       .typeError('Total income should not be less than ₹ 10,000 and more than ₹ 50,00,00,000')
@@ -222,7 +229,10 @@ const applicantSchema = Yup.object().shape({
       .max(90, 'Business name can be max 90 characters long')
       .required('This field is mandatory'),
     industries: Yup.string().required('This field is mandatory'),
-
+    udyam_number: Yup.string().matches(
+      /^UDYAM-[A-Z]{2}-00-\d{7}$/,
+      'Invalid Udyam Number Eg: UDYAM-XX-00-0000000',
+    ),
     gst_number: Yup.string().matches(
       /^([0][1-9]|[1-2][0-9]|[3][0-7])([a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[0-9]{1}[zZ]{1}[0-9a-zA-Z]{1})+$/,
       'Invalid GST Number Eg: 06AAAPB2117A1ZI ',

@@ -1,18 +1,181 @@
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useState, useEffect } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInput from '../../../../components/TextInput';
-import { CurrencyInput } from '../../../../components';
+import { CardRadio, CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import { professionOptions } from '../utils';
+import { IconSalarid, IconSelfEmployed } from '../../../../assets/icons';
 
 export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStatus }) {
-  const { values, errors, touched, handleBlur, setFieldValue, activeIndex } =
+  const { values, errors, touched, handleBlur, setFieldValue, activeIndex, handleChange } =
     useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
 
+  const IncomeProofOptions = [
+    {
+      label: 'PAN ID',
+      value: 'PAN ID',
+      icon: <IconSalarid />,
+    },
+    {
+      label: 'Form 60',
+      value: 'Form 60',
+      icon: <IconSelfEmployed />,
+    },
+  ];
+
+  const handleRadioChange = useCallback(
+    (e) => {
+      setFieldValue(e.name, e.value);
+
+      if (!errors.applicants?.[activeIndex]?.work_income_detail?.income_proof) {
+        editFieldsById(
+          values?.applicants?.[activeIndex]?.work_income_detail.id,
+          'work-income',
+          {
+            income_proof: e.value,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+        const name = e.name.split('.')[2];
+
+        if (!values?.applicants?.[activeIndex]?.work_income_detail.income_proof) {
+          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+        }
+      } else {
+        const name = e.name.split('.')[2];
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+      }
+    },
+    [values],
+  );
+
+  useEffect(() => {
+    if (
+      values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+      values?.applicants?.[activeIndex]?.personal_details?.id_number
+    ) {
+      if (values?.applicants?.[activeIndex]?.work_income_detail.income_proof) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: true }));
+      } else {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: false }));
+      }
+    } else {
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
+    }
+  }, [values?.applicants?.[activeIndex]?.work_income_detail?.income_proof]);
+
   return (
     <>
+      <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
+        Income proof <span className='text-primary-red text-xs'>*</span>
+      </label>
+
+      <div className={`flex gap-4 w-full`}>
+        {IncomeProofOptions.map((option) => {
+          return (
+            <CardRadio
+              key={option.value}
+              label={option.label}
+              name={`applicants[${activeIndex}].work_income_detail.income_proof`}
+              value={option.value}
+              current={values?.applicants?.[activeIndex]?.work_income_detail?.income_proof}
+              onChange={handleRadioChange}
+              containerClasses='flex-1'
+              disabled={
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              }
+            >
+              {option.icon}
+            </CardRadio>
+          );
+        })}
+      </div>
+
+      {values?.applicants?.[activeIndex]?.work_income_detail?.income_proof === 'PAN ID' && (
+        <TextInput
+          label='Enter PAN number'
+          placeholder='EG ABCD1256D'
+          required
+          name={`applicants[${activeIndex}].work_income_detail.pan_number`}
+          value={values?.applicants?.[activeIndex]?.work_income_detail?.pan_number}
+          onChange={(e) => {
+            if (e.target.value === ' ') {
+              return;
+            }
+            let value = e.target.value;
+            value = value.trimStart().replace(/\s\s+/g, ' ');
+            const pattern = /^[A-Za-z0-9]+$/;
+
+            if (value?.trim() == '') {
+              setFieldValue(e.target.name, value);
+            }
+
+            if (pattern.test(value)) {
+              setFieldValue(e.target.name, value.toUpperCase());
+            }
+          }}
+          inputClasses='capitalize'
+          error={errors.applicants?.[activeIndex]?.work_income_detail?.pan_number}
+          touched={
+            touched?.applicants &&
+            touched?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+          }
+          disabled={
+            (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+              values?.applicants?.[activeIndex]?.personal_details?.id_number) ||
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          }
+          // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
+          onBlur={(e) => {
+            handleBlur(e);
+
+            if (
+              !errors.applicants?.[activeIndex]?.work_income_detail?.pan_number &&
+              values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+            ) {
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail.id,
+                'work-income',
+                {
+                  pan_number: e.target.value,
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
+              const name = e.target.name.split('.')[2];
+
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+            } else {
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail.id,
+                'work-income',
+                {
+                  pan_number: '',
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
+
+              const name = e.target.name.split('.')[2];
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            }
+          }}
+        />
+      )}
+
       <TextInput
         type='number'
         label='No. of current loan(s)'
@@ -117,6 +280,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
+
       <CurrencyInput
         label='Ongoing EMI(s)'
         placeholder='Eg: 10,000'

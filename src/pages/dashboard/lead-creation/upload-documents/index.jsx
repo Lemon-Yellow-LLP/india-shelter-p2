@@ -1844,6 +1844,9 @@ const UploadDocuments = () => {
         if (active_uploads.length) {
           setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
           setIdProofPhotos(active_uploads);
+        } else {
+          setIdProofUploads(null);
+          setIdProofPhotos([]);
         }
       }
 
@@ -1881,6 +1884,9 @@ const UploadDocuments = () => {
         if (active_uploads.length) {
           setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
           setAddressProofPhotos(active_uploads);
+        } else {
+          setAddressProofUploads(null);
+          setAddressProofPhotos([]);
         }
       }
 
@@ -1961,7 +1967,9 @@ const UploadDocuments = () => {
         id_proof: !!document_meta?.id_proof_photos?.find((slip) => slip?.active),
         address_proof: !!document_meta?.address_proof_photos?.find((slip) => slip?.active),
 
-        form_60: !!document_meta?.form_60_photos?.find((slip) => slip?.active),
+        ...(values?.applicants[activeIndex]?.work_income_detail?.income_proof === 'Form 60' && {
+          form_60: !!document_meta?.form_60_photos?.find((slip) => slip?.active),
+        }),
 
         ...(values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' &&
           !isCoApplicant && {
@@ -2042,7 +2050,7 @@ const UploadDocuments = () => {
               touched={
                 touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.id_type
               }
-              disabled={values?.applicants?.[activeIndex]?.personal_details?.id_type ? true : false}
+              disabled={!!isQaulifierActivated}
               disableOption={
                 values?.applicants[activeIndex]?.personal_details?.selected_address_proof
               }
@@ -2300,11 +2308,7 @@ const UploadDocuments = () => {
                 touched?.applicants &&
                 touched.applicants?.[activeIndex]?.personal_details?.selected_address_proof
               }
-              disabled={
-                values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
-                  ? true
-                  : false
-              }
+              disabled={!!isQaulifierActivated}
               disableOption={values?.applicants?.[activeIndex]?.personal_details?.id_type}
               onBlur={(e) => {
                 handleBlur(e);
@@ -2597,26 +2601,28 @@ const UploadDocuments = () => {
             />
           )}
 
-          <ImageUpload
-            files={form60photos}
-            setFile={setForm60photos}
-            uploads={form60Uploads}
-            setUploads={setForm60Uploads}
-            setEdit={setEditForm60}
-            label='Form 60'
-            required
-            hint='File size should be less than 5MB'
-            setSingleFile={setForm60photosFile}
-            setLatLong={setForm60LatLong}
-            imageArrayBorder={true}
-            errorMessage={
-              preview === location.pathname &&
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                ?.upload_required_fields_status?.form_60 == false
-                ? 'This field is mandatory'
-                : ''
-            }
-          />
+          {values?.applicants[activeIndex]?.work_income_detail?.income_proof === 'Form 60' ? (
+            <ImageUpload
+              files={form60photos}
+              setFile={setForm60photos}
+              uploads={form60Uploads}
+              setUploads={setForm60Uploads}
+              setEdit={setEditForm60}
+              label='Form 60'
+              required
+              hint='File size should be less than 5MB'
+              setSingleFile={setForm60photosFile}
+              setLatLong={setForm60LatLong}
+              imageArrayBorder={true}
+              errorMessage={
+                preview === location.pathname &&
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                  ?.upload_required_fields_status?.form_60 == false
+                  ? 'This field is mandatory'
+                  : ''
+              }
+            />
+          ) : null}
 
           {values?.property_details?.property_identification_is !== 'not-yet' && !isCoApplicant && (
             <ImageUpload

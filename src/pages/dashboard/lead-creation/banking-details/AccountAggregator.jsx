@@ -30,7 +30,7 @@ export default function AccountAggregator() {
     setLoadingState(true);
     await axios
       .post(
-        `https://lo.scotttiger.in/api/applicant/account-aggregator/initiate-by-phone-number/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+        `https://uatagile.indiashelter.in/api/applicant/account-aggregator/initiate-by-phone-number/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         { phone_number: mobileNo },
         {
           headers: {
@@ -53,7 +53,7 @@ export default function AccountAggregator() {
   const handleResend = async () => {
     await axios
       .post(
-        `https://lo.scotttiger.in/api/applicant/account-aggregator/regenerate-redirection-url/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+        `https://uatagile.indiashelter.in/api/applicant/account-aggregator/regenerate-redirection-url/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         { referenceId: referenceId },
         {
           headers: {
@@ -74,7 +74,7 @@ export default function AccountAggregator() {
     setChecking(true);
     await axios
       .post(
-        `https://lo.scotttiger.in/api/applicant/account-aggregator/tracking-status/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+        `https://uatagile.indiashelter.in/api/applicant/account-aggregator/tracking-status/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         {
           referenceId: referenceId,
         },
@@ -91,7 +91,7 @@ export default function AccountAggregator() {
           setAARunning(false);
           await axios
             .get(
-              `https://lo.scotttiger.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+              `https://uatagile.indiashelter.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
               {
                 headers: {
                   Authorization: token,

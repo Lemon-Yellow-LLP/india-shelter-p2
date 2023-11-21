@@ -3,18 +3,17 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import { useContext, useEffect, useState } from 'react';
-import ArrowRightIcon2 from '../../../../assets/icons/arrow-right-2';
 import { fieldLabels, pages } from '../../../../utils';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../../components';
-import StepCompletedIllustration from '../../../../assets/step-completed';
 import { Snackbar } from '@mui/material';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
-import PropTypes from 'prop-types';
 import { getApplicantById } from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import Popup from '../../../../components/Popup';
+import StepCompleted from './step-completed';
+import PreviewCard from './preview-card';
 
 const steps = ['', '', '', '', ''];
 
@@ -108,8 +107,8 @@ export default function Preview() {
                 errors?.applicants?.[idx]?.work_income_detail?.extra_params?.extra_company_name,
             }),
 
-          ...(errors?.applicants?.[idx]?.work_income_detail?.total_income && {
-            total_income: errors?.applicants?.[idx]?.work_income_detail?.total_income,
+          ...(errors?.applicants?.[idx]?.work_income_detail?.salary_per_month && {
+            salary_per_month: errors?.applicants?.[idx]?.work_income_detail?.salary_per_month,
           }),
 
           ...(errors?.applicants?.[idx]?.work_income_detail?.no_current_loan && {
@@ -1266,61 +1265,3 @@ export default function Preview() {
     </>
   );
 }
-
-function PreviewCard({ index, title, count, link, hide, children, hideLabel }) {
-  const { setActiveIndex } = useContext(LeadContext);
-  const handleClick = () => setActiveIndex(index);
-
-  return (
-    <>
-      {hide || count == 0 ? null : (
-        <div onClick={handleClick}>
-          <Link
-            to={link}
-            className='rounded-lg border border-[#EBEBEB] bg-white p-3 flex flex-col gap-2 active:opacity-90'
-          >
-            <div className='flex justify-between'>
-              <h4 className='overflow-hidden text-sm not-italic font-medium text-primary-black'>
-                {title || '-'}
-              </h4>
-              <ArrowRightIcon2 />
-            </div>
-
-            <Separator />
-            <div className='flex justify-start gap-[6px]'>
-              {!hideLabel && (
-                <p className='not-italic font-medium text-[10px] text-light-grey'>
-                  INCOMPLETE FIELDS:{' '}
-                </p>
-              )}
-              <span className='not-italic font-medium text-[10px] text-dark-grey leading-loose'>
-                {count}
-              </span>
-            </div>
-            {count === 'ALL' ? null : children}
-          </Link>
-        </div>
-      )}
-    </>
-  );
-}
-
-function StepCompleted() {
-  return (
-    <div className='h-full w-full flex justify-center items-center bg-[#EEF0DD] mt-[20px]'>
-      <StepCompletedIllustration />
-    </div>
-  );
-}
-
-const Separator = () => {
-  return <div className='border-t-2 border-b-0 w-full'></div>;
-};
-
-PreviewCard.propTypes = {
-  title: PropTypes.string,
-  link: PropTypes.any,
-  count: PropTypes.any,
-  hide: PropTypes.any,
-  children: PropTypes.any,
-};
