@@ -346,9 +346,8 @@ export default function BankingManual() {
         },
       )
       .then(({ data }) => {
-        const newData = data.map((item) => {
-          return { label: item.branch, value: item.branch };
-        });
+        const newData = data.map(({ branch }) => ({ label: branch, value: branch }));
+        newData.sort((a, b) => a.label.localeCompare(b.label));
         setBranchData(newData);
       })
       .catch((err) => {
