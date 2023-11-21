@@ -101,7 +101,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
       {values?.applicants?.[activeIndex]?.work_income_detail?.income_proof === 'PAN ID' && (
         <TextInput
           label='Enter PAN number'
-          placeholder='EG ABCD1256D'
+          placeholder='EG: ABCD1256D'
           required
           name={`applicants[${activeIndex}].work_income_detail.pan_number`}
           value={values?.applicants?.[activeIndex]?.work_income_detail?.pan_number}
