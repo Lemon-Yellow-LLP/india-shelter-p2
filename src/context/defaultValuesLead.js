@@ -188,7 +188,6 @@ export const defaultValuesLead = {
         current_city: '',
         current_state: '',
         current_no_of_year_residing: null,
-        additional_type_of_residence: '',
         additional_flat_no_building_name: '',
         additional_street_area_locality: '',
         additional_town: '',
