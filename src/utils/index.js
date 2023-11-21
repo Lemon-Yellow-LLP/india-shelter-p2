@@ -26,7 +26,8 @@ export const fieldLabels = {
   selected_address_proof: 'Address proof',
   address_proof_number: 'Address proof number',
   gender: 'Gender',
-  father_name: `Father/Husband's name`,
+  father_name: `Father's name`,
+  spouse_name: `Spouse's name`,
   mother_name: `Mother's name`,
   marital_status: 'Marital Status',
   religion: 'Religion',
@@ -52,6 +53,7 @@ export const fieldLabels = {
   additional_state: 'Additional State',
   additional_no_of_year_residing: 'Additional No. of Year Residing',
   additional_address_same_as_current: ' Additional address is same as Current address',
+  additional_type_of_residence: 'Type of address',
 
   profession: 'Profession',
   company_name: 'Company Name',
@@ -75,6 +77,11 @@ export const fieldLabels = {
   pention_amount: 'Pention Amount',
   extra_company_name: 'Other Company Name',
   extra_industries: 'Other Industries',
+  no_of_employees: 'No. of employees',
+  udyam_number: 'Udyam number',
+  income_proof: 'Income proof',
+  salary_per_month: 'Salary per month',
+  pan_number: 'PAN number',
 
   // reference
   reference_1_address: 'Reference 1 address',
