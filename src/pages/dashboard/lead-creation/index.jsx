@@ -1,7 +1,7 @@
-import React, { lazy, useEffect, useState } from 'react';
-import { Route, Routes, useParams, useNavigate } from 'react-router-dom';
-import SwipeableDrawerComponent from '../../../components/SwipeableDrawer/LeadDrawer';
-import BRE_ONE from './bre-screen';
+import { lazy, useEffect, useState } from 'react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import Qualifier from './Qualifier';
+import Eligibility from './Eligibility';
 import Preview from './preview';
 import { Snackbar } from '@mui/material';
 import { useSearchParams, useLocation } from 'react-router-dom';
@@ -19,8 +19,6 @@ const PropertyDetails = lazy(() => import('./property-details'));
 const UploadDocuments = lazy(() => import('./upload-documents'));
 
 const LeadCreationRoutes = () => {
-  const params = useParams();
-
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -113,12 +111,13 @@ const LeadCreationRoutes = () => {
 
   return (
     <>
-      {params['*'] === 'qualifier' ||
+      {/* {params['*'] === 'applicant-details' ||
+      params['*'] === 'qualifier' ||
       params['*'] === 'lnt-charges' ||
       params['*'] === 'banking-details/manual' ||
       params['*'] === 'banking-details/account-aggregator' ? null : (
         <SwipeableDrawerComponent />
-      )}
+      )} */}
       <Routes>
         <Route index element={<ApplicantDetails />} />
         <Route path='applicant-details' element={<ApplicantDetails />} />
@@ -130,9 +129,10 @@ const LeadCreationRoutes = () => {
         <Route path='personal-details' element={<PersonalDetails />} />
         <Route path='reference-details' element={<ReferenceDetails />} />
         <Route path='work-income-details' element={<WorkIncomeDetails />} />
-        <Route path='qualifier' element={<BRE_ONE />} />
+        <Route path='qualifier' element={<Qualifier />} />
         <Route path='property-details' element={<PropertyDetails />} />
         <Route path='upload-documents' element={<UploadDocuments />} />
+        <Route path='eligibility' element={<Eligibility />}></Route>
         <Route path='preview' element={<Preview />} />
         <Route path='*' element={<h1>404, Page not found!</h1>} />
       </Routes>

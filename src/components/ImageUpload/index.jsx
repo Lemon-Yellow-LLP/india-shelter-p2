@@ -1,8 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
-import { editFieldsById, getApplicantById } from '../../global';
+import { editDoc, editFieldsById, getApplicantById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 function ImageUpload({
   files,
@@ -14,10 +15,14 @@ function ImageUpload({
   label,
   hint,
   noBorder,
+  setLatLong,
+  imageArrayBorder, //in address proof of upload page there is no border for immage array but in salary slip there is border so when you want to add border to immage array just pass true to this prop
+  errorMessage,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
-  const [message, setMessage] = useState();
+  const { token } = useContext(AuthContext);
+  const [message, setMessage] = useState(errorMessage);
   const [loader, setLoader] = useState(false);
 
   const [show, setShow] = useState(false);
@@ -30,18 +35,27 @@ function ImageUpload({
 
     let file = e.target.files;
 
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
+    if (file.length !== 0) {
+      for (let i = 0; i < file.length; i++) {
+        const fileType = file[i]['type'];
 
-      const validImageTypes = ['image/jpeg'];
+        const validImageTypes = ['image/jpeg'];
 
-      if (validImageTypes.includes(fileType)) {
-        setSingleFile(file[i]);
-        setFile([...files, file[i]]);
-      } else {
-        setLoader(false);
-        setMessage('File format not supported');
+        if (validImageTypes.includes(fileType)) {
+          if (file[i].size <= 5000000) {
+            setSingleFile(file[i]);
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File size should be less than 5MB');
+          }
+        } else {
+          setLoader(false);
+          setMessage('File format not supported');
+        }
       }
+    } else {
+      setLoader(false);
     }
   };
 
@@ -50,39 +64,32 @@ function ImageUpload({
 
     setLoader(true);
 
-    let userLocation = navigator.geolocation;
-
-    if (userLocation) {
-      userLocation.getCurrentPosition(success);
-    } else {
-      ('The geolocation API is not supported by your browser.');
-    }
-
-    function success(data) {
-      let lat = data.coords.latitude;
-      let long = data.coords.longitude;
-
-      setLat(lat);
-      setLong(long);
-    }
-
     let file = e.target.files;
 
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
+    if (file.length !== 0) {
+      for (let i = 0; i < file.length; i++) {
+        const fileType = file[i]['type'];
 
-      const validImageTypes = ['image/jpeg'];
+        const validImageTypes = ['image/jpeg'];
 
-      if (validImageTypes.includes(fileType)) {
-        setEdit({
-          file: file[i],
-          id: id,
-        });
-        setFile([...files, file[i]]);
-      } else {
-        setLoader(false);
-        setMessage('File format not supported');
+        if (validImageTypes.includes(fileType)) {
+          if (file[i].size <= 5000000) {
+            setEdit({
+              file: file[i],
+              id: id,
+            });
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File size should be less than 5MB');
+          }
+        } else {
+          setLoader(false);
+          setMessage('File format not supported');
+        }
       }
+    } else {
+      setLoader(false);
     }
   };
 
@@ -91,8 +98,23 @@ function ImageUpload({
 
     setFile(files.filter((x) => x.name !== id));
 
+    await editDoc(
+      id,
+      { active: false },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+
     const applicant = await getApplicantById(
-      values?.applicants?.[activeIndex]?.applicant_details.id,
+      values?.applicants?.[activeIndex]?.applicant_details?.id,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
 
     const document_meta = applicant.document_meta;
@@ -112,7 +134,7 @@ function ImageUpload({
     const edited_applicant = [...edited_photos, edited_photo];
 
     const new_edited_applicant = await editFieldsById(
-      values?.applicants?.[activeIndex]?.applicant_details.id,
+      values?.applicants?.[activeIndex]?.applicant_details?.id,
       'applicant',
       {
         document_meta: { ...document_meta, [type]: edited_applicant },
@@ -167,6 +189,26 @@ function ImageUpload({
   useEffect(() => {
     uploads && setLoader(false);
   }, [uploads]);
+
+  useEffect(() => {
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      ('The geolocation API is not supported by your browser.');
+    }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+
+      setLatLong({
+        lat: lat,
+        long: long,
+      });
+    }
+  }, []);
 
   return (
     <div className='w-full'>
@@ -257,7 +299,13 @@ function ImageUpload({
 
       {uploads && !loader ? (
         <>
-          <div className='flex justify-start overflow-auto'>
+          <div
+            className={
+              imageArrayBorder
+                ? 'flex justify-start overflow-auto p-2 border border-[#D9D9D9] rounded-lg'
+                : 'flex justify-start overflow-auto'
+            }
+          >
             <div className='flex gap-2 my-2'>
               <div
                 style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
@@ -304,8 +352,8 @@ function ImageUpload({
               <div className='flex gap-2 h-[85px]'>
                 {uploads.data.map((upload, index) => {
                   return (
-                    <div key={index} className='overflow-hidden rounded-lg relative w-[68px]'>
-                      <button className='absolute right-0 top-0 z-20 w-4 h-4'>
+                    <div key={index} className='rounded-lg relative w-[68px]'>
+                      <button className='absolute right-[-4px] top-[-4px] z-10 w-4 h-4'>
                         <svg
                           width='16'
                           height='16'
@@ -333,7 +381,7 @@ function ImageUpload({
                       </button>
 
                       <div className='relative rounded-md h-full w-full'>
-                        <div className='absolute h-full w-full bg-black opacity-40'></div>
+                        <div className='absolute h-full w-full bg-black opacity-40 rounded-lg'></div>
                         <button
                           className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
                           onClick={() => {
@@ -361,7 +409,7 @@ function ImageUpload({
                         <img
                           src={upload.document_fetch_url}
                           alt='Gigs'
-                          className='object-cover object-center h-full w-full'
+                          className='object-cover object-center h-full w-full rounded-lg'
                         />
                       </div>
                     </div>

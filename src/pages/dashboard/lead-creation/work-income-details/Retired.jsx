@@ -3,10 +3,12 @@ import { LeadContext } from '../../../../context/LeadContextProvider';
 import TextInput from '../../../../components/TextInput';
 import { CurrencyInput } from '../../../../components';
 import { editFieldsById } from '../../../../global';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus }) {
   const { values, errors, handleBlur, touched, setFieldValue, activeIndex } =
     useContext(LeadContext);
+  const { token } = useContext(AuthContext);
 
   return (
     <>
@@ -32,12 +34,30 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
                 pention_amount:
                   values?.applicants?.[activeIndex]?.work_income_detail?.pention_amount,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             setRequiredFieldsStatus((prev) => ({
               ...prev,
               ['pention_amount']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                pention_amount: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -51,12 +71,14 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
             }
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInput
         type='number'
         label='No. of current loan(s)'
         placeholder='Eg: 1'
+        pattern='\d*'
         required
         name={`applicants[${activeIndex}].work_income_detail.no_current_loan`}
         value={values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
@@ -64,19 +86,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
         touched={touched?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan}
         onBlur={(e) => {
           handleBlur(e);
-          if (values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0) {
-            setFieldValue(`applicants[${activeIndex}].work_income_detail.ongoing_emi`, null);
-            editFieldsById(
-              values?.applicants?.[activeIndex]?.work_income_detail?.id,
-              'work-income',
-              {
-                ongoing_emi: null,
-              },
-            );
-          }
+
           if (
             !errors?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan &&
-            values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan
+            (values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan ||
+              values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0)
           ) {
             editFieldsById(
               values?.applicants?.[activeIndex]?.work_income_detail?.id,
@@ -86,12 +100,67 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
                   values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan,
                 ),
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
+
+            setRequiredFieldsStatus((prev) => ({
+              ...prev,
+              no_current_loan: true,
+            }));
+
+            if (e.target.value == 0) {
+              setFieldValue(`applicants[${activeIndex}].work_income_detail.ongoing_emi`, '');
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                'work-income',
+                {
+                  ongoing_emi: null,
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
+
+              setRequiredFieldsStatus((prev) => {
+                return {
+                  ...prev,
+                  no_current_loan: true,
+                  ongoing_emi: true,
+                };
+              });
+            } else if (
+              errors?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi ||
+              !values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi
+            ) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ongoing_emi: false,
+              }));
+            }
           } else {
             setRequiredFieldsStatus((prev) => ({
               ...prev,
               ['no_current_loan']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                no_current_loan: 0,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -102,13 +171,13 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
           }
 
           setFieldValue(e.currentTarget.name, value && parseInt(value));
-          if (!requiredFieldsStatus['no_current_loan']) {
-            setRequiredFieldsStatus((prev) => ({
-              ...prev,
-              ['no_current_loan']: true,
-            }));
-          }
+
+          setRequiredFieldsStatus((prev) => ({
+            ...prev,
+            no_current_loan: false,
+          }));
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <CurrencyInput
@@ -136,12 +205,30 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
               {
                 ongoing_emi: values?.applicants?.[activeIndex]?.work_income_detail?.ongoing_emi,
               },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             );
           } else {
             setRequiredFieldsStatus((prev) => ({
               ...prev,
               ['ongoing_emi']: false,
             }));
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                ongoing_emi: '',
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
           }
         }}
         onChange={(e) => {
@@ -157,6 +244,11 @@ export default function Retired({ requiredFieldsStatus, setRequiredFieldsStatus 
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
         disabled={
+          values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0
+            ? true
+            : false || values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+        }
+        labelDisabled={
           values?.applicants?.[activeIndex]?.work_income_detail?.no_current_loan == 0 ? true : false
         }
       />

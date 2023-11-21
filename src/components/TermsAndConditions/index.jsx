@@ -37,11 +37,11 @@ const TermsAndConditions = ({ show, setShow, children, title }) => {
   );
 };
 
-export default TermsAndConditions;
-
 TermsAndConditions.propTypes = {
   show: PropTypes.bool.isRequired,
   setShow: PropTypes.func.isRequired,
   children: PropTypes.elementType,
   title: PropTypes.string,
 };
+
+export default TermsAndConditions;

@@ -23,13 +23,9 @@ import DrawerStepBanking from './DrawerStepBanking';
 import QualifierStep from './QualifierStep';
 import EligibilityStep from './EligibilityStep';
 import UploadSteps from './UplodSteps';
+import { AuthContext } from '../../../context/AuthContextProvider';
 
 const drawerBleeding = 0;
-
-const Root = styled('div')(({ theme }) => ({
-  height: '100%',
-  backgroundColor: theme.palette.mode === 'light' ? grey[100] : theme.palette.background.default,
-}));
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'light' ? '#fff' : grey[800],
@@ -74,21 +70,22 @@ export default function SwipeableDrawerComponent() {
     setActiveIndex,
     coApplicantStepsProgress,
     setValues,
+    drawerTabIndex,
+    setDrawerTabIndex,
+    primaryIndex,
+    setPrimaryIndex,
+    activeCoApplicantIndex,
+    setActiveCoApplicantIndex,
+    coApplicants,
   } = useContext(LeadContext);
 
-  const theme = useTheme();
+  const { token } = useContext(AuthContext);
 
-  const [value, setValue] = useState(0);
+  const theme = useTheme();
 
   const [open, setOpen] = useState(false);
 
   const [toggle, setToggle] = useState(false);
-
-  const [primaryIndex, setPrimaryIndex] = useState(0);
-
-  const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
-
-  const [coApplicants, setCoApplicants] = useState([]);
 
   const [changePrimaryAlert, setChangePrimaryAlert] = useState(false);
 
@@ -103,44 +100,21 @@ export default function SwipeableDrawerComponent() {
   };
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setDrawerTabIndex(newValue);
   };
 
   const handleChangeIndex = useCallback((index) => {
-    setValue(index);
+    setDrawerTabIndex(index);
   }, []);
 
   const toggleDrawer = () => {
     setDrawerOpen((prev) => !prev);
   };
 
-  useEffect(() => {
-    let newData = [];
-
-    values.applicants.map((e, index) => {
-      if (!e.applicant_details.is_primary) {
-        newData.push({
-          label: e.applicant_details.first_name,
-          value: index,
-        });
-      }
-    });
-
-    setCoApplicants(newData);
-
-    setActiveCoApplicantIndex(newData?.[0]?.value);
-
-    values.applicants.map((e, index) => {
-      if (e.applicant_details.is_primary) {
-        setPrimaryIndex(index);
-      }
-    });
-  }, [values.applicants]);
-
   const handleMakePrimary = async () => {
     setToggle(true);
 
-    let newData = JSON.parse(JSON.stringify(values));
+    let newData = structuredClone(values);
 
     newData.applicants[activeCoApplicantIndex].applicant_details = {
       ...newData.applicants[activeCoApplicantIndex].applicant_details,
@@ -165,20 +139,34 @@ export default function SwipeableDrawerComponent() {
         is_primary: true,
         applicant_type: 'Primary Applicant',
       },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
 
-    await editFieldsById(values?.applicants[primaryIndex]?.applicant_details?.id, 'applicant', {
-      is_primary: false,
-      applicant_type: 'Co Applicant',
-    });
+    await editFieldsById(
+      values?.applicants[primaryIndex]?.applicant_details?.id,
+      'applicant',
+      {
+        is_primary: false,
+        applicant_type: 'Co Applicant',
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     setChangePrimaryAlert(false);
   };
 
   const handleDelete = async () => {
-    let ogData = JSON.parse(JSON.stringify(values));
+    let ogData = structuredClone(values);
 
-    let newData = JSON.parse(JSON.stringify(ogData));
+    let newData = structuredClone(ogData);
 
     newData.applicants = newData.applicants.filter((e, index) => index !== activeCoApplicantIndex);
 
@@ -197,13 +185,18 @@ export default function SwipeableDrawerComponent() {
       {
         is_deleted: true,
       },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
 
     setDeleteAlert(false);
   };
 
   return (
-    <Root>
+    <div>
       <SwipeableDrawer
         anchor='bottom'
         open={drawerOpen}
@@ -243,7 +236,9 @@ export default function SwipeableDrawerComponent() {
                 </h4>
               </div>
               <div className='flex flex-col items-end'>
-                <span className='text-base text-[#E33439] font-medium'>15%</span>
+                <span className='text-base text-[#E33439] font-medium'>
+                  {values?.lead?.extra_params?.progress}%
+                </span>
                 <span className='text-xs text-[#727376] font-normal'>Completed</span>
               </div>
             </div>
@@ -262,7 +257,7 @@ export default function SwipeableDrawerComponent() {
             }}
           >
             <Tabs
-              value={value}
+              value={drawerTabIndex}
               onChange={handleChange}
               textColor='inherit'
               variant='fullWidth'
@@ -276,13 +271,13 @@ export default function SwipeableDrawerComponent() {
 
             <SwipeableViews
               axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-              index={value}
+              index={drawerTabIndex}
               onChangeIndex={handleChangeIndex}
             >
               <TabPanel
                 className='tabPanel'
                 style={{ maxHeight: `calc(100vh - 175px)`, overflow: 'auto' }}
-                value={value}
+                value={drawerTabIndex}
                 index={0}
                 dir={theme.direction}
               >
@@ -424,14 +419,14 @@ export default function SwipeableDrawerComponent() {
                     index={primaryIndex}
                     stepIndex={11}
                     noProgress={true}
-                    lock={true}
+                    lock={values?.lead?.extra_params?.progress_without_eligibility !== 100}
                   />
                 </div>
               </TabPanel>
               <TabPanel
                 className='tabPanel'
                 style={{ height: `calc(100vh - 175px)`, overflow: 'auto' }}
-                value={value}
+                value={drawerTabIndex}
                 index={1}
                 dir={theme.direction}
               >
@@ -465,8 +460,11 @@ export default function SwipeableDrawerComponent() {
 
                             <span className='font-semibold text-[16px] leading-[24px] text-[#373435]'>
                               {
-                                values.applicants.filter((e) => !e.applicant_details.is_primary)
-                                  .length
+                                values.applicants.filter(
+                                  (e) =>
+                                    !e.applicant_details.is_primary &&
+                                    e.applicant_details.is_mobile_verified,
+                                ).length
                               }
                               <span className='text-[#96989A]'>/4</span>
                             </span>
@@ -478,18 +476,28 @@ export default function SwipeableDrawerComponent() {
                               addApplicant();
                             }}
                             className={
-                              values?.applicants.length >= 5
+                              values.applicants.filter(
+                                (e) => e.applicant_details.is_mobile_verified,
+                              ).length >= 5 ||
+                              values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                                ?.progress !== 100
                                 ? 'text-[#96989A] font-medium text-[16px]'
                                 : 'text-primary-red font-medium text-[16px]'
                             }
-                            disabled={values?.applicants.length >= 5}
+                            disabled={
+                              values.applicants.filter(
+                                (e) => e.applicant_details.is_mobile_verified,
+                              ).length >= 5 ||
+                              values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                                ?.progress !== 100
+                            }
                           >
                             + Add
                           </button>
                         </div>
-                        <span className='font-normal text-[12px] leading-[18px] text-[#727376]'>
+                        {/* <span className='font-normal text-[12px] leading-[18px] text-[#727376]'>
                           After the qualifier is complete, co-applicants can be made primary
-                        </span>
+                        </span> */}
                       </div>
 
                       {values?.applicants && values.applicants.length >= 2 ? (
@@ -512,12 +520,28 @@ export default function SwipeableDrawerComponent() {
                                 onChange={(e) => setChangePrimaryAlert(true)}
                               />
                             </div>
+
                             <div className='flex justify-end gap-2 items-center'>
                               <span className='text-[#727376] text-[12px] font-normal'>
                                 Qualifier:
-                                <span className='text-[#FF9D4A] text-[12px] font-semibold ml-[5px]'>
-                                  Amber
-                                </span>
+                                {values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.bre_101_response?.body?.Display?.red_amber_green === 'Red' ? (
+                                  <span className='text-[#E33439] text-[12px] font-semibold ml-[5px]'>
+                                    Red
+                                  </span>
+                                ) : values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                    ?.bre_101_response?.body?.Display?.red_amber_green ===
+                                  'Amber' ? (
+                                  <span className='text-[#FF9D4A] text-[12px] font-semibold ml-[5px]'>
+                                    Amber
+                                  </span>
+                                ) : values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                    ?.bre_101_response?.body?.Display?.red_amber_green ===
+                                  'Green' ? (
+                                  <span className='text-[#147257] text-[12px] font-semibold ml-[5px]'>
+                                    Green
+                                  </span>
+                                ) : null}
                               </span>
                               <button onClick={() => setDeleteAlert(true)}>
                                 <DustbinIcon />
@@ -572,7 +596,16 @@ export default function SwipeableDrawerComponent() {
                               index={activeCoApplicantIndex}
                               stepIndex={4}
                               noProgress={true}
-                              lock={true}
+                              lock={
+                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
+                                  ?.extra_params?.progress !== 100 ||
+                                values?.applicants?.[activeCoApplicantIndex]?.personal_details
+                                  ?.extra_params?.progress !== 100 ||
+                                values?.applicants?.[activeCoApplicantIndex]?.address_detail
+                                  ?.extra_params?.progress !== 100 ||
+                                values?.applicants?.[activeCoApplicantIndex]?.work_income_detail
+                                  ?.extra_params?.progress !== 100
+                              }
                             />
                             <DrawerStepBanking
                               key={5}
@@ -594,19 +627,29 @@ export default function SwipeableDrawerComponent() {
                               index={activeCoApplicantIndex}
                               stepIndex={6}
                               lock={
-                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.upload_progress !== 100
+                                values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                                  ?.progress !== 100
                               }
                             />
                           </div>
                         </div>
                       ) : (
                         <button
+                          disabled={
+                            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                              ?.progress !== 100
+                          }
                           onClick={() => {
                             setActiveCoApplicantIndex(values?.applicants?.length);
                             addApplicant();
                           }}
-                          className='w-[100%] h-[48px] border bg-[#E33439] rounded-[4px] flex items-center justify-center text-[16px] text-[white] font-normal'
+                          className={`w-[100%] h-[48px] border rounded-[4px] flex items-center justify-center text-[16px] font-normal
+                          ${
+                            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
+                              ?.progress !== 100
+                              ? 'text-[#96989A] border-[#96989A]'
+                              : 'text-white bg-[#E33439]'
+                          }`}
                         >
                           Add Co-applicant
                         </button>
@@ -618,7 +661,7 @@ export default function SwipeableDrawerComponent() {
               <TabPanel
                 className='tabPanel p-0'
                 style={{ height: `calc(80vh - 65px)`, overflow: 'auto' }}
-                value={value}
+                value={drawerTabIndex}
                 index={2}
                 dir={theme.direction}
               >
@@ -686,6 +729,6 @@ export default function SwipeableDrawerComponent() {
           </Button>
         </div>
       </DynamicDrawer>
-    </Root>
+    </div>
   );
 }

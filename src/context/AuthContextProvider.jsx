@@ -1,11 +1,11 @@
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { signInSchema } from '../schemas/index';
 import PropTypes from 'prop-types';
 
 export const defaultValues = {
   employee_code: '',
-  username: '9876543210',
+  username: import.meta.env.VITE_DEV === 'true' ? '9876543210' : '',
   password: '',
   role: '',
   first_name: '',
@@ -25,14 +25,20 @@ const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loData, setLoData] = useState(null);
+  const [phoneNumberList, setPhoneNumberList] = useState({});
   const [otpFailCount, setOtpFailCount] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
+  const [errorToastMessage, setErrorToastMessage] = useState(null);
   const [isQaulifierActivated, setIsQaulifierActivated] = useState(null);
 
   const formik = useFormik({
     initialValues: { ...defaultValues },
     validationSchema: signInSchema,
   });
+
+  useEffect(() => {
+    console.log('Lo Data', { loData, token, isAuthenticated });
+  }, [loData, token, isAuthenticated]);
 
   return (
     <AuthContext.Provider
@@ -50,6 +56,10 @@ const AuthContextProvider = ({ children }) => {
         setIsQaulifierActivated,
         loData,
         setLoData,
+        phoneNumberList,
+        setPhoneNumberList,
+        errorToastMessage,
+        setErrorToastMessage,
       }}
     >
       {children}

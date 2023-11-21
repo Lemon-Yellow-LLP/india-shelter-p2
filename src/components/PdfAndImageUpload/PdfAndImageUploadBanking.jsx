@@ -1,8 +1,6 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
-import { editFieldsById, getApplicantById } from '../../global';
-import { LeadContext } from '../../context/LeadContextProvider';
 
 function PdfAndImageUploadBanking({
   files,
@@ -17,52 +15,43 @@ function PdfAndImageUploadBanking({
   hint,
   removeImage,
   deletePDF,
+  setLatLong,
   ...props
 }) {
-  const { activeIndex, values } = useContext(LeadContext);
   const [message, setMessage] = useState();
   const [loader, setLoader] = useState(false);
 
   const [show, setShow] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
-  const [lat, setLat] = useState('');
-  const [long, setLong] = useState('');
 
   const handleFile = async (e) => {
     setMessage('');
 
     setLoader(true);
 
-    let userLocation = navigator.geolocation;
-
-    if (userLocation) {
-      userLocation.getCurrentPosition(success);
-    } else {
-      ('The geolocation API is not supported by your browser.');
-    }
-
-    function success(data) {
-      let lat = data.coords.latitude;
-      let long = data.coords.longitude;
-
-      setLat(lat);
-      setLong(long);
-    }
-
     let file = e.target.files;
 
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
+    if (file.length !== 0) {
+      for (let i = 0; i < file.length; i++) {
+        const fileType = file[i]['type'];
 
-      const validImageTypes = ['image/jpeg', 'application/pdf'];
+        const validImageTypes = ['image/jpeg', 'application/pdf'];
 
-      if (validImageTypes.includes(fileType)) {
-        setSingleFile(file[i]);
-        setFile([...files, file[i]]);
-      } else {
-        setLoader(false);
-        setMessage('File format not supported');
+        if (validImageTypes.includes(fileType)) {
+          if (file[i].size <= 5000000) {
+            setSingleFile(file[i]);
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File size should be less than 5MB');
+          }
+        } else {
+          setLoader(false);
+          setMessage('File format not supported');
+        }
       }
+    } else {
+      setLoader(false);
     }
   };
 
@@ -75,10 +64,37 @@ function PdfAndImageUploadBanking({
   }, [pdf]);
 
   const editImage = (e, id) => {
+    // console.log(id);
     setMessage('');
 
     setLoader(true);
 
+    let file = e.target.files;
+
+    for (let i = 0; i < file.length; i++) {
+      const fileType = file[i]['type'];
+
+      const validImageTypes = ['image/jpeg'];
+
+      if (validImageTypes.includes(fileType)) {
+        if (file[i].size <= 5000000) {
+          setEdit({
+            file: file[i],
+            id: id,
+          });
+          setFile([...files, file[i]]);
+        } else {
+          setLoader(false);
+          setMessage('File size should be less than 5MB');
+        }
+      } else {
+        setLoader(false);
+        setMessage('File format not supported');
+      }
+    }
+  };
+
+  useEffect(() => {
     let userLocation = navigator.geolocation;
 
     if (userLocation) {
@@ -91,29 +107,12 @@ function PdfAndImageUploadBanking({
       let lat = data.coords.latitude;
       let long = data.coords.longitude;
 
-      setLat(lat);
-      setLong(long);
+      setLatLong({
+        lat: lat,
+        long: long,
+      });
     }
-
-    let file = e.target.files;
-
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
-
-      const validImageTypes = ['image/jpeg'];
-
-      if (validImageTypes.includes(fileType)) {
-        setEdit({
-          file: file[i],
-          id: id,
-        });
-        setFile([...files, file[i]]);
-      } else {
-        setLoader(false);
-        setMessage('File format not supported');
-      }
-    }
-  };
+  }, []);
 
   return (
     <div className='w-full'>
@@ -131,7 +130,7 @@ function PdfAndImageUploadBanking({
         />
       )}
 
-      {!files.length ? (
+      {files?.length === 0 ? (
         <div className=''>
           <div className='bg-white flex items-center justify-center w-full'>
             <label
@@ -199,9 +198,9 @@ function PdfAndImageUploadBanking({
         </div>
       ) : null}
 
-      {uploads && !pdf && !loader ? (
+      {files?.length && files?.length !== 0 && uploads && !pdf && !loader ? (
         <>
-          <div className='flex justify-start overflow-auto'>
+          <div className='flex justify-start overflow-auto p-2 border border-[#D9D9D9] rounded-lg'>
             <div className='flex gap-2 my-2'>
               <div
                 style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
@@ -246,8 +245,8 @@ function PdfAndImageUploadBanking({
               <div className='flex gap-2 h-[85px]'>
                 {uploads.data.map((upload, index) => {
                   return (
-                    <div key={index} className='overflow-hidden rounded-lg relative w-[68px]'>
-                      <button className='absolute right-0 top-0 z-20 w-4 h-4'>
+                    <div key={index} className='rounded-lg relative w-[68px]'>
+                      <button className='absolute right-[-4px] top-[-4px] z-20 w-4 h-4'>
                         <svg
                           width='16'
                           height='16'
@@ -275,7 +274,7 @@ function PdfAndImageUploadBanking({
                       </button>
 
                       <div className='relative rounded-md h-full w-full'>
-                        <div className='absolute h-full w-full bg-black opacity-40'></div>
+                        <div className='absolute h-full w-full bg-black opacity-40 rounded-lg'></div>
                         <button
                           className='absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'
                           onClick={() => {
@@ -303,7 +302,7 @@ function PdfAndImageUploadBanking({
                         <img
                           src={upload.document_fetch_url}
                           alt='Gigs'
-                          className='object-cover object-center h-full w-full'
+                          className='object-cover object-center h-full w-full rounded-lg'
                         />
                       </div>
                     </div>
@@ -316,8 +315,6 @@ function PdfAndImageUploadBanking({
                 setShowPopUp={setShow}
                 index={previewFile}
                 callback={removeImage}
-                lat={lat}
-                long={long}
                 photos={uploads.data}
               />
             </div>

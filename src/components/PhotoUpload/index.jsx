@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
-import { editFieldsById, getApplicantById } from '../../global';
+import { editDoc, editFieldsById, getApplicantById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 function PhotoUpload({
   files,
@@ -12,49 +13,44 @@ function PhotoUpload({
   setUploads,
   label,
   hint,
+  setLatLong,
+  errorMessage,
+  disabled,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
-  const [message, setMessage] = useState();
+  const { token } = useContext(AuthContext);
+  const [message, setMessage] = useState(errorMessage);
   const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
-  const [lat, setLat] = useState('');
-  const [long, setLong] = useState('');
 
   const handleFile = async (e) => {
     setMessage('');
 
     setLoader(true);
 
-    let userLocation = navigator.geolocation;
-
-    if (userLocation) {
-      userLocation.getCurrentPosition(success);
-    } else {
-      ('The geolocation API is not supported by your browser.');
-    }
-
-    function success(data) {
-      let lat = data.coords.latitude;
-      let long = data.coords.longitude;
-
-      setLat(lat);
-      setLong(long);
-    }
-
     let file = e.target.files;
 
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
+    if (file.length !== 0) {
+      for (let i = 0; i < file.length; i++) {
+        const fileType = file[i]['type'];
 
-      const validImageTypes = ['image/jpeg'];
+        const validImageTypes = ['image/jpeg'];
 
-      if (validImageTypes.includes(fileType)) {
-        setSingleFile(file[0]);
-        setFile([...files, file[i]]);
-      } else {
-        setMessage('File format not supported');
+        if (validImageTypes.includes(fileType)) {
+          if (file[i].size <= 5000000) {
+            setSingleFile(file[i]);
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File size should be less than 5MB');
+          }
+        } else {
+          setMessage('File format not supported');
+        }
       }
+    } else {
+      setLoader(false);
     }
   };
 
@@ -63,8 +59,23 @@ function PhotoUpload({
 
     setFile(files.filter((x) => x.name !== id));
 
+    await editDoc(
+      id,
+      { active: false },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+
     const applicant = await getApplicantById(
-      values?.applicants?.[activeIndex]?.applicant_details.id,
+      values?.applicants?.[activeIndex]?.applicant_details?.id,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
     const document_meta = applicant.document_meta;
 
@@ -83,7 +94,7 @@ function PhotoUpload({
     const edited_applicant = [...edited_photos, edited_photo];
 
     const new_edited_applicant = await editFieldsById(
-      values?.applicants?.[activeIndex]?.applicant_details.id,
+      values?.applicants?.[activeIndex]?.applicant_details?.id,
       'applicant',
       {
         document_meta: { ...document_meta, [type]: edited_applicant },
@@ -107,6 +118,26 @@ function PhotoUpload({
   useEffect(() => {
     uploads && setLoader(false);
   }, [uploads]);
+
+  useEffect(() => {
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      ('The geolocation API is not supported by your browser.');
+    }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+
+      setLatLong({
+        lat: lat,
+        long: long,
+      });
+    }
+  }, []);
 
   return (
     <div className='w-full'>
@@ -178,7 +209,11 @@ function PhotoUpload({
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
             {message}
           </span>
-          <div className='bg-white border-x border-y border-stroke rounded-lg p-2 flex justify-between mt-1'>
+          <div
+            className={` border-x border-y border-stroke rounded-lg p-2 flex justify-between mt-1 ${
+              disabled ? 'bg-stroke pointer-events-none' : 'bg-white pointer-events-auto'
+            }`}
+          >
             <div className='flex gap-2 items-center'>
               <div className='relative rounded-md h-10 w-10'>
                 <div className='absolute h-full w-full bg-black opacity-40'></div>
@@ -217,8 +252,6 @@ function PhotoUpload({
                 index={0}
                 singlePhoto={uploads.data}
                 callback={removeImage}
-                lat={lat}
-                long={long}
               />
 
               <div>
@@ -229,16 +262,19 @@ function PhotoUpload({
             </div>
 
             <button
-              onClick={() => {
-                removeImage(uploads.data.id);
-              }}
+            // onClick={() => {
+            //   removeImage(uploads.data.id);
+            // }}
             >
               <svg
                 width='24'
-                height='24'
+                height='40'
                 viewBox='0 0 24 24'
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'
+                onClick={() => {
+                  removeImage(uploads.data.id);
+                }}
               >
                 <path
                   d='M6.61905 8.1V16.6C6.61905 18.4778 8.06879 20 9.85714 20H14.7143C16.5026 20 17.9524 18.4778 17.9524 16.6V8.1M13.9048 10.65V15.75M10.6667 10.65L10.6667 15.75M15.5238 5.55L14.3854 3.75701C14.0851 3.28407 13.5796 3 13.0383 3H11.5332C10.9918 3 10.4863 3.28407 10.186 3.75701L9.04762 5.55M15.5238 5.55H9.04762M15.5238 5.55H19.5714M9.04762 5.55H5'

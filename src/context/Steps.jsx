@@ -22,7 +22,7 @@ export const applicantSteps = [
   },
   {
     title: 'Personal Details',
-    description: 'OCR, e-KYC, Address',
+    description: 'OCR, e-KYC, Manual',
     url: '/lead/personal-details',
     lock: false,
     Icon: PersonalDetailsIcon,
@@ -30,7 +30,7 @@ export const applicantSteps = [
   },
   {
     title: 'Address Details',
-    description: 'OCR, e-KYC, Address',
+    description: 'Current / Additional / Communication Address',
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,
@@ -62,7 +62,7 @@ export const applicantSteps = [
   },
   {
     title: 'Property Details',
-    description: 'Profession details, Family Income',
+    description: 'Property Identification, Property address',
     url: '/lead/property-details',
     lock: true,
     Icon: PropertyDetailsIcon,
@@ -74,6 +74,7 @@ export const applicantSteps = [
     url: '/lead/banking-details',
     lock: true,
     Icon: BankingDetailsIcon,
+    name: 'banking_details',
   },
   {
     title: 'Reference Details',
@@ -118,7 +119,7 @@ export const coApplicantSteps = [
   },
   {
     title: 'Personal Details',
-    description: 'OCR, e-KYC, Address',
+    description: 'OCR, e-KYC, Manual',
     url: '/lead/personal-details',
     lock: false,
     Icon: PersonalDetailsIcon,
@@ -126,7 +127,7 @@ export const coApplicantSteps = [
   },
   {
     title: 'Address Details',
-    description: 'OCR, e-KYC, Address',
+    description: 'Current / Additional / Communication Address',
     url: '/lead/address-details',
     lock: true,
     Icon: AddressDetailsIcon,
@@ -146,6 +147,7 @@ export const coApplicantSteps = [
     url: '/lead/qualifier',
     hideProgress: true,
     Icon: QualifierIcon,
+    name: 'qualifier',
   },
   {
     title: 'Banking Details',
@@ -153,6 +155,7 @@ export const coApplicantSteps = [
     url: '/lead/banking-details',
     lock: true,
     Icon: BankingDetailsIcon,
+    name: 'banking_details',
   },
   {
     title: 'Upload Documents',
@@ -160,6 +163,6 @@ export const coApplicantSteps = [
     url: '/lead/upload-documents',
     lock: true,
     Icon: UploadIcon,
-    name: 'upload_documents',
+    name: 'applicant_details',
   },
 ];

@@ -23,7 +23,7 @@ export default function EligibilityStep({ details, steps, index, stepIndex, noPr
       className={`flex flex-col w-[100%] max-h-[77px] rounded-lg border p-2 justify-between ${
         lock
           ? 'bg-[#FDECE8] border-[#E33439]'
-          : values?.applicants?.[index]?.applicant_details?.extra_params?.[details.name]
+          : values?.applicants?.[index]?.applicant_details?.extra_params?.eligibility
           ? 'bg-[#D9F2CB] border-[#147257]'
           : 'bg-[#FBF7D9] border-[#E1CE3F]'
       } `}
@@ -40,7 +40,7 @@ export default function EligibilityStep({ details, steps, index, stepIndex, noPr
                 Complete all the steps to activate
               </span>
             </>
-          ) : values?.applicants?.[index]?.applicant_details?.extra_params?.[details.name] ? (
+          ) : values?.applicants?.[index]?.applicant_details?.extra_params?.eligibility ? (
             <>
               <span className='text-[14px] font-normal'>Eligibility completed</span>
             </>
@@ -60,7 +60,7 @@ export default function EligibilityStep({ details, steps, index, stepIndex, noPr
         {!details.hideProgress ? (
           !lock && steps ? (
             <>
-              {values?.applicants?.[index]?.applicant_details?.extra_params?.[details.name] ? (
+              {values?.applicants?.[index]?.applicant_details?.extra_params?.eligibility ? (
                 <span className='text-[#147257] text-[10px] font-medium border border-[#147257] bg-[#D9F2CB] rounded-[12px] h-[23px] w-[81px] flex items-center justify-center'>
                   Done
                 </span>
@@ -78,9 +78,7 @@ export default function EligibilityStep({ details, steps, index, stepIndex, noPr
 
       {!lock && !noProgress ? (
         <ProgressBar
-          progress={
-            values?.applicants?.[index]?.applicant_details?.extra_params?.[details.name] || 0
-          }
+          progress={values?.applicants?.[index]?.applicant_details?.extra_params?.eligibility || 0}
         />
       ) : null}
     </div>

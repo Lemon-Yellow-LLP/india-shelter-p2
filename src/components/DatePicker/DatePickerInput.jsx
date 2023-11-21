@@ -36,6 +36,7 @@ const DatePickerInput = forwardRef(function DatePickerInput(
           ref={reference}
           onBlur={onBlur}
           onInput={(e) => {
+            e.currentTarget.value = e.currentTarget.value.replace(/[^0-9/]/g, '');
             let value = e.currentTarget.value;
             if (value.length >= 2 && value.charAt(2) !== '/') {
               value = value.slice(0, 2) + '/' + value.slice(2);
@@ -94,11 +95,11 @@ const DatePickerInput = forwardRef(function DatePickerInput(
   );
 });
 
-export default DatePickerInput;
-
 DatePickerInput.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
   error: PropTypes.string,
   datepickerref: PropTypes.object,
 };
+
+export default DatePickerInput;

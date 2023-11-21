@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import BackIcon2 from '../../assets/icons/back-2';
-import { IconBack, IconClose } from '../../assets/icons';
-import { Button } from '@mui/material';
+import { IconClose } from '../../assets/icons';
+import { AuthContext } from '../../context/AuthContextProvider';
+import { useContext } from 'react';
 
 export const pages = [
   '/lead/applicant-details',
@@ -9,17 +9,29 @@ export const pages = [
   '/lead/address-details',
   '/lead/work-income-details',
   '/lead/qualifier',
+  '/lead/lnt-charges',
   '/lead/property-details',
+  '/lead/banking-details',
   '/lead/reference-details',
   '/lead/upload-documents',
   '/lead/preview',
   '/lead/eligibility',
 ];
 
-export default function Topbar({ title, id, progress, showBack = false, showClose = true }) {
+export default function Topbar({
+  title,
+  id,
+  progress,
+  showBack = false,
+  showClose = true,
+  coApplicant,
+  handleBack,
+  coApplicantName,
+}) {
   const navigate = useNavigate();
 
   const location = useLocation();
+  const { setPhoneNumberList } = useContext(AuthContext);
 
   return (
     <>
@@ -28,7 +40,13 @@ export default function Topbar({ title, id, progress, showBack = false, showClos
         className='sticky inset-0 bg-white h-fit flex items-start px-4 py-3 border border-[#ECECEC] z-[200]'
       >
         {showBack ? (
-          <button onClick={() => navigate(-1)} className='mt-2 mr-3'>
+          <button
+            onClick={() => {
+              navigate(-1);
+              handleBack();
+            }}
+            className='mt-2 mr-3'
+          >
             <svg
               xmlns='http://www.w3.org/2000/svg'
               width='14'
@@ -51,13 +69,27 @@ export default function Topbar({ title, id, progress, showBack = false, showClos
           <h3 className='truncate'>{title}</h3>
           <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
             APP ID:
-            <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey pl-1'>
+            <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey pl-1 pr-2'>
               {id}
             </span>
+            {coApplicant ? (
+              <>
+                <span className='text-[#D9D9D9]'>|</span>
+                <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey pl-2'>
+                  {coApplicantName}
+                </span>
+              </>
+            ) : null}
           </p>
         </div>
         {showClose ? (
-          <button onClick={() => navigate('/')} className=''>
+          <button
+            onClick={() => {
+              setPhoneNumberList({});
+              navigate('/');
+            }}
+            className=''
+          >
             <IconClose />
           </button>
         ) : null}

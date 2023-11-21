@@ -11,6 +11,9 @@ import axios from 'axios';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 import ErrorTost from '../../../../components/ToastMessage/ErrorTost';
+import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export const bankingMode = [
   {
@@ -35,9 +38,10 @@ const BankingDetails = () => {
     setBankSuccessTost,
     bankErrorTost,
     setBankErrorTost,
+    setCurrentStepIndex,
   } = useContext(LeadContext);
 
-  console.log(activeIndex);
+  const { token } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -72,10 +76,28 @@ const BankingDetails = () => {
     });
     setValues(newData);
 
-    editFieldsById(id, 'banking', { is_primary: checked });
+    editFieldsById(
+      id,
+      'banking',
+      { is_primary: checked },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     if (currentPrimaryId) {
-      editFieldsById(currentPrimaryId, 'banking', { is_primary: false });
+      editFieldsById(
+        currentPrimaryId,
+        'banking',
+        { is_primary: false },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
     }
   };
 
@@ -96,6 +118,11 @@ const BankingDetails = () => {
           values?.applicants?.[activeIndex]?.applicant_details?.id,
           'applicant',
           newData,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
       } else {
         setFieldValue(
@@ -108,16 +135,65 @@ const BankingDetails = () => {
           values?.applicants?.[activeIndex]?.applicant_details?.id,
           'applicant',
           newData,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
       }
     }
   }, [values?.applicants?.[activeIndex]?.banking_details]);
 
   const handleDelete = async () => {
-    await editFieldsById(deleteId, 'banking', { extra_params: { is_deleted: true } });
+    await editFieldsById(
+      deleteId,
+      'banking',
+      { extra_params: { is_deleted: true } },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
     let newBanking = values?.applicants?.[activeIndex]?.banking_details;
     newBanking = newBanking.filter((account) => account.id !== deleteId);
     setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
+    if (newBanking?.length) {
+      setFieldValue(
+        `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
+        100,
+      );
+      let newData = { ...values?.applicants?.[activeIndex]?.applicant_details };
+      newData.extra_params.banking_progress = 100;
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+        'applicant',
+        newData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+    } else {
+      setFieldValue(
+        `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
+        0,
+      );
+      let newData = { ...values?.applicants?.[activeIndex]?.applicant_details };
+      newData.extra_params.banking_progress = 0;
+      editFieldsById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+        'applicant',
+        newData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+    }
     setOpenPopup(false);
   };
 
@@ -129,8 +205,13 @@ const BankingDetails = () => {
     };
     await axios
       .post(
-        `https://lo.scotttiger.in/api/applicant/penny-drop/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+        `https://uatagile.indiashelter.in/api/applicant/penny-drop/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
         { ...data },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       )
       .then(({ data }) => {
         setLoading(false);
@@ -151,17 +232,24 @@ const BankingDetails = () => {
   };
 
   const fetchBanking = async () => {
-    await axios
-      .get(
-        `https://lo.scotttiger.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
-      )
-      .then(({ data }) => {
-        const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
-        setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (values?.applicants?.[activeIndex]?.applicant_details?.id) {
+      await axios
+        .get(
+          `https://uatagile.indiashelter.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+        .then(({ data }) => {
+          const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
+          setFieldValue(`applicants[${activeIndex}].banking_details`, newBanking);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   useEffect(() => {
@@ -170,10 +258,22 @@ const BankingDetails = () => {
 
   return (
     <>
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
+        {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+          <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        ) : (
+          <Topbar
+            title='Adding Co-applicant'
+            id={values?.lead?.id}
+            showClose={false}
+            showBack={true}
+            coApplicant={true}
+            coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
+          />
+        )}
         <ToastMessage message={bankSuccessTost} setMessage={setBankSuccessTost} />
         <ErrorTost message={bankErrorTost} setMessage={setBankErrorTost} />
-        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
+        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
           <div className='flex flex-col gap-2'>
             <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
               Add a bank account <span className='text-primary-red text-xs'>*</span>
@@ -227,16 +327,41 @@ const BankingDetails = () => {
           ) : null}
         </div>
 
-        <div className='bottom-0 fixed'>
-          <PreviousNextButtons
-            linkPrevious='/lead/property-details'
-            linkNext='/lead/reference-details'
-          />
-        </div>
+        <PreviousNextButtons
+          linkPrevious={
+            values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+              ? '/lead/property-details'
+              : '/lead/qualifier'
+          }
+          linkNext={
+            values?.applicants?.[activeIndex]?.applicant_details?.is_primary
+              ? '/lead/reference-details'
+              : '/lead/upload-documents'
+          }
+          onPreviousClick={() => {
+            if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
+              setCurrentStepIndex(6);
+            } else {
+              setCurrentStepIndex(4);
+            }
+          }}
+          onNextClick={() => {
+            if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
+              setCurrentStepIndex(8);
+            } else {
+              setCurrentStepIndex(6);
+            }
+          }}
+        />
+        <SwipeableDrawerComponent />
 
         {loading ? (
           <div className='absolute w-full h-full bg-[#00000080] z-[9000]'>
-            <LoaderDynamicText text='Verifying your bank account' textColor='white' />
+            <LoaderDynamicText
+              text='Verifying your bank account'
+              textColor='white'
+              height='100vh'
+            />
           </div>
         ) : null}
       </div>

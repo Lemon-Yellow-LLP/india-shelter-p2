@@ -16,6 +16,8 @@ import { editFieldsById, reUploadDoc, uploadDoc } from '../../../../global';
 import imageCompression from 'browser-image-compression';
 import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 import PdfAndImageUploadBanking from '../../../../components/PdfAndImageUpload/PdfAndImageUploadBanking';
+import { set } from 'date-fns';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export const entityType = [
   {
@@ -63,17 +65,6 @@ export const account_type = [
   },
 ];
 
-const defaultValues = {
-  account_number: '',
-  account_holder_name: '',
-  ifsc_code: '',
-  entity_type: '',
-  account_type: 'Savings',
-  bank_name: '',
-  branch_name: '',
-  bank_statement_image: [],
-};
-
 const validationSchema = Yup.object().shape({
   account_number: Yup.string()
     .matches(/^\d{9,18}$/, 'Enter a valid account number')
@@ -100,6 +91,8 @@ export default function BankingManual() {
     setBankErrorTost,
   } = useContext(LeadContext);
 
+  const { token } = useContext(AuthContext);
+
   const {
     values,
     setFieldValue,
@@ -110,7 +103,16 @@ export default function BankingManual() {
     setValues,
     setFieldError,
   } = useFormik({
-    initialValues: { ...defaultValues },
+    initialValues: {
+      account_number: '',
+      account_holder_name: '',
+      ifsc_code: '',
+      entity_type: '',
+      account_type: 'Savings',
+      bank_name: '',
+      branch_name: '',
+      bank_statement_image: [],
+    },
     validationSchema: validationSchema,
     onSubmit: () => {
       verify();
@@ -125,7 +127,11 @@ export default function BankingManual() {
 
   const [bankNameData, setBankNameData] = useState([]);
 
-  const [searchedIfsc, setSearchedIfsc] = useState();
+  const [searchedBank, setSearchedBank] = useState('');
+
+  const [searchedBranch, setSearchedBranch] = useState('');
+
+  const [searchedIfsc, setSearchedIfsc] = useState('');
 
   const [bankStatement, setBankStatement] = useState([]);
 
@@ -137,6 +143,8 @@ export default function BankingManual() {
     file: {},
     id: null,
   });
+
+  const [bankStatementLatLong, setBankStatementLatLong] = useState(null);
 
   const [bankStatementFile, setBankStatementFile] = useState(null);
 
@@ -168,8 +176,12 @@ export default function BankingManual() {
     const pattern = /^[A-Za-z0-9]+$/;
 
     if (pattern.test(value)) {
+      setFieldValue('bank_name', '');
+      setFieldValue('branch_name', '');
       setFieldValue(e.currentTarget.name, value.toUpperCase());
     } else if (value.length < values?.[e.currentTarget.name]?.length) {
+      setFieldValue('bank_name', '');
+      setFieldValue('branch_name', '');
       setFieldValue(e.currentTarget.name, value.toUpperCase());
     }
   };
@@ -197,22 +209,41 @@ export default function BankingManual() {
     if (preFilledData) {
       valuesData = { ...valuesData, banking_id: preFilledData?.id };
 
-      await editFieldsById(preFilledData?.id, 'banking', {
-        ...values,
-      });
+      await editFieldsById(
+        preFilledData?.id,
+        'banking',
+        {
+          ...values,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
     }
 
     await axios
       .post(
-        `https://lo.scotttiger.in/api/applicant/penny-drop/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+        `https://uatagile.indiashelter.in/api/applicant/penny-drop/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
         {
           ...valuesData,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
         },
       )
       .then(async (res) => {
         await axios
           .get(
-            `https://lo.scotttiger.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            `https://uatagile.indiashelter.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           )
           .then(({ data }) => {
             const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
@@ -230,7 +261,12 @@ export default function BankingManual() {
 
         await axios
           .get(
-            `https://lo.scotttiger.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            `https://uatagile.indiashelter.in/api/banking/by-applicant/${leadValues?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           )
           .then(({ data }) => {
             const newBanking = data?.filter((bank) => !bank?.extra_params?.is_deleted);
@@ -251,10 +287,18 @@ export default function BankingManual() {
 
   const getIfsc = async () => {
     axios
-      .post(`https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`, {
-        bank: values?.bank_name,
-        branch: values?.branch_name,
-      })
+      .post(
+        `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
+        {
+          bank: searchedBank,
+          branch: searchedBranch,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      )
       .then(({ data }) => {
         setSearchedIfsc(data[0].ifsc_code);
       })
@@ -265,9 +309,17 @@ export default function BankingManual() {
 
   const getBankFromIfsc = async () => {
     axios
-      .post(`https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`, {
-        ifsc: values?.ifsc_code,
-      })
+      .post(
+        `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
+        {
+          ifsc: values?.ifsc_code,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      )
       .then(({ data }) => {
         setFieldValue('bank_name', data[0]?.name);
         setFieldValue('branch_name', data[0]?.branch);
@@ -279,16 +331,23 @@ export default function BankingManual() {
       });
   };
 
-  const getBranchesFromBankName = async () => {
+  const getBranchesFromBankName = async (value) => {
     axios
-      .post(`https://lo.scotttiger.in/api/ifsc/r/get-bank-ifsc`, {
-        bank: values?.bank_name,
-      })
+      .post(
+        `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
+        {
+          bank: value,
+        },
+
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      )
       .then(({ data }) => {
-        const newData = data.map((item) => {
-          return { label: item.branch, value: item.branch };
-        });
-        console.log(newData);
+        const newData = data.map(({ branch }) => ({ label: branch, value: branch }));
+        newData.sort((a, b) => a.label.localeCompare(b.label));
         setBranchData(newData);
       })
       .catch((err) => {
@@ -298,7 +357,11 @@ export default function BankingManual() {
 
   const getAllBanks = async () => {
     axios
-      .get(`https://lo.scotttiger.in/api/ifsc/r/get-all-bank`)
+      .get(`https://uatagile.indiashelter.in/api/ifsc/r/get-all-bank`, {
+        headers: {
+          Authorization: token,
+        },
+      })
       .then(({ data }) => {
         const newData = data.map((item) => {
           return { label: item.name, value: item.name };
@@ -310,21 +373,28 @@ export default function BankingManual() {
       });
   };
 
-  const searchableTextInputChange = (name, value) => {
-    setFieldValue(name, value?.value);
-  };
-
   async function removeImage(id) {
     let newData = { ...values };
 
+    let document_name = newData.bank_statement_image.filter(
+      (data) => data.id.toString() === id.toString(),
+    );
+
+    document_name = document_name?.[0]?.document_name;
+
+    setBankStatement((prev) => prev.filter((data) => data.name !== document_name));
+    setBankStatementUploads((prev) =>
+      prev.data.filter((data) => data.document_name !== document_name),
+    );
+    if (bankStatementFile?.name === document_name) {
+      setBankStatementFile(null);
+    }
+
     newData = {
       ...newData,
-      bank_statement_image: newData.bank_statement_image.map((data) => {
-        if (data.id === id) {
-          return { ...data, active: false };
-        }
-        return data;
-      }),
+      bank_statement_image: newData.bank_statement_image.filter(
+        (data) => data.id.toString() !== id.toString(),
+      ),
     };
 
     setValues(newData);
@@ -336,17 +406,31 @@ export default function BankingManual() {
     setBankStatementUploads({ data: active_uploads });
   }
 
+  // useEffect(() => console.log('-------', values), [values]);
+
   async function deletePDF(id) {
     let newData = { ...values };
 
+    let document_name = newData.bank_statement_image.filter(
+      (data) => data.id.toString() === id.toString(),
+    );
+
+    document_name = document_name?.[0]?.document_name;
+
+    setBankStatement((prev) => prev && prev.filter((data) => data?.name !== document_name));
+    setBankStatementUploads(
+      (prev) => prev && prev?.data?.filter((data) => data?.document_name !== document_name),
+    );
+    setBankStatementPdf(null);
+    if (bankStatementFile?.name === document_name) {
+      setBankStatementFile(null);
+    }
+
     newData = {
       ...newData,
-      bank_statement_image: newData.bank_statement_image.map((data) => {
-        if (data.id === id) {
-          return { ...data, active: false };
-        }
-        return data;
-      }),
+      bank_statement_image: newData.bank_statement_image.filter(
+        (data) => data.id.toString() !== id.toString(),
+      ),
     };
 
     setValues(newData);
@@ -371,6 +455,8 @@ export default function BankingManual() {
       data.append('applicant_id', leadValues?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'bank_statement_photo');
       data.append('document_name', filename);
+      data.append('geo_lat', bankStatementLatLong.lat);
+      data.append('geo_long', bankStatementLatLong.long);
 
       if (bankStatementFile.type === 'image/jpeg') {
         const options = {
@@ -394,33 +480,38 @@ export default function BankingManual() {
         data.append('file', bankStatementFile);
       }
 
-      const res = await uploadDoc(data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let fileSize = data.get('file');
 
-      if (res) {
-        let newData = { ...values };
-
-        newData.bank_statement_image.push(res.document);
-
-        setValues(newData);
-
-        const pdf = values.bank_statement_image.find((data) => {
-          if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
-            return data;
-          }
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: token,
+          },
         });
 
-        if (bankStatementFile.type === 'image/jpeg') {
-          const active_uploads = values.bank_statement_image.filter((data) => {
-            return data.active === true;
+        if (res) {
+          let newData = { ...values };
+
+          newData.bank_statement_image.push(res.document);
+
+          setValues(newData);
+
+          const pdf = values.bank_statement_image.find((data) => {
+            if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+              return data;
+            }
           });
 
-          setBankStatementUploads({ data: active_uploads });
-        } else {
-          setBankStatementPdf(pdf);
+          if (bankStatementFile.type === 'image/jpeg') {
+            const active_uploads = values.bank_statement_image.filter((data) => {
+              return data.active === true;
+            });
+
+            setBankStatementUploads({ data: active_uploads });
+          } else {
+            setBankStatementPdf(pdf);
+          }
         }
       }
     }
@@ -433,6 +524,8 @@ export default function BankingManual() {
       const filename = editBankStatement.file.name;
       data.append('document_type', 'bank_statement_photo');
       data.append('document_name', filename);
+      data.append('geo_lat', bankStatementLatLong.lat);
+      data.append('geo_long', bankStatementLatLong.long);
 
       if (editBankStatement.file.type === 'image/jpeg') {
         const options = {
@@ -459,6 +552,7 @@ export default function BankingManual() {
       const res = await reUploadDoc(editBankStatement.id, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          Authorization: token,
         },
       });
 
@@ -647,6 +741,7 @@ export default function BankingManual() {
             setSingleFile={setBankStatementFile}
             removeImage={removeImage}
             deletePDF={deletePDF}
+            setLatLong={setBankStatementLatLong}
           />
           {errors?.bank_statement_image && touched?.bank_statement_image ? (
             <span
@@ -671,7 +766,11 @@ export default function BankingManual() {
 
         {loading ? (
           <div className='absolute w-full h-full bg-[#00000080]'>
-            <LoaderDynamicText text='Verifying your bank account' textColor='white' />
+            <LoaderDynamicText
+              text='Verifying your bank account'
+              textColor='white'
+              height='100vh'
+            />
           </div>
         ) : null}
       </div>
@@ -695,14 +794,18 @@ export default function BankingManual() {
             placeholder='Eg: ICICI Bank'
             required
             name='bank_name'
-            value={values?.bank_name}
+            value={searchedBank}
             error={errors?.bank_name}
             touched={touched?.bank_name}
             onBlur={(e) => {
               handleBlur(e);
-              getBranchesFromBankName();
+              getBranchesFromBankName(e.target.value);
             }}
-            onChange={searchableTextInputChange}
+            onChange={(name, value) => {
+              setSearchedIfsc('');
+              setSearchedBranch('');
+              setSearchedBank(value.value);
+            }}
             type='search'
             options={bankNameData}
           />
@@ -711,13 +814,16 @@ export default function BankingManual() {
             placeholder='Eg: College Road, Nashik'
             required
             name='branch_name'
-            value={values?.branch_name}
+            value={searchedBranch}
             error={errors?.branch_name}
             touched={touched?.branch_name}
             onBlur={(e) => {
               handleBlur(e);
             }}
-            onChange={searchableTextInputChange}
+            onChange={(name, value) => {
+              setSearchedIfsc('');
+              setSearchedBranch(value.value);
+            }}
             type='search'
             options={branchData}
           />
@@ -736,13 +842,20 @@ export default function BankingManual() {
               inputClasses='w-full h-[46px]'
               onClick={() => {
                 setFieldValue('ifsc_code', searchedIfsc);
+                setFieldValue('bank_name', searchedBank);
+                setFieldValue('branch_name', searchedBranch);
                 setOpen(false);
               }}
             >
               Continue
             </Button>
           ) : (
-            <Button primary={true} inputClasses='w-full h-[46px]' onClick={getIfsc}>
+            <Button
+              primary={true}
+              disabled={!searchedBank || !searchedBranch}
+              inputClasses='w-full h-[46px]'
+              onClick={getIfsc}
+            >
               Search IFSC code
             </Button>
           )}
@@ -775,9 +888,22 @@ export default function BankingManual() {
             inputClasses=' w-full h-[46px]'
             onClick={(e) => {
               e.preventDefault();
-              setValues({ ...defaultValues });
-              setConfirmation(false);
-              navigate('/lead/banking-details');
+              setValues({
+                account_number: '',
+                account_holder_name: '',
+                ifsc_code: '',
+                entity_type: '',
+                account_type: 'Savings',
+                bank_name: '',
+                branch_name: '',
+                bank_statement_image: [],
+              });
+
+              setBankStatement([]);
+              setBankStatementUploads(null);
+              setBankStatementPdf(null);
+              setBankStatementFile(null);
+              setConfirmation(false, navigate('/lead/banking-details'));
             }}
           >
             Leave

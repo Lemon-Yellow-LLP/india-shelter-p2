@@ -8,7 +8,7 @@ import { AuthContext } from '../../context/AuthContextProvider';
 axiosRetry(axios, { retries: 0 });
 
 export default function FaceAuth() {
-  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, setIsAuthenticated, token } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -28,6 +28,9 @@ export default function FaceAuth() {
           `/api/bre-100`,
           { capturedImage },
           {
+            headers: {
+              Authorization: token,
+            },
             timeout: 90000,
             'axios-retry': {
               retries: 2,

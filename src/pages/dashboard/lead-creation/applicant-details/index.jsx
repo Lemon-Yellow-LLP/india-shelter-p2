@@ -32,6 +32,7 @@ import {
 } from './ApplicantDropDownData';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
+import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 
 const ApplicantDetails = () => {
   const {
@@ -46,13 +47,15 @@ const ApplicantDetails = () => {
     setToastMessage,
     setFieldTouched,
     activeIndex,
-    setValues,
     setCurrentStepIndex,
+    removeCoApplicant,
   } = useContext(LeadContext);
 
-  const { setOtpFailCount } = useContext(AuthContext);
+  const { setOtpFailCount, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
 
-  const { lo_id } = useContext(AuthContext);
+  const { loData } = useContext(AuthContext);
+
+  const { token } = useContext(AuthContext);
 
   const [openExistingPopup, setOpenExistingPopup] = useState(false);
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
@@ -102,10 +105,19 @@ const ApplicantDetails = () => {
         values?.applicants[activeIndex]?.applicant_details?.id,
         'applicant',
         newData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
       return res;
     } else {
-      await addApi('applicant', values?.applicants?.[activeIndex]?.applicant_details)
+      await addApi('applicant', values?.applicants?.[activeIndex]?.applicant_details, {
+        headers: {
+          Authorization: token,
+        },
+      })
         .then((res) => {
           setFieldValue(`applicants[${activeIndex}].applicant_details.id`, res.id);
           return res;
@@ -116,15 +128,26 @@ const ApplicantDetails = () => {
     }
   };
 
-  const updateFieldsLead = useCallback(async (name, value) => {
-    let newData = {};
-    newData[name] = value;
-    newData.lo_id = lo_id;
+  const updateFieldsLead = async (name, value) => {
     if (values?.lead?.id) {
-      const res = await editFieldsById(values?.lead?.id, 'lead', newData);
+      let newData = {};
+      newData[name] = value;
+      newData.lo_id = loData.session.user_id;
+      const res = await editFieldsById(values?.lead?.id, 'lead', newData, {
+        headers: {
+          Authorization: token,
+        },
+      });
       return res;
     } else {
-      await addApi('lead', values?.lead)
+      let newData = { ...values?.lead };
+      newData[name] = value;
+      newData.lo_id = loData.session.user_id;
+      await addApi('lead', newData, {
+        headers: {
+          Authorization: token,
+        },
+      })
         .then((res) => {
           setFieldValue('lead.id', res.id);
           return res;
@@ -133,7 +156,7 @@ const ApplicantDetails = () => {
           return err;
         });
     }
-  });
+  };
 
   useEffect(() => {
     updateProgressApplicantSteps('applicant_details', requiredFieldsStatus, 'applicant');
@@ -144,8 +167,24 @@ const ApplicantDetails = () => {
       setFieldValue(e.name, e.value);
       const name = e.name.split('.')[1];
       updateFieldsLead(name, e.value);
-      if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+
+      if (values.lead?.purpose_of_loan) {
+        setFieldValue('lead.purpose_of_loan', '');
+        updateFieldsLead('purpose_of_loan', '');
+      }
+
+      if (values?.lead.loan_type) {
+        setFieldValue('lead.property_type', '');
+        updateFieldsLead('property_type', '');
+      }
+
+      if (requiredFieldsStatus[name] !== undefined) {
+        setRequiredFieldsStatus((prev) => ({
+          ...prev,
+          [name]: true,
+          purpose_of_loan: false,
+          property_type: false,
+        }));
       }
     },
     [requiredFieldsStatus, values],
@@ -153,7 +192,8 @@ const ApplicantDetails = () => {
 
   const handleFirstNameChange = useCallback(
     (e) => {
-      const value = e.currentTarget.value;
+      let value = e.currentTarget.value;
+      value = value.trimStart().replace(/\s\s+/g, ' ');
       const pattern = /^[A-Za-z][A-Za-z\s]*$/;
       if (pattern.exec(value)) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
@@ -250,6 +290,23 @@ const ApplicantDetails = () => {
       if (phoneNumber.length === 10) {
         setHasSentOTPOnce(false);
         updateFieldsApplicant('mobile_number', phoneNumber);
+        if (values?.applicants[activeIndex]?.applicant_details?.id) {
+          await editFieldsById(
+            values?.applicants[activeIndex]?.applicant_details?.id,
+            'applicant',
+            {
+              otp: null,
+              otp_send_on: null,
+              otp_fail_count: 0,
+              otp_fail_release: null,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          );
+        }
       }
     },
     [requiredFieldsStatus, values],
@@ -269,7 +326,7 @@ const ApplicantDetails = () => {
     [requiredFieldsStatus, values],
   );
 
-  const checkDate = (date) => {
+  const checkDate = async (date) => {
     if (!date) {
       return;
     }
@@ -297,16 +354,20 @@ const ApplicantDetails = () => {
       ) {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['date_of_birth']: true }));
       }
-    }
-  };
-
-  // useEffect(() => {
-  //   checkDate();
-  // }, [date, values.applicants[activeIndex]?.applicant_details.date_of_birth]);
-
-  const datePickerScrollToTop = () => {
-    if (dateInputRef.current) {
-      dateInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+        await editFieldsById(
+          values?.applicants[activeIndex]?.personal_details?.id,
+          'personal',
+          {
+            date_of_birth: finalDate,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+      }
     }
   };
 
@@ -315,98 +376,109 @@ const ApplicantDetails = () => {
       await updateFieldsApplicant().then(async () => {
         // setDisablePhoneNumber((prev) => !prev);
 
-        getMobileOtp(values.applicants[activeIndex]?.applicant_details?.id).then(async (res) => {
+        getMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, {
+          headers: {
+            Authorization: token,
+          },
+        }).then(async (res) => {
           setShowOTPInput(true);
           setHasSentOTPOnce(true);
           setToastMessage('OTP has been sent to your mail id');
-          const bodyForExistingCustomer = JSON.stringify({
+
+          const bodyForExistingCustomer = {
             resource: '/customer_check',
             path: '/customer_check',
             httpMethod: 'POST',
             auth: 'exi$t_Sys@85',
             'source flag': '1',
             body: {
-              DOB: values.applicants[activeIndex]?.applicant_details.date_of_birth,
-              'Mobile Number': values.applicants[activeIndex]?.applicant_details.mobile_number,
-              Product: values.lead.loan_type,
+              loan_type: values.lead.loan_type,
+              date_of_birth: values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth,
+              mobile_number: values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
             },
-          });
-
-          const responce = await checkExistingCustomer(bodyForExistingCustomer);
-
-          const { body } = {
-            ErrorCode: 200,
-            body: [
-              {
-                is_existing_customer: 'TRUE',
-                pre_approved_amount: '1000000',
-
-                id_type: 'PAN',
-                id_number: 'AAAPB2117A',
-
-                selected_address_proof: 'AADHAR',
-                address_proof_number: '654987321659',
-
-                first_name: 'SANTOSH YADAV',
-                middle_name: '',
-                last_name: '',
-
-                gender: 'MALE',
-                father_husband_name: 'XYZ',
-                mother_name: 'XYZ',
-
-                current_flat_no_building_name: '12',
-                current_street_area_locality: 'Thane',
-                current_town: 'Delhi',
-                current_landmark: 'ABC',
-                current_pincode: '421202',
-                current_city: 'Dombivli',
-                current_state: 'Maharashtra',
-                current_no_of_year_residing: '20',
-                permanent_flat_no_building_name: '12',
-                permanent_street_area_locality: 'Thane',
-                permanent_town: 'Delhi',
-                permanent_landmark: 'ABC',
-                permanent_pincode: '421202',
-                permanent_city: 'Dombivli',
-                permanent_state: 'Maharashtra',
-                permanent_no_of_year_residing: '20',
-              },
-            ],
           };
 
-          let {
-            id_type,
-            id_number,
-            selected_address_proof,
-            address_proof_number,
-            first_name,
-            middle_name,
-            last_name,
-            gender,
-            father_husband_name,
-            mother_name,
-          } = body[0];
+          await checkExistingCustomer(bodyForExistingCustomer)
+            .then((body) => {
+              if (body && body?.length !== 0) {
+                const { existing_customer_is_existing_customer } = body[0];
+                if (
+                  existing_customer_is_existing_customer &&
+                  existing_customer_is_existing_customer?.toLowercase() === 'false'
+                ) {
+                  editFieldsById(
+                    values?.applicants[activeIndex]?.applicant_details?.id,
+                    'applicant',
+                    {
+                      extra_params: {
+                        ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                        is_existing: false,
+                      },
+                    },
+                  );
+                  setFieldValue(
+                    `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                    false,
+                  );
+                  return;
+                }
 
-          let newData = { ...values };
-
-          newData.personal_details = {
-            id_type,
-            id_number,
-            selected_address_proof,
-            address_proof_number,
-            first_name,
-            middle_name,
-            last_name,
-            gender,
-            father_husband_name,
-            mother_name,
-          };
-          // setValues(newData);
-          // setFieldValue(
-          //   `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
-          //   true,
-          // );
+                const { loan_type, ...dataWithoutLoanType } = body[0];
+                setFieldValue(`applicants[${activeIndex}].applicant_details`, {
+                  ...values?.applicants[activeIndex]?.applicant_details,
+                  ...dataWithoutLoanType,
+                });
+                editFieldsById(
+                  values?.applicants[activeIndex]?.applicant_details?.id,
+                  'applicant',
+                  {
+                    ...values?.applicants[activeIndex]?.applicant_details,
+                    ...dataWithoutLoanType,
+                    extra_params: {
+                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                      is_existing: true,
+                    },
+                  },
+                  {
+                    headers: {
+                      Authorization: token,
+                    },
+                  },
+                );
+                setFieldValue(
+                  `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                  true,
+                );
+              } else {
+                editFieldsById(
+                  values?.applicants[activeIndex]?.applicant_details?.id,
+                  'applicant',
+                  {
+                    extra_params: {
+                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                      is_existing: false,
+                    },
+                  },
+                );
+                setFieldValue(
+                  `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                  false,
+                );
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
+                extra_params: {
+                  ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                  is_existing: false,
+                },
+              });
+              setFieldValue(
+                `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                false,
+              );
+            });
         });
       });
     } else {
@@ -420,8 +492,12 @@ const ApplicantDetails = () => {
   };
 
   const verifyOTP = async (otp) => {
-    verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp)
-      .then(async () => {
+    verifyMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, otp, {
+      headers: {
+        Authorization: token,
+      },
+    })
+      .then(async (res) => {
         await updateFieldsLead().then((res) => {
           setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
           updateFieldsApplicant('lead_id', res.id);
@@ -452,16 +528,65 @@ const ApplicantDetails = () => {
     );
   }, [activeIndex]);
 
-  // console.log('values', values.applicants[activeIndex]?.applicant_details);
+  // For unique phone numbers
+  useEffect(() => {
+    const _phoneNumberList = Object.assign({}, phoneNumberList);
+    if (_phoneNumberList?.[`applicant_${activeIndex}`]) {
+      delete _phoneNumberList?.[[`applicant_${activeIndex}`]];
+    }
+
+    if (
+      values?.applicants?.[activeIndex]?.applicant_details?.mobile_number &&
+      _phoneNumberList &&
+      Object.values(_phoneNumberList)?.includes(
+        values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
+      )
+    ) {
+      setFieldError(
+        `applicants[${activeIndex}].applicant_details.mobile_number`,
+        'Phone number must be unique',
+      );
+    } else {
+      setPhoneNumberList((prev) => {
+        return {
+          ...prev,
+          [`applicant_${activeIndex}`]:
+            values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
+        };
+      });
+    }
+  }, [
+    values?.applicants?.[activeIndex]?.applicant_details,
+    errors?.applicants?.[activeIndex]?.applicant_details,
+  ]);
+
+  const handleBack = () => {
+    if (!values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified) {
+      removeCoApplicant(activeIndex);
+    }
+  };
+
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
 
   return (
     <>
-      <Topbar title='Lead Creation' id={values?.lead?.id} progress={8} />
-      <div className='overflow-hidden flex flex-col h-[100vh]'>
+      <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
+        {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+          <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        ) : (
+          <Topbar
+            title='Adding Co-applicant'
+            id={values?.lead?.id}
+            showClose={false}
+            showBack={true}
+            coApplicant={true}
+            handleBack={handleBack}
+            coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
+          />
+        )}
         <div
-          className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1`}
+          className={`flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1`}
         >
           <div className='flex flex-col gap-2'>
             <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
@@ -481,7 +606,10 @@ const ApplicantDetails = () => {
                   current={values.lead?.loan_type}
                   onChange={onLoanTypeChange}
                   containerClasses='flex-1'
-                  disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+                  disabled={
+                    !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+                    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  }
                 >
                   {data.icon}
                 </CardRadio>
@@ -498,7 +626,10 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
             onChange={handleLoanAmountChange}
             displayError={false}
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
             inputClasses='font-semibold'
           />
 
@@ -509,7 +640,10 @@ const ApplicantDetails = () => {
             initialValue={values.lead?.applied_amount}
             min={100000}
             max={5000000}
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
             step={50000}
           />
 
@@ -527,7 +661,7 @@ const ApplicantDetails = () => {
             touched={
               touched?.applicants && touched?.applicants[activeIndex]?.applicant_details?.first_name
             }
-            onBlur={(e) => {
+            onBlur={async (e) => {
               handleBlur(e);
               const name = e.currentTarget.name.split('.')[2];
               if (
@@ -541,13 +675,47 @@ const ApplicantDetails = () => {
                 if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
                   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                 }
+
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      first_name: values?.applicants?.[activeIndex]?.applicant_details?.first_name,
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
+                }
               } else {
                 if (requiredFieldsStatus[name] !== undefined) {
                   setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                 }
+                updateFieldsApplicant(name, '');
+
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      first_name: '',
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
+                }
               }
             }}
-            disabled={inputDisabled}
+            disabled={
+              inputDisabled ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
             onChange={handleFirstNameChange}
             inputClasses='capitalize'
           />
@@ -564,8 +732,11 @@ const ApplicantDetails = () => {
                   touched.applicants &&
                   touched?.applicants[activeIndex]?.applicant_details?.middle_name
                 }
-                disabled={inputDisabled}
-                onBlur={(e) => {
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
+                onBlur={async (e) => {
                   handleBlur(e);
                   const name = e.currentTarget.name.split('.')[2];
                   if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
@@ -573,6 +744,38 @@ const ApplicantDetails = () => {
                       name,
                       values.applicants[activeIndex]?.applicant_details?.[name],
                     );
+
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          middle_name:
+                            values?.applicants?.[activeIndex]?.applicant_details?.middle_name,
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
+                    }
+                  } else {
+                    updateFieldsApplicant(name, '');
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          middle_name: '',
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
+                    }
                   }
                 }}
                 onChange={handleTextInputChange}
@@ -589,12 +792,15 @@ const ApplicantDetails = () => {
                   touched?.applicants[activeIndex]?.applicant_details?.last_name
                 }
                 placeholder='Eg: Swami, Singh'
-                disabled={inputDisabled}
+                disabled={
+                  inputDisabled ||
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                }
                 name={`applicants[${activeIndex}].applicant_details.last_name`}
                 onChange={handleTextInputChange}
                 inputClasses='capitalize'
                 // onFocus={datePickerScrollToTop}
-                onBlur={(e) => {
+                onBlur={async (e) => {
                   handleBlur(e);
                   const name = e.currentTarget.name.split('.')[2];
                   if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
@@ -602,6 +808,38 @@ const ApplicantDetails = () => {
                       name,
                       values.applicants[activeIndex]?.applicant_details?.[name],
                     );
+
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          last_name:
+                            values?.applicants?.[activeIndex]?.applicant_details?.last_name,
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
+                    }
+                  } else {
+                    updateFieldsApplicant(name, '');
+                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                      const res = await editFieldsById(
+                        values?.applicants[activeIndex]?.personal_details?.id,
+                        'personal',
+                        {
+                          last_name: '',
+                        },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        },
+                      );
+                    }
                   }
                 }}
               />
@@ -626,6 +864,7 @@ const ApplicantDetails = () => {
               checkDate(e.target.value);
             }}
             reference={dateInputRef}
+            disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
           />
 
           <TextInputWithSendOtp
@@ -651,7 +890,8 @@ const ApplicantDetails = () => {
             }
             disabled={
               disablePhoneNumber ||
-              values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified
+              values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
             }
             message={
               values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified
@@ -661,6 +901,7 @@ const ApplicantDetails = () => {
             onBlur={(e) => {
               handleBlur(e);
               const name = e.target.name.split('.')[1];
+
               if (
                 !errors?.applicants?.[activeIndex]?.applicant_details?.[name] &&
                 values?.applicants?.[activeIndex]?.applicant_details?.[name]
@@ -669,6 +910,15 @@ const ApplicantDetails = () => {
                   name,
                   values.applicants?.[activeIndex]?.applicant_details?.[name],
                 );
+                setPhoneNumberList((prev) => {
+                  return {
+                    ...prev,
+                    [`applicant_${activeIndex}`]:
+                      values.applicants?.[activeIndex]?.applicant_details?.[name],
+                  };
+                });
+              } else {
+                updateFieldsApplicant(name, '');
               }
             }}
             pattern='\d*'
@@ -716,7 +966,10 @@ const ApplicantDetails = () => {
             onBlur={handleBlur}
             defaultSelected={values.lead?.purpose_of_loan}
             inputClasses='mt-2'
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
           />
 
           <DropDown
@@ -744,44 +997,46 @@ const ApplicantDetails = () => {
             touched={touched && touched?.lead?.property_type}
             error={errors && errors?.lead?.property_type}
             onBlur={handleBlur}
-            disabled={!values?.applicants?.[activeIndex]?.applicant_details?.is_primary}
+            disabled={
+              !values?.applicants?.[activeIndex]?.applicant_details?.is_primary ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
           />
         </div>
+        <PreviousNextButtons
+          disablePrevious={true}
+          disableNext={
+            !values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.progress !== 100
+          }
+          onNextClick={() => {
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
+              ? setOpenExistingPopup(true)
+              : setCurrentStepIndex(1);
+          }}
+          linkNext={
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
+              ? undefined
+              : '/lead/personal-details'
+          }
+        />
 
-        <div className='bottom-0 fixed'>
-          <PreviousNextButtons
-            disablePrevious={true}
-            disableNext={
-              !values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified ||
-              (errors?.applicants && errors?.applicants?.[activeIndex]?.applicant_details) ||
-              errors.lead
-            }
-            onNextClick={() => {
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
-                ? setOpenExistingPopup(true)
-                : setCurrentStepIndex(1);
-            }}
-            linkNext={
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing_done
-                ? undefined
-                : '/lead/personal-details'
-            }
-          />
-        </div>
+        <SwipeableDrawerComponent />
       </div>
 
-      <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='223px'>
-        <div className='z-[6000] h-full w-full flex flex-col'>
-          <span className='font-normal text-center leading-[21px] text-[16px] text-black '>
-            This is an existing customer and is already pre-approved for a loan upto
-          </span>
-          <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
+      {openExistingPopup ? (
+        <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='223px'>
+          <div className='z-[6000] h-full w-full flex flex-col'>
+            <span className='font-normal text-center leading-[21px] text-[16px] text-black '>
+              This is an existing customer and is already pre-approved for a loan upto
+            </span>
             {
               values?.applicants?.[activeIndex]?.applicant_details
-                ?.existing_customer_pre_approved_amount
-                ? parseInt(
+                ?.existing_customer_pre_approved_amount ? (
+                <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
+                  {parseInt(
                     values.applicants?.[activeIndex].applicant_details
                       .existing_customer_pre_approved_amount,
                   )
@@ -789,21 +1044,48 @@ const ApplicantDetails = () => {
                       style: 'currency',
                       currency: 'INR',
                     })
-                    .replace('.00', '')
-                : 'N/A' // Display 'N/A' or some other fallback if the value is undefined
+                    .replace('.00', '')}
+                  /-
+                </span>
+              ) : (
+                <span className='p-5 mb-5 text-center text-[#277C5E] font-[500] text-[26px]'>
+                  N/A
+                </span>
+              ) // Display 'N/A' or some other fallback if the value is undefined
             }
-            /-
-          </span>
-          <Button
-            primary={true}
-            inputClasses='w-full h-[46px]'
-            onClick={() => setCurrentStepIndex(1)}
-            link='/lead/personal-details'
-          >
-            Continue
-          </Button>
-        </div>
-      </DynamicDrawer>
+            <Button
+              primary={true}
+              inputClasses='w-full h-[46px]'
+              onClick={() => {
+                setFieldValue(
+                  `applicants[${activeIndex}].applicant_details.extra_params.is_existing_done`,
+                  true,
+                );
+                editFieldsById(
+                  values?.applicants[activeIndex]?.applicant_details?.id,
+                  'applicant',
+                  {
+                    extra_params: {
+                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                      is_existing_done: true,
+                    },
+                  },
+                  {
+                    headers: {
+                      Authorization: token,
+                    },
+                  },
+                );
+                setOpenExistingPopup(false);
+                setCurrentStepIndex(1);
+              }}
+              link='/lead/personal-details'
+            >
+              Continue
+            </Button>
+          </div>
+        </DynamicDrawer>
+      ) : null}
     </>
   );
 };

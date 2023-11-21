@@ -1,18 +1,19 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EditIcon from '../../assets/icons/edit';
-import BackIcon2 from '../../assets/icons/back-2';
 import { AuthContext } from '../../context/AuthContextProvider';
-import { Box, Button, Tabs, Tab } from '@mui/material';
+import { Box, Tabs, Tab } from '@mui/material';
 import ProgressBadge from '../../components/ProgressBadge';
-import { getDashboardLeadById } from '../../global';
-import { CheckBox, DropDown } from '../../components';
+import { getDashboardLeadById, pushToSalesforce } from '../../global';
+import { CheckBox, DropDown, ToastMessage } from '../../components';
 import moment from 'moment';
 import { PrimaryDropdownOptions, CoApplicantDropdownOptions } from './DashboardDropdowns';
 import { LeadContext } from '../../context/LeadContextProvider';
 import EditLeadEnabled from '../../assets/icons/EditFormEnabled';
+import loading from '../../assets/icons/loading.svg';
 
 export default function DashboardApplicant() {
+  const { token } = useContext(AuthContext);
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
@@ -28,7 +29,6 @@ export default function DashboardApplicant() {
   const [coApplicantSelectedStep, setCoApplicantSelectedStep] = useState(
     CoApplicantDropdownOptions[0].value,
   );
-
   const [lntCharges, setLntCharges] = useState(null);
 
   function a11yProps(index) {
@@ -45,7 +45,11 @@ export default function DashboardApplicant() {
   useEffect(() => {
     (async () => {
       try {
-        const data = await getDashboardLeadById(id);
+        const data = await getDashboardLeadById(id, {
+          headers: {
+            Authorization: token,
+          },
+        });
         setLeadData(data);
 
         // Find Primary Applicant
@@ -131,11 +135,51 @@ export default function DashboardApplicant() {
     }
   }, [coApplicantSelectedStep, activeTab]);
 
+  const bankingDetailsArr = (applicant) => {
+    let arr = [];
+    applicant?.banking_details
+      ?.filter((b) => !b?.extra_params?.is_deleted)
+      ?.map(
+        (b, i) =>
+          (arr = [
+            ...arr,
+
+            {
+              subtitle: `ACCOUNT ${i + 1}`,
+              label: 'Bank name',
+              value: b?.bank_name,
+            },
+            {
+              label: 'Account number',
+              value: b?.account_number,
+            },
+            {
+              label: 'Penny drop',
+              value: b?.penny_drop_response?.result?.active === 'yes' ? 'Success' : 'Failed',
+            },
+            {
+              label: 'IFSC Code',
+              value: b?.ifsc_code,
+            },
+            {
+              label: 'Branch',
+              value: b?.branch_name,
+            },
+            {
+              label: 'Account type',
+              value: b?.account_type,
+            },
+          ]),
+      );
+    return arr;
+  };
+
   return (
     <div className='relative overflow-hidden h-screen'>
       <Titlebar
         title={`${primaryApplicant?.applicant_details?.first_name} ${primaryApplicant?.applicant_details?.middle_name} ${primaryApplicant?.applicant_details?.last_name}`}
         id={id}
+        primaryApplicant={primaryApplicant}
       />
 
       <Box sx={{ width: '100%', background: '#FEFEFE' }}>
@@ -275,8 +319,8 @@ export default function DashboardApplicant() {
                 value: primaryApplicant?.personal_details?.mobile_number,
               },
               {
-                label: 'Father/Husband’s name',
-                value: primaryApplicant?.personal_details?.father_husband_name,
+                label: 'Father’s name',
+                value: primaryApplicant?.personal_details?.father_name,
               },
               {
                 label: 'Mother’s name',
@@ -286,6 +330,12 @@ export default function DashboardApplicant() {
                 label: 'Marital status',
                 value: primaryApplicant?.personal_details?.marital_status,
               },
+              primaryApplicant?.personal_details?.marital_status === 'Married'
+                ? {
+                    label: 'Spouse name',
+                    value: primaryApplicant?.personal_details?.spouse_name,
+                  }
+                : null,
               {
                 label: 'Religion',
                 value: primaryApplicant?.personal_details?.religion,
@@ -351,59 +401,59 @@ export default function DashboardApplicant() {
               {
                 label: '',
                 value: '',
-                subtitle: 'PERMANENT ADDRESS',
+                subtitle: 'ADDITIONAL ADDRESS',
                 children: (
                   <div className='flex gap-2'>
                     <CheckBox
                       name=''
                       checked={
                         primaryApplicant?.address_detail?.extra_params
-                          ?.permanent_address_same_as_current
+                          ?.additional_address_same_as_current
                       }
                       disabled={true}
                     />
                     <p className='text-xs not-italic font-medium text-primary-black'>
-                      Permanent address is same as Current address
+                      Additional address is same as Current address
                     </p>
                   </div>
                 ),
               },
 
               {
-                label: 'Type of residence',
-                value: primaryApplicant?.address_detail?.current_type_of_residence,
+                label: 'Type of address',
+                value: primaryApplicant?.address_detail?.additional_type_of_residence,
               },
               {
                 label: 'Flat no/Building name',
-                value: primaryApplicant?.address_detail?.permanent_flat_no_building_name,
+                value: primaryApplicant?.address_detail?.additional_flat_no_building_name,
               },
               {
                 label: 'Street/Area/Locality',
-                value: primaryApplicant?.address_detail?.permanent_street_area_locality,
+                value: primaryApplicant?.address_detail?.additional_street_area_locality,
               },
               {
                 label: 'Town',
-                value: primaryApplicant?.address_detail?.permanent_town,
+                value: primaryApplicant?.address_detail?.additional_town,
               },
               {
                 label: 'Landmark',
-                value: primaryApplicant?.address_detail?.permanent_landmark,
+                value: primaryApplicant?.address_detail?.additional_landmark,
               },
               {
                 label: 'Pincode',
-                value: primaryApplicant?.address_detail?.permanent_pincode,
+                value: primaryApplicant?.address_detail?.additional_pincode,
               },
               {
                 label: 'City',
-                value: primaryApplicant?.address_detail?.permanent_city,
+                value: primaryApplicant?.address_detail?.additional_city,
               },
               {
                 label: 'State',
-                value: primaryApplicant?.address_detail?.permanent_state,
+                value: primaryApplicant?.address_detail?.additional_state,
               },
               {
                 label: 'No. of years residing',
-                value: primaryApplicant?.address_detail?.permanent_no_of_year_residing,
+                value: primaryApplicant?.address_detail?.additional_no_of_year_residing,
               },
             ]}
           />
@@ -419,12 +469,29 @@ export default function DashboardApplicant() {
                 value: primaryApplicant?.work_income_detail?.profession,
               },
               {
+                label: 'PAN number',
+                value: primaryApplicant?.work_income_detail?.pan_number,
+              },
+              ,
+              {
                 label: 'Company name',
                 value: primaryApplicant?.work_income_detail?.company_name,
               },
               {
-                label: 'Total income',
-                value: primaryApplicant?.work_income_detail?.total_income,
+                label: 'No. of employees',
+                value: primaryApplicant?.work_income_detail?.no_of_employees,
+              },
+              {
+                label: 'Udyam number',
+                value: primaryApplicant?.work_income_detail?.udyam_number,
+              },
+              {
+                label: 'Salary per month',
+                value: primaryApplicant?.work_income_detail?.salary_per_month,
+              },
+              {
+                label: 'Income proof',
+                value: primaryApplicant?.work_income_detail?.income_proof,
               },
               {
                 label: 'PF UAN',
@@ -447,7 +514,7 @@ export default function DashboardApplicant() {
                 value: primaryApplicant?.work_income_detail?.mode_of_salary,
               },
               {
-                label: 'Flat no/Building name',
+                label: 'Plot no/Building name',
                 value: primaryApplicant?.work_income_detail?.flat_no_building_name,
               },
 
@@ -499,6 +566,7 @@ export default function DashboardApplicant() {
                 label: 'GST Number',
                 value: primaryApplicant?.work_income_detail?.gst_number,
               },
+
               {
                 label: 'Pension amount',
                 value: primaryApplicant?.work_income_detail?.pention_amount,
@@ -510,8 +578,12 @@ export default function DashboardApplicant() {
           <FormDetails
             title='QUALIFIER'
             ref={primarySelectedStep == 'qualifier' ? primarySelectedStepRef : null}
-            progress={0}
             data={[]}
+            message={
+              primaryApplicant?.applicant_details?.extra_params?.qualifier
+                ? 'Qualifier completed'
+                : 'Qualifier incomplete'
+            }
           />
           <Separator />
 
@@ -544,7 +616,7 @@ export default function DashboardApplicant() {
               },
               {
                 label: 'Owner name',
-                value: leadData?.property_details?.owner_name,
+                value: leadData?.property_details?.current_owner_name,
               },
               {
                 label: 'Plot/House/Flat no',
@@ -574,7 +646,7 @@ export default function DashboardApplicant() {
             title='BANKING DETAILS'
             ref={primarySelectedStep == 'banking_details' ? primarySelectedStepRef : null}
             progress={primaryApplicant?.applicant_details?.extra_params?.banking_progress}
-            data={[]}
+            data={bankingDetailsArr(primaryApplicant)}
           />
           <Separator />
 
@@ -656,24 +728,111 @@ export default function DashboardApplicant() {
           <FormDetails
             ref={primarySelectedStep == 'upload_documents' ? primarySelectedStepRef : null}
             title='UPLOAD DOCUMENTS'
-            data={[]}
-            message={'Will fill this once Banking details is done'}
+            progress={primaryApplicant?.applicant_details?.extra_params?.upload_progress}
+            data={[
+              {
+                label: 'Customer photo',
+                value: primaryApplicant?.applicant_details?.document_meta?.customer_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'ID Type',
+                value: primaryApplicant?.personal_details?.id_type,
+              },
+              {
+                label: 'ID proof',
+                value: primaryApplicant?.applicant_details?.document_meta?.id_proof_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Address type',
+                value: primaryApplicant?.personal_details?.selected_address_proof,
+              },
+              {
+                label: 'Address proof',
+                value:
+                  primaryApplicant?.applicant_details?.document_meta?.address_proof_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Property papers',
+                value:
+                  primaryApplicant?.applicant_details?.document_meta?.property_paper_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Salary slip',
+                value:
+                  primaryApplicant?.applicant_details?.document_meta?.salary_slip_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Form 60',
+                value: primaryApplicant?.applicant_details?.document_meta?.form_60_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Property image',
+                value: primaryApplicant?.applicant_details?.document_meta?.property_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Upload selfie',
+                value: primaryApplicant?.applicant_details?.document_meta?.lo_selfie?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Other documents',
+                value: primaryApplicant?.applicant_details?.document_meta?.other_docs?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+            ]}
           />
           <Separator />
 
-          <FormDetails
+          {/* <FormDetails
             ref={primarySelectedStep == 'preview' ? primarySelectedStepRef : null}
             title='PREVIEW'
             data={[]}
             message={'Will fill this once Banking details is done'}
           />
-          <Separator />
+          <Separator /> */}
 
           <FormDetails
             ref={primarySelectedStep == 'eligibility' ? primarySelectedStepRef : null}
             title='ELIGIBILITY'
-            data={[]}
-            message={'Will fill this once Banking details is done'}
+            message={
+              primaryApplicant?.applicant_details?.extra_params?.eligibility
+                ? 'Eligibility completed'
+                : 'Eligibility incomplete'
+            }
           />
 
           <div className='h-[500px] w-full'></div>
@@ -804,17 +963,24 @@ export default function DashboardApplicant() {
                 value: activeCoApplicant?.personal_details?.mobile_number,
               },
               {
-                label: 'Father/Husband’s name',
-                value: activeCoApplicant?.personal_details?.father_husband_name,
+                label: 'Father’s name',
+                value: activeCoApplicant?.personal_details?.father_name,
               },
               {
                 label: 'Mother’s name',
                 value: activeCoApplicant?.personal_details?.mother_name,
               },
+
               {
                 label: 'Marital status',
                 value: activeCoApplicant?.personal_details?.marital_status,
               },
+
+              activeCoApplicant?.personal_details?.marital_status === 'Married' && {
+                label: 'Spouse name',
+                value: activeCoApplicant?.personal_details?.spouse_name,
+              },
+
               {
                 label: 'Religion',
                 value: activeCoApplicant?.personal_details?.religion,
@@ -880,59 +1046,58 @@ export default function DashboardApplicant() {
               {
                 label: '',
                 value: '',
-                subtitle: 'PERMANENT ADDRESS',
+                subtitle: 'ADDITIONAL ADDRESS',
                 children: (
                   <div className='flex gap-2'>
                     <CheckBox
                       name=''
                       checked={
                         primaryApplicant?.address_detail?.extra_params
-                          ?.permanent_address_same_as_current
+                          ?.additional_address_same_as_current
                       }
                       disabled={true}
                     />
                     <p className='text-xs not-italic font-medium text-primary-black'>
-                      Permanent address is same as Current address
+                      Additional address is same as Current address
                     </p>
                   </div>
                 ),
               },
-
               {
-                label: 'Type of residence',
-                value: activeCoApplicant?.address_detail?.current_type_of_residence,
+                label: 'Type of address',
+                value: activeCoApplicant?.address_detail?.additional_type_of_residence,
               },
               {
                 label: 'Flat no/Building name',
-                value: activeCoApplicant?.address_detail?.permanent_flat_no_building_name,
+                value: activeCoApplicant?.address_detail?.additional_flat_no_building_name,
               },
               {
                 label: 'Street/Area/Locality',
-                value: activeCoApplicant?.address_detail?.permanent_street_area_locality,
+                value: activeCoApplicant?.address_detail?.additional_street_area_locality,
               },
               {
                 label: 'Town',
-                value: activeCoApplicant?.address_detail?.permanent_town,
+                value: activeCoApplicant?.address_detail?.additional_town,
               },
               {
                 label: 'Landmark',
-                value: activeCoApplicant?.address_detail?.permanent_landmark,
+                value: activeCoApplicant?.address_detail?.additional_landmark,
               },
               {
                 label: 'Pincode',
-                value: activeCoApplicant?.address_detail?.permanent_pincode,
+                value: activeCoApplicant?.address_detail?.additional_pincode,
               },
               {
                 label: 'City',
-                value: activeCoApplicant?.address_detail?.permanent_city,
+                value: activeCoApplicant?.address_detail?.additional_city,
               },
               {
                 label: 'State',
-                value: activeCoApplicant?.address_detail?.permanent_state,
+                value: activeCoApplicant?.address_detail?.additional_state,
               },
               {
                 label: 'No. of years residing',
-                value: activeCoApplicant?.address_detail?.permanent_no_of_year_residing,
+                value: activeCoApplicant?.address_detail?.additional_no_of_year_residing,
               },
             ]}
           />
@@ -950,12 +1115,28 @@ export default function DashboardApplicant() {
                 value: activeCoApplicant?.work_income_detail?.profession,
               },
               {
+                label: 'PAN number',
+                value: activeCoApplicant?.work_income_detail?.pan_number,
+              },
+              {
                 label: 'Company name',
                 value: activeCoApplicant?.work_income_detail?.company_name,
               },
               {
-                label: 'Total income',
-                value: activeCoApplicant?.work_income_detail?.total_income,
+                label: 'No. of employees',
+                value: activeCoApplicant?.work_income_detail?.no_of_employees,
+              },
+              {
+                label: 'Udyam number',
+                value: activeCoApplicant?.work_income_detail?.udyam_number,
+              },
+              {
+                label: 'Salary per month',
+                value: activeCoApplicant?.work_income_detail?.salary_per_month,
+              },
+              {
+                label: 'Income proof',
+                value: activeCoApplicant?.work_income_detail?.income_proof,
               },
               {
                 label: 'PF UAN',
@@ -978,7 +1159,7 @@ export default function DashboardApplicant() {
                 value: activeCoApplicant?.work_income_detail?.mode_of_salary,
               },
               {
-                label: 'Flat no/Building name',
+                label: 'Plot no/Building name',
                 value: activeCoApplicant?.work_income_detail?.flat_no_building_name,
               },
 
@@ -1020,30 +1201,118 @@ export default function DashboardApplicant() {
               },
             ]}
           />
+
+          <Separator />
+
+          <FormDetails
+            ref={coApplicantSelectedStep == 'qualifier' ? coApplicantSelectedStepRef : null}
+            title='QUALIFIER'
+            data={[]}
+            message={
+              activeCoApplicant?.applicant_details?.extra_params?.qualifier
+                ? 'Qualifier completed'
+                : 'Qualifier incomplete'
+            }
+          />
           <Separator />
 
           <FormDetails
             ref={coApplicantSelectedStep == 'banking_details' ? coApplicantSelectedStepRef : null}
             title='BANKING DETAILS'
             progress={activeCoApplicant?.applicant_details?.extra_params?.banking_progress}
-            data={[]}
+            data={bankingDetailsArr(activeCoApplicant)}
           />
           <Separator />
 
           <FormDetails
             ref={coApplicantSelectedStep == 'upload_documents' ? coApplicantSelectedStepRef : null}
             title='UPLOAD DOCUMENTS'
-            progress={0}
-            data={[]}
-            message={'Will fill this once Banking details is done'}
-          />
-          <Separator />
-
-          <FormDetails
-            ref={coApplicantSelectedStep == 'qualifier' ? coApplicantSelectedStepRef : null}
-            title='QUALIFIER'
-            progress={null}
-            data={[]}
+            progress={activeCoApplicant?.applicant_details?.extra_params?.upload_progress}
+            data={[
+              {
+                label: 'Customer photo',
+                value: activeCoApplicant?.applicant_details?.document_meta?.customer_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'ID Type',
+                value: activeCoApplicant?.personal_details?.id_type,
+              },
+              {
+                label: 'ID proof',
+                value: activeCoApplicant?.applicant_details?.document_meta?.id_proof_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Address type',
+                value: activeCoApplicant?.personal_details?.selected_address_proof,
+              },
+              {
+                label: 'Address proof',
+                value:
+                  activeCoApplicant?.applicant_details?.document_meta?.address_proof_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Property papers',
+                value:
+                  activeCoApplicant?.applicant_details?.document_meta?.property_paper_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Salary slip',
+                value:
+                  activeCoApplicant?.applicant_details?.document_meta?.salary_slip_photos?.filter(
+                    (cp) => cp?.active,
+                  ).length
+                    ? 'Uploaded'
+                    : '-',
+              },
+              {
+                label: 'Form 60',
+                value: activeCoApplicant?.applicant_details?.document_meta?.form_60_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Property image',
+                value: activeCoApplicant?.applicant_details?.document_meta?.property_photos?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Upload selfie',
+                value: activeCoApplicant?.applicant_details?.document_meta?.lo_selfie?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+              {
+                label: 'Other documents',
+                value: activeCoApplicant?.applicant_details?.document_meta?.other_docs?.filter(
+                  (cp) => cp?.active,
+                ).length
+                  ? 'Uploaded'
+                  : '-',
+              },
+            ]}
           />
 
           <div className='h-[500px] w-full'></div>
@@ -1053,13 +1322,25 @@ export default function DashboardApplicant() {
   );
 }
 
-const Titlebar = ({ title, id }) => {
-  const { values, setValues } = useContext(LeadContext);
+const Titlebar = ({ title, id, primaryApplicant }) => {
+  const { setValues, setActiveIndex } = useContext(LeadContext);
+  const { setPhoneNumberList, toastMessage, setToastMessage, token } = useContext(AuthContext);
+
   const [totalProgress, setTotalProgress] = useState(0);
+  const [leadData, setLeadData] = useState(null);
+  const [sfdcPush, setSfdcPush] = useState({
+    status: null,
+    loader: false,
+  });
   const navigate = useNavigate();
 
   const getLeadData = async () => {
-    const data = await getDashboardLeadById(id);
+    const data = await getDashboardLeadById(id, {
+      headers: {
+        Authorization: token,
+      },
+    });
+    setLeadData(data);
     setTotalProgress(data?.lead?.extra_params?.progress);
   };
 
@@ -1068,7 +1349,24 @@ const Titlebar = ({ title, id }) => {
   }, []);
 
   const handleOpenForm = async (id) => {
-    const data = await getDashboardLeadById(id);
+    const data = await getDashboardLeadById(id, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    setPhoneNumberList((prev) => {
+      return {
+        ...prev,
+        applicant_0: data?.applicants?.[0]?.applicant_details?.mobile_number ?? '',
+        applicant_1: data?.applicants?.[1]?.applicant_details?.mobile_number ?? '',
+        applicant_2: data?.applicants?.[2]?.applicant_details?.mobile_number ?? '',
+        applicant_3: data?.applicants?.[3]?.applicant_details?.mobile_number ?? '',
+        applicant_4: data?.applicants?.[4]?.applicant_details?.mobile_number ?? '',
+        reference_1: data?.reference_details?.reference_1_phone_number ?? '',
+        reference_2: data?.reference_details?.reference_2_phone_number ?? '',
+      };
+    });
 
     const newApplicants = data.applicants.map((applicant) => {
       let accounts = [];
@@ -1083,30 +1381,253 @@ const Titlebar = ({ title, id }) => {
 
     setValues({ ...data, applicants: newApplicants });
 
+    let primaryIndex = newApplicants
+      .map((applicant, index) => (applicant.applicant_details.is_primary ? index : -1))
+      .filter((index) => index !== -1);
+
+    setActiveIndex(primaryIndex[0] ?? 0);
+
     navigate('/lead/applicant-details');
   };
 
+  const sfdcPUSH = async () => {
+    setSfdcPush({ ...sfdcPush, loader: true });
+
+    try {
+      const sfdc_res = await pushToSalesforce(leadData.lead.id, {
+        headers: {
+          Authorization: token,
+        },
+      });
+
+      if (sfdc_res) {
+        setToastMessage('Data has been successfully pushed to the Salesforce');
+        setSfdcPush({ ...sfdcPush, loader: false, status: sfdc_res.lead.sfdc_status });
+      }
+    } catch (err) {
+      console.log(err);
+      setToastMessage('The data push to Salesforce has failed');
+      setSfdcPush({ ...sfdcPush, loader: false, status: 'Error' });
+    }
+  };
+
+  useEffect(() => {
+    leadData && setSfdcPush({ ...sfdcPush, status: leadData?.lead.sfdc_status });
+  }, [leadData]);
+
   return (
-    <div
-      id='titlebar'
-      className='sticky inset-0 bg-neutral-white h-fit flex items-start px-4 py-3 border border-[#ECECEC]'
-    >
-      <button classes={{ padding: '0' }} onClick={() => navigate('/dashboard')} className='mr-3'>
-        <BackIcon2 />
-      </button>
-      <div className='flex-1'>
-        <h3 className='w-[200px] truncate'>{title}</h3>
-        <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
-          LEAD ID:
-          <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey'>
-            {id}
-          </span>
-        </p>
+    <>
+      <ToastMessage
+        message={toastMessage}
+        setMessage={setToastMessage}
+        error={sfdcPush.status !== 'Complete' ? true : false}
+      />
+
+      <div
+        id='titlebar'
+        className='sticky inset-0 bg-neutral-white h-fit flex items-start px-4 py-3 border border-[#ECECEC]'
+      >
+        <button
+          className='p-0 mr-3'
+          onClick={() => navigate('/dashboard')}
+          disabled={sfdcPush.loader}
+        >
+          {sfdcPush.loader ? (
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='24'
+              height='24'
+              fill='none'
+              viewBox='0 0 24 24'
+            >
+              <g>
+                <rect
+                  width='24'
+                  height='24'
+                  fill='#FEFEFE'
+                  rx='12'
+                  transform='matrix(1 0 0 -1 0 24)'
+                ></rect>
+                <path
+                  stroke='#96989A'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='1.5'
+                  d='M15 18l-6-6 6-6'
+                ></path>
+              </g>
+            </svg>
+          ) : (
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='24'
+              height='24'
+              fill='none'
+              viewBox='0 0 24 24'
+            >
+              <g>
+                <rect
+                  width='24'
+                  height='24'
+                  fill='#FEFEFE'
+                  rx='12'
+                  transform='matrix(1 0 0 -1 0 24)'
+                ></rect>
+                <path
+                  stroke='#373435'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='1.5'
+                  d='M15 18l-6-6 6-6'
+                ></path>
+              </g>
+            </svg>
+          )}
+        </button>
+        <div className='flex-1'>
+          <h3 className='w-[200px] truncate'>{title}</h3>
+          <p className='not-italic font-medium text-[10px] leading-normal text-light-grey'>
+            LEAD ID:
+            <span className='not-italic font-medium text-[10px] leading-normal text-dark-grey'>
+              {id}
+            </span>
+          </p>
+        </div>
+
+        {leadData && (
+          <button>
+            {!sfdcPush.loader &&
+              leadData?.lead.sfdc_count !== 0 &&
+              leadData?.lead.sfdc_count <= 4 &&
+              (sfdcPush.status === 'Complete' ? (
+                <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-secondary-green'>
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M5.843 17.372C4.273 17.372 3 16.099 3 14.529C3 12.959 4.273 11.686 5.843 11.686C5.843 8.546 8.389 6 11.529 6C13.879 6 15.895 7.426 16.762 9.46C17.051 9.394 17.349 9.351 17.658 9.351C19.873 9.351 21.668 11.146 21.668 13.361C21.668 15.576 19.873 17.371 17.658 17.371'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeMiterlimit='10'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                    <path
+                      d='M16 14L11.1875 19L9 16.7273'
+                      stroke='#147257'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                </div>
+              ) : (
+                <div
+                  onClick={() => sfdcPUSH()}
+                  className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-primary-red'
+                >
+                  <svg
+                    width='24'
+                    height='24'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M5.843 16.372C4.273 16.372 3 15.099 3 13.529C3 11.959 4.273 10.686 5.843 10.686C5.843 7.546 8.389 5 11.529 5C13.879 5 15.895 6.426 16.762 8.46C17.051 8.394 17.349 8.351 17.658 8.351C19.873 8.351 21.668 10.146 21.668 12.361C21.668 14.576 19.873 16.371 17.658 16.371'
+                      stroke='#E33439'
+                      strokeWidth='1.5'
+                      strokeMiterlimit='10'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                    <path
+                      d='M8 15C8 12.7909 9.79086 11 12 11C14.2091 11 16 12.7909 16 15C16 17.2091 14.2091 19 12 19C10.5194 19 9.22675 18.1956 8.53513 17M8.53513 17V19M8.53513 17H10.5'
+                      stroke='#E33439'
+                      strokeWidth='1.5'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                </div>
+              ))}
+
+            {sfdcPush.loader ? (
+              <div className='ml-auto'>
+                <img src={loading} alt='loading' className='animate-spin duration-300 ease-out' />
+              </div>
+            ) : null}
+
+            {leadData.lead.sfdc_count > 4 && leadData.lead.sfdc_status !== 'Complete' && (
+              <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4'>
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <g opacity='0.6'>
+                    <path
+                      d='M17.658 15.371C19.873 15.371 21.668 13.576 21.668 11.361C21.668 9.146 19.873 7.351 17.658 7.351C17.349 7.351 17.051 7.393 16.762 7.46C15.896 5.426 13.879 4 11.529 4C8.389 4 5.843 6.546 5.843 9.686C4.273 9.686 3 10.959 3 12.529C3 14.099 4.273 15.372 5.843 15.372M14.355 13.022L9.368 18.009M15.387 15.516C15.387 17.4634 13.8084 19.042 11.861 19.042C9.91364 19.042 8.335 17.4634 8.335 15.516C8.335 13.5686 9.91364 11.99 11.861 11.99C13.8084 11.99 15.387 13.5686 15.387 15.516Z'
+                      stroke='#96989A'
+                      strokeWidth='1.5'
+                      strokeMiterlimit='10'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </g>
+                </svg>
+              </div>
+            )}
+
+            {leadData.lead.sfdc_count > 4 && leadData.lead.sfdc_status === 'Complete' ? (
+              <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-secondary-green'>
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M5.843 17.372C4.273 17.372 3 16.099 3 14.529C3 12.959 4.273 11.686 5.843 11.686C5.843 8.546 8.389 6 11.529 6C13.879 6 15.895 7.426 16.762 9.46C17.051 9.394 17.349 9.351 17.658 9.351C19.873 9.351 21.668 11.146 21.668 13.361C21.668 15.576 19.873 17.371 17.658 17.371'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeMiterlimit='10'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                  <path
+                    d='M16 14L11.1875 19L9 16.7273'
+                    stroke='#147257'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              </div>
+            ) : null}
+          </button>
+        )}
+
+        <button
+          className='ml-4 '
+          onClick={() => handleOpenForm(id)}
+          disabled={primaryApplicant?.applicant_details?.extra_params?.eligibility}
+        >
+          {primaryApplicant?.applicant_details?.extra_params?.eligibility ? (
+            <EditIcon />
+          ) : (
+            <EditLeadEnabled />
+          )}
+        </button>
       </div>
-      <button className='ml-4 ' onClick={() => handleOpenForm(id)} disabled={totalProgress === 100}>
-        {totalProgress === 100 ? <EditIcon /> : <EditLeadEnabled />}
-      </button>
-    </div>
+    </>
   );
 };
 
@@ -1141,24 +1662,28 @@ const FormDetails = React.forwardRef(function FormDetails(
       ) : (
         <div className='flex flex-col gap-2'>
           {data && data.length ? (
-            data.map(({ label, value, subtitle, children }, i) => (
-              <div key={i} className='flex flex-col gap-4'>
-                {subtitle ? (
-                  <p className='text-xs not-italic font-semibold text-primary-black mt-1'>
-                    {subtitle}
-                  </p>
-                ) : null}
-                {label ? (
-                  <div className='w-full flex gap-4' key={i}>
-                    <p className='w-1/2 text-xs not-italic font-normal text-dark-grey'>{label}</p>
-                    <p className='w-1/2 text-xs not-italic font-medium text-primary-black'>
-                      {value || '-'}
+            data.map((e, i) =>
+              e ? (
+                <div key={i} className='flex flex-col gap-4'>
+                  {e?.subtitle ? (
+                    <p className='text-xs not-italic font-semibold text-primary-black mt-1'>
+                      {e?.subtitle}
                     </p>
-                  </div>
-                ) : null}
-                {children ? children : null}
-              </div>
-            ))
+                  ) : null}
+                  {e?.label ? (
+                    <div className='w-full flex gap-4' key={i}>
+                      <p className='w-1/2 text-xs not-italic font-normal text-dark-grey'>
+                        {e?.label}
+                      </p>
+                      <p className='w-1/2 text-xs not-italic font-medium text-primary-black'>
+                        {e?.value || (e?.value === 0 ? e?.value : '-')}
+                      </p>
+                    </div>
+                  ) : null}
+                  {e?.children ? e?.children : null}
+                </div>
+              ) : null,
+            )
           ) : (
             <p className='text-xs not-italic font-medium text-primary-black'>
               This section is not done yet

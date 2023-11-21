@@ -96,8 +96,6 @@ const TextInput = memo(
   }),
 );
 
-export default TextInput;
-
 TextInput.propTypes = {
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
@@ -112,4 +110,7 @@ TextInput.propTypes = {
   disabled: PropTypes.bool,
   message: PropTypes.string,
   onChange: PropTypes.func.isRequired,
+  labelDisabled: PropTypes.any,
 };
+
+export default TextInput;

@@ -7,7 +7,8 @@ export const fieldLabels = {
 
   property_identification_is: 'Property identification is',
   property_value_estimate: 'Property value estimate',
-  owner_name: 'Owner name',
+  current_owner_name: 'Owner name',
+  current_owner_name: 'Current owner name',
   plot_house_flat: 'Plot/House/Flat no.',
   project_society_colony: 'Project Society Colony',
   city: 'City',
@@ -25,7 +26,8 @@ export const fieldLabels = {
   selected_address_proof: 'Address proof',
   address_proof_number: 'Address proof number',
   gender: 'Gender',
-  father_husband_name: `Father/Husband's name`,
+  father_name: `Father's name`,
+  spouse_name: `Spouse's name`,
   mother_name: `Mother's name`,
   marital_status: 'Marital Status',
   religion: 'Religion',
@@ -42,19 +44,19 @@ export const fieldLabels = {
   current_city: 'Current City',
   current_state: 'Current State',
   current_no_of_year_residing: 'Current No. of Year Residing',
-  permanent_flat_no_building_name: 'Permanent Flat no/Building name',
-  permanent_street_area_locality: 'Permanent Street/Area/Locality',
-  permanent_town: 'Permanent Town',
-  permanent_landmark: 'Permanent Landmark',
-  permanent_pincode: 'Permanent Pincode',
-  permanent_city: 'Permanent City',
-  permanent_state: 'Permanent State',
-  permanent_no_of_year_residing: 'Permanent No. of Year Residing',
-  permanent_address_same_as_current: ' Permanent address is same as Current address',
+  additional_flat_no_building_name: 'Additional Flat no/Building name',
+  additional_street_area_locality: 'Additional Street/Area/Locality',
+  additional_town: 'Additional Town',
+  additional_landmark: 'Additional Landmark',
+  additional_pincode: 'Additional Pincode',
+  additional_city: 'Additional City',
+  additional_state: 'Additional State',
+  additional_no_of_year_residing: 'Additional No. of Year Residing',
+  additional_address_same_as_current: ' Additional address is same as Current address',
+  additional_type_of_residence: 'Type of address',
 
   profession: 'Profession',
   company_name: 'Company Name',
-  total_income: 'Total Income',
   pf_uan: 'PF UAN',
   no_current_loan: 'No. of Current Loan',
   ongoing_emi: 'Ongoing EMI',
@@ -74,6 +76,11 @@ export const fieldLabels = {
   pention_amount: 'Pention Amount',
   extra_company_name: 'Other Company Name',
   extra_industries: 'Other Industries',
+  no_of_employees: 'No. of employees',
+  udyam_number: 'Udyam number',
+  income_proof: 'Income proof',
+  salary_per_month: 'Salary per month',
+  pan_number: 'PAN number',
 
   // reference
   reference_1_address: 'Reference 1 address',
@@ -92,6 +99,16 @@ export const fieldLabels = {
   reference_2_pincode: 'Reference 2 pincode',
   reference_2_state: 'Reference 2 state',
   reference_2_type: 'Reference 2 type',
+
+  //upload
+  customer_photo: 'Customer photo',
+  id_proof: 'Id proof',
+  address_proof: 'Address proof',
+  property_paper: 'Property papers',
+  salary_slip: 'Salary slip',
+  form_60: 'Form 60',
+  property_image: 'Property image',
+  upload_selfie: 'Upload selfie',
 };
 
 export const nonRequiredFields = [
@@ -125,7 +142,7 @@ export const pages = {
   property_details: {
     title: 'Property Details',
     url: '/lead/property-details',
-    name: 'propertySchema',
+    name: 'property_details',
   },
   banking_details: {
     title: 'Banking Details',
@@ -135,7 +152,7 @@ export const pages = {
   reference_details: {
     title: 'Reference Details',
     url: '/lead/reference-details',
-    name: 'referenceSchema',
+    name: 'reference_details',
   },
   upload_documents: {
     title: 'Upload Documents',

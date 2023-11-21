@@ -34,9 +34,9 @@ const DesktopStepper = ({ steps, activeStep }) => {
   );
 };
 
-export default DesktopStepper;
-
 DesktopStepper.propTypes = {
   steps: PropTypes.arrayOf(PropTypes.object),
   activeStep: PropTypes.number,
 };
+
+export default DesktopStepper;

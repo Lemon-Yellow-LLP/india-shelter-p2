@@ -39,10 +39,10 @@ export const PrimaryDropdownOptions = [
     label: 'Upload Documents',
     value: 'upload_documents',
   },
-  {
-    label: 'Preview',
-    value: 'preview',
-  },
+  // {
+  //   label: 'Preview',
+  //   value: 'preview',
+  // },
   {
     label: 'Eligibility',
     value: 'eligibility',
@@ -66,7 +66,10 @@ export const CoApplicantDropdownOptions = [
     label: 'Work & Income Details',
     value: 'work_income_details',
   },
-
+  {
+    label: 'Qualifier',
+    value: 'qualifier',
+  },
   {
     label: 'Banking Details',
     value: 'banking_details',
@@ -74,9 +77,5 @@ export const CoApplicantDropdownOptions = [
   {
     label: 'Upload Documents',
     value: 'upload_documents',
-  },
-  {
-    label: 'Qualifier',
-    value: 'qualifier',
   },
 ];

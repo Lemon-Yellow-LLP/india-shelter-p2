@@ -25,10 +25,12 @@ export default function UploadSteps({ details, steps, index, stepIndex, noProgre
     >
       <div className='flex justify-between gap-1'>
         <details.Icon />
-        <div className='flex flex-col flex-1'>
+        <div className='flex flex-col flex-1 overflow-hidden overflow-ellipsis'>
           <span className='text-[14px] font-normal'>{details.title}</span>
           {steps ? (
-            <span className='text-[11px] font-normal text-[#727376]'>{details.description}</span>
+            <span className='text-[11px] font-normal text-[#727376] whitespace-nowrap truncate'>
+              {details.description}
+            </span>
           ) : null}
         </div>
         {!details.hideProgress ? (

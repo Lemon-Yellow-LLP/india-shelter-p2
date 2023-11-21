@@ -10,7 +10,8 @@ import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWith
 import { manualModeDropdownOptions } from './manualModeDropdownOptions';
 import OtpInput from '../../../../components/OtpInput/index';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
-import { getEmailOtp, verifyEmailOtp } from '../../../../global';
+import { editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
+import { AuthContext } from '../../../../context/AuthContextProvider';
 
 function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields }) {
   const {
@@ -27,6 +28,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setFieldError,
     setValues,
   } = useContext(LeadContext);
+
+  const { token } = useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
@@ -50,24 +53,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     }
   }, [activeIndex, values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
 
-  const dobUpdate = useCallback(() => {
-    if (date && date.length) {
-      var dateParts = date?.split('/');
-      var day = parseInt(dateParts[0], 10);
-      var month = parseInt(dateParts[1], 10);
-      var year = parseInt(dateParts[2], 10);
-
-      const finalDate = `${year}-${month}-${day}`;
-
-      setFieldValue(`applicants[${activeIndex}].personal_details.date_of_birth`, finalDate);
-      updateFields('date_of_birth', finalDate);
-    }
-  }, [date]);
-
-  useEffect(() => {
-    dobUpdate();
-  }, [date]);
-
   useEffect(() => {
     updateProgressApplicantSteps(1, requiredFieldsStatus);
   }, [requiredFieldsStatus]);
@@ -77,7 +62,19 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       setFieldValue(e.name, e.value);
       const name = e.name.split('.')[2];
       updateFields(name, e.value);
-      if (!requiredFieldsStatus[name]) {
+      if (e.value === 'Married') {
+        setFieldValue(`applicants[${activeIndex}].personal_details.spouse_name`, null);
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true, spouse_name: false }));
+      } else if (e.value === 'Single') {
+        let newRequiredFields = {};
+        Object.keys(requiredFieldsStatus).reduce((newObject, key) => {
+          if (key !== 'spouse_name') {
+            newRequiredFields[key] = requiredFieldsStatus[key];
+          }
+        });
+        setFieldValue(`applicants[${activeIndex}].personal_details.spouse_name`, null);
+        setRequiredFieldsStatus({ ...newRequiredFields, [name]: true });
+      } else {
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
@@ -87,14 +84,42 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const changeIdType = useCallback(
     (e) => {
       setFieldValue(`applicants[${activeIndex}].personal_details.id_type`, e);
-      setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
+
+      if (values?.applicants?.[activeIndex]?.work_income_detail?.pan_number && e === 'PAN') {
+        setFieldValue(
+          `applicants[${activeIndex}].personal_details.id_number`,
+          values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
+        );
+      } else {
+        setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
+        updateFields('id_number', '');
+      }
+
       updateFields('id_type', e);
-      updateFields('id_number', '');
+
       setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true, id_number: false }));
       if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-        updateFields('selected_address_proof', e);
-        updateFields('address_proof_number', '');
-        setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: false }));
+        if (e === 'PAN') {
+          setFieldValue(
+            `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
+            false,
+          );
+          setFieldValue(`applicants[${activeIndex}].personal_details.selected_address_proof`, '');
+          setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
+          updateFields('selected_address_proof', '');
+          updateFields('address_proof_number', '');
+          setRequiredFieldsStatus((prev) => ({
+            ...prev,
+            selected_address_proof: false,
+            address_proof_number: false,
+          }));
+        } else {
+          setFieldValue(`applicants[${activeIndex}].personal_details.selected_address_proof`, e);
+          setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
+          updateFields('selected_address_proof', e);
+          updateFields('address_proof_number', '');
+          setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: false }));
+        }
       }
     },
     [requiredFieldsStatus],
@@ -117,7 +142,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const handleTextInputChange = useCallback(
     (e) => {
-      const value = e.target.value;
+      if (e.target.value === ' ') {
+        return;
+      }
+      let value = e.target.value;
+      value = value.trimStart().replace(/\s\s+/g, ' ');
       const pattern = /^[A-Za-z]+$/;
       const pattern2 = /^[a-zA-Z\s]*$/;
 
@@ -127,7 +156,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
       if (
         pattern2.test(value) &&
-        e.target.name == `applicants[${activeIndex}].personal_details.father_husband_name`
+        (e.target.name == `applicants[${activeIndex}].personal_details.father_name` ||
+          e.target.name == `applicants[${activeIndex}].personal_details.mother_name`)
       ) {
         setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
@@ -142,9 +172,34 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       }
 
       if (e.target.name === `applicants[${activeIndex}].personal_details.email`) {
+        const value = e.currentTarget.value;
+        const email_pattern = /^[a-zA-Z0-9\s,@\.\/]+$/;
+
+        if (!email_pattern.test(value)) {
+          return;
+        }
+
         setFieldValue(e.target.name, value);
         setHasSentOTPOnce(false);
         setShowOTPInput(false);
+      }
+
+      if (
+        e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
+        values?.applicants?.[activeIndex]?.personal_details?.id_type === 'Passport'
+      ) {
+        if (value[0] === 'Q' || value[0] === 'X' || value[0] === 'Z') {
+          return;
+        }
+      }
+
+      if (
+        e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
+        values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'Passport'
+      ) {
+        if (value[0] === 'Q' || value[0] === 'X' || value[0] === 'Z') {
+          return;
+        }
       }
 
       if (
@@ -155,6 +210,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
           values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR'
         ) {
+          if (e.target.selectionStart !== value.length) {
+            e.target.selectionStart = e.target.selectionEnd = value.length;
+            return;
+          }
           let aadharPattern = /^\d$/;
           if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
             const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
@@ -169,6 +228,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
           values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR'
         ) {
+          if (e.target.selectionStart !== value.length) {
+            e.target.selectionStart = e.target.selectionEnd = value.length;
+            return;
+          }
           let aadharPattern = /^\d$/;
           if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
             const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
@@ -204,12 +267,20 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   );
 
   useEffect(() => {
-    updateFields();
+    if (values?.applicants[activeIndex]?.personal_details?.id) {
+      // console.log(errors?.applicants?.[activeIndex]);
+      if (
+        !errors?.applicants?.[activeIndex]?.personal_details?.id_type &&
+        !errors?.applicants?.[activeIndex]?.personal_details?.id_number
+      ) {
+        updateFields();
+      }
+    }
   }, [values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type]);
 
   useEffect(() => {
     if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-      let newData = JSON.parse(JSON.stringify(values));
+      let newData = structuredClone(values);
 
       newData.applicants[activeIndex].personal_details = {
         ...newData.applicants[activeIndex].personal_details,
@@ -224,7 +295,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
       values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN Card'
     ) {
-      let newData = JSON.parse(JSON.stringify(values));
+      let newData = structuredClone(values);
 
       newData.applicants[activeIndex].personal_details = {
         ...newData.applicants[activeIndex].personal_details,
@@ -245,12 +316,21 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     // setDisableEmailInput((prev) => !prev);
     setShowOTPInput(true);
     setHasSentOTPOnce(true);
-    getEmailOtp(values?.applicants?.[activeIndex]?.personal_details?.id);
+
+    getEmailOtp(values?.applicants?.[activeIndex]?.personal_details?.id, {
+      headers: {
+        Authorization: token,
+      },
+    });
     setToastMessage('OTP has been sent to your mail id');
   };
 
   const verifyOTP = (otp) => {
-    verifyEmailOtp(values?.applicants?.[activeIndex]?.personal_details?.id, otp)
+    verifyEmailOtp(values?.applicants?.[activeIndex]?.personal_details?.id, otp, {
+      headers: {
+        Authorization: token,
+      },
+    })
       .then((res) => {
         setEmailVerified(true);
         setShowOTPInput(false);
@@ -264,6 +344,26 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         return false;
       });
   };
+
+  const dobUpdate = useCallback(() => {
+    if (date && date.length) {
+      var dateParts = date?.split('/');
+      var day = parseInt(dateParts[0], 10);
+      var month = parseInt(dateParts[1], 10);
+      var year = parseInt(dateParts[2], 10);
+
+      const finalDate = `${year}-${month}-${day}`;
+
+      setFieldValue(`applicants[${activeIndex}].personal_details.date_of_birth`, finalDate);
+      if (values?.applicants[activeIndex]?.personal_details?.id) {
+        updateFields('date_of_birth', finalDate);
+      }
+    }
+  }, [date]);
+
+  useEffect(() => {
+    dobUpdate();
+  }, [date]);
 
   const mobileNumberUpdate = useCallback(() => {
     setFieldValue(
@@ -279,6 +379,31 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   // console.log(values?.applicants[activeIndex]?.personal_details?.id_type);
   // console.log(values?.applicants[activeIndex]?.personal_details?.id_number);
+
+  // useEffect(() => {
+  //   if (
+  //     values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+  //     values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
+  //   ) {
+  //     setFieldValue(
+  //       `values.applicants[${activeIndex}].personal_details.id_number`,
+  //       values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
+  //     );
+
+  //     editFieldsById(
+  //       values?.applicants?.[activeIndex]?.personal_details.id,
+  //       'personal',
+  //       {
+  //         id_number: values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: token,
+  //         },
+  //       },
+  //     );
+  //   }
+  // }, [values?.applicants?.[activeIndex]?.personal_details?.id_type]);
 
   return (
     <>
@@ -304,6 +429,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             );
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInput
@@ -321,7 +447,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={
           touched?.applicants && touched?.applicants?.[activeIndex]?.personal_details?.id_number
         }
-        disabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
+        disabled={
+          !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+        }
         labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
           handleBlur(e);
@@ -334,20 +463,38 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
               setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
             }
+
+            if (
+              values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+            ) {
+              updateFields(
+                'address_proof_number',
+                values?.applicants?.[activeIndex]?.personal_details?.[name],
+              );
+              if (
+                requiredFieldsStatus.address_proof_number !== undefined &&
+                !requiredFieldsStatus.address_proof_number
+              ) {
+                setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: true }));
+              }
+            }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            updateFields(name, '');
           }
-          if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-            updateFields(
-              'address_proof_number',
-              values?.applicants?.[activeIndex]?.personal_details?.[name],
-            );
-            if (
-              requiredFieldsStatus.address_proof_number !== undefined &&
-              !requiredFieldsStatus.address_proof_number
-            ) {
-              setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: true }));
-            }
+        }}
+        onKeyDown={(e) => {
+          if (
+            values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
+            (e.key === 'ArrowUp' ||
+              e.key === 'ArrowDown' ||
+              e.key === 'ArrowLeft' ||
+              e.key === 'ArrowRight' ||
+              e.key === ' ' ||
+              e.keyCode === 32 ||
+              (e.keyCode >= 65 && e.keyCode <= 90))
+          ) {
+            e.preventDefault();
           }
         }}
       />
@@ -359,10 +506,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
           name='terms-agreed'
           onTouchEnd={(e) => {
-            setFieldValue(
-              `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
-              e.target.checked,
-            );
             if (!e.target.checked) {
               setFieldValue(
                 `applicants[${activeIndex}].personal_details.selected_address_proof`,
@@ -376,30 +519,42 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                 address_proof_number: false,
               }));
             } else {
-              setFieldValue(
-                `applicants[${activeIndex}].personal_details.selected_address_proof`,
-                values?.applicants?.[activeIndex]?.personal_details?.id_type,
-              );
-              setFieldValue(
-                `applicants[${activeIndex}].personal_details.address_proof_number`,
-                values?.applicants?.[activeIndex]?.personal_details?.id_number,
-              );
-              setFieldError(
-                `applicants[${activeIndex}].personal_details.selected_address_proof`,
-                null,
-              );
-              setFieldError(
-                `applicants[${activeIndex}].personal_details.address_proof_number`,
-                null,
-              );
+              if (!errors?.applicants?.[activeIndex]?.personal_details?.id_type) {
+                setFieldValue(
+                  `applicants[${activeIndex}].personal_details.selected_address_proof`,
+                  values?.applicants?.[activeIndex]?.personal_details?.id_type,
+                );
+                setFieldError(
+                  `applicants[${activeIndex}].personal_details.selected_address_proof`,
+                  null,
+                );
+              }
+              if (
+                !errors?.applicants?.[activeIndex]?.personal_details?.id_type &&
+                !errors?.applicants?.[activeIndex]?.personal_details?.id_number
+              ) {
+                setFieldValue(
+                  `applicants[${activeIndex}].personal_details.address_proof_number`,
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number,
+                );
 
-              setRequiredFieldsStatus((prev) => ({
-                ...prev,
-                selected_address_proof: true,
-                address_proof_number: true,
-              }));
+                setFieldError(
+                  `applicants[${activeIndex}].personal_details.address_proof_number`,
+                  null,
+                );
+
+                setRequiredFieldsStatus((prev) => ({
+                  ...prev,
+                  selected_address_proof: true,
+                  address_proof_number: true,
+                }));
+              }
             }
-            updateFields();
+
+            setFieldValue(
+              `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
+              e.target.checked,
+            );
           }}
           disabled={
             !values?.applicants?.[activeIndex]?.personal_details?.id_type
@@ -408,7 +563,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               ? true
               : !values?.applicants?.[activeIndex]?.personal_details?.id_number
               ? true
-              : false
+              : false ||
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
           }
         />
         <span
@@ -440,7 +596,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           touched.applicants?.[activeIndex]?.personal_details?.selected_address_proof
         }
         disabled={
-          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
         }
         disableOption={values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
@@ -466,7 +623,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
-          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
         }
         labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
         onBlur={(e) => {
@@ -482,6 +640,22 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            updateFields(name, '');
+          }
+        }}
+        onKeyDown={(e) => {
+          if (
+            values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ===
+              'AADHAR' &&
+            (e.key === 'ArrowUp' ||
+              e.key === 'ArrowDown' ||
+              e.key === 'ArrowLeft' ||
+              e.key === 'ArrowRight' ||
+              e.key === ' ' ||
+              e.keyCode === 32 ||
+              (e.keyCode >= 65 && e.keyCode <= 90))
+          ) {
+            e.preventDefault();
           }
         }}
       />
@@ -491,65 +665,39 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         placeholder='Eg: Sanjay'
         required
         name={`applicants[${activeIndex}].personal_details.first_name`}
-        value={values?.applicants?.[activeIndex]?.personal_details?.first_name}
+        value={values?.applicants?.[activeIndex]?.applicant_details?.first_name}
         onChange={handleTextInputChange}
-        error={errors.applicants?.[activeIndex]?.personal_details?.first_name}
+        error={errors.applicants?.[activeIndex]?.applicant_details?.first_name}
         touched={
-          touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.first_name
+          touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.first_name
         }
-        onBlur={(e) => {
-          handleBlur(e);
-          const name = e.target.name.split('.')[2];
-          if (
-            !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
-            values?.applicants?.[activeIndex]?.personal_details?.[name]
-          ) {
-            updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
-            if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
-              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-            }
-          } else {
-            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
-          }
-        }}
+        disabled={true}
       />
-
       <TextInput
         label='Middle Name'
         placeholder='Eg: Sham'
         name={`applicants[${activeIndex}].personal_details.middle_name`}
-        value={values?.applicants?.[activeIndex]?.personal_details?.middle_name}
+        value={values?.applicants?.[activeIndex]?.applicant_details?.middle_name}
         onChange={handleTextInputChange}
-        error={errors.applicants?.[activeIndex]?.personal_details?.middle_name}
+        error={errors.applicants?.[activeIndex]?.applicant_details?.middle_name}
         touched={
-          touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.middle_name
+          touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.middle_name
         }
-        onBlur={(e) => {
-          handleBlur(e);
-          const name = e.target.name.split('.')[2];
-          if (!errors.applicants?.[activeIndex]?.personal_details?.[name]) {
-            updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
-          }
-        }}
+        disabled={true}
       />
       <TextInput
         label='Last Name'
         placeholder='Eg: Picha'
         name={`applicants[${activeIndex}].personal_details.last_name`}
-        value={values?.applicants?.[activeIndex]?.personal_details?.last_name}
+        value={values?.applicants?.[activeIndex]?.applicant_details?.last_name}
         onChange={handleTextInputChange}
-        error={errors.applicants?.[activeIndex]?.personal_details?.last_name}
+        error={errors.applicants?.[activeIndex]?.applicant_details?.last_name}
         touched={
-          touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.last_name
+          touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.last_name
         }
-        onBlur={(e) => {
-          handleBlur(e);
-          const name = e.target.name.split('.')[2];
-          if (!errors.applicants?.[activeIndex]?.personal_details?.[name]) {
-            updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
-          }
-        }}
+        disabled={true}
       />
+
       <div className='flex flex-col gap-2'>
         <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
           Gender <span className='text-primary-red text-xs'>*</span>
@@ -563,6 +711,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               value={option.value}
               current={values?.applicants?.[activeIndex]?.personal_details?.gender}
               onChange={handleRadioChange}
+              disabled={
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              }
             >
               {option.icon}
             </CardRadio>
@@ -625,21 +776,22 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.[name]
           ) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+          } else {
+            updateFields(name, '');
           }
         }}
       />
 
       <TextInput
-        label={`Father/Husband's name`}
+        label={`Father's name`}
         placeholder='Eg: Akash'
         required
-        name={`applicants[${activeIndex}].personal_details.father_husband_name`}
-        value={values?.applicants?.[activeIndex]?.personal_details?.father_husband_name}
+        name={`applicants[${activeIndex}].personal_details.father_name`}
+        value={values?.applicants?.[activeIndex]?.personal_details?.father_name}
         onChange={handleTextInputChange}
-        error={errors.applicants?.[activeIndex]?.personal_details?.father_husband_name}
+        error={errors.applicants?.[activeIndex]?.personal_details?.father_name}
         touched={
-          touched?.applicants &&
-          touched.applicants?.[activeIndex]?.personal_details?.father_husband_name
+          touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.father_name
         }
         onBlur={(e) => {
           handleBlur(e);
@@ -654,8 +806,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            updateFields(name, '');
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInput
@@ -682,8 +836,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             }
           } else {
             setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+            updateFields(name, '');
           }
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <div className='flex flex-col gap-2'>
@@ -699,6 +855,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               value={option.value}
               current={values?.applicants?.[activeIndex]?.personal_details?.marital_status}
               onChange={handleRadioChange}
+              disabled={
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              }
             >
               {option.icon}
             </CardRadio>
@@ -719,6 +878,38 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         ''
       )}
 
+      {values?.applicants?.[activeIndex]?.personal_details?.marital_status === 'Married' ? (
+        <TextInput
+          label={`Spouse name`}
+          placeholder='Eg: Rupali'
+          required
+          name={`applicants[${activeIndex}].personal_details.spouse_name`}
+          value={values?.applicants?.[activeIndex]?.personal_details?.spouse_name}
+          onChange={handleTextInputChange}
+          error={errors.applicants?.[activeIndex]?.personal_details?.spouse_name}
+          touched={
+            touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.spouse_name
+          }
+          onBlur={(e) => {
+            handleBlur(e);
+            const name = e.target.name.split('.')[2];
+            if (
+              !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
+              values?.applicants?.[activeIndex]?.personal_details?.[name]
+            ) {
+              updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+              if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
+                setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+              }
+            } else {
+              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+              updateFields(name, '');
+            }
+          }}
+          disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        />
+      ) : null}
+
       <DropDown
         label='Religion'
         name={`applicants[${activeIndex}].personal_details.religion`}
@@ -736,6 +927,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <DropDown
@@ -756,6 +948,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <DropDown
@@ -775,6 +968,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
+        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
 
       <TextInputWithSendOtp
@@ -792,7 +986,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           emailVerified ||
           hasSentOTPOnce
         }
-        disabled={disableEmailInput || emailVerified}
+        disabled={
+          disableEmailInput ||
+          emailVerified ||
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+        }
         message={
           emailVerified
             ? `OTP Verfied
@@ -808,6 +1006,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.[name]
           ) {
             updateFields(name, values?.applicants?.[activeIndex]?.personal_details?.[name]);
+          } else {
+            updateFields(name, '');
           }
         }}
       />

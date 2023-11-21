@@ -1,13 +1,14 @@
-import { createContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
 import { validationSchemaLead } from '../schemas/index';
 import { defaultErrorsLead } from './defaultErrorsLead';
 import { defaultValuesLead } from './defaultValuesLead';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { applicantSteps, coApplicantSteps } from './Steps';
 import { editFieldsById, getApplicantById } from '../global';
 import { newCoApplicantValues } from './NewCoApplicant';
+import { AuthContext } from './AuthContextProvider';
 
 export const LeadContext = createContext(defaultValuesLead);
 
@@ -22,18 +23,127 @@ const LeadContextProvider = ({ children }) => {
   const [coApplicantStepsProgress, setCoApplicantSetpsProgress] = useState([...coApplicantSteps]);
   const [bankSuccessTost, setBankSuccessTost] = useState('');
   const [bankErrorTost, setBankErrorTost] = useState('');
+  const [drawerTabIndex, setDrawerTabIndex] = useState(0);
+  const [primaryIndex, setPrimaryIndex] = useState(0);
+  const [activeCoApplicantIndex, setActiveCoApplicantIndex] = useState(0);
+  const [coApplicants, setCoApplicants] = useState([]);
+  const [pincodeErr, setPincodeErr] = useState({});
+  const [propertyValueEstimateError, setPropertyValueEstimateError] = useState('');
+
+  const { token } = useContext(AuthContext);
+
+  const location = useLocation();
 
   const formik = useFormik({
-    initialValues: { ...defaultValuesLead },
-    initialErrors: {
-      ...defaultErrorsLead,
-    },
+    initialValues: structuredClone(defaultValuesLead),
+    initialErrors: structuredClone(defaultErrorsLead),
     validationSchema: validationSchemaLead,
     onSubmit: (_, action) => {
-      console.log(action);
+      // console.log(action);
       // action.resetForm(defaultValues);
     },
   });
+
+  // Function to recursively count keys and calculate the sum of values
+  const countKeysAndValues = (obj, result = { totalKeys: 0, valuesSum: 0 }) => {
+    for (const key in obj) {
+      if (typeof obj[key] === 'object') {
+        countKeysAndValues(obj[key], result);
+      } else {
+        result.totalKeys += 1;
+        result.valuesSum += obj[key];
+      }
+    }
+
+    return result;
+  };
+
+  const updateCompleteFormProgress = async () => {
+    if (formik?.values) {
+      let newData = structuredClone(formik.values);
+
+      const getProgress = (obj) => obj?.extra_params?.progress;
+
+      // Map over the keys of formData and get progress for each key
+      let progressMap = {};
+      let progressMapTemp = {};
+      Object.keys(newData).forEach((key) => {
+        if (key !== 'lead') {
+          progressMap[key] = getProgress(newData[key]);
+        }
+      });
+
+      progressMap.applicants = [];
+      progressMapTemp = structuredClone(progressMap);
+      progressMapTemp.applicants = [];
+
+      newData?.applicants.map((applicant, index) => {
+        progressMap.applicants[index] = {};
+        progressMapTemp.applicants[index] = {};
+        Object.keys(applicant).forEach((key) => {
+          if (key === 'banking_details') {
+            if (applicant?.applicant_details?.is_primary) {
+              progressMap.applicants[index][key] = applicant?.applicant_details?.extra_params
+                ?.banking_progress
+                ? 100
+                : 0;
+            }
+          } else {
+            progressMap.applicants[index][key] = getProgress(applicant[key]);
+          }
+        });
+        progressMap.applicants[index].upload_progress =
+          applicant?.applicant_details?.extra_params?.upload_progress;
+
+        progressMap.applicants[index].qualifier = applicant?.applicant_details?.extra_params
+          ?.qualifier
+          ? 100
+          : 0;
+
+        progressMapTemp.applicants[index] = structuredClone(progressMap.applicants[index]);
+
+        if (applicant?.applicant_details?.is_primary) {
+          progressMap.applicants[index].eligibility = applicant?.applicant_details?.extra_params
+            ?.eligibility
+            ? 100
+            : 0;
+        }
+      });
+      progressMap.lt_charges = newData?.lt_charges?.find((e) => e.status === 'Completed') ? 100 : 0;
+
+      progressMapTemp.lt_charges = structuredClone(progressMap.lt_charges);
+
+      const { totalKeys, valuesSum } = countKeysAndValues(progressMap);
+      const resValues = countKeysAndValues(progressMapTemp);
+
+      let finalProgress = parseInt(parseInt(valuesSum) / parseInt(totalKeys));
+
+      let tempFinalProgress = parseInt(
+        parseInt(resValues.valuesSum) / parseInt(resValues.totalKeys),
+      );
+
+      formik.setFieldValue('lead.extra_params.progress', finalProgress);
+      formik.setFieldValue('lead.extra_params.progress_without_eligibility', tempFinalProgress);
+
+      if (formik?.values?.lead?.id) {
+        await editFieldsById(
+          formik?.values?.lead?.id,
+          'lead',
+          {
+            extra_params: {
+              progress: finalProgress,
+              progress_without_eligibility: tempFinalProgress,
+            },
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+      }
+    }
+  };
 
   const updateProgressApplicantSteps = async (updateStep, requiredFieldsStatus, page) => {
     let trueCount = 0;
@@ -54,7 +164,18 @@ const LeadContextProvider = ({ children }) => {
       if (newData?.[updateStep] && typeof newData[updateStep]?.extra_params === 'object') {
         newData[updateStep].extra_params.progress = finalProgress;
         newData[updateStep].extra_params.required_fields_status = requiredFieldsStatus;
-        await editFieldsById(formik.values[updateStep].id, page, newData[updateStep]);
+        await editFieldsById(
+          formik.values[updateStep].id,
+          page,
+          {
+            extra_params: newData[updateStep].extra_params,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
       }
     } else {
       if (
@@ -68,11 +189,20 @@ const LeadContextProvider = ({ children }) => {
         await editFieldsById(
           formik.values.applicants[activeIndex][updateStep].id,
           page,
-          newData.applicants[activeIndex][updateStep],
+          {
+            extra_params: newData.applicants[activeIndex][updateStep].extra_params,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
         );
       }
     }
     formik.setValues(newData);
+
+    updateCompleteFormProgress();
   };
 
   const updateProgressUploadDocumentSteps = async (requiredFieldsStatus) => {
@@ -97,13 +227,13 @@ const LeadContextProvider = ({ children }) => {
     // const updated_field_status = { ...}
     //    newData.applicants[activeIndex].applicant_details,
 
-    // console.log(
-    //   newData.applicants[activeIndex].applicant_details.extra_params.upload_required_fields_status,
-    // );
-    // console.log(requiredFieldsStatus);
-
     const applicant = await getApplicantById(
-      formik.values?.applicants?.[activeIndex]?.applicant_details.id,
+      formik.values?.applicants?.[activeIndex]?.applicant_details?.id,
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
 
     const old_extra_params = applicant.extra_params;
@@ -120,21 +250,28 @@ const LeadContextProvider = ({ children }) => {
       upload_progress: finalProgress,
     };
 
-    console.log(updated_extra_params);
-
-    await editFieldsById(formik.values.applicants[activeIndex].applicant_details.id, 'applicant', {
-      extra_params: updated_extra_params,
-    });
+    await editFieldsById(
+      formik.values.applicants[activeIndex].applicant_details.id,
+      'applicant',
+      {
+        extra_params: updated_extra_params,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
 
     formik.setValues(newData);
-  };
 
-  console.log(formik.values);
+    updateCompleteFormProgress();
+  };
 
   const addApplicant = () => {
     formik.setValues((prev) => {
       let newData = { ...prev };
-      newData.applicants.push({ ...newCoApplicantValues });
+      newData.applicants.push(structuredClone(newCoApplicantValues));
       return newData;
     });
 
@@ -143,12 +280,69 @@ const LeadContextProvider = ({ children }) => {
     navigate('/lead/applicant-details');
 
     setDrawerOpen(false);
+
+    updateCompleteFormProgress();
   };
+
+  const removeCoApplicant = (activeIndex) => {
+    formik.setValues((prev) => {
+      let newData = { ...prev };
+      newData.applicants.splice(activeIndex, 1);
+      return newData;
+    });
+
+    setActiveIndex(0);
+
+    navigate('/lead/applicant-details');
+
+    setDrawerOpen(false);
+
+    updateCompleteFormProgress();
+  };
+
+  useEffect(() => {
+    if (location.pathname !== '/lead/applicant-details') {
+      let newApplicants = formik.values.applicants.filter(
+        (e) => e.applicant_details.is_mobile_verified,
+      );
+      formik.setFieldValue('applicants', newApplicants);
+      updateCompleteFormProgress();
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    let newData = [];
+
+    formik.values.applicants.map((e, index) => {
+      if (!e.applicant_details.is_primary && e.applicant_details.is_mobile_verified) {
+        newData.push({
+          label: e.applicant_details.first_name || e.applicant_details.mobile_number,
+          value: index,
+        });
+      }
+    });
+
+    setCoApplicants(newData);
+
+    setActiveCoApplicantIndex(newData?.[0]?.value);
+
+    formik.values.applicants.map((e, index) => {
+      if (e.applicant_details.is_primary) {
+        setPrimaryIndex(index);
+      }
+    });
+  }, [formik.values.applicants]);
+
+  useEffect(() => {
+    console.log('Lead Context Values', formik.values);
+  }, [formik.values]);
 
   return (
     <LeadContext.Provider
       value={{
         ...formik,
+        updateCompleteFormProgress,
+        removeCoApplicant,
         applicantStepsProgress,
         setApplicantSetpsProgress,
         updateProgressApplicantSteps,
@@ -166,11 +360,22 @@ const LeadContextProvider = ({ children }) => {
         coApplicantStepsProgress,
         setCoApplicantSetpsProgress,
         updateProgressUploadDocumentSteps,
-        updateProgressUploadDocumentSteps,
         bankSuccessTost,
         setBankSuccessTost,
         bankErrorTost,
         setBankErrorTost,
+        drawerTabIndex,
+        setDrawerTabIndex,
+        primaryIndex,
+        setPrimaryIndex,
+        activeCoApplicantIndex,
+        setActiveCoApplicantIndex,
+        coApplicants,
+        setCoApplicants,
+        pincodeErr,
+        setPincodeErr,
+        propertyValueEstimateError,
+        setPropertyValueEstimateError,
       }}
     >
       {children}

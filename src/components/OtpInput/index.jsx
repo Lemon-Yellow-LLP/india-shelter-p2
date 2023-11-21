@@ -155,7 +155,7 @@ const OtpInput = ({
         </div>
       </div>
       <div className='w-full flex justify-end'>
-        {hasSentOTPOnce && disableSendOTP && !timer && verified !== true ? (
+        {hasSentOTPOnce && disableSendOTP && !timer && verified !== true && otpFailCount !== 3 ? (
           <button
             type='button'
             className='text-primary-red cursor-pointer font-semibold'
@@ -175,8 +175,6 @@ const OtpInput = ({
   );
 };
 
-export default OtpInput;
-
 OtpInput.propTypes = {
   label: PropTypes.string.isRequired,
   required: PropTypes.bool,
@@ -186,4 +184,9 @@ OtpInput.propTypes = {
   disableSendOTP: PropTypes.bool,
   verifyOTPCB: PropTypes.func,
   defaultResendTime: PropTypes.number,
+  hasSentOTPOnce: PropTypes.any,
+  verifiedOnce: PropTypes.any,
+  setVerifiedOnce: PropTypes.any,
 };
+
+export default OtpInput;
