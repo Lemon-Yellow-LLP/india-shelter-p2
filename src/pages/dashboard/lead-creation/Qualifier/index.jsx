@@ -165,9 +165,30 @@ const Qualifier = () => {
         return;
       }
 
+      if (values.applicants[activeIndex]?.work_income_detail.income_proof === 'Form 60') {
+        setFieldValue(`applicants[${activeIndex}].work_income_detail.pan_number`, '');
+
+        editFieldsById(
+          values?.applicants?.[activeIndex]?.work_income_detail?.id,
+          'work-income',
+          {
+            pan_number: '',
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+      }
+
       let final_api = [];
 
-      if (values.applicants[activeIndex]?.personal_details.id_type === 'PAN') {
+      if (
+        values.applicants[activeIndex]?.personal_details.id_type === 'PAN' ||
+        (values.applicants[activeIndex]?.work_income_detail.pan_number &&
+          values.applicants[activeIndex]?.work_income_detail.income_proof !== 'Form 60')
+      ) {
         setPAN((prev) => ({
           ...prev,
           loader: true,
@@ -589,7 +610,8 @@ const Qualifier = () => {
 
         <div className='mt-4 flex flex-col gap-2'>
           {(values.applicants[activeIndex]?.personal_details.id_type === 'PAN' ||
-            values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN') && (
+            values.applicants[activeIndex]?.personal_details.selected_address_proof === 'PAN' ||
+            values.applicants[activeIndex]?.work_income_detail.pan_number) && (
             <div className='flex justify-between items-center rounded-lg border-stroke border-x border-y px-2 py-1.5'>
               <div className='flex items-center gap-1'>
                 {/* {!PAN.ran ? (
