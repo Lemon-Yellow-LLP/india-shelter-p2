@@ -45,9 +45,7 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
         );
         const name = e.name.split('.')[2];
 
-        if (!values?.applicants?.[activeIndex]?.work_income_detail?.income_proof) {
-          setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-        }
+        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       } else {
         const name = e.name.split('.')[2];
         setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
@@ -67,7 +65,27 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
         setRequiredFieldsStatus((prev) => ({ ...prev, ['income_proof']: false }));
       }
     } else {
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
+      if (values?.applicants?.[activeIndex]?.work_income_detail?.pan_number) {
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
+      }
+    }
+
+    if (values?.applicants?.[activeIndex]?.work_income_detail?.income_proof === 'Form 60') {
+      setRequiredFieldsStatus((prev) => {
+        let newPrev = { ...prev };
+        if ('pan_number' in newPrev) delete newPrev.pan_number;
+
+        return newPrev;
+      });
+    } else {
+      setRequiredFieldsStatus((prev) => {
+        let newPrev = {
+          ...prev,
+          ['pan_number']: !!values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
+        };
+
+        return newPrev;
+      });
     }
   }, [values?.applicants?.[activeIndex]?.work_income_detail?.income_proof]);
 
