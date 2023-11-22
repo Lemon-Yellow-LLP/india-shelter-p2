@@ -481,7 +481,10 @@ const WorkIncomeDetails = () => {
       );
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
-    } else if (!values?.applicants?.[activeIndex]?.work_income_detail?.pan_number) {
+    } else if (
+      !values?.applicants?.[activeIndex]?.work_income_detail?.pan_number &&
+      values?.applicants?.[activeIndex]?.work_income_detail?.income_proof !== 'Form 60'
+    ) {
       setFieldValue(`applicants[${activeIndex}].work_income_detail.pan_number`, '');
 
       editFieldsById(
@@ -497,7 +500,10 @@ const WorkIncomeDetails = () => {
         },
       );
 
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: false }));
+      setRequiredFieldsStatus((prev) => ({
+        ...prev,
+        ['pan_number']: !!values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
+      }));
     }
   }, []);
 
