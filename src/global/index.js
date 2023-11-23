@@ -384,11 +384,13 @@ export async function getLnTChargesQRCode(leadId, options) {
   return data;
 }
 
+const REQUEST_TIMEOUT = 30 * 1000; // 30 seconds
+
 export async function checkPaymentStatus(leadId, options) {
   const controller = new AbortController();
   setTimeout(() => {
     controller.abort();
-  }, 30000);
+  }, REQUEST_TIMEOUT);
   const { data } = await axios.post(
     `${API_URL}/lt-charges/payment-verify/${leadId}`,
     {},
