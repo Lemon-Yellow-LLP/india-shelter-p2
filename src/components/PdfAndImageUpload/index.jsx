@@ -19,12 +19,14 @@ function PdfAndImageUpload({
   setLatLong,
   imageArrayBorder, //in address proof of upload page there is no border for immage array but in salary slip there is border so when you want to add border to immage array just pass true to this prop
   errorMessage,
+  message,
+  setMessage,
+  loader,
+  setLoader,
   ...props
 }) {
   const { activeIndex, values } = useContext(LeadContext);
   const { token } = useContext(AuthContext);
-  const [message, setMessage] = useState(errorMessage);
-  const [loader, setLoader] = useState(false);
 
   const [show, setShow] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
@@ -43,12 +45,17 @@ function PdfAndImageUpload({
         const validImageTypes = ['image/jpeg', 'application/pdf'];
 
         if (validImageTypes.includes(fileType)) {
-          if (file[i].size <= 5000000) {
+          if (file[i].type === 'application/pdf') {
+            if (file[i].size <= 5000000) {
+              setSingleFile(file[i]);
+              setFile([...files, file[i]]);
+            } else {
+              setLoader(false);
+              setMessage('File size should be less than 5MB');
+            }
+          } else {
             setSingleFile(file[i]);
             setFile([...files, file[i]]);
-          } else {
-            setLoader(false);
-            setMessage('File size should be less than 5MB');
           }
         } else {
           setLoader(false);
@@ -82,16 +89,11 @@ function PdfAndImageUpload({
         const validImageTypes = ['image/jpeg'];
 
         if (validImageTypes.includes(fileType)) {
-          if (file[i].size <= 5000000) {
-            setEdit({
-              file: file[i],
-              id: id,
-            });
-            setFile([...files, file[i]]);
-          } else {
-            setLoader(false);
-            setMessage('File size should be less than 5MB');
-          }
+          setEdit({
+            file: file[i],
+            id: id,
+          });
+          setFile([...files, file[i]]);
         } else {
           setLoader(false);
           setMessage('File format not supported');
@@ -261,7 +263,7 @@ function PdfAndImageUpload({
             <label
               // style={{ boxShadow: '5px 0px 10px 0px #0000001F' }}
               className={`flex cursor-pointer flex-col w-full h-[72px] border-2 rounded-md ${
-                message ? 'border-primary-red' : 'border-dashed border-stroke'
+                message || errorMessage ? 'border-primary-red' : 'border-dashed border-stroke'
               } relative`}
             >
               <div className='flex flex-col items-center absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'>
@@ -313,7 +315,7 @@ function PdfAndImageUpload({
               />
             </label>
           </div>
-          <span className='mt-1 text-[12px] text-red-500'>{message}</span>
+          <span className='mt-1 text-[12px] text-red-500'>{message || errorMessage}</span>
         </div>
       ) : null}
 
@@ -451,7 +453,7 @@ function PdfAndImageUpload({
             </div>
           </div>
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
-            {message}
+            {message || errorMessage}
           </span>
         </>
       ) : null}

@@ -16,11 +16,12 @@ function PdfAndImageUploadBanking({
   removeImage,
   deletePDF,
   setLatLong,
+  message,
+  setMessage,
+  loader,
+  setLoader,
   ...props
 }) {
-  const [message, setMessage] = useState();
-  const [loader, setLoader] = useState(false);
-
   const [show, setShow] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
 
@@ -38,13 +39,8 @@ function PdfAndImageUploadBanking({
         const validImageTypes = ['image/jpeg', 'application/pdf'];
 
         if (validImageTypes.includes(fileType)) {
-          if (file[i].size <= 5000000) {
-            setSingleFile(file[i]);
-            setFile([...files, file[i]]);
-          } else {
-            setLoader(false);
-            setMessage('File size should be less than 5MB');
-          }
+          setSingleFile(file[i]);
+          setFile([...files, file[i]]);
         } else {
           setLoader(false);
           setMessage('File format not supported');
@@ -77,16 +73,11 @@ function PdfAndImageUploadBanking({
       const validImageTypes = ['image/jpeg'];
 
       if (validImageTypes.includes(fileType)) {
-        if (file[i].size <= 5000000) {
-          setEdit({
-            file: file[i],
-            id: id,
-          });
-          setFile([...files, file[i]]);
-        } else {
-          setLoader(false);
-          setMessage('File size should be less than 5MB');
-        }
+        setEdit({
+          file: file[i],
+          id: id,
+        });
+        setFile([...files, file[i]]);
       } else {
         setLoader(false);
         setMessage('File format not supported');
