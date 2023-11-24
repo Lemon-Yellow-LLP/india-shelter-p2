@@ -783,26 +783,36 @@ export default function Preview() {
               title={pages.property_details.title}
               link={pages.property_details.url + '?preview=' + pages.property_details.url}
               count={
-                flattedErrors &&
-                flattedErrors?.[pages.property_details.name] &&
-                values?.[pages.property_details.name] &&
-                values?.[pages.property_details.name]?.extra_params?.progress != 0
-                  ? Object.keys(flattedErrors?.[pages.property_details.name]).length
+                values?.[pages.property_details.name]?.extra_params?.required_fields_status &&
+                  values?.[pages.property_details.name]?.extra_params?.progress != 0
+                  ? Object.keys(
+                    values?.[pages.property_details.name]?.extra_params?.required_fields_status,
+                    ).filter(
+                      (k) =>
+                        !values?.[pages.property_details.name]?.extra_params?.required_fields_status[k],
+                    )?.length
                   : 'ALL'
               }
             >
-              {flattedErrors?.[pages.property_details.name] &&
-                Object.keys(flattedErrors?.[pages.property_details.name]).map((val, i) =>
-                  fieldLabels[val] ? (
-                    <p
-                      key={i}
-                      className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                    >
-                      {fieldLabels[val]}
-                      <span className='text-primary-red text-xs'>*</span>
-                    </p>
-                  ) : null,
-                )}
+              {values?.[pages.property_details.name]?.extra_params?.required_fields_status &&
+                Object.keys(
+                  values?.[pages.property_details.name]?.extra_params?.required_fields_status,
+                )
+                  .filter(
+                    (k) =>
+                      !values?.[pages.property_details.name]?.extra_params?.required_fields_status[k]
+                  )
+                  .map((val, i) =>
+                    fieldLabels[val] ? (
+                      <p
+                        key={i}
+                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                      >
+                        {fieldLabels[val]}
+                        <span className='text-primary-red text-xs'>*</span>
+                      </p>
+                    ) : null,
+                  )}
             </PreviewCard>
 
             <PreviewCard
