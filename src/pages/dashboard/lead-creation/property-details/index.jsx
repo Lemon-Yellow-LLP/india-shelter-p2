@@ -45,6 +45,26 @@ const PropertyDetails = () => {
   };
 
   useEffect(() => {
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      console.log('The geolocation API is not supported by your browser.');
+    }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+      if (values?.property_details?.id)
+        editPropertyById(values?.property_details?.id, {
+          geo_lat: String(lat),
+          geo_long: String(long),
+        });
+    }
+  }, []);
+
+  useEffect(() => {
     setRequiredFieldsStatus(values?.property_details?.extra_params?.required_fields_status);
   }, [activeIndex]);
 
