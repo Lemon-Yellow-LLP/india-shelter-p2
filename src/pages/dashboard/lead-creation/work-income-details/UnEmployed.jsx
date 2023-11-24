@@ -107,7 +107,9 @@ export default function UnEmployed({ requiredFieldsStatus, setRequiredFieldsStat
               onChange={handleRadioChange}
               containerClasses='flex-1'
               disabled={
-                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                (option.value === 'Form 60' &&
+                  values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN')
               }
             >
               {option.icon}

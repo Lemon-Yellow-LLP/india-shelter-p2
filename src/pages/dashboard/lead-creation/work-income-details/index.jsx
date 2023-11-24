@@ -507,18 +507,6 @@ const WorkIncomeDetails = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (
-      values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
-      values?.applicants?.[activeIndex]?.personal_details?.id_number
-    ) {
-      setFieldValue(
-        `applicants[${activeIndex}].work_income_detail.pan_number`,
-        values?.applicants?.[activeIndex]?.personal_details?.id_number,
-      );
-    }
-  }, [values?.applicants?.[activeIndex]?.work_income_detail?.pan_number]);
-
   return (
     <>
       <Popup
@@ -610,7 +598,6 @@ const WorkIncomeDetails = () => {
                     !errors.applicants?.[activeIndex]?.work_income_detail?.pan_number &&
                     values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
                   ) {
-                    console.log('---', 'on blur');
                     editFieldsById(
                       values?.applicants?.[activeIndex]?.work_income_detail?.id,
                       'work-income',
