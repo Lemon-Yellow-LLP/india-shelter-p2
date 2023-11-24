@@ -138,6 +138,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
   const isCoApplicant = values?.applicants?.[activeIndex]?.applicant_details?.is_primary == false;
 
+  const [message, setMessage] = useState('');
+  const [loader, setLoader] = useState(false);
+
   const idRef = useRef();
   const addressRef = useRef();
 
@@ -518,14 +521,13 @@ const UploadDocuments = ({ activeIndex }) => {
 
       if (propertyPapersFile.type === 'image/jpeg') {
         const options = {
-          maxSizeMB: 0.02,
-          maxWidthOrHeight: 1920,
+          maxSizeMB: 4,
+          maxWidthOrHeight: 1024,
           useWebWorker: true,
         };
 
         try {
           const compressedFile = await imageCompression(propertyPapersFile, options);
-
           const compressedImageFile = new File([compressedFile], filename, {
             type: compressedFile.type,
           });
@@ -594,6 +596,9 @@ const UploadDocuments = ({ activeIndex }) => {
             setPropertyPaperUploads({ data: active_uploads });
           }
         }
+      } else {
+        setLoader(false);
+        setMessage('File size should be less than 5MB');
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: true }));
@@ -2623,6 +2628,10 @@ const UploadDocuments = ({ activeIndex }) => {
                   ? 'This field is mandatory'
                   : ''
               }
+              message={message}
+              setMessage={setMessage}
+              loader={loader}
+              setLoader={setLoader}
             />
           )}
 

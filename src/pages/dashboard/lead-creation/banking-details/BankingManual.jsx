@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, CardRadio, DropDown, TextInput } from '../../../../components';
 import { IconBackBanking, IconClose } from '../../../../assets/icons';
@@ -16,7 +16,6 @@ import { editFieldsById, reUploadDoc, uploadDoc } from '../../../../global';
 import imageCompression from 'browser-image-compression';
 import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 import PdfAndImageUploadBanking from '../../../../components/PdfAndImageUpload/PdfAndImageUploadBanking';
-import { set } from 'date-fns';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 
 export const entityType = [
@@ -149,6 +148,10 @@ export default function BankingManual() {
   const [bankStatementFile, setBankStatementFile] = useState(null);
 
   const [loading, setLoading] = useState(false);
+
+  const [message, setMessage] = useState();
+
+  const [loader, setLoader] = useState(false);
 
   const navigate = useNavigate();
 
@@ -460,8 +463,8 @@ export default function BankingManual() {
 
       if (bankStatementFile.type === 'image/jpeg') {
         const options = {
-          maxSizeMB: 0.02,
-          maxWidthOrHeight: 1920,
+          maxSizeMB: 4,
+          maxWidthOrHeight: 1024,
           useWebWorker: true,
         };
 
@@ -513,6 +516,9 @@ export default function BankingManual() {
             setBankStatementPdf(pdf);
           }
         }
+      } else {
+        setLoader(false);
+        setMessage('File size should be less than 5MB');
       }
     }
     bankStatement.length > 0 && addPropertyPaperPhotos();
@@ -742,6 +748,10 @@ export default function BankingManual() {
             removeImage={removeImage}
             deletePDF={deletePDF}
             setLatLong={setBankStatementLatLong}
+            message={message}
+            setMessage={setMessage}
+            loader={loader}
+            setLoader={setLoader}
           />
           {errors?.bank_statement_image && touched?.bank_statement_image ? (
             <span
