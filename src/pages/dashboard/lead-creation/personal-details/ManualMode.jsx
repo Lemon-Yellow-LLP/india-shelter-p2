@@ -10,8 +10,9 @@ import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWith
 import { manualModeDropdownOptions } from './manualModeDropdownOptions';
 import OtpInput from '../../../../components/OtpInput/index';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
-import { editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
+import { addApi, editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 
 function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields }) {
   const {
@@ -152,7 +153,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   );
 
   const handleTextInputChange = useCallback(
-    (e) => {
+    async (e) => {
       if (e.target.value === ' ') {
         return;
       }
@@ -254,6 +255,50 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.address_proof_number.length
           ) {
             setFieldValue(e.target.name, value);
+          }
+        } else if (
+          e.target.name === `applicants[${activeIndex}].personal_details.id_number` &&
+          values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN'
+        ) {
+          setFieldValue(`applicants[${activeIndex}].work_income_detail.pan_number`, value);
+
+          if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
+            await editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                pan_number: value,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+          } else {
+            await addApi('work-income', defaultValuesLead?.applicants?.[0]?.work_income_detail, {
+              headers: {
+                Authorization: token,
+              },
+            })
+              .then(async (res) => {
+                setFieldValue(`applicants[${activeIndex}].work_income_detail`, {
+                  ...res,
+                });
+                await editFieldsById(
+                  values?.applicants?.[activeIndex]?.applicant_details?.id,
+                  'applicant',
+                  { work_income_detail: res.id },
+                  {
+                    headers: {
+                      Authorization: token,
+                    },
+                  },
+                );
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           }
         } else {
           const pattern2 = /^[A-Za-z0-9]+$/;

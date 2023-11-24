@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from 'react';
 import { fieldLabels, pages } from '../../../../utils';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../../components';
-import { Snackbar } from '@mui/material';
+import { CircularProgress, Snackbar } from '@mui/material';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import { getApplicantById } from '../../../../global';
@@ -33,6 +33,7 @@ export default function Preview() {
   const { token } = useContext(AuthContext);
 
   const isCoApplicant = values?.applicants?.[activeIndex]?.applicant_details?.is_primary == false;
+  const [loadingUploadDocs, setLoadingUploadDocs] = useState(false);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.applicant_details?.extra_params?.upload_required_fields_status,
@@ -175,6 +176,7 @@ export default function Preview() {
   }, [activeStep]);
 
   useEffect(() => {
+    // load upload documents
     async function getRequiredFields() {
       const { extra_params, document_meta } = await getApplicantById(
         values?.applicants?.[activeIndex]?.applicant_details?.id,
@@ -213,7 +215,11 @@ export default function Preview() {
         }),
       });
     }
-    getRequiredFields();
+
+    setLoadingUploadDocs(true);
+    getRequiredFields()
+      .catch((err) => console.log('Failed to load upload documents in preview', err))
+      .finally(() => setLoadingUploadDocs(false));
   }, []);
 
   const previousStep = () => {
@@ -488,62 +494,68 @@ export default function Preview() {
                   )}
             </PreviewCard>
 
-            <PreviewCard
-              index={coApplicantIndexes[coApplicantIndex]}
-              hide={
-                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.applicant_details.name
-                ]?.extra_params?.upload_progress == 100
-              }
-              title={pages.upload_documents.title}
-              link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
-              // hideLabel={true}
-              count={
-                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+            {loadingUploadDocs ? (
+              <div className='flex justify-center'>
+                <CircularProgress size={30} color='error' />
+              </div>
+            ) : (
+              <PreviewCard
+                index={coApplicantIndexes[coApplicantIndex]}
+                hide={
+                  values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                    pages.applicant_details.name
+                  ]?.extra_params?.upload_progress == 100
+                }
+                title={pages.upload_documents.title}
+                link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
+                // hideLabel={true}
+                count={
+                  values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                    pages.applicant_details.name
+                  ]?.extra_params?.upload_required_fields_status &&
+                  values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                    pages.applicant_details.name
+                  ]?.extra_params?.upload_progress != 0
+                    ? Object.keys(
+                        values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                          pages.applicant_details.name
+                        ]?.extra_params?.upload_required_fields_status,
+                      ).filter(
+                        (k) =>
+                          !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                            pages.applicant_details.name
+                          ]?.extra_params?.upload_required_fields_status[k],
+                      )?.length
+                    : 'ALL'
+                }
+              >
+                {values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                   pages.applicant_details.name
                 ]?.extra_params?.upload_required_fields_status &&
-                values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                  pages.applicant_details.name
-                ]?.extra_params?.upload_progress != 0
-                  ? Object.keys(
-                      values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                        pages.applicant_details.name
-                      ]?.extra_params?.upload_required_fields_status,
-                    ).filter(
+                  Object.keys(
+                    values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
+                      pages.applicant_details.name
+                    ]?.extra_params?.upload_required_fields_status,
+                  )
+                    .filter(
                       (k) =>
                         !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
                           pages.applicant_details.name
                         ]?.extra_params?.upload_required_fields_status[k],
-                    )?.length
-                  : 'ALL'
-              }
-            >
-              {values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                pages.applicant_details.name
-              ]?.extra_params?.upload_required_fields_status &&
-                Object.keys(
-                  values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                    pages.applicant_details.name
-                  ]?.extra_params?.upload_required_fields_status,
-                )
-                  .filter(
-                    (k) =>
-                      !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.[
-                        pages.applicant_details.name
-                      ]?.extra_params?.upload_required_fields_status[k],
-                  )
-                  .map((val, i) =>
-                    fieldLabels[val] ? (
-                      <p
-                        key={i}
-                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                      >
-                        {fieldLabels[val]}
-                        <span className='text-primary-red text-xs'>*</span>
-                      </p>
-                    ) : null,
-                  )}
-            </PreviewCard>
+                    )
+                    .map((val, i) =>
+                      fieldLabels[val] ? (
+                        <p
+                          key={i}
+                          className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                        >
+                          {fieldLabels[val]}
+                          <span className='text-primary-red text-xs'>*</span>
+                        </p>
+                      ) : null,
+                    )}
+              </PreviewCard>
+            )}
           </div>
         )}
       </>
@@ -854,53 +866,59 @@ export default function Preview() {
                 )}
             </PreviewCard>
 
-            <PreviewCard
-              index={primaryIndex}
-              hide={
-                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.upload_progress == 100
-              }
-              title={pages.upload_documents.title}
-              link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
-              count={
-                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+            {loadingUploadDocs ? (
+              <div className='flex justify-center'>
+                <CircularProgress size={30} color='error' />
+              </div>
+            ) : (
+              <PreviewCard
+                index={primaryIndex}
+                hide={
+                  values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                    ?.upload_progress == 100
+                }
+                title={pages.upload_documents.title}
+                link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
+                count={
+                  values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                    ?.upload_required_fields_status &&
+                  values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                    ?.upload_progress != 0
+                    ? Object.keys(
+                        values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
+                          ?.extra_params?.upload_required_fields_status,
+                      ).filter(
+                        (k) =>
+                          !values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
+                            ?.extra_params?.upload_required_fields_status[k],
+                      )?.length
+                    : 'ALL'
+                }
+              >
+                {values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
                   ?.upload_required_fields_status &&
-                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.upload_progress != 0
-                  ? Object.keys(
-                      values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
-                        ?.extra_params?.upload_required_fields_status,
-                    ).filter(
+                  Object.keys(
+                    values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
+                      ?.upload_required_fields_status,
+                  )
+                    .filter(
                       (k) =>
                         !values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
                           ?.extra_params?.upload_required_fields_status[k],
-                    )?.length
-                  : 'ALL'
-              }
-            >
-              {values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                ?.upload_required_fields_status &&
-                Object.keys(
-                  values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                    ?.upload_required_fields_status,
-                )
-                  .filter(
-                    (k) =>
-                      !values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
-                        ?.extra_params?.upload_required_fields_status[k],
-                  )
-                  .map((val, i) =>
-                    fieldLabels[val] ? (
-                      <p
-                        key={i}
-                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                      >
-                        {fieldLabels[val]}
-                        <span className='text-primary-red text-xs'>*</span>
-                      </p>
-                    ) : null,
-                  )}
-            </PreviewCard>
+                    )
+                    .map((val, i) =>
+                      fieldLabels[val] ? (
+                        <p
+                          key={i}
+                          className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                        >
+                          {fieldLabels[val]}
+                          <span className='text-primary-red text-xs'>*</span>
+                        </p>
+                      ) : null,
+                    )}
+              </PreviewCard>
+            )}
           </div>
         )}
       </>

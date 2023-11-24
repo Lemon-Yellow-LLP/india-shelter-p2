@@ -138,6 +138,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
   const isCoApplicant = values?.applicants?.[activeIndex]?.applicant_details?.is_primary == false;
 
+  const [message, setMessage] = useState('');
+  const [loader, setLoader] = useState(false);
+
   const idRef = useRef();
   const addressRef = useRef();
 
@@ -158,10 +161,6 @@ const UploadDocuments = ({ activeIndex }) => {
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.applicant_details?.extra_params?.upload_required_fields_status,
   });
-
-  useEffect(() => {
-    setRequiredFieldsStatus(values?.applicant_details?.extra_params?.upload_required_fields_status);
-  }, [activeIndex]);
 
   useEffect(() => {
     updateProgressUploadDocumentSteps(requiredFieldsStatus);
@@ -518,14 +517,13 @@ const UploadDocuments = ({ activeIndex }) => {
 
       if (propertyPapersFile.type === 'image/jpeg') {
         const options = {
-          maxSizeMB: 0.02,
-          maxWidthOrHeight: 1920,
+          maxSizeMB: 4,
+          maxWidthOrHeight: 1024,
           useWebWorker: true,
         };
 
         try {
           const compressedFile = await imageCompression(propertyPapersFile, options);
-
           const compressedImageFile = new File([compressedFile], filename, {
             type: compressedFile.type,
           });
@@ -594,6 +592,9 @@ const UploadDocuments = ({ activeIndex }) => {
             setPropertyPaperUploads({ data: active_uploads });
           }
         }
+      } else {
+        setLoader(false);
+        setMessage('File size should be less than 5MB');
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: true }));
@@ -1670,7 +1671,7 @@ const UploadDocuments = ({ activeIndex }) => {
         return data.active === true;
       });
 
-      if (!active_uploads) {
+      if (!active_uploads && !isCoApplicant) {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: false }));
       }
     }
@@ -1819,14 +1820,11 @@ const UploadDocuments = ({ activeIndex }) => {
           Authorization: token,
         },
       });
-
       if (!res) return;
-
       if (res.document_meta.customer_photos) {
         const active_upload = res.document_meta.customer_photos.find((data) => {
           return data.active === true;
         });
-
         if (active_upload) {
           setCustomerUploads({ type: 'customer_photos', data: active_upload });
           setCustomerPhotos([1]);
@@ -1838,7 +1836,6 @@ const UploadDocuments = ({ activeIndex }) => {
         setCustomerUploads(null);
         setCustomerPhotos([]);
       }
-
       if (res.document_meta.id_proof_photos) {
         const active_uploads = res.document_meta.id_proof_photos.filter((data) => {
           return (
@@ -1846,7 +1843,6 @@ const UploadDocuments = ({ activeIndex }) => {
             data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
           );
         });
-
         if (active_uploads.length) {
           setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
           setIdProofPhotos(active_uploads);
@@ -1858,14 +1854,12 @@ const UploadDocuments = ({ activeIndex }) => {
         setIdProofUploads(null);
         setIdProofPhotos([]);
       }
-
       if (res.document_meta.property_paper_photos) {
         const pdf = res.document_meta.property_paper_photos.find((data) => {
           if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
             return data;
           }
         });
-
         if (pdf) {
           setPropertyPdf(pdf);
           setPropertyPapers([1]);
@@ -1873,7 +1867,6 @@ const UploadDocuments = ({ activeIndex }) => {
           const active_uploads = res.document_meta.property_paper_photos.filter((data) => {
             return data.active === true;
           });
-
           if (active_uploads.length) {
             setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
             setPropertyPapers(active_uploads);
@@ -1886,7 +1879,6 @@ const UploadDocuments = ({ activeIndex }) => {
         setPropertyPaperUploads(null);
         setPropertyPapers([]);
       }
-
       if (res.document_meta.address_proof_photos) {
         const active_uploads = res.document_meta.address_proof_photos.filter((data) => {
           return (
@@ -1895,7 +1887,6 @@ const UploadDocuments = ({ activeIndex }) => {
               values?.applicants[activeIndex]?.personal_details?.selected_address_proof
           );
         });
-
         if (active_uploads.length) {
           setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
           setAddressProofPhotos(active_uploads);
@@ -1907,12 +1898,10 @@ const UploadDocuments = ({ activeIndex }) => {
         setAddressProofUploads(null);
         setAddressProofPhotos([]);
       }
-
       if (res.document_meta.salary_slip_photos) {
         const active_uploads = res.document_meta.salary_slip_photos.filter((data) => {
           return data.active === true;
         });
-
         if (active_uploads.length) {
           setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
           setSalarySlipPhotos(active_uploads);
@@ -1924,12 +1913,10 @@ const UploadDocuments = ({ activeIndex }) => {
         setSalarySlipUploads(null);
         setSalarySlipPhotos([]);
       }
-
       if (res.document_meta.form_60_photos) {
         const active_uploads = res.document_meta.form_60_photos.filter((data) => {
           return data.active === true;
         });
-
         if (active_uploads.length) {
           setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
           setForm60photos(active_uploads);
@@ -1941,12 +1928,10 @@ const UploadDocuments = ({ activeIndex }) => {
         setForm60Uploads(null);
         setForm60photos([]);
       }
-
       if (res.document_meta.property_photos) {
         const active_uploads = res.document_meta.property_photos.filter((data) => {
           return data.active === true;
         });
-
         if (active_uploads.length) {
           setPropertyUploads({ type: 'property_photos', data: active_uploads });
           setPropertyPhotos(active_uploads);
@@ -1958,12 +1943,10 @@ const UploadDocuments = ({ activeIndex }) => {
         setPropertyUploads(null);
         setPropertyPhotos([]);
       }
-
       if (res.document_meta.lo_selfie) {
         const active_upload = res.document_meta.lo_selfie.find((data) => {
           return data.active === true;
         });
-
         if (active_upload) {
           setSelfieUploads({ type: 'lo_selfie', data: active_upload });
           setSelfie([1]);
@@ -1975,12 +1958,10 @@ const UploadDocuments = ({ activeIndex }) => {
         setSelfieUploads(null);
         setSelfie([]);
       }
-
       if (res.document_meta.other_docs) {
         const active_uploads = res.document_meta.other_docs.filter((data) => {
           return data.active === true;
         });
-
         if (active_uploads.length) {
           setDocUploads({ type: 'other_docs', data: active_uploads });
           setDocs(active_uploads);
@@ -1993,13 +1974,6 @@ const UploadDocuments = ({ activeIndex }) => {
         setDocs([]);
       }
     }
-    getPreviousUploads();
-  }, [
-    values?.applicants?.[activeIndex]?.personal_details?.id_type,
-    values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
-  ]);
-
-  useEffect(() => {
     async function getRequiredFields() {
       const { extra_params, document_meta } = await getApplicantById(
         values?.applicants?.[activeIndex]?.applicant_details?.id,
@@ -2014,22 +1988,18 @@ const UploadDocuments = ({ activeIndex }) => {
         customer_photo: !!document_meta?.customer_photos?.find((slip) => slip?.active),
         id_proof: !!document_meta?.id_proof_photos?.find((slip) => slip?.active),
         address_proof: !!document_meta?.address_proof_photos?.find((slip) => slip?.active),
-
         ...(values?.applicants[activeIndex]?.work_income_detail?.income_proof === 'Form 60' && {
           form_60: !!document_meta?.form_60_photos?.find((slip) => slip?.active),
         }),
-
         ...(values?.applicants[activeIndex]?.work_income_detail?.profession === 'Salaried' &&
           !isCoApplicant && {
             salary_slip: !!document_meta?.salary_slip_photos?.find((slip) => slip?.active),
           }),
-
         ...(values?.property_details?.property_identification_is === 'done' &&
           !isCoApplicant && {
             property_paper: !!document_meta?.property_paper_photos?.find((slip) => slip?.active),
             property_image: !!document_meta?.property_photos?.find((slip) => slip?.active),
           }),
-
         ...(!isCoApplicant && {
           upload_selfie: !!(
             document_meta?.lo_selfie?.find((slip) => slip?.active) &&
@@ -2038,8 +2008,16 @@ const UploadDocuments = ({ activeIndex }) => {
         }),
       });
     }
-    getRequiredFields();
-  }, []);
+    getPreviousUploads()
+      .then(() => {
+        getRequiredFields().catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
+  }, [
+    values?.applicants?.[activeIndex]?.personal_details?.id_type,
+    values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
+    activeIndex,
+  ]);
 
   return (
     <>
@@ -2623,6 +2601,10 @@ const UploadDocuments = ({ activeIndex }) => {
                   ? 'This field is mandatory'
                   : ''
               }
+              message={message}
+              setMessage={setMessage}
+              loader={loader}
+              setLoader={setLoader}
             />
           )}
 
