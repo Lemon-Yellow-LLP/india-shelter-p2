@@ -1989,14 +1989,7 @@ const UploadDocuments = ({ activeIndex }) => {
         setDocs([]);
       }
     }
-    getPreviousUploads();
-  }, [
-    values?.applicants?.[activeIndex]?.personal_details?.id_type,
-    values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
-    activeIndex,
-  ]);
 
-  useEffect(() => {
     async function getRequiredFields() {
       const { extra_params, document_meta } = await getApplicantById(
         values?.applicants?.[activeIndex]?.applicant_details?.id,
@@ -2035,8 +2028,17 @@ const UploadDocuments = ({ activeIndex }) => {
         }),
       });
     }
-    getRequiredFields();
-  }, [activeIndex]);
+
+    getPreviousUploads()
+      .then(() => {
+        getRequiredFields().catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
+  }, [
+    values?.applicants?.[activeIndex]?.personal_details?.id_type,
+    values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
+    activeIndex,
+  ]);
 
   return (
     <>
