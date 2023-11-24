@@ -118,8 +118,6 @@ export const newCoApplicantValues = {
     additional_city: '',
     additional_state: '',
     additional_no_of_year_residing: null,
-    additional_type_of_residence: '',
-
     extra_params: {
       additional_address_same_as_current: false,
       progress: 0,
@@ -176,6 +174,7 @@ export const newCoApplicantValues = {
       extra_industries: '',
       progress: 0,
       required_fields_status: {
+        pan_number: false,
         profession: false,
         flat_no_building_name: false,
         street_area_locality: false,

@@ -1,11 +1,14 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect, useContext } from 'react';
 import DesktopPopUp from '../UploadDocsModal';
 import loading from '../../assets/icons/loading.svg';
 import { editDoc, editFieldsById, getApplicantById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
+import imageCompression from 'browser-image-compression';
 
 function ImageUpload({
+  // eslint-disable-next-line react/prop-types
   files,
   setFile,
   setSingleFile,
@@ -22,13 +25,13 @@ function ImageUpload({
 }) {
   const { values, activeIndex } = useContext(LeadContext);
   const { token } = useContext(AuthContext);
-  const [message, setMessage] = useState(errorMessage);
+  const [message, setMessage] = useState('');
   const [loader, setLoader] = useState(false);
 
   const [show, setShow] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
 
-  const handleFile = (e) => {
+  const handleFile = async (e) => {
     setMessage('');
 
     setLoader(true);
@@ -41,13 +44,32 @@ function ImageUpload({
 
         const validImageTypes = ['image/jpeg'];
 
+        const filename = file[i].name;
+
         if (validImageTypes.includes(fileType)) {
-          if (file[i].size <= 5000000) {
-            setSingleFile(file[i]);
-            setFile([...files, file[i]]);
-          } else {
+          const options = {
+            maxSizeMB: 4,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+          };
+
+          try {
+            const compressedFile = await imageCompression(file[i], options);
+            const compressedImageFile = new File([compressedFile], filename, {
+              type: compressedFile.type,
+            });
+
+            if (compressedImageFile.size <= 5000000) {
+              setSingleFile(compressedImageFile);
+              setFile([...files, compressedImageFile]);
+            } else {
+              setLoader(false);
+              setMessage('File size should be less than 5MB');
+            }
+          } catch (error) {
+            console.log(error);
             setLoader(false);
-            setMessage('File size should be less than 5MB');
+            setMessage('File format not supported');
           }
         } else {
           setLoader(false);
@@ -59,7 +81,7 @@ function ImageUpload({
     }
   };
 
-  const editImage = (e, id) => {
+  const editImage = async (e, id) => {
     setMessage('');
 
     setLoader(true);
@@ -72,16 +94,34 @@ function ImageUpload({
 
         const validImageTypes = ['image/jpeg'];
 
+        const filename = file[i].name;
+
         if (validImageTypes.includes(fileType)) {
-          if (file[i].size <= 5000000) {
-            setEdit({
-              file: file[i],
-              id: id,
+          const options = {
+            maxSizeMB: 4,
+            maxWidthOrHeight: 1024,
+            useWebWorker: true,
+          };
+
+          try {
+            const compressedFile = await imageCompression(file[i], options);
+            const compressedImageFile = new File([compressedFile], filename, {
+              type: compressedFile.type,
             });
-            setFile([...files, file[i]]);
-          } else {
+
+            if (compressedImageFile.size <= 5000000) {
+              setEdit({
+                file: compressedImageFile,
+                id: id,
+              });
+              setFile([...files, compressedImageFile]);
+            } else {
+              setLoader(false);
+              setMessage('File size should be less than 5MB');
+            }
+          } catch (error) {
             setLoader(false);
-            setMessage('File size should be less than 5MB');
+            setMessage('File format not supported');
           }
         } else {
           setLoader(false);
@@ -233,7 +273,7 @@ function ImageUpload({
               className={`flex cursor-pointer flex-col w-full h-[72px] ${
                 noBorder ? 'border-0' : 'border-2'
               } ${
-                message ? 'border-primary-red' : 'border-dashed border-stroke'
+                message || errorMessage ? 'border-primary-red' : 'border-dashed border-stroke'
               } rounded-md relative`}
             >
               <div className='flex flex-col items-center absolute top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4'>
@@ -287,7 +327,7 @@ function ImageUpload({
               />
             </label>
           </div>
-          <span className='mt-1 text-[12px] text-red-500'>{message}</span>
+          <span className='mt-1 text-[12px] text-red-500'>{message || errorMessage}</span>
         </div>
       ) : null}
 
@@ -428,7 +468,7 @@ function ImageUpload({
           />
 
           <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
-            {message}
+            {message || errorMessage}
           </span>
         </>
       ) : null}

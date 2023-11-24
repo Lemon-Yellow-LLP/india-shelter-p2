@@ -253,6 +253,7 @@ export const defaultValuesLead = {
           extra_industries: '',
           progress: 0,
           required_fields_status: {
+            pan_number: false,
             profession: false,
             flat_no_building_name: false,
             street_area_locality: false,
