@@ -163,10 +163,6 @@ const UploadDocuments = ({ activeIndex }) => {
   });
 
   useEffect(() => {
-    setRequiredFieldsStatus(values?.applicant_details?.extra_params?.upload_required_fields_status);
-  }, [activeIndex]);
-
-  useEffect(() => {
     updateProgressUploadDocumentSteps(requiredFieldsStatus);
   }, [requiredFieldsStatus]);
 
@@ -1675,7 +1671,7 @@ const UploadDocuments = ({ activeIndex }) => {
         return data.active === true;
       });
 
-      if (!active_uploads) {
+      if (!active_uploads && !isCoApplicant) {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['upload_selfie']: false }));
       }
     }
@@ -1998,13 +1994,7 @@ const UploadDocuments = ({ activeIndex }) => {
         setDocs([]);
       }
     }
-    getPreviousUploads();
-  }, [
-    values?.applicants?.[activeIndex]?.personal_details?.id_type,
-    values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
-  ]);
 
-  useEffect(() => {
     async function getRequiredFields() {
       const { extra_params, document_meta } = await getApplicantById(
         values?.applicants?.[activeIndex]?.applicant_details?.id,
@@ -2043,8 +2033,17 @@ const UploadDocuments = ({ activeIndex }) => {
         }),
       });
     }
-    getRequiredFields();
-  }, []);
+
+    getPreviousUploads()
+      .then(() => {
+        getRequiredFields().catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
+  }, [
+    values?.applicants?.[activeIndex]?.personal_details?.id_type,
+    values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
+    activeIndex,
+  ]);
 
   return (
     <>
