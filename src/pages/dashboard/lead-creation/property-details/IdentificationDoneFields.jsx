@@ -132,7 +132,7 @@ const IdentificationDoneFields = ({
 
   useEffect(() => {
     if (
-      parseInt(values?.lead?.applied_amount) >
+      parseInt(values?.lead?.applied_amount) >=
       parseInt(values?.property_details?.property_value_estimate)
     ) {
       setFieldError(
@@ -170,7 +170,7 @@ const IdentificationDoneFields = ({
           }}
           onBlur={(e) => {
             if (
-              parseInt(values?.lead?.applied_amount) >
+              parseInt(values?.lead?.applied_amount) >=
                 parseInt(values?.property_details?.property_value_estimate) &&
               !errors?.property_details?.property_value_estimate
             ) {
