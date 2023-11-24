@@ -261,6 +261,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN'
         ) {
           setFieldValue(`applicants[${activeIndex}].work_income_detail.pan_number`, value);
+          setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, value);
 
           if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
             await editFieldsById(
