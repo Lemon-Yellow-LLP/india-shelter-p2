@@ -91,14 +91,25 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           `applicants[${activeIndex}].personal_details.id_number`,
           values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
         );
+
+        setRequiredFieldsStatus((prev) => {
+          let newPrev = {
+            ...prev,
+            ['id_number']: true,
+          };
+
+          console.log('+++', newPrev);
+
+          return newPrev;
+        });
       } else {
         setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '');
         updateFields('id_number', '');
+        setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true, id_number: false }));
       }
 
       updateFields('id_type', e);
 
-      setRequiredFieldsStatus((prev) => ({ ...prev, id_type: true, id_number: false }));
       if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
         if (e === 'PAN') {
           setFieldValue(
@@ -423,34 +434,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     mobileNumberUpdate();
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
-  // console.log(values?.applicants[activeIndex]?.personal_details?.id_type);
-  // console.log(values?.applicants[activeIndex]?.personal_details?.id_number);
-
-  // useEffect(() => {
-  //   if (
-  //     values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
-  //     values?.applicants?.[activeIndex]?.work_income_detail?.pan_number
-  //   ) {
-  //     setFieldValue(
-  //       `values.applicants[${activeIndex}].personal_details.id_number`,
-  //       values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
-  //     );
-
-  //     editFieldsById(
-  //       values?.applicants?.[activeIndex]?.personal_details.id,
-  //       'personal',
-  //       {
-  //         id_number: values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: token,
-  //         },
-  //       },
-  //     );
-  //   }
-  // }, [values?.applicants?.[activeIndex]?.personal_details?.id_type]);
-
   return (
     <>
       <DropDown
@@ -501,6 +484,13 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[2];
+          if (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN') {
+            setFieldValue(
+              `applicants[${activeIndex}].work_income_detail.pan_number`,
+              values?.applicants?.[activeIndex]?.personal_details?.id_number,
+            );
+          }
+
           if (
             !errors.applicants?.[activeIndex]?.personal_details?.[name] &&
             values?.applicants?.[activeIndex]?.personal_details?.[name]
