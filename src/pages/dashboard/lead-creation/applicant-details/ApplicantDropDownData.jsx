@@ -116,6 +116,10 @@ export const loanOptionsLap = {
       label: 'Commercial Building',
       value: 'Commercial Building',
     },
+    {
+      label: 'Plot + Construction',
+      value: 'Plot + Construction',
+    },
   ],
   'Personal usage': [
     {

@@ -11,6 +11,7 @@ const IdentificationDoneFields = ({
   selectedLoanType,
   requiredFieldsStatus,
   setRequiredFieldsStatus,
+  latLong,
 }) => {
   const {
     values,
@@ -65,6 +66,7 @@ const IdentificationDoneFields = ({
           city: '',
           state: '',
           pincode: null,
+          ...latLong,
         },
         {
           headers: {
@@ -92,6 +94,7 @@ const IdentificationDoneFields = ({
           city: '',
           state: '',
           pincode: null,
+          ...latLong,
         },
         {
           headers: {
@@ -109,6 +112,7 @@ const IdentificationDoneFields = ({
         city: res.city,
         state: res.state,
         pincode: parseInt(values?.property_details?.pincode),
+        ...latLong,
       },
       {
         headers: {
@@ -132,7 +136,7 @@ const IdentificationDoneFields = ({
 
   useEffect(() => {
     if (
-      parseInt(values?.lead?.applied_amount) >
+      parseInt(values?.lead?.applied_amount) >=
       parseInt(values?.property_details?.property_value_estimate)
     ) {
       setFieldError(
@@ -170,7 +174,7 @@ const IdentificationDoneFields = ({
           }}
           onBlur={(e) => {
             if (
-              parseInt(values?.lead?.applied_amount) >
+              parseInt(values?.lead?.applied_amount) >=
                 parseInt(values?.property_details?.property_value_estimate) &&
               !errors?.property_details?.property_value_estimate
             ) {
@@ -193,6 +197,7 @@ const IdentificationDoneFields = ({
                 values?.property_details?.id,
                 {
                   property_value_estimate: values?.property_details?.property_value_estimate,
+                  ...latLong,
                 },
                 {
                   headers: {
@@ -209,6 +214,7 @@ const IdentificationDoneFields = ({
                 values?.property_details?.id,
                 {
                   property_value_estimate: '',
+                  ...latLong,
                 },
                 {
                   headers: {
@@ -246,6 +252,7 @@ const IdentificationDoneFields = ({
               values?.property_details?.id,
               {
                 current_owner_name: values?.property_details?.current_owner_name,
+                ...latLong,
               },
               {
                 headers: {
@@ -265,6 +272,7 @@ const IdentificationDoneFields = ({
               values?.property_details?.id,
               {
                 current_owner_name: '',
+                ...latLong,
               },
               {
                 headers: {
@@ -312,6 +320,7 @@ const IdentificationDoneFields = ({
               values?.property_details?.id,
               {
                 plot_house_flat: values?.property_details?.plot_house_flat,
+                ...latLong,
               },
               {
                 headers: {
@@ -330,6 +339,7 @@ const IdentificationDoneFields = ({
               values?.property_details?.id,
               {
                 plot_house_flat: '',
+                ...latLong,
               },
               {
                 headers: {
@@ -378,6 +388,7 @@ const IdentificationDoneFields = ({
               values?.property_details?.id,
               {
                 project_society_colony: values?.property_details?.project_society_colony,
+                ...latLong,
               },
               {
                 headers: {
@@ -396,6 +407,7 @@ const IdentificationDoneFields = ({
               values?.property_details?.id,
               {
                 project_society_colony: '',
+                ...latLong,
               },
               {
                 headers: {
@@ -459,6 +471,7 @@ const IdentificationDoneFields = ({
               values?.property_details?.id,
               {
                 pincode: '',
+                ...latLong,
               },
               {
                 headers: {

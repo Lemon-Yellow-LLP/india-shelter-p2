@@ -43,6 +43,26 @@ const PropertyDetails = () => {
   const handleCloseQualifierNotActivePopup = () => {
     setOpenQualifierNotActivePopup(false);
   };
+  const [latLong, setLatLong] = useState({});
+
+  useEffect(() => {
+    let userLocation = navigator.geolocation;
+
+    if (userLocation) {
+      userLocation.getCurrentPosition(success);
+    } else {
+      console.log('The geolocation API is not supported by your browser.');
+    }
+
+    function success(data) {
+      let lat = data.coords.latitude;
+      let long = data.coords.longitude;
+      setLatLong({
+        geo_lat: String(lat),
+        geo_long: String(long),
+      });
+    }
+  }, []);
 
   useEffect(() => {
     setRequiredFieldsStatus(values?.property_details?.extra_params?.required_fields_status);
@@ -69,6 +89,7 @@ const PropertyDetails = () => {
               pincode: null,
               city: '',
               state: '',
+              ...latLong,
               extra_params: {
                 ...values?.property_details?.extra_params,
                 progress: 100,
@@ -119,6 +140,7 @@ const PropertyDetails = () => {
               pincode: null,
               city: '',
               state: '',
+              ...latLong,
               extra_params: {
                 ...values?.property_details?.extra_params,
                 progress: 16,
@@ -247,6 +269,7 @@ const PropertyDetails = () => {
               selectedLoanType={selectedLoanType}
               requiredFieldsStatus={requiredFieldsStatus}
               setRequiredFieldsStatus={setRequiredFieldsStatus}
+              latLong={latLong}
             />
           ) : null}
         </div>
