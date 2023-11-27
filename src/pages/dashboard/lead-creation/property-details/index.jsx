@@ -43,6 +43,7 @@ const PropertyDetails = () => {
   const handleCloseQualifierNotActivePopup = () => {
     setOpenQualifierNotActivePopup(false);
   };
+  const [latLong, setLatLong] = useState({});
 
   useEffect(() => {
     let userLocation = navigator.geolocation;
@@ -56,11 +57,10 @@ const PropertyDetails = () => {
     function success(data) {
       let lat = data.coords.latitude;
       let long = data.coords.longitude;
-      if (values?.property_details?.id)
-        editPropertyById(values?.property_details?.id, {
-          geo_lat: String(lat),
-          geo_long: String(long),
-        });
+      setLatLong({
+        geo_lat: String(lat),
+        geo_long: String(long),
+      });
     }
   }, []);
 
@@ -89,6 +89,7 @@ const PropertyDetails = () => {
               pincode: null,
               city: '',
               state: '',
+              ...latLong,
               extra_params: {
                 ...values?.property_details?.extra_params,
                 progress: 100,
@@ -139,6 +140,7 @@ const PropertyDetails = () => {
               pincode: null,
               city: '',
               state: '',
+              ...latLong,
               extra_params: {
                 ...values?.property_details?.extra_params,
                 progress: 16,
@@ -267,6 +269,7 @@ const PropertyDetails = () => {
               selectedLoanType={selectedLoanType}
               requiredFieldsStatus={requiredFieldsStatus}
               setRequiredFieldsStatus={setRequiredFieldsStatus}
+              latLong={latLong}
             />
           ) : null}
         </div>
