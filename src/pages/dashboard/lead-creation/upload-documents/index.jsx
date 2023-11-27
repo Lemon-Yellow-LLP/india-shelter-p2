@@ -2164,6 +2164,23 @@ const UploadDocuments = ({ activeIndex }) => {
                                 },
                               },
                             );
+
+                            if (
+                              values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN'
+                            ) {
+                              editFieldsById(
+                                values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                                'work-income',
+                                {
+                                  pan_number: e.target.value,
+                                },
+                                {
+                                  headers: {
+                                    Authorization: token,
+                                  },
+                                },
+                              );
+                            }
                           }
                         }}
                         inputClasses='text-xs capitalize h-3'
