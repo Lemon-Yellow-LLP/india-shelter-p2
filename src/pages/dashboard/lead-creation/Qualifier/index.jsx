@@ -206,7 +206,9 @@ const Qualifier = () => {
             },
           ),
         );
-      } else if (values.applicants[activeIndex]?.personal_details.id_type === 'Driving license') {
+      }
+
+      if (values.applicants[activeIndex]?.personal_details.id_type === 'Driving license') {
         setDL((prev) => ({
           ...prev,
           loader: true,
