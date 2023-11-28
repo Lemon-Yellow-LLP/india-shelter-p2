@@ -709,6 +709,13 @@ const WorkIncomeDetails = () => {
                         },
                       },
                     );
+
+                    if (!requiredFieldsStatus['flat_no_building_name']) {
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        ['flat_no_building_name']: true,
+                      }));
+                    }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
                       ...prev,
@@ -740,13 +747,6 @@ const WorkIncomeDetails = () => {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-
-                    if (!requiredFieldsStatus['flat_no_building_name']) {
-                      setRequiredFieldsStatus((prev) => ({
-                        ...prev,
-                        ['flat_no_building_name']: true,
-                      }));
-                    }
                   }
                 }}
                 disabled={
@@ -785,6 +785,13 @@ const WorkIncomeDetails = () => {
                         },
                       },
                     );
+
+                    if (!requiredFieldsStatus['street_area_locality']) {
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        ['street_area_locality']: true,
+                      }));
+                    }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
                       ...prev,
@@ -817,13 +824,6 @@ const WorkIncomeDetails = () => {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-
-                    if (!requiredFieldsStatus['street_area_locality']) {
-                      setRequiredFieldsStatus((prev) => ({
-                        ...prev,
-                        ['street_area_locality']: true,
-                      }));
-                    }
                   }
                 }}
                 disabled={
@@ -858,6 +858,13 @@ const WorkIncomeDetails = () => {
                         },
                       },
                     );
+
+                    if (!requiredFieldsStatus['town']) {
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        ['town']: true,
+                      }));
+                    }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
                       ...prev,
@@ -890,13 +897,6 @@ const WorkIncomeDetails = () => {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-
-                    if (!requiredFieldsStatus['town']) {
-                      setRequiredFieldsStatus((prev) => ({
-                        ...prev,
-                        ['town']: true,
-                      }));
-                    }
                   }
                 }}
                 disabled={
@@ -931,6 +931,13 @@ const WorkIncomeDetails = () => {
                         },
                       },
                     );
+
+                    if (!requiredFieldsStatus['landmark']) {
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        ['landmark']: true,
+                      }));
+                    }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
                       ...prev,
@@ -962,13 +969,6 @@ const WorkIncomeDetails = () => {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-
-                    if (!requiredFieldsStatus['landmark']) {
-                      setRequiredFieldsStatus((prev) => ({
-                        ...prev,
-                        ['landmark']: true,
-                      }));
-                    }
                   }
                 }}
                 disabled={
@@ -1197,6 +1197,13 @@ const WorkIncomeDetails = () => {
                         },
                       },
                     );
+
+                    if (!requiredFieldsStatus['total_household_income']) {
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        ['total_household_income']: true,
+                      }));
+                    }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
                       ...prev,
@@ -1225,13 +1232,6 @@ const WorkIncomeDetails = () => {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-
-                    if (!requiredFieldsStatus['total_household_income']) {
-                      setRequiredFieldsStatus((prev) => ({
-                        ...prev,
-                        ['total_household_income']: true,
-                      }));
-                    }
                   }
                 }}
                 disabled={

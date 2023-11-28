@@ -709,6 +709,12 @@ export default function AddressDetails() {
                           },
                         },
                       );
+
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        current_flat_no_building_name: true,
+                        additional_flat_no_building_name: true,
+                      }));
                     } else {
                       editAddressById(
                         values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -723,6 +729,11 @@ export default function AddressDetails() {
                           },
                         },
                       );
+
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        current_flat_no_building_name: true,
+                      }));
                     }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -759,11 +770,6 @@ export default function AddressDetails() {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-
-                    const name = e.target.name.split('.')[2];
-                    if (!requiredFieldsStatus[name]) {
-                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                    }
                   } else if (value == '') {
                     setFieldValue(e.currentTarget.name, value);
                   }
@@ -817,6 +823,11 @@ export default function AddressDetails() {
                           },
                         },
                       );
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        current_street_area_locality: true,
+                        additional_street_area_locality: true,
+                      }));
                     } else {
                       editAddressById(
                         values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -831,6 +842,11 @@ export default function AddressDetails() {
                           },
                         },
                       );
+
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        current_street_area_locality: true,
+                      }));
                     }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -867,11 +883,6 @@ export default function AddressDetails() {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-
-                    const name = e.target.name.split('.')[2];
-                    if (!requiredFieldsStatus[name]) {
-                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                    }
                   } else if (value == '') {
                     setFieldValue(e.currentTarget.name, value);
                   }
@@ -915,6 +926,12 @@ export default function AddressDetails() {
                           },
                         },
                       );
+
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        current_town: true,
+                        additional_town: true,
+                      }));
                     } else {
                       editAddressById(
                         values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -928,6 +945,11 @@ export default function AddressDetails() {
                           },
                         },
                       );
+
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        current_town: true,
+                      }));
                     }
                   } else {
                     setRequiredFieldsStatus((prev) => ({
@@ -964,11 +986,6 @@ export default function AddressDetails() {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-                  }
-
-                  const name = e.target.name.split('.')[2];
-                  if (!requiredFieldsStatus[name]) {
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
                 inputClasses='capitalize'
@@ -1010,6 +1027,12 @@ export default function AddressDetails() {
                           },
                         },
                       );
+
+                      setRequiredFieldsStatus((prev) => ({
+                        ...prev,
+                        current_landmark: true,
+                        additional_landmark: true,
+                      }));
                     } else {
                       editAddressById(
                         values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -1024,6 +1047,11 @@ export default function AddressDetails() {
                         },
                       );
                     }
+
+                    setRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_landmark: true,
+                    }));
                   } else {
                     setRequiredFieldsStatus((prev) => ({
                       ...prev,
@@ -1059,11 +1087,6 @@ export default function AddressDetails() {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-                  }
-
-                  const name = e.target.name.split('.')[2];
-                  if (!requiredFieldsStatus[name]) {
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
                 inputClasses='capitalize'
@@ -1341,7 +1364,16 @@ export default function AddressDetails() {
                         },
                       },
                     );
+
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    }
                   } else {
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                    }
                     editAddressById(
                       values?.applicants?.[activeIndex]?.address_detail?.id,
                       {
@@ -1373,11 +1405,6 @@ export default function AddressDetails() {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-                  }
-
-                  const name = e.target.name.split('.')[2];
-                  if (!requiredFieldsStatus[name]) {
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
                 inputClasses='capitalize'
@@ -1419,7 +1446,16 @@ export default function AddressDetails() {
                         },
                       },
                     );
+
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    }
                   } else {
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                    }
                     editAddressById(
                       values?.applicants?.[activeIndex]?.address_detail?.id,
                       {
@@ -1452,11 +1488,6 @@ export default function AddressDetails() {
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
                   }
-
-                  const name = e.target.name.split('.')[2];
-                  if (!requiredFieldsStatus[name]) {
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                  }
                 }}
                 inputClasses='capitalize'
               />
@@ -1487,6 +1518,11 @@ export default function AddressDetails() {
                         },
                       },
                     );
+
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    }
                   } else {
                     editAddressById(
                       values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -1499,6 +1535,11 @@ export default function AddressDetails() {
                         },
                       },
                     );
+
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                    }
                   }
                 }}
                 disabled={
@@ -1519,11 +1560,6 @@ export default function AddressDetails() {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-                  }
-
-                  const name = e.target.name.split('.')[2];
-                  if (!requiredFieldsStatus[name]) {
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
                 inputClasses='capitalize'
@@ -1555,7 +1591,17 @@ export default function AddressDetails() {
                         },
                       },
                     );
+
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    }
                   } else {
+                    const name = e.target.name.split('.')[2];
+                    if (!requiredFieldsStatus[name]) {
+                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                    }
+
                     editAddressById(
                       values?.applicants?.[activeIndex]?.address_detail?.id,
                       {
@@ -1587,11 +1633,6 @@ export default function AddressDetails() {
                       e.currentTarget.name,
                       value.charAt(0).toUpperCase() + value.slice(1),
                     );
-                  }
-
-                  const name = e.target.name.split('.')[2];
-                  if (!requiredFieldsStatus[name]) {
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                   }
                 }}
                 inputClasses='capitalize'

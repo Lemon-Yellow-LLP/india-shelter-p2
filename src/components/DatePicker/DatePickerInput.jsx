@@ -37,25 +37,19 @@ const DatePickerInput = forwardRef(function DatePickerInput(
           onBlur={onBlur}
           onInput={(e) => {
             e.currentTarget.value = e.currentTarget.value.replace(/[^0-9/]/g, '');
-            let value = e.currentTarget.value;
-            if (value.length >= 2 && value.charAt(2) !== '/') {
-              value = value.slice(0, 2) + '/' + value.slice(2);
+            let valueNew = e.currentTarget.value;
+            if (valueNew.length >= 2 && valueNew.charAt(2) !== '/') {
+              valueNew = valueNew.slice(0, 2) + '/' + valueNew.slice(2);
             }
 
-            if (value.length >= 5 && value.charAt(5) !== '/') {
-              value = value.slice(0, 5) + '/' + value.slice(5);
+            if (valueNew.length >= 5 && valueNew.charAt(5) !== '/') {
+              valueNew = valueNew.slice(0, 5) + '/' + valueNew.slice(5);
             }
 
-            if (value.length >= 10) {
-              value = value.slice(0, 10);
-
-              const year = value.slice(6);
-              const month = value.slice(0, 2);
-              const day = value.slice(3, 5);
-
-              value = month + '/' + day + '/' + year;
+            if (valueNew.length > 10) {
+              valueNew = value;
             }
-            e.currentTarget.value = value;
+            e.currentTarget.value = valueNew;
           }}
           onKeyDown={(e) => {
             const value = e.currentTarget.value;
