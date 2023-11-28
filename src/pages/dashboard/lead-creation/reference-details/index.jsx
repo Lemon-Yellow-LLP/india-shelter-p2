@@ -160,15 +160,6 @@ const ReferenceDetails = () => {
       if (pattern.test(value) || value.length == 0) {
         setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
-
-      const name = e.target.name.split('.')[1];
-      if (
-        requiredFieldsStatus[name] !== undefined &&
-        !requiredFieldsStatus[name] &&
-        value.length > 1
-      ) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-      }
     },
     [requiredFieldsStatus],
   );
@@ -548,11 +539,6 @@ const ReferenceDetails = () => {
                   return;
                 }
                 handleChange(e);
-
-                const name = e.target.name.split('.')[1];
-                if (!requiredFieldsStatus[name]) {
-                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                }
               }}
               onPaste={(e) => {
                 e.preventDefault();
@@ -650,11 +636,6 @@ const ReferenceDetails = () => {
                   return;
                 }
                 handleChange(e);
-
-                const name = e.target.name.split('.')[1];
-                if (!requiredFieldsStatus[name]) {
-                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                }
               }}
               onKeyDown={(e) => {
                 //capturing ctrl V and ctrl C
@@ -743,11 +724,6 @@ const ReferenceDetails = () => {
                 }
 
                 handleChange(e);
-
-                const name = e.target.name.split('.')[1];
-                if (!requiredFieldsStatus[name]) {
-                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                }
               }}
             />
           </div>
@@ -883,11 +859,6 @@ const ReferenceDetails = () => {
                   return;
                 }
                 handleChange(e);
-
-                const name = e.target.name.split('.')[1];
-                if (!requiredFieldsStatus[name]) {
-                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                }
               }}
               onPaste={(e) => {
                 e.preventDefault();
@@ -986,11 +957,6 @@ const ReferenceDetails = () => {
                   return;
                 }
                 handleChange(e);
-
-                const name = e.target.name.split('.')[1];
-                if (!requiredFieldsStatus[name]) {
-                  setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                }
               }}
               onKeyDown={(e) => {
                 //capturing ctrl V and ctrl C

@@ -224,6 +224,13 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                     },
                   },
                 );
+
+                if (!requiredFieldsStatus['company_name']) {
+                  setRequiredFieldsStatus((prev) => ({
+                    ...prev,
+                    ['company_name']: true,
+                  }));
+                }
               } else {
                 setRequiredFieldsStatus((prev) => ({
                   ...prev,
@@ -255,13 +262,6 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
               }
               if (pattern.exec(value[value.length - 1])) {
                 setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-
-                if (!requiredFieldsStatus['company_name']) {
-                  setRequiredFieldsStatus((prev) => ({
-                    ...prev,
-                    ['company_name']: true,
-                  }));
-                }
               }
             }}
             disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
@@ -353,6 +353,13 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                 },
               },
             );
+
+            if (!requiredFieldsStatus['salary_per_month']) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ['salary_per_month']: true,
+              }));
+            }
           } else {
             setRequiredFieldsStatus((prev) => ({
               ...prev,
@@ -378,13 +385,6 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
           const pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-
-            if (!requiredFieldsStatus['salary_per_month']) {
-              setRequiredFieldsStatus((prev) => ({
-                ...prev,
-                ['salary_per_month']: true,
-              }));
-            }
           }
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
@@ -562,11 +562,6 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
           }
 
           setFieldValue(e.currentTarget.name, value && parseInt(value));
-
-          setRequiredFieldsStatus((prev) => ({
-            ...prev,
-            no_current_loan: false,
-          }));
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
       />
@@ -602,6 +597,13 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
                 },
               },
             );
+
+            if (!requiredFieldsStatus['ongoing_emi']) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ['ongoing_emi']: true,
+              }));
+            }
           } else {
             setRequiredFieldsStatus((prev) => ({
               ...prev,
@@ -627,13 +629,6 @@ export default function Salaried({ requiredFieldsStatus, setRequiredFieldsStatus
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-
-            if (!requiredFieldsStatus['ongoing_emi']) {
-              setRequiredFieldsStatus((prev) => ({
-                ...prev,
-                ['ongoing_emi']: true,
-              }));
-            }
           }
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
