@@ -240,7 +240,7 @@ const applicantSchema = Yup.object().shape({
       .required('This field is mandatory'),
     industries: Yup.string().required('This field is mandatory'),
     udyam_number: Yup.string().matches(
-      /^UDYAM-[A-Z]{2}-00-\d{7}$/,
+      /^UDYAM-[A-Z]{2}-\d{2}-\d{7}$/,
       'Invalid Udyam Number Eg: UDYAM-XX-00-0000000',
     ),
     gst_number: Yup.string().matches(
