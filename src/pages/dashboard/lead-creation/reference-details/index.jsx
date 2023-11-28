@@ -487,10 +487,8 @@ const ReferenceDetails = () => {
               type='tel'
               value={values?.reference_details?.reference_1_phone_number}
               error={
-                errors?.reference_details?.reference_1_phone_number &&
-                phoneNumberList?.reference_1 === ''
-                  ? 'Reference phone number must be unique'
-                  : ''
+                errors?.reference_details?.reference_1_phone_number ||
+                (phoneNumberList?.reference_1 === '' ? 'Reference phone number must be unique' : '')
               }
               touched={touched?.reference_details?.reference_1_phone_number}
               onBlur={(e) => {
@@ -823,9 +821,7 @@ const ReferenceDetails = () => {
               value={values?.reference_details?.reference_2_phone_number}
               error={
                 errors?.reference_details?.reference_2_phone_number ||
-                phoneNumberList?.reference_2 === ''
-                  ? 'Reference phone number must be unique'
-                  : ''
+                (phoneNumberList?.reference_2 === '' ? 'Reference phone number must be unique' : '')
               }
               touched={touched?.reference_details?.reference_2_phone_number}
               onBlur={(e) => {
