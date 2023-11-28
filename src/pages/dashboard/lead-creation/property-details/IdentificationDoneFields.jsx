@@ -44,10 +44,6 @@ const IdentificationDoneFields = ({
     if (pattern.test(value) || value.length === 0) {
       setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
     }
-
-    if (!requiredFieldsStatus[name]) {
-      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-    }
   };
 
   const handleOnPincodeChange = useCallback(async () => {
@@ -166,11 +162,6 @@ const IdentificationDoneFields = ({
           touched={touched.property_details?.property_value_estimate}
           onChange={(e) => {
             handleChange(e);
-
-            const name = e.target.name.split('.')[1];
-            if (!requiredFieldsStatus[name]) {
-              setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-            }
           }}
           onBlur={(e) => {
             if (
@@ -302,11 +293,6 @@ const IdentificationDoneFields = ({
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
           }
-
-          const name = e.target.name.split('.')[1];
-          if (!requiredFieldsStatus[name]) {
-            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-          }
         }}
         onBlur={(e) => {
           handleBlur(e);
@@ -368,11 +354,6 @@ const IdentificationDoneFields = ({
           }
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-          }
-
-          const name = e.target.name.split('.')[1];
-          if (!requiredFieldsStatus[name]) {
-            setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
           }
         }}
         inputClasses='capitalize'
