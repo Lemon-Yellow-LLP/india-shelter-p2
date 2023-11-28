@@ -91,6 +91,13 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
                 },
               },
             );
+
+            if (!requiredFieldsStatus['business_name']) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ['business_name']: true,
+              }));
+            }
           } else {
             setRequiredFieldsStatus((prev) => ({
               ...prev,
@@ -122,13 +129,6 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
           }
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-
-            if (!requiredFieldsStatus['business_name']) {
-              setRequiredFieldsStatus((prev) => ({
-                ...prev,
-                ['business_name']: true,
-              }));
-            }
           }
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
@@ -546,6 +546,13 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
                 },
               },
             );
+
+            if (!requiredFieldsStatus.ongoing_emi) {
+              setRequiredFieldsStatus((prev) => ({
+                ...prev,
+                ongoing_emi: true,
+              }));
+            }
           } else {
             setRequiredFieldsStatus((prev) => ({
               ...prev,
@@ -571,13 +578,6 @@ export default function SelfEmployed({ requiredFieldsStatus, setRequiredFieldsSt
           const address_pattern = /^[a-zA-Z0-9\/-\s,]+$/;
           if (address_pattern.exec(value[value.length - 1])) {
             setFieldValue(e.currentTarget.name, value.charAt(0).toUpperCase() + value.slice(1));
-
-            if (!requiredFieldsStatus.ongoing_emi) {
-              setRequiredFieldsStatus((prev) => ({
-                ...prev,
-                ongoing_emi: true,
-              }));
-            }
           }
         }}
         hint='Total ongoing EMI(s) based on the ongoing loan(s)'
