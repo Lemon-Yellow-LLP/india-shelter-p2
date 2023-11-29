@@ -160,3 +160,28 @@ export const pages = {
     name: 'upload_documents',
   },
 };
+
+export const primaryPagesRoute = [
+  '/lead/applicant-details',
+  '/lead/personal-details',
+  '/lead/address-details',
+  '/lead/work-income-details',
+  '/lead/qualifier',
+  '/lead/lnt-charges',
+  '/lead/property-details',
+  '/lead/banking-details',
+  '/lead/reference-details',
+  '/lead/upload-documents',
+  '/lead/preview',
+  '/lead/eligibility',
+];
+
+export const coApplicantPagesRoute = [
+  '/lead/applicant-details',
+  '/lead/personal-details',
+  '/lead/address-details',
+  '/lead/work-income-details',
+  '/lead/qualifier',
+  '/lead/banking-details',
+  '/lead/upload-documents',
+];

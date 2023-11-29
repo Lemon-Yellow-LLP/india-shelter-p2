@@ -85,7 +85,9 @@ export default function Topbar({
         {showClose ? (
           <button
             onClick={() => {
-              setPhoneNumberList({});
+              setPhoneNumberList((prev) => ({
+                lo: prev?.lo,
+              }));
               navigate('/');
             }}
             className=''
