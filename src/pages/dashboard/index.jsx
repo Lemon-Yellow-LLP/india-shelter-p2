@@ -29,7 +29,7 @@ LeadCard.propTypes = {
 };
 
 export default function Dashboard() {
-  const { setValues, setActiveIndex } = useContext(LeadContext);
+  const { setValues, setActiveIndex, handleReset } = useContext(LeadContext);
   const [leadList, setLeadList] = useState([]);
   const [primaryApplicantList, setPrimaryApplicantList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
@@ -232,6 +232,7 @@ export default function Dashboard() {
 
       <button
         onClick={() => {
+          handleReset();
           let newDefaultValues = structuredClone(defaultValuesLead);
           setValues(newDefaultValues);
           setActiveIndex(0);
