@@ -472,7 +472,7 @@ export default function SwipeableDrawerComponent() {
 
                           <button
                             onClick={() => {
-                              setActiveCoApplicantIndex(values?.applicants?.length);
+                              // setActiveCoApplicantIndex(values?.applicants?.length);
                               addApplicant();
                             }}
                             className={
@@ -500,7 +500,9 @@ export default function SwipeableDrawerComponent() {
                         </span> */}
                       </div>
 
-                      {values?.applicants && values.applicants.length >= 2 ? (
+                      {values?.applicants &&
+                      values.applicants.length >= 2 &&
+                      !!values.applicants?.find((e) => e.applicant_details.is_mobile_verified) ? (
                         <div className='flex flex-col gap-4'>
                           <DropDown
                             options={coApplicants}
@@ -640,7 +642,7 @@ export default function SwipeableDrawerComponent() {
                               ?.progress !== 100
                           }
                           onClick={() => {
-                            setActiveCoApplicantIndex(values?.applicants?.length);
+                            // setActiveCoApplicantIndex(values?.applicants?.length);
                             addApplicant();
                           }}
                           className={`w-[100%] h-[48px] border rounded-[4px] flex items-center justify-center text-[16px] font-normal

@@ -176,6 +176,7 @@ const LeadContextProvider = ({ children }) => {
             },
           },
         );
+        formik.setFieldValue(`${updateStep}.extra_params`, newData[updateStep].extra_params);
       }
     } else {
       if (
@@ -198,9 +199,15 @@ const LeadContextProvider = ({ children }) => {
             },
           },
         );
+
+        formik.setFieldValue(
+          `applicants[${activeIndex}].${updateStep}.extra_params`,
+          newData[updateStep].extra_params,
+        );
       }
     }
-    formik.setValues(newData);
+
+    // formik.setValues(newData);
 
     updateCompleteFormProgress();
   };
@@ -263,7 +270,10 @@ const LeadContextProvider = ({ children }) => {
       },
     );
 
-    formik.setValues(newData);
+    formik.setFieldValue(
+      `applicants[${activeIndex}].applicant_details.extra_params`,
+      updated_extra_params,
+    );
 
     updateCompleteFormProgress();
   };
@@ -305,6 +315,7 @@ const LeadContextProvider = ({ children }) => {
       let newApplicants = formik.values.applicants.filter(
         (e) => e.applicant_details.is_mobile_verified,
       );
+
       formik.setFieldValue('applicants', newApplicants);
       updateCompleteFormProgress();
     }

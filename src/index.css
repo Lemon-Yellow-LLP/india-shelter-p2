@@ -396,3 +396,7 @@ body {
 .dashBoardLoaderHeight {
   height: calc(100vh - 186px);
 }
+
+.MuiStack-root {
+  padding-top: 0 !important;
+}
