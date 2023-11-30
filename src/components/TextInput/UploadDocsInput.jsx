@@ -50,7 +50,7 @@ const UploadDocsInput = memo(
           tabIndex={-1}
           onClick={() => (ref ? ref.current.focus() : inputRef.current.focus())}
           onKeyDown={() => (ref ? ref.current?.focus() : inputRef.current.focus())}
-          className={`input-container px-4 py-3 border rounded-lg
+          className={`input-container border rounded-lg
         flex gap-1
         transition-all ease-out duration-150
         focus-within:border-secondary-blue focus-within:shadow-secondary-blue focus-within:shadow-primary
@@ -63,7 +63,7 @@ const UploadDocsInput = memo(
         >
           {Icon && <Icon />}
           <input
-            className={`w-full focus:outline-none ${inputClasses}`}
+            className={`w-full focus:outline-none px-4 py-5 ${inputClasses}`}
             ref={ref || inputRef}
             id={name}
             name={name}
