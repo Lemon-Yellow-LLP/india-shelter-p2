@@ -192,7 +192,7 @@ const Eligibility = () => {
           }));
         }
         setBre201(lead);
-        updateCompleteFormProgress();
+        // updateCompleteFormProgress();
         setSdfcResponse(true);
         return;
       }
@@ -797,11 +797,11 @@ const Eligibility = () => {
             edited_extra_params,
           );
         }
-        updateCompleteFormProgress();
+        // updateCompleteFormProgress();
       } catch (err) {
         console.log(err);
       }
-      updateCompleteFormProgress();
+
       try {
         const sdfc_res = await pushToSalesforce(
           values?.applicants?.[activeIndex]?.applicant_details?.lead_id,
@@ -817,7 +817,9 @@ const Eligibility = () => {
         setToastMessage('Data has been successfully pushed to the Salesforce');
         setSdfcResponse(true);
         setSfdcStatus(false);
+        updateCompleteFormProgress();
       } catch (err) {
+        updateCompleteFormProgress();
         console.log(err);
         setToastMessage('The data push to Salesforce has failed');
         setSdfcResponse(true);
