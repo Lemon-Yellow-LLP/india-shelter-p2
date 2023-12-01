@@ -113,6 +113,7 @@ const DatePicker = ({
           setDate(dateStr);
         }
       }}
+      adjustDateOnChange={false}
       // maxDate={today}
       dateFormat='dd/MM/yyyy'
     ></ReactDatePicker>
