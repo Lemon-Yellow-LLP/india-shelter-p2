@@ -24,6 +24,7 @@ const SearchableTextInput = memo(
       message,
       onChange,
       options,
+      onTextChange,
       ...props
     },
     ref,
@@ -84,7 +85,12 @@ const SearchableTextInput = memo(
             options={options}
             sx={{ width: 300, border: 'none' }}
             renderInput={(params) => (
-              <TextField {...params} label='Movie' placeholder={props.placeholder} />
+              <TextField
+                {...params}
+                label='Movie'
+                placeholder={props.placeholder}
+                onChange={(e) => onTextChange(e.target.value ? e.target.value.toUpperCase() : '')}
+              />
             )}
             disabled={props.disabled}
           />
