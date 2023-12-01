@@ -21,11 +21,12 @@ const DatePicker = ({
 
   useEffect(() => {
     if (value) {
-      var dateParts = value.split('/');
-      var day = parseInt(dateParts[0], 10);
-      var month = parseInt(dateParts[1], 10) - 1;
-      var year = parseInt(dateParts[2], 10);
-      const newStartDate = new Date(year, month, day);
+      // var dateParts = value.split('/');
+      // var day = parseInt(dateParts[0], 10);
+      // var month = parseInt(dateParts[1], 10) - 1;
+      // var year = parseInt(dateParts[2], 10);
+      // const newStartDate = new Date(year, month, day);
+      const newStartDate = moment(value, 'DD/MM/YYYY').toDate();
       setStartDate(newStartDate);
     } else {
       setStartDate(null);
