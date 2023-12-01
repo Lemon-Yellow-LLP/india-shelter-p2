@@ -334,14 +334,14 @@ export default function BankingManual() {
       });
   };
 
-  const getBranchesFromBankName = async (value) => {
+  const getBranchesFromBankName = async (e) => {
     axios
       .post(
         `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
         {
-          bank: value,
+          bank: searchedBank,
+          branch: e,
         },
-
         {
           headers: {
             Authorization: token,
@@ -809,16 +809,19 @@ export default function BankingManual() {
             touched={touched?.bank_name}
             onBlur={(e) => {
               handleBlur(e);
-              getBranchesFromBankName(e.target.value);
+              setBranchData([]);
+              // getBranchesFromBankName(e.target.value);
             }}
             onChange={(name, value) => {
               setSearchedIfsc('');
               setSearchedBranch('');
               setSearchedBank(value.value);
             }}
+            onTextChange={(e) => console.log(e)}
             type='search'
             options={bankNameData}
           />
+
           <SearchableTextInput
             label='Branch'
             placeholder='Eg: College Road, Nashik'
@@ -832,7 +835,11 @@ export default function BankingManual() {
             }}
             onChange={(name, value) => {
               setSearchedIfsc('');
-              setSearchedBranch(value.value);
+              setSearchedBranch(value.value ? value.value : '');
+              getBranchesFromBankName(value.value);
+            }}
+            onTextChange={(e) => {
+              getBranchesFromBankName(e);
             }}
             type='search'
             options={branchData}
