@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import DatePickerHeader from './DatePickerHeader';
 import { useEffect, useRef, useState } from 'react';
 import DatePickerInput from './DatePickerInput';
+import moment from 'moment';
 
 const DatePicker = ({
   value,
@@ -20,11 +21,12 @@ const DatePicker = ({
 
   useEffect(() => {
     if (value) {
-      var dateParts = value.split('/');
-      var day = parseInt(dateParts[0], 10);
-      var month = parseInt(dateParts[1], 10) - 1;
-      var year = parseInt(dateParts[2], 10);
-      const newStartDate = new Date(year, month, day);
+      // var dateParts = value.split('/');
+      // var day = parseInt(dateParts[0], 10);
+      // var month = parseInt(dateParts[1], 10) - 1;
+      // var year = parseInt(dateParts[2], 10);
+      // const newStartDate = new Date(year, month, day);
+      const newStartDate = moment(value, 'DD/MM/YYYY').toDate();
       setStartDate(newStartDate);
     } else {
       setStartDate(null);
@@ -79,19 +81,40 @@ const DatePicker = ({
         else return defaultDateStyles + ' text-primary-black';
       }}
       weekDayClassName={(_) => 'mx-1 text-light-grey font-semibold text-base mx-auto my-0'}
-      onChange={(date) => {
-        if (date) {
-          let returnDate = new Date(date.toString());
-          let month = returnDate.getMonth() + 1;
-          month = month.toString().padStart(2, '0');
-          const dayOfMonth = returnDate.getDate().toString().padStart(2, '0');
-          const year = returnDate.getFullYear();
-          const finalDate = `${dayOfMonth}/${month}/${year}`;
-          // const finalDate = `${year}-${month}-${dayOfMonth}`;
+      // onChange={(date) => {
+      //   const dateStr = moment(date).format('DD/MM/YYYY');
+      //   if (dateStr !== rawDate) {
+      //     console.log('!=', dateStr, rawDate);
+      //   }
+      //   if (date) {
+      //     let returnDate = new Date(date.toString());
+      //     let month = returnDate.getMonth() + 1;
+      //     month = month.toString().padStart(2, '0');
+      //     const dayOfMonth = returnDate.getDate().toString().padStart(2, '0');
+      //     const year = returnDate.getFullYear();
+      //     const finalDate = `${dayOfMonth}/${month}/${year}`;
+      //     // const finalDate = `${year}-${month}-${dayOfMonth}`;
 
-          setDate(finalDate);
+      //     setDate(finalDate);
+      //   }
+      // }}
+      onChangeRaw={(e) => {
+        const date = e.target.value;
+        if (!date || date?.length < 10) return;
+        else {
+          const dateStr = moment(e.target.value).format('DD/MM/YYYY');
+          if (dateStr !== 'Invalid date') {
+            setDate(dateStr);
+          }
         }
       }}
+      onDayMouseEnter={(date) => {
+        const dateStr = moment(date).format('DD/MM/YYYY');
+        if (dateStr !== 'Invalid date') {
+          setDate(dateStr);
+        }
+      }}
+      adjustDateOnChange={false}
       // maxDate={today}
       dateFormat='dd/MM/yyyy'
     ></ReactDatePicker>
