@@ -289,12 +289,12 @@ export default function BankingManual() {
   };
 
   const getIfsc = async () => {
-    axios
+    await axios
       .post(
         `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
         {
-          bank: searchedBank,
-          branch: searchedBranch,
+          // bank: searchedBank,
+          ifsc: searchedBranch?.value,
         },
         {
           headers: {
@@ -311,7 +311,7 @@ export default function BankingManual() {
   };
 
   const getBankFromIfsc = async () => {
-    axios
+    await axios
       .post(
         `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
         {
@@ -335,7 +335,7 @@ export default function BankingManual() {
   };
 
   const getBranchesFromBankName = async (e) => {
-    axios
+    await axios
       .post(
         `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
         {
@@ -349,9 +349,17 @@ export default function BankingManual() {
         },
       )
       .then(({ data }) => {
-        const newData = data.map(({ branch }) => ({ label: branch, value: branch }));
-        newData.sort((a, b) => a.label.localeCompare(b.label));
-        setBranchData(newData);
+        const newData = data.map(({ branch, ifsc_code }) => ({
+          label: branch.toString().toUpperCase(),
+          value: ifsc_code,
+        }));
+        const collator = new Intl.Collator('en', { sensitivity: 'base' });
+        newData.sort((a, b) => collator.compare(a.label, b.label));
+        const slicedData = newData.slice(0, 10);
+        console.log(newData.length);
+        // console.log(slicedData.length);
+        //setBranchData(newData);
+        setBranchData(slicedData);
       })
       .catch((err) => {
         console.log(err);
@@ -359,7 +367,7 @@ export default function BankingManual() {
   };
 
   const getAllBanks = async () => {
-    axios
+    await axios
       .get(`https://uatagile.indiashelter.in/api/ifsc/r/get-all-bank`, {
         headers: {
           Authorization: token,
@@ -611,6 +619,14 @@ export default function BankingManual() {
     }
   }, [preFilledData]);
 
+  useEffect(() => {
+    if (!open) {
+      setSearchedBank('');
+      setSearchedBranch('');
+      setSearchedIfsc('');
+    }
+  }, [open]);
+
   // console.log(errors);
   // console.log(values);
 
@@ -792,7 +808,14 @@ export default function BankingManual() {
           </h4>
 
           <div className=''>
-            <button onClick={() => setOpen(false)}>
+            <button
+              onClick={() => {
+                setSearchedBank('');
+                setSearchedBranch('');
+                setSearchedIfsc('');
+                setOpen(false);
+              }}
+            >
               <IconClose />
             </button>
           </div>
@@ -810,7 +833,7 @@ export default function BankingManual() {
             onBlur={(e) => {
               handleBlur(e);
               setBranchData([]);
-              // getBranchesFromBankName(e.target.value);
+              getBranchesFromBankName();
             }}
             onChange={(name, value) => {
               setSearchedIfsc('');
@@ -827,7 +850,7 @@ export default function BankingManual() {
             placeholder='Eg: College Road, Nashik'
             required
             name='branch_name'
-            value={searchedBranch}
+            value={searchedBranch?.label}
             error={errors?.branch_name}
             touched={touched?.branch_name}
             onBlur={(e) => {
@@ -835,8 +858,8 @@ export default function BankingManual() {
             }}
             onChange={(name, value) => {
               setSearchedIfsc('');
-              setSearchedBranch(value.value ? value.value : '');
-              getBranchesFromBankName(value.value);
+              setSearchedBranch(value);
+              // getBranchesFromBankName(value.value);
             }}
             onTextChange={(e) => {
               getBranchesFromBankName(e);
@@ -860,7 +883,7 @@ export default function BankingManual() {
               onClick={() => {
                 setFieldValue('ifsc_code', searchedIfsc);
                 setFieldValue('bank_name', searchedBank);
-                setFieldValue('branch_name', searchedBranch);
+                setFieldValue('branch_name', searchedBranch?.label);
                 setOpen(false);
               }}
             >
