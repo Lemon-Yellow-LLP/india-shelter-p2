@@ -335,35 +335,56 @@ export default function BankingManual() {
   };
 
   const getBranchesFromBankName = async (e) => {
-    await axios
-      .post(
-        `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
-        {
-          bank: searchedBank,
-          branch: e,
-        },
-        {
-          headers: {
-            Authorization: token,
+    if (e) {
+      await axios
+        .post(
+          `https://uatagile.indiashelter.in/api/ifsc/r/get-bank-ifsc`,
+          {
+            bank: searchedBank,
+            branch: e ? e : '',
           },
-        },
-      )
-      .then(({ data }) => {
-        const newData = data.map(({ branch, ifsc_code }) => ({
-          label: branch.toString().toUpperCase(),
-          value: ifsc_code,
-        }));
-        const collator = new Intl.Collator('en', { sensitivity: 'base' });
-        newData.sort((a, b) => collator.compare(a.label, b.label));
-        const slicedData = newData.slice(0, 10);
-        console.log(newData.length);
-        // console.log(slicedData.length);
-        //setBranchData(newData);
-        setBranchData(slicedData);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+        .then(({ data }) => {
+          const newData = data.map(({ branch, ifsc_code }) => ({
+            label: branch.toString().toUpperCase(),
+            value: ifsc_code,
+          }));
+
+          const calculateMatchScore = (item) => {
+            const label = item.label;
+            let matchScore = 0;
+
+            if (e) {
+              for (const char of e) {
+                const index = label.indexOf(char);
+                if (index !== -1) {
+                  matchScore += 1 / (index + 1);
+                }
+              }
+            }
+
+            return matchScore;
+          };
+
+          newData.sort((a, b) => calculateMatchScore(b) - calculateMatchScore(a));
+
+          // newData.sort((a, b) => a.label.localeCompare(b.label));
+
+          const slicedData = newData.slice(0, 30);
+
+          setBranchData(slicedData);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setBranchData([]);
+    }
   };
 
   const getAllBanks = async () => {
