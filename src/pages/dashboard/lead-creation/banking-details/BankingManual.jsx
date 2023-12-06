@@ -128,7 +128,7 @@ export default function BankingManual() {
 
   const [searchedBank, setSearchedBank] = useState('');
 
-  const [searchedBranch, setSearchedBranch] = useState('');
+  const [searchedBranch, setSearchedBranch] = useState({});
 
   const [searchedIfsc, setSearchedIfsc] = useState('');
 
@@ -644,7 +644,7 @@ export default function BankingManual() {
   useEffect(() => {
     if (!open) {
       setSearchedBank('');
-      setSearchedBranch('');
+      setSearchedBranch({});
       setSearchedIfsc('');
     }
   }, [open]);
@@ -833,7 +833,7 @@ export default function BankingManual() {
             <button
               onClick={() => {
                 setSearchedBank('');
-                setSearchedBranch('');
+                setSearchedBranch({});
                 setSearchedIfsc('');
                 setOpen(false);
               }}
@@ -849,7 +849,7 @@ export default function BankingManual() {
             placeholder='Eg: ICICI Bank'
             required
             name='bank_name'
-            value={searchedBank}
+            value={searchedBank ? searchedBank : ''}
             error={errors?.bank_name}
             touched={touched?.bank_name}
             onBlur={(e) => {
@@ -859,7 +859,7 @@ export default function BankingManual() {
             }}
             onChange={(name, value) => {
               setSearchedIfsc('');
-              setSearchedBranch('');
+              setSearchedBranch({});
               setSearchedBank(value.value);
             }}
             onTextChange={(e) => console.log(e)}
@@ -872,7 +872,7 @@ export default function BankingManual() {
             placeholder='Eg: College Road, Nashik'
             required
             name='branch_name'
-            value={searchedBranch?.label}
+            value={searchedBranch?.label ? searchedBranch?.label : ''}
             error={errors?.branch_name}
             touched={touched?.branch_name}
             onBlur={(e) => {
