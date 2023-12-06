@@ -395,9 +395,10 @@ export default function BankingManual() {
         },
       })
       .then(({ data }) => {
-        const newData = data.map((item) => {
+        let newData = data.map((item) => {
           return { label: item.name, value: item.name };
         });
+        newData.sort((a, b) => a.label.localeCompare(b.label));
         setBankNameData(newData);
       })
       .catch((err) => {
