@@ -2201,7 +2201,7 @@ const UploadDocuments = ({ activeIndex }) => {
                         }}
                       />
                     </div>
-                    {idStatus !== 'Valid' &&
+                    {idStatus !== 'Valid Match' &&
                       (!editIdNumber ? (
                         <p className='flex gap-1 items-center'>
                           <svg
@@ -2237,7 +2237,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
                   <div className='flex justify-between mt-1'>
                     <div className='flex items-center gap-1'>
-                      {idStatus === 'Valid' ? (
+                      {idStatus === 'Valid Match' ? (
                         <>
                           <svg
                             width='18'
@@ -2300,7 +2300,7 @@ const UploadDocuments = ({ activeIndex }) => {
                       )}
                     </div>
 
-                    {idStatus !== 'Valid' && (
+                    {idStatus !== 'Valid Match' && (
                       <p className='text-light-grey leading-5 text-xs font-normal'>
                         Photo mandatory
                       </p>
@@ -2462,7 +2462,7 @@ const UploadDocuments = ({ activeIndex }) => {
                       />
                     </div>
 
-                    {addressStatus !== 'Valid' &&
+                    {addressStatus !== 'Valid Match' &&
                       (!editAddressNumber ? (
                         <p className='flex gap-1 items-center'>
                           <svg
@@ -2498,7 +2498,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
                   <div className='flex justify-between mt-1'>
                     <div className='flex items-center gap-1'>
-                      {addressStatus === 'Valid' ? (
+                      {addressStatus === 'Valid Match' ? (
                         <>
                           <svg
                             width='18'
@@ -2561,7 +2561,7 @@ const UploadDocuments = ({ activeIndex }) => {
                       )}
                     </div>
 
-                    {addressStatus !== 'Valid' && (
+                    {addressStatus !== 'Valid Match' && (
                       <p className='text-light-grey leading-5 text-xs font-normal'>
                         Photo mandatory
                       </p>
@@ -2770,13 +2770,13 @@ const UploadDocuments = ({ activeIndex }) => {
                     return;
                   }
                 }}
-                disabled={uanStatus === 'Valid'}
+                disabled={uanStatus === 'Valid Match'}
               />
 
               {isQaulifierActivated ? (
                 <div className='flex justify-between mt-1'>
                   <div className='flex items-center gap-1'>
-                    {uanStatus === 'Valid' ? (
+                    {uanStatus === 'Valid Match' ? (
                       <>
                         <svg
                           width='18'
@@ -2902,12 +2902,12 @@ const UploadDocuments = ({ activeIndex }) => {
                     );
                   }
                 }}
-                disabled={gstStatus === 'Valid'}
+                disabled={gstStatus === 'Valid Match'}
               />
               {isQaulifierActivated ? (
                 <div className='flex justify-between mt-1'>
                   <div className='flex items-center gap-1'>
-                    {gstStatus === 'Valid' ? (
+                    {gstStatus === 'Valid Match' ? (
                       <>
                         <svg
                           width='18'
