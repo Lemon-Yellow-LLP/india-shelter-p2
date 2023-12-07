@@ -98,8 +98,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             ['id_number']: true,
           };
 
-          console.log('+++', newPrev);
-
           return newPrev;
         });
       } else {
