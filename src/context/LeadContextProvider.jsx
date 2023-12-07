@@ -245,7 +245,7 @@ const LeadContextProvider = ({ children }) => {
 
     const old_extra_params = applicant.extra_params;
     const required_fields = applicant.extra_params.upload_required_fields_status;
-    const updated_required_fields = { ...required_fields, ...requiredFieldsStatus };
+    const updated_required_fields = { ...requiredFieldsStatus };
 
     // const updated_required_fields_status = {
     //   upload_required_fields_status: updated_required_fields,
@@ -256,6 +256,8 @@ const LeadContextProvider = ({ children }) => {
       upload_required_fields_status: updated_required_fields,
       upload_progress: finalProgress,
     };
+
+    console.log(requiredFieldsStatus);
 
     await editFieldsById(
       formik.values.applicants[activeIndex].applicant_details.id,
