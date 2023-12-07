@@ -360,6 +360,19 @@ body {
   padding: 0px 16px 16px 16px !important;
 }
 
+.MuiFormControl-root {
+  width: 100%;
+}
+
+.MuiPickersDay-root.Mui-selected {
+  background-color: #147257 !important;
+}
+
+.MuiPickersDay-root:not(.Mui-selected) {
+  border-color: #147257 !important;
+  background-color: white !important;
+}
+
 @media (max-width: 1024px) {
   .indiaShelterLogo {
     max-width: 140px;

@@ -33,6 +33,7 @@ import {
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import DatePicker2 from '../../../../components/DatePicker/DatePicker2';
 
 const ApplicantDetails = () => {
   const {
@@ -331,12 +332,14 @@ const ApplicantDetails = () => {
       return;
     }
 
-    var dateParts = date.split('/');
-    var day = parseInt(dateParts[0], 10);
-    var month = parseInt(dateParts[1], 10);
-    var year = parseInt(dateParts[2], 10);
+    // var dateParts = date.split('/');
+    // var day = parseInt(dateParts[0], 10);
+    // var month = parseInt(dateParts[1], 10);
+    // var year = parseInt(dateParts[2], 10);
 
-    const finalDate = `${year}-${month}-${day}`;
+    //const finalDate = `${year}-${month}-${day}`;
+
+    const finalDate = date;
 
     if (!isEighteenOrAbove(finalDate)) {
       setFieldError(
@@ -720,133 +723,149 @@ const ApplicantDetails = () => {
             inputClasses='capitalize'
           />
 
-          <div className='flex flex-col md:flex-row gap-2 md:gap-6'>
-            <div className='w-full'>
-              <TextInput
-                label='Middle Name'
-                placeholder='Eg: Ramji, Sreenath'
-                name={`applicants[${activeIndex}].applicant_details.middle_name`}
-                value={values?.applicants?.[activeIndex]?.applicant_details?.middle_name || ''}
-                error={errors?.applicants?.[activeIndex]?.applicant_details?.middle_name}
-                touched={
-                  touched.applicants &&
-                  touched?.applicants[activeIndex]?.applicant_details?.middle_name
-                }
-                disabled={
-                  inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
-                }
-                onBlur={async (e) => {
-                  handleBlur(e);
-                  const name = e.currentTarget.name.split('.')[2];
-                  if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
-                    updateFieldsApplicant(
-                      name,
-                      values.applicants[activeIndex]?.applicant_details?.[name],
-                    );
+          <TextInput
+            label='Middle Name'
+            placeholder='Eg: Ramji, Sreenath'
+            name={`applicants[${activeIndex}].applicant_details.middle_name`}
+            value={values?.applicants?.[activeIndex]?.applicant_details?.middle_name || ''}
+            error={errors?.applicants?.[activeIndex]?.applicant_details?.middle_name}
+            touched={
+              touched.applicants && touched?.applicants[activeIndex]?.applicant_details?.middle_name
+            }
+            disabled={
+              inputDisabled ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
+            onBlur={async (e) => {
+              handleBlur(e);
+              const name = e.currentTarget.name.split('.')[2];
+              if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
+                updateFieldsApplicant(
+                  name,
+                  values.applicants[activeIndex]?.applicant_details?.[name],
+                );
 
-                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-                      const res = await editFieldsById(
-                        values?.applicants[activeIndex]?.personal_details?.id,
-                        'personal',
-                        {
-                          middle_name:
-                            values?.applicants?.[activeIndex]?.applicant_details?.middle_name,
-                        },
-                        {
-                          headers: {
-                            Authorization: token,
-                          },
-                        },
-                      );
-                    }
-                  } else {
-                    updateFieldsApplicant(name, '');
-                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-                      const res = await editFieldsById(
-                        values?.applicants[activeIndex]?.personal_details?.id,
-                        'personal',
-                        {
-                          middle_name: '',
-                        },
-                        {
-                          headers: {
-                            Authorization: token,
-                          },
-                        },
-                      );
-                    }
-                  }
-                }}
-                onChange={handleTextInputChange}
-                inputClasses='capitalize'
-              />
-            </div>
-            <div className='w-full'>
-              <TextInput
-                label='Last Name'
-                value={values?.applicants?.[activeIndex]?.applicant_details?.last_name || ''}
-                error={errors?.applicants?.[activeIndex]?.applicant_details?.last_name}
-                touched={
-                  touched.applicants &&
-                  touched?.applicants[activeIndex]?.applicant_details?.last_name
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      middle_name:
+                        values?.applicants?.[activeIndex]?.applicant_details?.middle_name,
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
                 }
-                placeholder='Eg: Swami, Singh'
-                disabled={
-                  inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              } else {
+                updateFieldsApplicant(name, '');
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      middle_name: '',
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
                 }
-                name={`applicants[${activeIndex}].applicant_details.last_name`}
-                onChange={handleTextInputChange}
-                inputClasses='capitalize'
-                // onFocus={datePickerScrollToTop}
-                onBlur={async (e) => {
-                  handleBlur(e);
-                  const name = e.currentTarget.name.split('.')[2];
-                  if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
-                    updateFieldsApplicant(
-                      name,
-                      values.applicants[activeIndex]?.applicant_details?.[name],
-                    );
+              }
+            }}
+            onChange={handleTextInputChange}
+            inputClasses='capitalize'
+          />
 
-                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-                      const res = await editFieldsById(
-                        values?.applicants[activeIndex]?.personal_details?.id,
-                        'personal',
-                        {
-                          last_name:
-                            values?.applicants?.[activeIndex]?.applicant_details?.last_name,
-                        },
-                        {
-                          headers: {
-                            Authorization: token,
-                          },
-                        },
-                      );
-                    }
-                  } else {
-                    updateFieldsApplicant(name, '');
-                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-                      const res = await editFieldsById(
-                        values?.applicants[activeIndex]?.personal_details?.id,
-                        'personal',
-                        {
-                          last_name: '',
-                        },
-                        {
-                          headers: {
-                            Authorization: token,
-                          },
-                        },
-                      );
-                    }
-                  }
-                }}
-              />
-            </div>
-          </div>
+          <TextInput
+            label='Last Name'
+            value={values?.applicants?.[activeIndex]?.applicant_details?.last_name || ''}
+            error={errors?.applicants?.[activeIndex]?.applicant_details?.last_name}
+            touched={
+              touched.applicants && touched?.applicants[activeIndex]?.applicant_details?.last_name
+            }
+            placeholder='Eg: Swami, Singh'
+            disabled={
+              inputDisabled ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
+            name={`applicants[${activeIndex}].applicant_details.last_name`}
+            onChange={handleTextInputChange}
+            inputClasses='capitalize'
+            // onFocus={datePickerScrollToTop}
+            onBlur={async (e) => {
+              handleBlur(e);
+              const name = e.currentTarget.name.split('.')[2];
+              if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
+                updateFieldsApplicant(
+                  name,
+                  values.applicants[activeIndex]?.applicant_details?.[name],
+                );
 
-          <DatePicker
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      last_name: values?.applicants?.[activeIndex]?.applicant_details?.last_name,
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
+                }
+              } else {
+                updateFieldsApplicant(name, '');
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      last_name: '',
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
+                }
+              }
+            }}
+          />
+
+          <DatePicker2
+            label='Date of Birth'
+            name={`applicants[${activeIndex}].applicant_details.date_of_birth`}
+            error={errors?.applicants?.[activeIndex]?.applicant_details?.date_of_birth}
+            touched={
+              touched?.applicants &&
+              touched?.applicants[activeIndex]?.applicant_details?.date_of_birth
+            }
+            disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+            value={date}
+            onChange={(e) => {
+              let date = e.format('YYYY-MM-DD');
+              console.log(date);
+              if (date !== 'Invalid date') {
+                checkDate(date);
+              }
+            }}
+            dateInputRef={dateInputRef}
+            onBlur={(e) => {
+              handleBlur(e);
+              // checkDate(e.target.value);
+            }}
+          />
+
+          {/* <DatePicker
             value={date}
             setDate={(e) => {
               setDate(e, checkDate(e));
@@ -865,7 +884,7 @@ const ApplicantDetails = () => {
             }}
             reference={dateInputRef}
             disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
-          />
+          /> */}
 
           <TextInputWithSendOtp
             type='tel'
