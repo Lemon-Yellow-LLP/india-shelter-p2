@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef } from 'react';
 import { useState, useCallback } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
-import DatePicker from '../../../../components/DatePicker';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import {
   editFieldsById,
@@ -33,6 +32,8 @@ import {
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
+import DatePicker2 from '../../../../components/DatePicker/DatePicker2';
+import moment from 'moment';
 
 const ApplicantDetails = () => {
   const {
@@ -67,13 +68,13 @@ const ApplicantDetails = () => {
   const [loanFields, setLoanFields] = useState(loanOptions);
   const [loanPurposeOptions, setLoanPurposeOptions] = useState(loanPurposeData);
 
-  const dateInputRef = useRef(null);
-
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
   });
 
   const [date, setDate] = useState(null);
+
+  const datePickerInputRef = useRef();
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
@@ -331,14 +332,9 @@ const ApplicantDetails = () => {
       return;
     }
 
-    var dateParts = date.split('/');
-    var day = parseInt(dateParts[0], 10);
-    var month = parseInt(dateParts[1], 10);
-    var year = parseInt(dateParts[2], 10);
+    const finalDate = date;
 
-    const finalDate = `${year}-${month}-${day}`;
-
-    if (!isEighteenOrAbove(finalDate)) {
+    if (date === 'Invalid date' || !isEighteenOrAbove(finalDate)) {
       setFieldError(
         `applicants[${activeIndex}].applicant_details.date_of_birth`,
         'Date of Birth is Required. Minimum age must be 18 or 18+',
@@ -487,7 +483,7 @@ const ApplicantDetails = () => {
         'Date of Birth is Required. Minimum age must be 18 or 18+',
       );
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
-      dateInputRef.current.focus();
+      datePickerInputRef.current.focus();
     }
   };
 
@@ -565,6 +561,23 @@ const ApplicantDetails = () => {
       removeCoApplicant(activeIndex);
     }
   };
+
+  const onDatePickerBlur = (e) => {
+    let date = moment(e.target.value).format('YYYY-DD-MM');
+    checkDate(date);
+    //   handleBlur(e);
+  };
+
+  useEffect(() => {
+    datePickerInputRef.current.addEventListener('blur', onDatePickerBlur);
+    datePickerInputRef.current.name = `applicants[${activeIndex}].applicant_details.date_of_birth`;
+  }, [datePickerInputRef, datePickerInputRef.current]);
+
+  // useEffect(() => {
+  //   if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth === '') {
+  //     setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
+  //   }
+  // }, [values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth]);
 
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
@@ -720,151 +733,138 @@ const ApplicantDetails = () => {
             inputClasses='capitalize'
           />
 
-          <div className='flex flex-col md:flex-row gap-2 md:gap-6'>
-            <div className='w-full'>
-              <TextInput
-                label='Middle Name'
-                placeholder='Eg: Ramji, Sreenath'
-                name={`applicants[${activeIndex}].applicant_details.middle_name`}
-                value={values?.applicants?.[activeIndex]?.applicant_details?.middle_name || ''}
-                error={errors?.applicants?.[activeIndex]?.applicant_details?.middle_name}
-                touched={
-                  touched.applicants &&
-                  touched?.applicants[activeIndex]?.applicant_details?.middle_name
-                }
-                disabled={
-                  inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
-                }
-                onBlur={async (e) => {
-                  handleBlur(e);
-                  const name = e.currentTarget.name.split('.')[2];
-                  if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
-                    updateFieldsApplicant(
-                      name,
-                      values.applicants[activeIndex]?.applicant_details?.[name],
-                    );
+          <TextInput
+            label='Middle Name'
+            placeholder='Eg: Ramji, Sreenath'
+            name={`applicants[${activeIndex}].applicant_details.middle_name`}
+            value={values?.applicants?.[activeIndex]?.applicant_details?.middle_name || ''}
+            error={errors?.applicants?.[activeIndex]?.applicant_details?.middle_name}
+            touched={
+              touched.applicants && touched?.applicants[activeIndex]?.applicant_details?.middle_name
+            }
+            disabled={
+              inputDisabled ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
+            onBlur={async (e) => {
+              handleBlur(e);
+              const name = e.currentTarget.name.split('.')[2];
+              if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
+                updateFieldsApplicant(
+                  name,
+                  values.applicants[activeIndex]?.applicant_details?.[name],
+                );
 
-                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-                      const res = await editFieldsById(
-                        values?.applicants[activeIndex]?.personal_details?.id,
-                        'personal',
-                        {
-                          middle_name:
-                            values?.applicants?.[activeIndex]?.applicant_details?.middle_name,
-                        },
-                        {
-                          headers: {
-                            Authorization: token,
-                          },
-                        },
-                      );
-                    }
-                  } else {
-                    updateFieldsApplicant(name, '');
-                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-                      const res = await editFieldsById(
-                        values?.applicants[activeIndex]?.personal_details?.id,
-                        'personal',
-                        {
-                          middle_name: '',
-                        },
-                        {
-                          headers: {
-                            Authorization: token,
-                          },
-                        },
-                      );
-                    }
-                  }
-                }}
-                onChange={handleTextInputChange}
-                inputClasses='capitalize'
-              />
-            </div>
-            <div className='w-full'>
-              <TextInput
-                label='Last Name'
-                value={values?.applicants?.[activeIndex]?.applicant_details?.last_name || ''}
-                error={errors?.applicants?.[activeIndex]?.applicant_details?.last_name}
-                touched={
-                  touched.applicants &&
-                  touched?.applicants[activeIndex]?.applicant_details?.last_name
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      middle_name:
+                        values?.applicants?.[activeIndex]?.applicant_details?.middle_name,
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
                 }
-                placeholder='Eg: Swami, Singh'
-                disabled={
-                  inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              } else {
+                updateFieldsApplicant(name, '');
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      middle_name: '',
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
                 }
-                name={`applicants[${activeIndex}].applicant_details.last_name`}
-                onChange={handleTextInputChange}
-                inputClasses='capitalize'
-                // onFocus={datePickerScrollToTop}
-                onBlur={async (e) => {
-                  handleBlur(e);
-                  const name = e.currentTarget.name.split('.')[2];
-                  if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
-                    updateFieldsApplicant(
-                      name,
-                      values.applicants[activeIndex]?.applicant_details?.[name],
-                    );
-
-                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-                      const res = await editFieldsById(
-                        values?.applicants[activeIndex]?.personal_details?.id,
-                        'personal',
-                        {
-                          last_name:
-                            values?.applicants?.[activeIndex]?.applicant_details?.last_name,
-                        },
-                        {
-                          headers: {
-                            Authorization: token,
-                          },
-                        },
-                      );
-                    }
-                  } else {
-                    updateFieldsApplicant(name, '');
-                    if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-                      const res = await editFieldsById(
-                        values?.applicants[activeIndex]?.personal_details?.id,
-                        'personal',
-                        {
-                          last_name: '',
-                        },
-                        {
-                          headers: {
-                            Authorization: token,
-                          },
-                        },
-                      );
-                    }
-                  }
-                }}
-              />
-            </div>
-          </div>
-
-          <DatePicker
-            value={date}
-            setDate={(e) => {
-              setDate(e, checkDate(e));
+              }
             }}
-            required
-            name={`applicants[${activeIndex}].applicant_details.date_of_birth`}
+            onChange={handleTextInputChange}
+            inputClasses='capitalize'
+          />
+
+          <TextInput
+            label='Last Name'
+            value={values?.applicants?.[activeIndex]?.applicant_details?.last_name || ''}
+            error={errors?.applicants?.[activeIndex]?.applicant_details?.last_name}
+            touched={
+              touched.applicants && touched?.applicants[activeIndex]?.applicant_details?.last_name
+            }
+            placeholder='Eg: Swami, Singh'
+            disabled={
+              inputDisabled ||
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            }
+            name={`applicants[${activeIndex}].applicant_details.last_name`}
+            onChange={handleTextInputChange}
+            inputClasses='capitalize'
+            // onFocus={datePickerScrollToTop}
+            onBlur={async (e) => {
+              handleBlur(e);
+              const name = e.currentTarget.name.split('.')[2];
+              if (!errors?.applicants[activeIndex]?.applicant_details?.[name]) {
+                updateFieldsApplicant(
+                  name,
+                  values.applicants[activeIndex]?.applicant_details?.[name],
+                );
+
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      last_name: values?.applicants?.[activeIndex]?.applicant_details?.last_name,
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
+                }
+              } else {
+                updateFieldsApplicant(name, '');
+                if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+                  const res = await editFieldsById(
+                    values?.applicants[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      last_name: '',
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
+                }
+              }
+            }}
+          />
+
+          <DatePicker2
             label='Date of Birth'
+            name={`applicants[${activeIndex}].applicant_details.date_of_birth`}
             error={errors?.applicants?.[activeIndex]?.applicant_details?.date_of_birth}
             touched={
               touched?.applicants &&
               touched?.applicants[activeIndex]?.applicant_details?.date_of_birth
             }
-            onBlur={(e) => {
-              handleBlur(e);
-              checkDate(e.target.value);
-            }}
-            reference={dateInputRef}
             disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+            value={date}
+            onAccept={(e) => {
+              checkDate(e);
+            }}
+            inputRef={datePickerInputRef}
           />
 
           <TextInputWithSendOtp

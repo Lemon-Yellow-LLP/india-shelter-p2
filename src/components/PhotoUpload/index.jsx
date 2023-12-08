@@ -16,13 +16,17 @@ function PhotoUpload({
   hint,
   setLatLong,
   errorMessage,
+  message,
+  setMessage,
+  loader,
+  setLoader,
   disabled,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
   const { token } = useContext(AuthContext);
-  const [message, setMessage] = useState(errorMessage);
-  const [loader, setLoader] = useState(false);
+  // const [message, setMessage] = useState(errorMessage);
+  // const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
 
   const handleFile = async (e) => {

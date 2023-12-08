@@ -80,7 +80,7 @@ export const professionOptions = [
   },
   {
     label: 'Pensioner',
-    value: 'Retired',
+    value: 'Pensioner',
     icon: <IconRetired />,
   },
 ];
