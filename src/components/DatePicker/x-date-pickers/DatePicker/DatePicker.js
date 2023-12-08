@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useThemeProps } from '@mui/material/styles';
 import { refType } from '@mui/utils';
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { DesktopDatePicker } from '../DesktopDatePicker';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { DEFAULT_DESKTOP_MODE_MEDIA_QUERY } from '@mui/x-date-pickers/internals/utils/utils';
 import { jsx as _jsx } from 'react/jsx-runtime';
@@ -361,6 +361,7 @@ process.env.NODE_ENV !== 'production'
        * Used when the component is controlled.
        */
       value: PropTypes.any,
+      onBlur: PropTypes.func,
       /**
        * The visible view.
        * Used when the component view is controlled.

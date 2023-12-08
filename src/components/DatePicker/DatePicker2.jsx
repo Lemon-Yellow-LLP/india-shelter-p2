@@ -1,10 +1,7 @@
 /* eslint-disable react/prop-types */
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { IconCalendar } from '../../assets/icons';
 import { DatePicker } from './x-date-pickers/DatePicker';
-import { useEffect, useState } from 'react';
 import moment from 'moment';
 
 export default function DatePicker2({
@@ -14,9 +11,8 @@ export default function DatePicker2({
   touched,
   disabled,
   value,
-  onChange,
-  dateInputRef,
-  onBlur,
+  onAccept,
+  inputRef,
 }) {
   return (
     <div className={`flex flex-col gap-1`}>
@@ -42,8 +38,14 @@ export default function DatePicker2({
             slotProps={{
               field: { clearable: true },
             }}
-            onChange={onChange}
-            value={moment(value)}
+            onAccept={(e) => {
+              let date = e?.format('YYYY-MM-DD');
+              console.log(date);
+              onAccept(date);
+            }}
+            value={moment(value, 'DD/MM/YYYY')}
+            inputRef={inputRef}
+            name={name}
           />
         </LocalizationProvider>
       </div>

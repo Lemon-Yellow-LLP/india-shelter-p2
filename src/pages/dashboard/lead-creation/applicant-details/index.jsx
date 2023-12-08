@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef } from 'react';
 import { useState, useCallback } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
-import DatePicker from '../../../../components/DatePicker';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import {
   editFieldsById,
@@ -34,6 +33,7 @@ import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import DatePicker2 from '../../../../components/DatePicker/DatePicker2';
+import moment from 'moment';
 
 const ApplicantDetails = () => {
   const {
@@ -68,13 +68,13 @@ const ApplicantDetails = () => {
   const [loanFields, setLoanFields] = useState(loanOptions);
   const [loanPurposeOptions, setLoanPurposeOptions] = useState(loanPurposeData);
 
-  const dateInputRef = useRef(null);
-
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.required_fields_status,
   });
 
   const [date, setDate] = useState(null);
+
+  const datePickerInputRef = useRef();
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
@@ -332,16 +332,9 @@ const ApplicantDetails = () => {
       return;
     }
 
-    // var dateParts = date.split('/');
-    // var day = parseInt(dateParts[0], 10);
-    // var month = parseInt(dateParts[1], 10);
-    // var year = parseInt(dateParts[2], 10);
-
-    //const finalDate = `${year}-${month}-${day}`;
-
     const finalDate = date;
 
-    if (!isEighteenOrAbove(finalDate)) {
+    if (date === 'Invalid date' || !isEighteenOrAbove(finalDate)) {
       setFieldError(
         `applicants[${activeIndex}].applicant_details.date_of_birth`,
         'Date of Birth is Required. Minimum age must be 18 or 18+',
@@ -490,7 +483,7 @@ const ApplicantDetails = () => {
         'Date of Birth is Required. Minimum age must be 18 or 18+',
       );
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
-      dateInputRef.current.focus();
+      datePickerInputRef.current.focus();
     }
   };
 
@@ -568,6 +561,23 @@ const ApplicantDetails = () => {
       removeCoApplicant(activeIndex);
     }
   };
+
+  const onDatePickerBlur = (e) => {
+    let date = moment(e.target.value).format('YYYY-DD-MM');
+    checkDate(date);
+    handleBlur(e);
+  };
+
+  useEffect(() => {
+    datePickerInputRef.current.addEventListener('blur', onDatePickerBlur);
+    datePickerInputRef.current.name = `applicants[${activeIndex}].applicant_details.date_of_birth`;
+  }, [activeIndex, datePickerInputRef]);
+
+  useEffect(() => {
+    if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth === '') {
+      setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
+    }
+  }, [values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth]);
 
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
@@ -851,40 +861,11 @@ const ApplicantDetails = () => {
             }
             disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
             value={date}
-            onChange={(e) => {
-              let date = e.format('YYYY-MM-DD');
-              console.log(date);
-              if (date !== 'Invalid date') {
-                checkDate(date);
-              }
+            onAccept={(e) => {
+              checkDate(e);
             }}
-            dateInputRef={dateInputRef}
-            onBlur={(e) => {
-              handleBlur(e);
-              // checkDate(e.target.value);
-            }}
+            inputRef={datePickerInputRef}
           />
-
-          {/* <DatePicker
-            value={date}
-            setDate={(e) => {
-              setDate(e, checkDate(e));
-            }}
-            required
-            name={`applicants[${activeIndex}].applicant_details.date_of_birth`}
-            label='Date of Birth'
-            error={errors?.applicants?.[activeIndex]?.applicant_details?.date_of_birth}
-            touched={
-              touched?.applicants &&
-              touched?.applicants[activeIndex]?.applicant_details?.date_of_birth
-            }
-            onBlur={(e) => {
-              handleBlur(e);
-              checkDate(e.target.value);
-            }}
-            reference={dateInputRef}
-            disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
-          /> */}
 
           <TextInputWithSendOtp
             type='tel'
