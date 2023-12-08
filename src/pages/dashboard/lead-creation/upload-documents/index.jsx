@@ -138,8 +138,32 @@ const UploadDocuments = ({ activeIndex }) => {
 
   const isCoApplicant = values?.applicants?.[activeIndex]?.applicant_details?.is_primary == false;
 
-  const [message, setMessage] = useState('');
-  const [loader, setLoader] = useState(false);
+  const [customerError, setCustomerError] = useState('');
+  const [customerLoader, setCustomerLoader] = useState(false);
+
+  const [idProofError, setIdProofError] = useState('');
+  const [idProofLoader, setIdProofLoader] = useState(false);
+
+  const [addressProofError, setAddressProofError] = useState('');
+  const [addressProofLoader, setAddressProofLoader] = useState(false);
+
+  const [propertyPaperError, setPropertyPaperError] = useState('');
+  const [propertyLoader, setPropertyLoader] = useState(false);
+
+  const [salarySlipError, setSalarySlipError] = useState('');
+  const [salarySlipLoader, setSalarySlipLoader] = useState(false);
+
+  const [form60Error, setForm60Error] = useState('');
+  const [form60Loader, setForm60Loader] = useState(false);
+
+  const [propertyPhotoError, setPropertyPhotoError] = useState('');
+  const [propertyPhotoLoader, setPropertyPhotoLoader] = useState(false);
+
+  const [selfieError, setSelfieError] = useState('');
+  const [selfieLoader, setSelfieLoader] = useState(false);
+
+  const [docError, setDocError] = useState('');
+  const [docLoader, setDocLoader] = useState(false);
 
   const idRef = useRef();
   const addressRef = useRef();
@@ -147,12 +171,6 @@ const UploadDocuments = ({ activeIndex }) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const preview = searchParams.get('preview');
-
-  // useEffect(() => {
-  //   if (preview === location.pathname) {
-  //     console.log('show error');
-  //   }
-  // }, [preview]);
 
   const handleCloseQualifierNotActivePopup = () => {
     setOpenQualifierNotActivePopup(false);
@@ -234,28 +252,6 @@ const UploadDocuments = ({ activeIndex }) => {
     }
     getQualifierResponse();
   }, []);
-
-  // useEffect(() => {
-  //   if (selfie.length === 0) {
-  //     setMobileVerified(false);
-  //     setDisablePhoneNumber(true);
-
-  //     const extra_params = values?.applicants?.[activeIndex]?.applicant_details?.extra_params;
-
-  //     editFieldsById(
-  //       values?.applicants?.[activeIndex]?.applicant_details?.id,
-  //       'applicant',
-  //       {
-  //         extra_params: { ...extra_params, is_upload_otp_verified: false },
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: token,
-  //         },
-  //       },
-  //     );
-  //   }
-  // }, [selfie]);
 
   const updateFields = async (name, value) => {
     let newData = {};
@@ -515,11 +511,18 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', propertyPapersLatLong?.lat);
       data.append('geo_long', propertyPapersLatLong?.long);
 
-      // if (!propertyPapersLatLong && !propertyPapersLatLong) {
-      //   setLoader(false);
-      //   setMessage('Lat long is not provided');
-      //   return;
-      // }
+      if (!propertyPapersLatLong && !propertyPapersLatLong) {
+        setPropertyLoader(false);
+        setPropertyPaperError('Location is not enabled');
+
+        if (!propertyPaperUploads) {
+          setPropertyPaperUploads(null);
+          setPropertyPapers([]);
+        } else {
+          setPropertyPaperUploads(propertyPaperUploads);
+        }
+        return;
+      }
 
       if (propertyPapersFile.type === 'image/jpeg') {
         const options = {
@@ -599,8 +602,8 @@ const UploadDocuments = ({ activeIndex }) => {
           }
         }
       } else {
-        setLoader(false);
-        setMessage('File size should be less than 5MB');
+        setPropertyLoader(false);
+        setPropertyPaperError('File size should be less than 5MB');
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: true }));
@@ -616,6 +619,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', propertyPapersLatLong?.lat);
       data.append('geo_long', propertyPapersLatLong?.long);
+
+      if (!propertyPapersLatLong && !propertyPapersLatLong) {
+        setPropertyLoader(false);
+        setPropertyPaperError('Location is not enabled');
+
+        if (!propertyPaperUploads) {
+          setPropertyPaperUploads(null);
+          setPropertyPapers([]);
+        } else {
+          setPropertyPaperUploads(propertyPaperUploads);
+        }
+        return;
+      }
 
       if (editPropertyPaper.file.type === 'image/jpeg') {
         const options = {
@@ -666,6 +682,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
         setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
         setPropertyPapers(active_uploads);
+      } else {
+        setPropertyLoader(false);
+        setPropertyPaperError('File size should be less than 5MB');
       }
     }
     editPropertyPaper.id && editPropertyPaperPhotos();
@@ -698,6 +717,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', customerLatLong?.lat);
       data.append('geo_long', customerLatLong?.long);
+
+      if (!customerLatLong && !customerLatLong) {
+        setCustomerLoader(false);
+        setCustomerError('Location is not enabled');
+
+        if (!customerUploads) {
+          setCustomerUploads(null);
+          setCustomerPhotos([]);
+        } else {
+          setCustomerUploads(customerUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -763,6 +795,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
           setCustomerUploads({ type: 'customer_photos', data: active_upload });
         }
+      } else {
+        setCustomerLoader(false);
+        setCustomerError('File size should be less than 5MB');
       }
       setRequiredFieldsStatus((prev) => ({ ...prev, ['customer_photo']: true }));
     }
@@ -796,6 +831,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', idProofLatLong?.lat);
       data.append('geo_long', idProofLatLong?.long);
+
+      if (!idProofLatLong && !idProofLatLong) {
+        setIdProofLoader(false);
+        setIdProofError('Location is not enabled');
+
+        if (!idProofUploads) {
+          setIdProofUploads(null);
+          setIdProofPhotos([]);
+        } else {
+          setIdProofUploads(idProofUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -863,6 +911,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
           setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
         }
+      } else {
+        setIdProofLoader(false);
+        setIdProofError('File size should be less than 5MB');
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['id_proof']: true }));
@@ -878,6 +929,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', idProofLatLong?.lat);
       data.append('geo_long', idProofLatLong?.long);
+
+      if (!idProofLatLong && !idProofLatLong) {
+        setIdProofLoader(false);
+        setIdProofError('Location is not enabled');
+
+        if (!idProofUploads) {
+          setIdProofUploads(null);
+          setIdProofPhotos([]);
+        } else {
+          setIdProofUploads(idProofUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -926,6 +990,9 @@ const UploadDocuments = ({ activeIndex }) => {
         });
 
         setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+      } else {
+        setIdProofLoader(false);
+        setIdProofError('File size should be less than 5MB');
       }
     }
     editIdProof.id && editIdProofPhotos();
@@ -961,6 +1028,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', addressProofLatLong?.lat);
       data.append('geo_long', addressProofLatLong?.long);
+
+      if (!addressProofLatLong && !addressProofLatLong) {
+        setAddressProofLoader(false);
+        setAddressProofError('Location is not enabled');
+
+        if (!addressProofUploads) {
+          setAddressProofUploads(null);
+          setAddressProofPhotos([]);
+        } else {
+          setAddressProofUploads(addressProofUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1031,6 +1111,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
           setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
         }
+      } else {
+        setAddressProofLoader(false);
+        setAddressProofError('File size should be less than 5MB');
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['address_proof']: true }));
@@ -1049,6 +1132,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', addressProofLatLong?.lat);
       data.append('geo_long', addressProofLatLong?.long);
+
+      if (!addressProofLatLong && !addressProofLatLong) {
+        setAddressProofLoader(false);
+        setAddressProofError('Location is not enabled');
+
+        if (!addressProofUploads) {
+          setAddressProofUploads(null);
+          setAddressProofPhotos([]);
+        } else {
+          setAddressProofUploads(addressProofUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1098,6 +1194,9 @@ const UploadDocuments = ({ activeIndex }) => {
         });
 
         setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+      } else {
+        setAddressProofLoader(false);
+        setAddressProofError('File size should be less than 5MB');
       }
     }
     editAddressProof.id && editAddressProofPhotos();
@@ -1130,6 +1229,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', salarySlipLatLong?.lat);
       data.append('geo_long', salarySlipLatLong?.long);
+
+      if (!salarySlipLatLong && !salarySlipLatLong) {
+        setSalarySlipLoader(false);
+        setSalarySlipError('Location is not enabled');
+
+        if (!salarySlipUploads) {
+          setSalarySlipUploads(null);
+          setSalarySlipPhotos([]);
+        } else {
+          setSalarySlipUploads(salarySlipUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1196,6 +1308,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
           setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
         }
+      } else {
+        setSalarySlipLoader(false);
+        setSalarySlipError('File size should be less than 5MB');
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['salary_slip']: true }));
@@ -1211,6 +1326,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', salarySlipLatLong?.lat);
       data.append('geo_long', salarySlipLatLong?.long);
+
+      if (!salarySlipLatLong && !salarySlipLatLong) {
+        setSalarySlipLoader(false);
+        setSalarySlipError('Location is not enabled');
+
+        if (!salarySlipUploads) {
+          setSalarySlipUploads(null);
+          setSalarySlipPhotos([]);
+        } else {
+          setSalarySlipUploads(salarySlipUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1256,6 +1384,9 @@ const UploadDocuments = ({ activeIndex }) => {
         });
 
         setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
+      } else {
+        setSalarySlipLoader(false);
+        setSalarySlipError('File size should be less than 5MB');
       }
     }
     editSalarySlip.id && editSalarySlipPhotos();
@@ -1288,6 +1419,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', form60LatLong?.lat);
       data.append('geo_long', form60LatLong?.long);
+
+      if (!form60LatLong && !form60LatLong) {
+        setForm60Loader(false);
+        setForm60Error('Location is not enabled');
+
+        if (!form60Uploads) {
+          setForm60Uploads(null);
+          setForm60photos([]);
+        } else {
+          setForm60Uploads(form60Uploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1351,6 +1495,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
           setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
         }
+      } else {
+        setForm60Loader(false);
+        setForm60Error('File size should be less than 5MB');
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['form_60']: true }));
@@ -1366,6 +1513,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', form60LatLong?.lat);
       data.append('geo_long', form60LatLong?.long);
+
+      if (!form60LatLong && !form60LatLong) {
+        setForm60Loader(false);
+        setForm60Error('Location is not enabled');
+
+        if (!form60Uploads) {
+          setForm60Uploads(null);
+          setForm60photos([]);
+        } else {
+          setForm60Uploads(form60Uploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1411,6 +1571,9 @@ const UploadDocuments = ({ activeIndex }) => {
         });
 
         setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
+      } else {
+        setForm60Loader(false);
+        setForm60Error('File size should be less than 5MB');
       }
     }
     editForm60.id && editForm60Photos();
@@ -1443,6 +1606,20 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', propertyLatLong?.lat);
       data.append('geo_long', propertyLatLong?.long);
+
+      if (!propertyLatLong && !propertyLatLong) {
+        setPropertyPhotoLoader(false);
+        setPropertyPhotoError('Location is not enabled');
+
+        if (!propertyUploads) {
+          setPropertyUploads(null);
+          setPropertyPhotos([]);
+        } else {
+          console.log(propertyUploads);
+          setPropertyUploads(propertyUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1506,6 +1683,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
           setPropertyUploads({ type: 'property_photos', data: active_uploads });
         }
+      } else {
+        setPropertyPhotoLoader(false);
+        setPropertyPhotoError('File size should be less than 5MB');
       }
 
       setRequiredFieldsStatus((prev) => ({ ...prev, ['property_image']: true }));
@@ -1521,6 +1701,20 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', propertyLatLong?.lat);
       data.append('geo_long', propertyLatLong?.long);
+
+      if (!propertyLatLong && !propertyLatLong) {
+        setPropertyPhotoLoader(false);
+        setPropertyPhotoError('Location is not enabled');
+
+        if (!propertyUploads) {
+          setPropertyUploads(null);
+          setPropertyPhotos([]);
+        } else {
+          setPropertyUploads(propertyUploads);
+        }
+
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1566,6 +1760,9 @@ const UploadDocuments = ({ activeIndex }) => {
         });
 
         setPropertyUploads({ type: 'property_photos', data: active_uploads });
+      } else {
+        setPropertyPhotoLoader(false);
+        setPropertyPhotoError('File size should be less than 5MB');
       }
     }
     editProperty.id && editPropertyPhotos();
@@ -1598,6 +1795,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', loSelfieLatLong?.lat);
       data.append('geo_long', loSelfieLatLong?.long);
+
+      if (!loSelfieLatLong && !loSelfieLatLong) {
+        setSelfieLoader(false);
+        setSelfieError('Location is not enabled');
+
+        if (!selfieUploads) {
+          setSelfieUploads(null);
+          setSelfie([]);
+        } else {
+          setSelfieUploads(selfieUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1661,6 +1871,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
           setSelfieUploads({ type: 'lo_selfie', data: active_upload });
         }
+      } else {
+        setSelfieLoader(false);
+        setSelfieError('File size should be less than 5MB');
       }
     }
     selfie.length > 0 && addSelfiePhoto();
@@ -1693,6 +1906,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', otherDocsLatLong?.lat);
       data.append('geo_long', otherDocsLatLong?.long);
+
+      if (!otherDocsLatLong && !otherDocsLatLong) {
+        setDocLoader(false);
+        setDocError('Location is not enabled');
+
+        if (!docUploads) {
+          setDocUploads(null);
+          setDocs([]);
+        } else {
+          setDocUploads(docUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1756,6 +1982,9 @@ const UploadDocuments = ({ activeIndex }) => {
 
           setDocUploads({ type: 'other_docs', data: active_uploads });
         }
+      } else {
+        setDocLoader(false);
+        setDocError('File size should be less than 5MB');
       }
     }
     docs.length > 0 && addOtherDocPhotos();
@@ -1769,6 +1998,19 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', otherDocsLatLong?.lat);
       data.append('geo_long', otherDocsLatLong?.long);
+
+      if (!otherDocsLatLong && !otherDocsLatLong) {
+        setDocLoader(false);
+        setDocError('Location is not enabled');
+
+        if (!docUploads) {
+          setDocUploads(null);
+          setDocs([]);
+        } else {
+          setDocUploads(docUploads);
+        }
+        return;
+      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1814,6 +2056,9 @@ const UploadDocuments = ({ activeIndex }) => {
         });
 
         setDocUploads({ type: 'other_docs', data: active_uploads });
+      } else {
+        setDocLoader(false);
+        setDocError('File size should be less than 5MB');
       }
     }
     editDoc.id && editOtherDocPhotos();
@@ -2068,6 +2313,10 @@ const UploadDocuments = ({ activeIndex }) => {
                 ? 'This field is mandatory'
                 : ''
             }
+            message={customerError}
+            setMessage={setCustomerError}
+            loader={customerLoader}
+            setLoader={setCustomerLoader}
           />
 
           <div className='flex flex-col gap-5'>
@@ -2129,6 +2378,10 @@ const UploadDocuments = ({ activeIndex }) => {
                         ? 'This field is mandatory'
                         : ''
                     }
+                    message={idProofError}
+                    setMessage={setIdProofError}
+                    loader={idProofLoader}
+                    setLoader={setIdProofLoader}
                   />
 
                   <div
@@ -2330,6 +2583,10 @@ const UploadDocuments = ({ activeIndex }) => {
                       : ''
                   }
                   imageArrayBorder={true}
+                  message={idProofError}
+                  setMessage={setIdProofError}
+                  loader={idProofLoader}
+                  setLoader={setIdProofLoader}
                 />
               )}
 
@@ -2395,6 +2652,10 @@ const UploadDocuments = ({ activeIndex }) => {
                     setUploads={setAddressProofUploads}
                     setLatLong={setAddressProofLatLong}
                     noBorder={true}
+                    message={addressProofError}
+                    setMessage={setAddressProofError}
+                    loader={addressProofLoader}
+                    setLoader={setAddressProofLoader}
                   />
 
                   <div
@@ -2591,6 +2852,10 @@ const UploadDocuments = ({ activeIndex }) => {
                       : ''
                   }
                   imageArrayBorder={true}
+                  message={addressProofError}
+                  setMessage={setAddressProofError}
+                  loader={addressProofLoader}
+                  setLoader={setAddressProofLoader}
                 />
               )}
 
@@ -2624,10 +2889,10 @@ const UploadDocuments = ({ activeIndex }) => {
                   ? 'This field is mandatory'
                   : ''
               }
-              message={message}
-              setMessage={setMessage}
-              loader={loader}
-              setLoader={setLoader}
+              message={propertyPaperError}
+              setMessage={setPropertyPaperError}
+              loader={propertyLoader}
+              setLoader={setPropertyLoader}
             />
           )}
 
@@ -2651,6 +2916,10 @@ const UploadDocuments = ({ activeIndex }) => {
                   ? 'This field is mandatory'
                   : ''
               }
+              message={salarySlipError}
+              setMessage={setSalarySlipError}
+              loader={salarySlipLoader}
+              setLoader={setSalarySlipLoader}
             />
           )}
 
@@ -2674,6 +2943,10 @@ const UploadDocuments = ({ activeIndex }) => {
                   ? 'This field is mandatory'
                   : ''
               }
+              message={form60Error}
+              setMessage={setForm60Error}
+              loader={form60Loader}
+              setLoader={setForm60Loader}
             />
           ) : null}
 
@@ -2688,6 +2961,7 @@ const UploadDocuments = ({ activeIndex }) => {
               required
               hint='File size should be less than 5MB'
               setSingleFile={setPropertyPhotosFile}
+              latlong={propertyLatLong}
               setLatLong={setPropertyLatLong}
               imageArrayBorder={true}
               errorMessage={
@@ -2697,6 +2971,10 @@ const UploadDocuments = ({ activeIndex }) => {
                   ? 'This field is mandatory'
                   : ''
               }
+              message={propertyPhotoError}
+              setMessage={setPropertyPhotoError}
+              loader={propertyPhotoLoader}
+              setLoader={setPropertyPhotoLoader}
             />
           )}
 
@@ -3001,6 +3279,10 @@ const UploadDocuments = ({ activeIndex }) => {
                         ? 'This field is mandatory'
                         : ''
                     }
+                    message={selfieError}
+                    setMessage={setSelfieError}
+                    loader={selfieLoader}
+                    setLoader={setSelfieLoader}
                   />
                 </div>
 
@@ -3052,6 +3334,10 @@ const UploadDocuments = ({ activeIndex }) => {
             setSingleFile={setDocsFile}
             setLatLong={setOtherDocsLatLong}
             imageArrayBorder={true}
+            message={docError}
+            setMessage={setDocError}
+            loader={docLoader}
+            setLoader={setDocLoader}
           />
         </div>
 
