@@ -1,6 +1,0 @@
-{
-  "sideEffects": false,
-  "module": "./index.js",
-  "main": "@mui/x-date-pickers/node/DateField/index.js",
-  "types": "./index.d.ts"
-}
