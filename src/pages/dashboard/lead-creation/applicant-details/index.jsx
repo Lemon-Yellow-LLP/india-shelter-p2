@@ -573,11 +573,11 @@ const ApplicantDetails = () => {
     datePickerInputRef.current.name = `applicants[${activeIndex}].applicant_details.date_of_birth`;
   }, [datePickerInputRef, datePickerInputRef.current]);
 
-  useEffect(() => {
-    if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth === '') {
-      setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
-    }
-  }, [values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth]);
+  // useEffect(() => {
+  //   if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth === '') {
+  //     setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
+  //   }
+  // }, [values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth]);
 
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
