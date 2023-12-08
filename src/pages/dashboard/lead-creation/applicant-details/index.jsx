@@ -565,7 +565,7 @@ const ApplicantDetails = () => {
   const onDatePickerBlur = (e) => {
     let date = moment(e.target.value).format('YYYY-DD-MM');
     checkDate(date);
-    handleBlur(e);
+    //   handleBlur(e);
   };
 
   useEffect(() => {
