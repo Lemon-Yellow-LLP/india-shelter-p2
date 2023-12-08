@@ -189,7 +189,7 @@ const WorkIncomeDetails = () => {
               no_of_dependents: true,
             };
           }
-        } else if (e.value === 'Retired') {
+        } else if (e.value === 'Pensioner') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
               pan_number:
@@ -669,7 +669,7 @@ const WorkIncomeDetails = () => {
             />
           )}
 
-          {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Retired' && (
+          {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Pensioner' && (
             <Retired
               requiredFieldsStatus={requiredFieldsStatus}
               setRequiredFieldsStatus={setRequiredFieldsStatus}

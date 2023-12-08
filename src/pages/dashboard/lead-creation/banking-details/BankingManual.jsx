@@ -488,8 +488,8 @@ export default function BankingManual() {
       data.append('applicant_id', leadValues?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'bank_statement_photo');
       data.append('document_name', filename);
-      data.append('geo_lat', bankStatementLatLong.lat);
-      data.append('geo_long', bankStatementLatLong.long);
+      data.append('geo_lat', bankStatementLatLong?.lat);
+      data.append('geo_long', bankStatementLatLong?.long);
 
       if (bankStatementFile.type === 'image/jpeg') {
         const options = {
@@ -560,8 +560,8 @@ export default function BankingManual() {
       const filename = editBankStatement.file.name;
       data.append('document_type', 'bank_statement_photo');
       data.append('document_name', filename);
-      data.append('geo_lat', bankStatementLatLong.lat);
-      data.append('geo_long', bankStatementLatLong.long);
+      data.append('geo_lat', bankStatementLatLong?.lat);
+      data.append('geo_long', bankStatementLatLong?.long);
 
       if (editBankStatement.file.type === 'image/jpeg') {
         const options = {

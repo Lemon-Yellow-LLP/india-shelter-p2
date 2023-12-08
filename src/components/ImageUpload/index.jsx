@@ -18,15 +18,20 @@ function ImageUpload({
   label,
   hint,
   noBorder,
+
   setLatLong,
   imageArrayBorder, //in address proof of upload page there is no border for immage array but in salary slip there is border so when you want to add border to immage array just pass true to this prop
   errorMessage,
+  message,
+  setMessage,
+  loader,
+  setLoader,
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
   const { token } = useContext(AuthContext);
-  const [message, setMessage] = useState('');
-  const [loader, setLoader] = useState(false);
+  // const [message, setMessage] = useState('');
+  // const [loader, setLoader] = useState(false);
 
   const [show, setShow] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
@@ -266,7 +271,7 @@ function ImageUpload({
         />
       )}
 
-      {!files.length ? (
+      {!files.length && !loader ? (
         <div>
           <div className='bg-white flex items-center justify-center w-full'>
             <label
