@@ -437,11 +437,7 @@ const Eligibility = () => {
         }
       }
 
-      if (
-        res.bre_101_response.body.Display.UAN_Status === 'Error' ||
-        res.bre_101_response.body.Display.UAN_Status === 'In-Valid' ||
-        res.bre_101_response.body.Display.UAN_Status === 'Valid No Match'
-      ) {
+      if (res.bre_101_response.body.Display.UAN_Status === 'Error') {
         setPfUAN((prev) => ({
           ...prev,
           loader: true,
@@ -485,11 +481,7 @@ const Eligibility = () => {
         }
       }
 
-      if (
-        res.bre_101_response.body.Display.GST_Status === 'Error' ||
-        res.bre_101_response.body.Display.GST_Status === 'In-Valid' ||
-        res.bre_101_response.body.Display.GST_Status === 'Valid No Match'
-      ) {
+      if (res.bre_101_response.body.Display.GST_Status === 'Error') {
         setGST((prev) => ({
           ...prev,
           loader: true,
