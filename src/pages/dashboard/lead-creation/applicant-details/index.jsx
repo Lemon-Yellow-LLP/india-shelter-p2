@@ -571,7 +571,7 @@ const ApplicantDetails = () => {
   useEffect(() => {
     datePickerInputRef.current.addEventListener('blur', onDatePickerBlur);
     datePickerInputRef.current.name = `applicants[${activeIndex}].applicant_details.date_of_birth`;
-  }, [activeIndex, datePickerInputRef]);
+  }, [datePickerInputRef, datePickerInputRef.current]);
 
   useEffect(() => {
     if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth === '') {
