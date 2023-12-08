@@ -8,6 +8,7 @@ import { Header } from '../../components';
 import { useNavigate } from 'react-router-dom';
 import OtpInputNoEdit from '../../components/OtpInput/OtpInputNoEdit';
 import ErrorTost from '../../components/ToastMessage/ErrorTost';
+import DatePicker2 from '../../components/DatePicker/DatePicker2';
 
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
@@ -286,7 +287,6 @@ export default function Login() {
             <h2 className='text-primary-black font-semibold'>Welcome!</h2>
             <p className='text-dark-grey font-normal'>Login to continue</p>
           </div>
-
           <TextInputWithSendOtp
             type='tel'
             inputClasses='hidearrow'

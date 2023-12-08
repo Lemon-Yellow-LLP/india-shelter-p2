@@ -199,7 +199,7 @@ const LeadContextProvider = ({ children }) => {
             },
           },
         );
-
+        console.log(newData[updateStep]);
         formik.setFieldValue(
           `applicants[${activeIndex}].${updateStep}.extra_params`,
           newData[updateStep].extra_params,

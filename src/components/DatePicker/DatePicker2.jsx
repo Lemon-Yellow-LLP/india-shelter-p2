@@ -1,0 +1,69 @@
+/* eslint-disable react/prop-types */
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from './x-date-pickers/DatePicker';
+import moment from 'moment';
+
+export default function DatePicker2({
+  label,
+  name,
+  error,
+  touched,
+  disabled,
+  value,
+  onAccept,
+  inputRef,
+}) {
+  return (
+    <div className={`flex flex-col gap-1`}>
+      <label htmlFor={name} className='flex gap-0.5 items-center text-primary-black w-fit'>
+        {label}
+        {true && <span className='text-primary-red text-sm'>*</span>}
+      </label>
+      <div
+        className={`input-container px-4 py-3 border justify-between  rounded-lg flex w-full items-center    
+      ${
+        error && touched
+          ? 'border-[#E33439] shadow-primary shadow-[#E33439]'
+          : value
+          ? 'border-dark-grey'
+          : 'border-[#D9D9D9]'
+      }
+      ${disabled ? 'bg-disabled-grey pointer-events-none cursor-not-allowed' : 'bg-white'}
+      `}
+      >
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+          <DatePicker
+            format='DD/MM/YYYY'
+            slotProps={{
+              field: { clearable: true },
+            }}
+            onAccept={(e) => {
+              let date = e?.format('YYYY-MM-DD');
+              console.log(date);
+              onAccept(date);
+            }}
+            value={moment(value, 'DD/MM/YYYY')}
+            inputRef={inputRef}
+            name={name}
+          />
+        </LocalizationProvider>
+      </div>
+      {error && touched ? (
+        <span
+          className='text-xs text-primary-red'
+          dangerouslySetInnerHTML={{
+            __html: error && touched ? error : String.fromCharCode(160),
+          }}
+        />
+      ) : (
+        <span
+          className='text-xs text-primary-red'
+          dangerouslySetInnerHTML={{
+            __html: String.fromCharCode(160),
+          }}
+        />
+      )}
+    </div>
+  );
+}
