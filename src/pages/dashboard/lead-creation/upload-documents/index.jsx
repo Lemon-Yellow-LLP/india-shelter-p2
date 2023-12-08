@@ -512,8 +512,14 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'property_paper_photos');
       data.append('document_name', filename);
-      data.append('geo_lat', propertyPapersLatLong.lat);
-      data.append('geo_long', propertyPapersLatLong.long);
+      data.append('geo_lat', propertyPapersLatLong?.lat);
+      data.append('geo_long', propertyPapersLatLong?.long);
+
+      // if (!propertyPapersLatLong && !propertyPapersLatLong) {
+      //   setLoader(false);
+      //   setMessage('Lat long is not provided');
+      //   return;
+      // }
 
       if (propertyPapersFile.type === 'image/jpeg') {
         const options = {
@@ -608,8 +614,8 @@ const UploadDocuments = ({ activeIndex }) => {
       const filename = editPropertyPaper.file.name;
       data.append('document_type', 'property_paper_photos');
       data.append('document_name', filename);
-      data.append('geo_lat', propertyPapersLatLong.lat);
-      data.append('geo_long', propertyPapersLatLong.long);
+      data.append('geo_lat', propertyPapersLatLong?.lat);
+      data.append('geo_long', propertyPapersLatLong?.long);
 
       if (editPropertyPaper.file.type === 'image/jpeg') {
         const options = {
@@ -690,8 +696,8 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'customer_photos');
       data.append('document_name', filename);
-      data.append('geo_lat', customerLatLong.lat);
-      data.append('geo_long', customerLatLong.long);
+      data.append('geo_lat', customerLatLong?.lat);
+      data.append('geo_long', customerLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -788,8 +794,8 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', values?.applicants?.[activeIndex]?.personal_details?.id_type);
       data.append('document_name', filename);
-      data.append('geo_lat', idProofLatLong.lat);
-      data.append('geo_long', idProofLatLong.long);
+      data.append('geo_lat', idProofLatLong?.lat);
+      data.append('geo_long', idProofLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -870,8 +876,8 @@ const UploadDocuments = ({ activeIndex }) => {
       const filename = editIdProof.file.name;
       data.append('document_type', values?.applicants?.[activeIndex]?.personal_details?.id_type);
       data.append('document_name', filename);
-      data.append('geo_lat', idProofLatLong.lat);
-      data.append('geo_long', idProofLatLong.long);
+      data.append('geo_lat', idProofLatLong?.lat);
+      data.append('geo_long', idProofLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -953,8 +959,8 @@ const UploadDocuments = ({ activeIndex }) => {
         values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof,
       );
       data.append('document_name', filename);
-      data.append('geo_lat', addressProofLatLong.lat);
-      data.append('geo_long', addressProofLatLong.long);
+      data.append('geo_lat', addressProofLatLong?.lat);
+      data.append('geo_long', addressProofLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1041,8 +1047,8 @@ const UploadDocuments = ({ activeIndex }) => {
         values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof,
       );
       data.append('document_name', filename);
-      data.append('geo_lat', addressProofLatLong.lat);
-      data.append('geo_long', addressProofLatLong.long);
+      data.append('geo_lat', addressProofLatLong?.lat);
+      data.append('geo_long', addressProofLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1122,8 +1128,8 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'salary_slip_photos');
       data.append('document_name', filename);
-      data.append('geo_lat', salarySlipLatLong.lat);
-      data.append('geo_long', salarySlipLatLong.long);
+      data.append('geo_lat', salarySlipLatLong?.lat);
+      data.append('geo_long', salarySlipLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1203,8 +1209,8 @@ const UploadDocuments = ({ activeIndex }) => {
       const filename = editSalarySlip.file.name;
       data.append('document_type', 'salary_slip_photos');
       data.append('document_name', filename);
-      data.append('geo_lat', salarySlipLatLong.lat);
-      data.append('geo_long', salarySlipLatLong.long);
+      data.append('geo_lat', salarySlipLatLong?.lat);
+      data.append('geo_long', salarySlipLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1280,8 +1286,8 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'form_60_photos');
       data.append('document_name', filename);
-      data.append('geo_lat', form60LatLong.lat);
-      data.append('geo_long', form60LatLong.long);
+      data.append('geo_lat', form60LatLong?.lat);
+      data.append('geo_long', form60LatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1358,8 +1364,8 @@ const UploadDocuments = ({ activeIndex }) => {
       const filename = editForm60.file.name;
       data.append('document_type', 'form_60_photos');
       data.append('document_name', filename);
-      data.append('geo_lat', form60LatLong.lat);
-      data.append('geo_long', form60LatLong.long);
+      data.append('geo_lat', form60LatLong?.lat);
+      data.append('geo_long', form60LatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1435,8 +1441,8 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'property_photos');
       data.append('document_name', filename);
-      data.append('geo_lat', propertyLatLong.lat);
-      data.append('geo_long', propertyLatLong.long);
+      data.append('geo_lat', propertyLatLong?.lat);
+      data.append('geo_long', propertyLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1513,8 +1519,8 @@ const UploadDocuments = ({ activeIndex }) => {
       const filename = editProperty.file.name;
       data.append('document_type', 'property_photos');
       data.append('document_name', filename);
-      data.append('geo_lat', propertyLatLong.lat);
-      data.append('geo_long', propertyLatLong.long);
+      data.append('geo_lat', propertyLatLong?.lat);
+      data.append('geo_long', propertyLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1590,8 +1596,8 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'lo_selfie');
       data.append('document_name', filename);
-      data.append('geo_lat', loSelfieLatLong.lat);
-      data.append('geo_long', loSelfieLatLong.long);
+      data.append('geo_lat', loSelfieLatLong?.lat);
+      data.append('geo_long', loSelfieLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1685,8 +1691,8 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'other_docs');
       data.append('document_name', filename);
-      data.append('geo_lat', otherDocsLatLong.lat);
-      data.append('geo_long', otherDocsLatLong.long);
+      data.append('geo_lat', otherDocsLatLong?.lat);
+      data.append('geo_long', otherDocsLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -1761,8 +1767,8 @@ const UploadDocuments = ({ activeIndex }) => {
       const filename = editDoc.file.name;
       data.append('document_type', 'other_docs');
       data.append('document_name', filename);
-      data.append('geo_lat', otherDocsLatLong.lat);
-      data.append('geo_long', otherDocsLatLong.long);
+      data.append('geo_lat', otherDocsLatLong?.lat);
+      data.append('geo_long', otherDocsLatLong?.long);
 
       const options = {
         maxSizeMB: 0.02,
@@ -2201,7 +2207,7 @@ const UploadDocuments = ({ activeIndex }) => {
                         }}
                       />
                     </div>
-                    {idStatus !== 'Valid' &&
+                    {idStatus !== 'Valid Match' &&
                       (!editIdNumber ? (
                         <p className='flex gap-1 items-center'>
                           <svg
@@ -2237,7 +2243,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
                   <div className='flex justify-between mt-1'>
                     <div className='flex items-center gap-1'>
-                      {idStatus === 'Valid' ? (
+                      {idStatus === 'Valid Match' ? (
                         <>
                           <svg
                             width='18'
@@ -2300,7 +2306,7 @@ const UploadDocuments = ({ activeIndex }) => {
                       )}
                     </div>
 
-                    {idStatus !== 'Valid' && (
+                    {idStatus !== 'Valid Match' && (
                       <p className='text-light-grey leading-5 text-xs font-normal'>
                         Photo mandatory
                       </p>
@@ -2462,7 +2468,7 @@ const UploadDocuments = ({ activeIndex }) => {
                       />
                     </div>
 
-                    {addressStatus !== 'Valid' &&
+                    {addressStatus !== 'Valid Match' &&
                       (!editAddressNumber ? (
                         <p className='flex gap-1 items-center'>
                           <svg
@@ -2498,7 +2504,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
                   <div className='flex justify-between mt-1'>
                     <div className='flex items-center gap-1'>
-                      {addressStatus === 'Valid' ? (
+                      {addressStatus === 'Valid Match' ? (
                         <>
                           <svg
                             width='18'
@@ -2561,7 +2567,7 @@ const UploadDocuments = ({ activeIndex }) => {
                       )}
                     </div>
 
-                    {addressStatus !== 'Valid' && (
+                    {addressStatus !== 'Valid Match' && (
                       <p className='text-light-grey leading-5 text-xs font-normal'>
                         Photo mandatory
                       </p>
@@ -2770,13 +2776,13 @@ const UploadDocuments = ({ activeIndex }) => {
                     return;
                   }
                 }}
-                disabled={uanStatus === 'Valid'}
+                disabled={uanStatus === 'Valid Match'}
               />
 
               {isQaulifierActivated ? (
                 <div className='flex justify-between mt-1'>
                   <div className='flex items-center gap-1'>
-                    {uanStatus === 'Valid' ? (
+                    {uanStatus === 'Valid Match' ? (
                       <>
                         <svg
                           width='18'
@@ -2902,12 +2908,12 @@ const UploadDocuments = ({ activeIndex }) => {
                     );
                   }
                 }}
-                disabled={gstStatus === 'Valid'}
+                disabled={gstStatus === 'Valid Match'}
               />
               {isQaulifierActivated ? (
                 <div className='flex justify-between mt-1'>
                   <div className='flex items-center gap-1'>
-                    {gstStatus === 'Valid' ? (
+                    {gstStatus === 'Valid Match' ? (
                       <>
                         <svg
                           width='18'
