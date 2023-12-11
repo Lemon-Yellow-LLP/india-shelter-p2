@@ -789,7 +789,8 @@ const Eligibility = () => {
             edited_extra_params,
           );
         }
-        // updateCompleteFormProgress();
+
+        updateCompleteFormProgress();
       } catch (err) {
         console.log(err);
       }
@@ -809,9 +810,7 @@ const Eligibility = () => {
         setToastMessage('Data has been successfully pushed to the Salesforce');
         setSdfcResponse(true);
         setSfdcStatus(false);
-        updateCompleteFormProgress();
       } catch (err) {
-        updateCompleteFormProgress();
         console.log(err);
         setToastMessage('The data push to Salesforce has failed');
         setSdfcResponse(true);
@@ -844,12 +843,16 @@ const Eligibility = () => {
         <div className='mt-4'>
           <p className='text-xs text-primary-black font-normal'>
             Applicant name:
-            {' ' +
-              values?.applicants?.[activeIndex]?.applicant_details?.first_name +
-              ' ' +
-              values?.applicants?.[activeIndex]?.applicant_details?.middle_name +
-              ' ' +
-              values?.applicants?.[activeIndex]?.applicant_details?.last_name}
+            {values?.applicants?.map((applicant) =>
+              applicant.applicant_details?.is_primary
+                ? ' ' +
+                  applicant.applicant_details?.first_name +
+                  ' ' +
+                  applicant.applicant_details?.middle_name +
+                  ' ' +
+                  applicant.applicant_details?.last_name
+                : null,
+            )}
           </p>
           <p className='text-xs text-primary-black font-normal mt-0.5'>Salesforce ID: 1234567</p>
           <div className='flex justify-between text-primary-black font-medium mt-1'>
