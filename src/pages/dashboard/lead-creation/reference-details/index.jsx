@@ -60,7 +60,6 @@ const ReferenceDetails = () => {
   const updateFields = async (name, value) => {
     let newData = {};
     newData[name] = value;
-
     if (values?.reference_details?.id) {
       await editFieldsById(values?.reference_details?.id, 'reference', newData, {
         headers: {
@@ -121,11 +120,10 @@ const ReferenceDetails = () => {
   const handleReferenceTypeChangeOne = useCallback(
     (value) => {
       disableTwoOption(value);
+      console.log(value);
       setFieldValue('reference_details.reference_1_type', value);
 
-      if (!requiredFieldsStatus['reference_1_type']) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_type']: true }));
-      }
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_1_type']: true }));
 
       updateFields('reference_1_type', value);
     },
@@ -137,9 +135,7 @@ const ReferenceDetails = () => {
       disableOneOption(value);
       setFieldValue('reference_details.reference_2_type', value);
 
-      if (!requiredFieldsStatus['reference_2_type']) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_type']: true }));
-      }
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['reference_2_type']: true }));
 
       updateFields('reference_2_type', value);
     },
