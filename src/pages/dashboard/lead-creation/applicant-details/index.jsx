@@ -333,8 +333,10 @@ const ApplicantDetails = () => {
     }
 
     const finalDate = date;
+    let checkDate = date.toString();
+    checkDate = checkDate.toUpperCase();
 
-    if (date === 'Invalid date' || !isEighteenOrAbove(finalDate)) {
+    if (checkDate === 'INVALID DATE' || !isEighteenOrAbove(finalDate)) {
       setFieldError(
         `applicants[${activeIndex}].applicant_details.date_of_birth`,
         'Date of Birth is Required. Minimum age must be 18 or 18+',
@@ -563,7 +565,13 @@ const ApplicantDetails = () => {
   };
 
   const onDatePickerBlur = (e) => {
-    let date = moment(e.target.value).format('YYYY-DD-MM');
+    // let date = moment(e.target.value).format('YYYY-DD-MM');
+    var dateParts = e.target.value.split('/');
+    var day = parseInt(dateParts[0], 10);
+    var month = parseInt(dateParts[1], 10) - 1;
+    var year = parseInt(dateParts[2], 10);
+    const date = new Date(year, month, day);
+    console.log(date);
     checkDate(date);
     //   handleBlur(e);
   };
