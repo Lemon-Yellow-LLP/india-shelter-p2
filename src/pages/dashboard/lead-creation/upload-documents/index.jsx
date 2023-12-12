@@ -2393,7 +2393,7 @@ const UploadDocuments = ({ activeIndex }) => {
                 />
               )}
 
-              {isQaulifierActivated && (
+              {idStatus !== 'Valid Match' && (
                 <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
                   To be verified during the eligibility step
                 </p>
@@ -2662,7 +2662,7 @@ const UploadDocuments = ({ activeIndex }) => {
                 />
               )}
 
-              {isQaulifierActivated && (
+              {addressStatus !== 'Valid Match' && (
                 <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
                   To be verified during the eligibility step
                 </p>
