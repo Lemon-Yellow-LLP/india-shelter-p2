@@ -27,27 +27,44 @@ function PdfAndImageUploadBanking({
 
   const handleFile = async (e) => {
     setMessage('');
-
     setLoader(true);
 
-    let file = e.target.files;
+    async function success(data) {
+      setLatLong({
+        lat: data.coords.latitude,
+        long: data.coords.longitude,
+      });
 
-    if (file.length !== 0) {
-      for (let i = 0; i < file.length; i++) {
-        const fileType = file[i]['type'];
+      let file = e.target.files;
 
-        const validImageTypes = ['image/jpeg', 'application/pdf'];
+      if (file.length !== 0) {
+        for (let i = 0; i < file.length; i++) {
+          const fileType = file[i]['type'];
 
-        if (validImageTypes.includes(fileType)) {
-          setSingleFile(file[i]);
-          setFile([...files, file[i]]);
-        } else {
-          setLoader(false);
-          setMessage('File format not supported');
+          const validImageTypes = ['image/jpeg', 'application/pdf'];
+
+          if (validImageTypes.includes(fileType)) {
+            setSingleFile(file[i]);
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File format not supported');
+          }
         }
+      } else {
+        setLoader(false);
       }
+    }
+
+    let userLocation = navigator.geolocation;
+    if (userLocation) {
+      userLocation.getCurrentPosition(success, (error) => {
+        setLoader(false);
+        setMessage('Location is not enabled');
+        return;
+      });
     } else {
-      setLoader(false);
+      ('The geolocation API is not supported by your browser.');
     }
   };
 
@@ -60,28 +77,44 @@ function PdfAndImageUploadBanking({
   }, [pdf]);
 
   const editImage = (e, id) => {
-    // console.log(id);
     setMessage('');
-
     setLoader(true);
 
-    let file = e.target.files;
+    async function success(data) {
+      setLatLong({
+        lat: data.coords.latitude,
+        long: data.coords.longitude,
+      });
 
-    for (let i = 0; i < file.length; i++) {
-      const fileType = file[i]['type'];
+      let file = e.target.files;
 
-      const validImageTypes = ['image/jpeg'];
+      for (let i = 0; i < file.length; i++) {
+        const fileType = file[i]['type'];
 
-      if (validImageTypes.includes(fileType)) {
-        setEdit({
-          file: file[i],
-          id: id,
-        });
-        setFile([...files, file[i]]);
-      } else {
-        setLoader(false);
-        setMessage('File format not supported');
+        const validImageTypes = ['image/jpeg'];
+
+        if (validImageTypes.includes(fileType)) {
+          setEdit({
+            file: file[i],
+            id: id,
+          });
+          setFile([...files, file[i]]);
+        } else {
+          setLoader(false);
+          setMessage('File format not supported');
+        }
       }
+    }
+
+    let userLocation = navigator.geolocation;
+    if (userLocation) {
+      userLocation.getCurrentPosition(success, (error) => {
+        setLoader(false);
+        setMessage('Location is not enabled');
+        return;
+      });
+    } else {
+      ('The geolocation API is not supported by your browser.');
     }
   };
 

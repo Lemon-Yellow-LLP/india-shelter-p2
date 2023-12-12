@@ -25,56 +25,71 @@ function PhotoUpload({
 }) {
   const { values, activeIndex } = useContext(LeadContext);
   const { token } = useContext(AuthContext);
-  // const [message, setMessage] = useState(errorMessage);
-  // const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
 
   const handleFile = async (e) => {
     setMessage('');
-
     setLoader(true);
 
-    let file = e.target.files;
+    async function success(data) {
+      setLatLong({
+        lat: data.coords.latitude,
+        long: data.coords.longitude,
+      });
 
-    if (file.length !== 0) {
-      for (let i = 0; i < file.length; i++) {
-        const fileType = file[i]['type'];
+      let file = e.target.files;
 
-        const validImageTypes = ['image/jpeg'];
+      if (file.length !== 0) {
+        for (let i = 0; i < file.length; i++) {
+          const fileType = file[i]['type'];
 
-        const filename = file[i].name;
+          const validImageTypes = ['image/jpeg'];
 
-        if (validImageTypes.includes(fileType)) {
-          const options = {
-            maxSizeMB: 4,
-            maxWidthOrHeight: 1024,
-            useWebWorker: true,
-          };
+          const filename = file[i].name;
 
-          try {
-            const compressedFile = await imageCompression(file[i], options);
-            const compressedImageFile = new File([compressedFile], filename, {
-              type: compressedFile.type,
-            });
+          if (validImageTypes.includes(fileType)) {
+            const options = {
+              maxSizeMB: 4,
+              maxWidthOrHeight: 1024,
+              useWebWorker: true,
+            };
 
-            if (compressedImageFile.size <= 5000000) {
-              setSingleFile(compressedImageFile);
-              setFile([...files, compressedImageFile]);
-            } else {
+            try {
+              const compressedFile = await imageCompression(file[i], options);
+              const compressedImageFile = new File([compressedFile], filename, {
+                type: compressedFile.type,
+              });
+
+              if (compressedImageFile.size <= 5000000) {
+                setSingleFile(compressedImageFile);
+                setFile([...files, compressedImageFile]);
+              } else {
+                setLoader(false);
+                setMessage('File size should be less than 5MB');
+              }
+            } catch (error) {
               setLoader(false);
-              setMessage('File size should be less than 5MB');
+              setMessage('File format not supported');
             }
-          } catch (error) {
+          } else {
             setLoader(false);
             setMessage('File format not supported');
           }
-        } else {
-          setLoader(false);
-          setMessage('File format not supported');
         }
+      } else {
+        setLoader(false);
       }
+    }
+
+    let userLocation = navigator.geolocation;
+    if (userLocation) {
+      userLocation.getCurrentPosition(success, (error) => {
+        setLoader(false);
+        setMessage('Location is not enabled');
+        return;
+      });
     } else {
-      setLoader(false);
+      ('The geolocation API is not supported by your browser.');
     }
   };
 
@@ -143,26 +158,6 @@ function PhotoUpload({
     uploads && setLoader(false);
   }, [uploads]);
 
-  useEffect(() => {
-    let userLocation = navigator.geolocation;
-
-    if (userLocation) {
-      userLocation.getCurrentPosition(success);
-    } else {
-      ('The geolocation API is not supported by your browser.');
-    }
-
-    function success(data) {
-      let lat = data.coords.latitude;
-      let long = data.coords.longitude;
-
-      setLatLong({
-        lat: lat,
-        long: long,
-      });
-    }
-  }, []);
-
   return (
     <div className='w-full'>
       <label className='flex gap-0.5 items-center text-primary-black font-medium'>
@@ -184,7 +179,7 @@ function PhotoUpload({
         </div>
       ) : (
         <>
-          {!files.length ? (
+          {!files.length && !loader ? (
             <div>
               <div className='flex items-center justify-center w-full bg-white'>
                 <label
@@ -234,7 +229,7 @@ function PhotoUpload({
           ) : null}
           {uploads && files.length && !loader ? (
             <div>
-              <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
+              <span className='flex justify-center items-center text-[12px] mt-1 mb-1 text-red-500'>
                 {message}
               </span>
               <div

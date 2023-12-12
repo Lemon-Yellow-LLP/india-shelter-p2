@@ -784,12 +784,13 @@ export default function Preview() {
               link={pages.property_details.url + '?preview=' + pages.property_details.url}
               count={
                 values?.[pages.property_details.name]?.extra_params?.required_fields_status &&
-                  values?.[pages.property_details.name]?.extra_params?.progress != 0
+                values?.[pages.property_details.name]?.extra_params?.progress != 0
                   ? Object.keys(
-                    values?.[pages.property_details.name]?.extra_params?.required_fields_status,
+                      values?.[pages.property_details.name]?.extra_params?.required_fields_status,
                     ).filter(
                       (k) =>
-                        !values?.[pages.property_details.name]?.extra_params?.required_fields_status[k],
+                        !values?.[pages.property_details.name]?.extra_params
+                          ?.required_fields_status[k],
                     )?.length
                   : 'ALL'
               }
@@ -800,7 +801,9 @@ export default function Preview() {
                 )
                   .filter(
                     (k) =>
-                      !values?.[pages.property_details.name]?.extra_params?.required_fields_status[k]
+                      !values?.[pages.property_details.name]?.extra_params?.required_fields_status[
+                        k
+                      ],
                   )
                   .map((val, i) =>
                     fieldLabels[val] ? (
@@ -1008,7 +1011,11 @@ export default function Preview() {
           className='flex w-[100vw] p-[18px] bg-white gap-[20px] justify-end'
           style={{ boxShadow: '0px -5px 10px #E5E5E580' }}
         >
-          <Button inputClasses='w-1/2 h-[46px]' onClick={previousStep}>
+          <Button
+            inputClasses='w-1/2 h-[46px]'
+            onClick={previousStep}
+            link={activeStep === 0 && '/lead/upload-documents'}
+          >
             Previous
           </Button>
           <Button
