@@ -41,5 +41,6 @@
         "singleQuote": true
       }
     ]
-  }
+  },
+  "ignorePatterns": ["/src/components/DatePicker"]
 }

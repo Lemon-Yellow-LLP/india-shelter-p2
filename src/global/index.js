@@ -361,7 +361,7 @@ async function editAddressById(id, data, options) {
   return res;
 }
 
-async function checkExistingCustomer(body, token) {
+async function checkExistingCustomer(body) {
   let myHeaders = new Headers();
   myHeaders.append('Content-Type', 'application/json');
   let requestOptions2 = {
