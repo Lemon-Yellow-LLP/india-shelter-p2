@@ -789,11 +789,11 @@ const Eligibility = () => {
             edited_extra_params,
           );
         }
-
-        updateCompleteFormProgress();
       } catch (err) {
         console.log(err);
       }
+
+      updateCompleteFormProgress();
 
       try {
         const sdfc_res = await pushToSalesforce(
