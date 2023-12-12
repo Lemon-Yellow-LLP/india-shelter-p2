@@ -29,7 +29,7 @@ export const entityType = [
   },
   {
     label: 'Sole_Proprietorship',
-    value: 'Sole_Proprietorship',
+    value: 'Proprietorship',
   },
   {
     label: 'Individual',
@@ -59,7 +59,7 @@ export const account_type = [
   },
   {
     label: 'Over Draft',
-    value: 'Over Draft',
+    value: 'OD',
     icon: <OverDraftIcon />,
   },
 ];

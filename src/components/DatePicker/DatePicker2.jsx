@@ -41,7 +41,6 @@ export default function DatePicker2({
             }}
             onAccept={(e) => {
               let date = e?.format('YYYY-MM-DD');
-              console.log(date);
               onAccept(date);
             }}
             value={moment(value, 'DD/MM/YYYY')}

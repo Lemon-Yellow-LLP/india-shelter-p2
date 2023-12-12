@@ -364,6 +364,9 @@ body {
   width: 100%;
 }
 
+.MuiPickersMonth-monthButton.Mui-selected:focus,
+.MuiPickersMonth-monthButton.Mui-selected:hover,
+.MuiPickersMonth-monthButton.Mui-selected,
 .MuiPickersYear-yearButton.Mui-selected,
 .MuiPickersDay-root.Mui-selected {
   background-color: #147257 !important;

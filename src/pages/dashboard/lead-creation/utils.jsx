@@ -44,7 +44,7 @@ export const personalDetailsGenderOption = [
   },
   {
     label: 'Transgender',
-    value: 'Transgender',
+    value: 'Third Gender',
     icon: <IconTransGender />,
   },
 ];

@@ -862,6 +862,7 @@ const ApplicantDetails = () => {
             disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
             value={date}
             onAccept={(e) => {
+              console.log(e);
               checkDate(e);
             }}
             inputRef={datePickerInputRef}
