@@ -38,7 +38,7 @@ export const yearsResidingData = [
 export const typeOfAddressData = [
   {
     label: 'Communication',
-    value: 'Communication',
+    value: 'Communication Address',
     icon: <CommunicationIcon />,
   },
   {

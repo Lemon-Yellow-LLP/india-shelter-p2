@@ -1,69 +1,77 @@
 export const referenceDropdownOneOptions = [
   {
-    label: 'Relative/Friend',
-    value: 'relative-friend',
+    label: 'Relative',
+    value: 'Relative',
+  },
+  {
+    label: 'Friend',
+    value: 'FRIEND',
   },
   {
     label: 'Current Employer/Contractor',
-    value: 'current-employer-contractor',
+    value: 'Current Employer/Contractor',
   },
   {
     label: 'Colleague',
-    value: 'colleague',
+    value: 'Colleague',
   },
   {
     label: 'Business Neighbour',
-    value: 'business-neighbour',
+    value: 'Business Neighbour',
   },
   {
     label: 'Customer/Client',
-    value: 'customer-client',
+    value: 'Customer / Client',
   },
   {
     label: 'Supplier',
-    value: 'supplier',
+    value: 'Supplier',
   },
   {
     label: 'Business Place Landlord',
-    value: 'business-place-landlord',
+    value: 'Business Place Landlord',
   },
   {
     label: 'Supervisor',
-    value: 'supervisor',
+    value: 'Supervisor',
   },
 ];
 
 export const referenceDropdownTwoOptions = [
   {
-    label: 'Relative/Friend',
-    value: 'relative-friend',
+    label: 'Relative',
+    value: 'Relative',
+  },
+  {
+    label: 'Friend',
+    value: 'FRIEND',
   },
   {
     label: 'Current Employer/Contractor',
-    value: 'current-employer-contractor',
+    value: 'Current Employer/Contractor',
   },
   {
     label: 'Colleague',
-    value: 'colleague',
+    value: 'Colleague',
   },
   {
     label: 'Business Neighbour',
-    value: 'business-neighbour',
+    value: 'Business Neighbour',
   },
   {
     label: 'Customer/Client',
-    value: 'customer-client',
+    value: 'Customer / Client',
   },
   {
     label: 'Supplier',
-    value: 'supplier',
+    value: 'Supplier',
   },
   {
     label: 'Business Place Landlord',
-    value: 'business-place-landlord',
+    value: 'Business Place Landlord',
   },
   {
     label: 'Supervisor',
-    value: 'supervisor',
+    value: 'Supervisor',
   },
 ];

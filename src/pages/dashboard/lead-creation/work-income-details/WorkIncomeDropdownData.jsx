@@ -198,7 +198,7 @@ export const workingSinceOptions = [
 ];
 
 export const modeOfSalary = [
-  { label: 'Bank transfer', value: 'Bank-transfer' },
+  { label: 'Bank transfer', value: 'Bank Credit' },
   { label: 'Cash', value: 'Cash' },
 ];
 

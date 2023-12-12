@@ -54,7 +54,7 @@ export const manualModeDropdownOptions = [
       },
       {
         label: 'Buddhist',
-        value: 'Buddhist',
+        value: 'BUDDHIST',
       },
       {
         label: 'Christian',
@@ -62,7 +62,7 @@ export const manualModeDropdownOptions = [
       },
       {
         label: 'Jain',
-        value: 'Jain',
+        value: 'JAIN',
       },
       {
         label: 'Muslim',
@@ -74,7 +74,7 @@ export const manualModeDropdownOptions = [
       },
       {
         label: 'Others',
-        value: 'Others',
+        value: 'OTHERS',
       },
     ],
   },

@@ -29,7 +29,7 @@ export const entityType = [
   },
   {
     label: 'Sole_Proprietorship',
-    value: 'Sole_Proprietorship',
+    value: 'Proprietorship',
   },
   {
     label: 'Individual',

@@ -34,13 +34,13 @@ export default function DatePicker2({
       >
         <LocalizationProvider dateAdapter={AdapterMoment}>
           <DatePicker
+            views={['year', 'month', 'day']}
             format='DD/MM/YYYY'
             slotProps={{
               field: { clearable: true },
             }}
             onAccept={(e) => {
               let date = e?.format('YYYY-MM-DD');
-              console.log(date);
               onAccept(date);
             }}
             value={moment(value, 'DD/MM/YYYY')}
