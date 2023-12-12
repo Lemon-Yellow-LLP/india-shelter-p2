@@ -59,7 +59,7 @@ export const account_type = [
   },
   {
     label: 'Over Draft',
-    value: 'Over Draft',
+    value: 'OD',
     icon: <OverDraftIcon />,
   },
 ];
