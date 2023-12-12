@@ -511,19 +511,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', propertyPapersLatLong?.lat);
       data.append('geo_long', propertyPapersLatLong?.long);
 
-      if (!propertyPapersLatLong && !propertyPapersLatLong) {
-        setPropertyLoader(false);
-        setPropertyPaperError('Location is not enabled');
-
-        if (!propertyPaperUploads) {
-          setPropertyPaperUploads(null);
-          setPropertyPapers([]);
-        } else {
-          setPropertyPaperUploads(propertyPaperUploads);
-        }
-        return;
-      }
-
       if (propertyPapersFile.type === 'image/jpeg') {
         const options = {
           maxSizeMB: 4,
@@ -620,19 +607,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', propertyPapersLatLong?.lat);
       data.append('geo_long', propertyPapersLatLong?.long);
 
-      if (!propertyPapersLatLong && !propertyPapersLatLong) {
-        setPropertyLoader(false);
-        setPropertyPaperError('Location is not enabled');
-
-        if (!propertyPaperUploads) {
-          setPropertyPaperUploads(null);
-          setPropertyPapers([]);
-        } else {
-          setPropertyPaperUploads(propertyPaperUploads);
-        }
-        return;
-      }
-
       if (editPropertyPaper.file.type === 'image/jpeg') {
         const options = {
           maxSizeMB: 0.02,
@@ -718,18 +692,18 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', customerLatLong?.lat);
       data.append('geo_long', customerLatLong?.long);
 
-      if (!customerLatLong && !customerLatLong) {
-        setCustomerLoader(false);
-        setCustomerError('Location is not enabled');
+      // if (!customerLatLong && !customerLatLong) {
+      //   setCustomerLoader(false);
+      //   setCustomerError('Location is not enabled');
 
-        if (!customerUploads) {
-          setCustomerUploads(null);
-          setCustomerPhotos([]);
-        } else {
-          setCustomerUploads(customerUploads);
-        }
-        return;
-      }
+      //   if (!customerUploads) {
+      //     setCustomerUploads(null);
+      //     setCustomerPhotos([]);
+      //   } else {
+      //     setCustomerUploads(customerUploads);
+      //   }
+      //   return;
+      // }
 
       const options = {
         maxSizeMB: 0.02,
@@ -832,19 +806,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', idProofLatLong?.lat);
       data.append('geo_long', idProofLatLong?.long);
 
-      if (!idProofLatLong && !idProofLatLong) {
-        setIdProofLoader(false);
-        setIdProofError('Location is not enabled');
-
-        if (!idProofUploads) {
-          setIdProofUploads(null);
-          setIdProofPhotos([]);
-        } else {
-          setIdProofUploads(idProofUploads);
-        }
-        return;
-      }
-
       const options = {
         maxSizeMB: 0.02,
         maxWidthOrHeight: 1920,
@@ -929,19 +890,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', idProofLatLong?.lat);
       data.append('geo_long', idProofLatLong?.long);
-
-      if (!idProofLatLong && !idProofLatLong) {
-        setIdProofLoader(false);
-        setIdProofError('Location is not enabled');
-
-        if (!idProofUploads) {
-          setIdProofUploads(null);
-          setIdProofPhotos([]);
-        } else {
-          setIdProofUploads(idProofUploads);
-        }
-        return;
-      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1029,19 +977,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', addressProofLatLong?.lat);
       data.append('geo_long', addressProofLatLong?.long);
 
-      if (!addressProofLatLong && !addressProofLatLong) {
-        setAddressProofLoader(false);
-        setAddressProofError('Location is not enabled');
-
-        if (!addressProofUploads) {
-          setAddressProofUploads(null);
-          setAddressProofPhotos([]);
-        } else {
-          setAddressProofUploads(addressProofUploads);
-        }
-        return;
-      }
-
       const options = {
         maxSizeMB: 0.02,
         maxWidthOrHeight: 1920,
@@ -1063,53 +998,59 @@ const UploadDocuments = ({ activeIndex }) => {
       let fileSize = data.get('file');
 
       if (fileSize.size <= 5000000) {
-        const res = await uploadDoc(data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: token,
-          },
-        });
-
-        if (res) {
-          const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details?.id,
-            {
-              headers: {
-                Authorization: token,
-              },
+        try {
+          const res = await uploadDoc(data, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: token,
             },
-          );
-          const document_meta = applicant.document_meta;
-          if ('address_proof_photos' in document_meta == false) {
-            document_meta['address_proof_photos'] = [];
+          });
+
+          if (res) {
+            const applicant = await getApplicantById(
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+            const document_meta = applicant.document_meta;
+            if ('address_proof_photos' in document_meta == false) {
+              document_meta['address_proof_photos'] = [];
+            }
+
+            document_meta['address_proof_photos'].push(res.document);
+
+            const edited_applicant = await editFieldsById(
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
+              'applicant',
+              {
+                document_meta: document_meta,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
+            const active_uploads = edited_applicant.document_meta.address_proof_photos.filter(
+              (data) => {
+                return (
+                  data.active === true &&
+                  data.document_type ==
+                    values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+                );
+              },
+            );
+
+            setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
           }
-
-          document_meta['address_proof_photos'].push(res.document);
-
-          const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details?.id,
-            'applicant',
-            {
-              document_meta: document_meta,
-            },
-            {
-              headers: {
-                Authorization: token,
-              },
-            },
-          );
-
-          const active_uploads = edited_applicant.document_meta.address_proof_photos.filter(
-            (data) => {
-              return (
-                data.active === true &&
-                data.document_type ==
-                  values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
-              );
-            },
-          );
-
-          setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+        } catch (error) {
+          console.log('AADHAR_ERR', error);
+          setAddressProofLoader(false);
+          setAddressProofError('Upload a valid Aadhar Image');
         }
       } else {
         setAddressProofLoader(false);
@@ -1133,19 +1074,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', addressProofLatLong?.lat);
       data.append('geo_long', addressProofLatLong?.long);
 
-      if (!addressProofLatLong && !addressProofLatLong) {
-        setAddressProofLoader(false);
-        setAddressProofError('Location is not enabled');
-
-        if (!addressProofUploads) {
-          setAddressProofUploads(null);
-          setAddressProofPhotos([]);
-        } else {
-          setAddressProofUploads(addressProofUploads);
-        }
-        return;
-      }
-
       const options = {
         maxSizeMB: 0.02,
         maxWidthOrHeight: 1920,
@@ -1167,33 +1095,41 @@ const UploadDocuments = ({ activeIndex }) => {
       let fileSize = data.get('file');
 
       if (fileSize.size <= 5000000) {
-        const res = await reUploadDoc(editAddressProof.id, data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: token,
-          },
-        });
-
-        if (!res) return;
-
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details?.id,
-          {
+        try {
+          const res = await reUploadDoc(editAddressProof.id, data, {
             headers: {
+              'Content-Type': 'multipart/form-data',
               Authorization: token,
             },
-          },
-        );
+          });
 
-        const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
-          return (
-            data.active === true &&
-            data.document_type ==
-              values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+          if (!res) return;
+
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
-        });
 
-        setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+          const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
+            return (
+              data.active === true &&
+              data.document_type ==
+                values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+            );
+          });
+
+          setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+        } catch (error) {
+          console.log('AADHAR_ERR', error);
+          setAddressProofLoader(false);
+          setAddressProofError(
+            'You cannot edit Aadhar Image, Delete the previous one and reupload a new Image',
+          );
+        }
       } else {
         setAddressProofLoader(false);
         setAddressProofError('File size should be less than 5MB');
@@ -1229,19 +1165,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', salarySlipLatLong?.lat);
       data.append('geo_long', salarySlipLatLong?.long);
-
-      if (!salarySlipLatLong && !salarySlipLatLong) {
-        setSalarySlipLoader(false);
-        setSalarySlipError('Location is not enabled');
-
-        if (!salarySlipUploads) {
-          setSalarySlipUploads(null);
-          setSalarySlipPhotos([]);
-        } else {
-          setSalarySlipUploads(salarySlipUploads);
-        }
-        return;
-      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1327,19 +1250,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', salarySlipLatLong?.lat);
       data.append('geo_long', salarySlipLatLong?.long);
 
-      if (!salarySlipLatLong && !salarySlipLatLong) {
-        setSalarySlipLoader(false);
-        setSalarySlipError('Location is not enabled');
-
-        if (!salarySlipUploads) {
-          setSalarySlipUploads(null);
-          setSalarySlipPhotos([]);
-        } else {
-          setSalarySlipUploads(salarySlipUploads);
-        }
-        return;
-      }
-
       const options = {
         maxSizeMB: 0.02,
         maxWidthOrHeight: 1920,
@@ -1419,19 +1329,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', form60LatLong?.lat);
       data.append('geo_long', form60LatLong?.long);
-
-      if (!form60LatLong && !form60LatLong) {
-        setForm60Loader(false);
-        setForm60Error('Location is not enabled');
-
-        if (!form60Uploads) {
-          setForm60Uploads(null);
-          setForm60photos([]);
-        } else {
-          setForm60Uploads(form60Uploads);
-        }
-        return;
-      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1514,19 +1411,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', form60LatLong?.lat);
       data.append('geo_long', form60LatLong?.long);
 
-      if (!form60LatLong && !form60LatLong) {
-        setForm60Loader(false);
-        setForm60Error('Location is not enabled');
-
-        if (!form60Uploads) {
-          setForm60Uploads(null);
-          setForm60photos([]);
-        } else {
-          setForm60Uploads(form60Uploads);
-        }
-        return;
-      }
-
       const options = {
         maxSizeMB: 0.02,
         maxWidthOrHeight: 1920,
@@ -1606,20 +1490,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', propertyLatLong?.lat);
       data.append('geo_long', propertyLatLong?.long);
-
-      if (!propertyLatLong && !propertyLatLong) {
-        setPropertyPhotoLoader(false);
-        setPropertyPhotoError('Location is not enabled');
-
-        if (!propertyUploads) {
-          setPropertyUploads(null);
-          setPropertyPhotos([]);
-        } else {
-          console.log(propertyUploads);
-          setPropertyUploads(propertyUploads);
-        }
-        return;
-      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1702,20 +1572,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', propertyLatLong?.lat);
       data.append('geo_long', propertyLatLong?.long);
 
-      if (!propertyLatLong && !propertyLatLong) {
-        setPropertyPhotoLoader(false);
-        setPropertyPhotoError('Location is not enabled');
-
-        if (!propertyUploads) {
-          setPropertyUploads(null);
-          setPropertyPhotos([]);
-        } else {
-          setPropertyUploads(propertyUploads);
-        }
-
-        return;
-      }
-
       const options = {
         maxSizeMB: 0.02,
         maxWidthOrHeight: 1920,
@@ -1795,19 +1651,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', loSelfieLatLong?.lat);
       data.append('geo_long', loSelfieLatLong?.long);
-
-      if (!loSelfieLatLong && !loSelfieLatLong) {
-        setSelfieLoader(false);
-        setSelfieError('Location is not enabled');
-
-        if (!selfieUploads) {
-          setSelfieUploads(null);
-          setSelfie([]);
-        } else {
-          setSelfieUploads(selfieUploads);
-        }
-        return;
-      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -1907,19 +1750,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', otherDocsLatLong?.lat);
       data.append('geo_long', otherDocsLatLong?.long);
 
-      if (!otherDocsLatLong && !otherDocsLatLong) {
-        setDocLoader(false);
-        setDocError('Location is not enabled');
-
-        if (!docUploads) {
-          setDocUploads(null);
-          setDocs([]);
-        } else {
-          setDocUploads(docUploads);
-        }
-        return;
-      }
-
       const options = {
         maxSizeMB: 0.02,
         maxWidthOrHeight: 1920,
@@ -1998,19 +1828,6 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', otherDocsLatLong?.lat);
       data.append('geo_long', otherDocsLatLong?.long);
-
-      if (!otherDocsLatLong && !otherDocsLatLong) {
-        setDocLoader(false);
-        setDocError('Location is not enabled');
-
-        if (!docUploads) {
-          setDocUploads(null);
-          setDocs([]);
-        } else {
-          setDocUploads(docUploads);
-        }
-        return;
-      }
 
       const options = {
         maxSizeMB: 0.02,
@@ -2590,7 +2407,7 @@ const UploadDocuments = ({ activeIndex }) => {
                 />
               )}
 
-              {isQaulifierActivated && (
+              {isQaulifierActivated && idStatus !== 'Valid Match' && (
                 <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
                   To be verified during the eligibility step
                 </p>
@@ -2859,7 +2676,7 @@ const UploadDocuments = ({ activeIndex }) => {
                 />
               )}
 
-              {isQaulifierActivated && (
+              {isQaulifierActivated && addressStatus !== 'Valid Match' && (
                 <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
                   To be verified during the eligibility step
                 </p>
