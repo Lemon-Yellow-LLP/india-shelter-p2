@@ -33,37 +33,54 @@ function PdfAndImageUpload({
 
   const handleFile = async (e) => {
     setMessage('');
-
     setLoader(true);
 
-    let file = e.target.files;
+    async function success(data) {
+      setLatLong({
+        lat: data.coords.latitude,
+        long: data.coords.longitude,
+      });
 
-    if (file.length !== 0) {
-      for (let i = 0; i < file.length; i++) {
-        const fileType = file[i]['type'];
+      let file = e.target.files;
 
-        const validImageTypes = ['image/jpeg', 'application/pdf'];
+      if (file.length !== 0) {
+        for (let i = 0; i < file.length; i++) {
+          const fileType = file[i]['type'];
 
-        if (validImageTypes.includes(fileType)) {
-          if (file[i].type === 'application/pdf') {
-            if (file[i].size <= 5000000) {
+          const validImageTypes = ['image/jpeg', 'application/pdf'];
+
+          if (validImageTypes.includes(fileType)) {
+            if (file[i].type === 'application/pdf') {
+              if (file[i].size <= 5000000) {
+                setSingleFile(file[i]);
+                setFile([...files, file[i]]);
+              } else {
+                setLoader(false);
+                setMessage('File size should be less than 5MB');
+              }
+            } else {
               setSingleFile(file[i]);
               setFile([...files, file[i]]);
-            } else {
-              setLoader(false);
-              setMessage('File size should be less than 5MB');
             }
           } else {
-            setSingleFile(file[i]);
-            setFile([...files, file[i]]);
+            setLoader(false);
+            setMessage('File format not supported');
           }
-        } else {
-          setLoader(false);
-          setMessage('File format not supported');
         }
+      } else {
+        setLoader(false);
       }
+    }
+
+    let userLocation = navigator.geolocation;
+    if (userLocation) {
+      userLocation.getCurrentPosition(success, (error) => {
+        setLoader(false);
+        setMessage('Location is not enabled');
+        return;
+      });
     } else {
-      setLoader(false);
+      ('The geolocation API is not supported by your browser.');
     }
   };
 
@@ -77,30 +94,46 @@ function PdfAndImageUpload({
 
   const editImage = (e, id) => {
     setMessage('');
-
     setLoader(true);
 
-    let file = e.target.files;
+    async function success(data) {
+      setLatLong({
+        lat: data.coords.latitude,
+        long: data.coords.longitude,
+      });
+      let file = e.target.files;
 
-    if (file.length !== 0) {
-      for (let i = 0; i < file.length; i++) {
-        const fileType = file[i]['type'];
+      if (file.length !== 0) {
+        for (let i = 0; i < file.length; i++) {
+          const fileType = file[i]['type'];
 
-        const validImageTypes = ['image/jpeg'];
+          const validImageTypes = ['image/jpeg'];
 
-        if (validImageTypes.includes(fileType)) {
-          setEdit({
-            file: file[i],
-            id: id,
-          });
-          setFile([...files, file[i]]);
-        } else {
-          setLoader(false);
-          setMessage('File format not supported');
+          if (validImageTypes.includes(fileType)) {
+            setEdit({
+              file: file[i],
+              id: id,
+            });
+            setFile([...files, file[i]]);
+          } else {
+            setLoader(false);
+            setMessage('File format not supported');
+          }
         }
+      } else {
+        setLoader(false);
       }
+    }
+
+    let userLocation = navigator.geolocation;
+    if (userLocation) {
+      userLocation.getCurrentPosition(success, (error) => {
+        setLoader(false);
+        setMessage('Location is not enabled');
+        return;
+      });
     } else {
-      setLoader(false);
+      ('The geolocation API is not supported by your browser.');
     }
   };
 
@@ -221,26 +254,6 @@ function PdfAndImageUpload({
     setPdf(null);
   }
 
-  useEffect(() => {
-    let userLocation = navigator.geolocation;
-
-    if (userLocation) {
-      userLocation.getCurrentPosition(success);
-    } else {
-      ('The geolocation API is not supported by your browser.');
-    }
-
-    function success(data) {
-      let lat = data.coords.latitude;
-      let long = data.coords.longitude;
-
-      setLatLong({
-        lat: lat,
-        long: long,
-      });
-    }
-  }, []);
-
   return (
     <div className='w-full'>
       <label className='flex gap-0.5 items-center text-primary-black font-medium'>
@@ -257,7 +270,7 @@ function PdfAndImageUpload({
         />
       )}
 
-      {!files.length ? (
+      {!files.length && !loader ? (
         <div className=''>
           <div className='bg-white flex items-center justify-center w-full'>
             <label
@@ -452,7 +465,7 @@ function PdfAndImageUpload({
               />
             </div>
           </div>
-          <span className='flex justify-center items-center text-[12px] mb-1 text-red-500'>
+          <span className='flex justify-center items-center text-[12px] mt-1 mb-1 text-red-500'>
             {message || errorMessage}
           </span>
         </>
