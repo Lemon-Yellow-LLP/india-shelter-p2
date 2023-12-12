@@ -998,53 +998,59 @@ const UploadDocuments = ({ activeIndex }) => {
       let fileSize = data.get('file');
 
       if (fileSize.size <= 5000000) {
-        const res = await uploadDoc(data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: token,
-          },
-        });
-
-        if (res) {
-          const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details?.id,
-            {
-              headers: {
-                Authorization: token,
-              },
+        try {
+          const res = await uploadDoc(data, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: token,
             },
-          );
-          const document_meta = applicant.document_meta;
-          if ('address_proof_photos' in document_meta == false) {
-            document_meta['address_proof_photos'] = [];
+          });
+
+          if (res) {
+            const applicant = await getApplicantById(
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+            const document_meta = applicant.document_meta;
+            if ('address_proof_photos' in document_meta == false) {
+              document_meta['address_proof_photos'] = [];
+            }
+
+            document_meta['address_proof_photos'].push(res.document);
+
+            const edited_applicant = await editFieldsById(
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
+              'applicant',
+              {
+                document_meta: document_meta,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
+            const active_uploads = edited_applicant.document_meta.address_proof_photos.filter(
+              (data) => {
+                return (
+                  data.active === true &&
+                  data.document_type ==
+                    values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+                );
+              },
+            );
+
+            setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
           }
-
-          document_meta['address_proof_photos'].push(res.document);
-
-          const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details?.id,
-            'applicant',
-            {
-              document_meta: document_meta,
-            },
-            {
-              headers: {
-                Authorization: token,
-              },
-            },
-          );
-
-          const active_uploads = edited_applicant.document_meta.address_proof_photos.filter(
-            (data) => {
-              return (
-                data.active === true &&
-                data.document_type ==
-                  values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
-              );
-            },
-          );
-
-          setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+        } catch (error) {
+          console.log('AADHAR_ERR', error);
+          setAddressProofLoader(false);
+          setAddressProofError('Upload a valid Aadhar Image');
         }
       } else {
         setAddressProofLoader(false);
@@ -1089,33 +1095,41 @@ const UploadDocuments = ({ activeIndex }) => {
       let fileSize = data.get('file');
 
       if (fileSize.size <= 5000000) {
-        const res = await reUploadDoc(editAddressProof.id, data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: token,
-          },
-        });
-
-        if (!res) return;
-
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details?.id,
-          {
+        try {
+          const res = await reUploadDoc(editAddressProof.id, data, {
             headers: {
+              'Content-Type': 'multipart/form-data',
               Authorization: token,
             },
-          },
-        );
+          });
 
-        const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
-          return (
-            data.active === true &&
-            data.document_type ==
-              values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+          if (!res) return;
+
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
-        });
 
-        setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+          const active_uploads = applicant.document_meta.address_proof_photos.filter((data) => {
+            return (
+              data.active === true &&
+              data.document_type ==
+                values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof
+            );
+          });
+
+          setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+        } catch (error) {
+          console.log('AADHAR_ERR', error);
+          setAddressProofLoader(false);
+          setAddressProofError(
+            'You cannot edit Aadhar Image, Delete the previous one and reupload a new Image',
+          );
+        }
       } else {
         setAddressProofLoader(false);
         setAddressProofError('File size should be less than 5MB');
@@ -2393,7 +2407,7 @@ const UploadDocuments = ({ activeIndex }) => {
                 />
               )}
 
-              {idStatus !== 'Valid Match' && (
+              {isQaulifierActivated && idStatus !== 'Valid Match' && (
                 <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
                   To be verified during the eligibility step
                 </p>
@@ -2662,7 +2676,7 @@ const UploadDocuments = ({ activeIndex }) => {
                 />
               )}
 
-              {addressStatus !== 'Valid Match' && (
+              {isQaulifierActivated && addressStatus !== 'Valid Match' && (
                 <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
                   To be verified during the eligibility step
                 </p>
