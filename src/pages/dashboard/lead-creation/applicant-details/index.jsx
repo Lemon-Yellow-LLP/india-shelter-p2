@@ -8,7 +8,6 @@ import {
   getMobileOtp,
   verifyMobileOtp,
   addApi,
-  checkExistingCustomer,
 } from '../../../../global/index';
 import {
   CardRadio,
@@ -34,6 +33,7 @@ import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import DatePicker2 from '../../../../components/DatePicker/DatePicker2';
 import moment from 'moment';
+import axios from 'axios';
 
 const ApplicantDetails = () => {
   const {
@@ -408,13 +408,22 @@ const ApplicantDetails = () => {
             },
           };
 
-          await checkExistingCustomer(bodyForExistingCustomer)
-            .then((body) => {
-              if (body && body?.length !== 0) {
+          await axios
+            .post(
+              'https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run',
+              bodyForExistingCustomer,
+            )
+            .then(({ data }) => {
+              const body = data?.body;
+              if (
+                body &&
+                body?.length !== 0 &&
+                body?.[0]?.existing_customer_is_existing_customer?.toUpperCase() === 'TRUE'
+              ) {
                 const { existing_customer_is_existing_customer } = body[0];
                 if (
                   existing_customer_is_existing_customer &&
-                  existing_customer_is_existing_customer?.toLowercase() === 'false'
+                  existing_customer_is_existing_customer?.toUpperCase() === 'FALSE'
                 ) {
                   editFieldsById(
                     values?.applicants[activeIndex]?.applicant_details?.id,
@@ -477,7 +486,7 @@ const ApplicantDetails = () => {
               }
             })
             .catch((err) => {
-              console.log(err);
+              console.log('Existing customer api error', err);
               editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
                 extra_params: {
                   ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
