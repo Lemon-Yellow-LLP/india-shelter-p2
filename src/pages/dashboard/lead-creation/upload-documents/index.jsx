@@ -812,6 +812,14 @@ const UploadDocuments = ({ activeIndex }) => {
         useWebWorker: true,
       };
 
+      // const active_photos = idProofUploads?.data?.filter((file) => file.active == true);
+
+      // if (active_photos?.length >= 1) {
+      //   setIdProofLoader(false);
+      //   setIdProofError('Maximum One Image can be uploaded');
+      //   return;
+      // }
+
       try {
         const compressedFile = await imageCompression(idProofPhotosFile, options);
 
@@ -976,6 +984,14 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', addressProofLatLong?.lat);
       data.append('geo_long', addressProofLatLong?.long);
+
+      // const active_photos = addressProofUploads?.data?.filter((file) => file.active == true);
+
+      // if (active_photos?.length >= 2) {
+      //   setAddressProofLoader(false);
+      //   setAddressProofError('Maximum Two Images can be uploaded');
+      //   return;
+      // }
 
       const options = {
         maxSizeMB: 0.02,

@@ -24,8 +24,14 @@ import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
 
 const Eligibility = () => {
-  const { activeIndex, values, setFieldValue, updateCompleteFormProgress } =
-    useContext(LeadContext);
+  const {
+    activeIndex,
+    values,
+    setFieldValue,
+    updateCompleteFormProgress,
+    setActiveIndex,
+    primaryIndex,
+  } = useContext(LeadContext);
   const { toastMessage, setToastMessage, token } = useContext(AuthContext);
 
   const [progress, setProgress] = useState(0);
@@ -97,6 +103,8 @@ const Eligibility = () => {
 
   useEffect(() => {
     async function breTwo() {
+      setActiveIndex(primaryIndex);
+
       const lead = await getLeadById(
         values?.applicants?.[activeIndex]?.applicant_details?.lead_id,
         {
