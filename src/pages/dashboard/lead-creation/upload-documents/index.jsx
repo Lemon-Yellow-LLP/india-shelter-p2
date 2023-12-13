@@ -1067,6 +1067,14 @@ const UploadDocuments = ({ activeIndex }) => {
           console.log('AADHAR_ERR', error);
           setAddressProofLoader(false);
           setAddressProofError('Upload a valid Aadhar Image');
+
+          if (!addressProofUploads) {
+            setAddressProofUploads(null);
+            setAddressProofPhotos([]);
+          } else {
+            setAddressProofUploads(addressProofUploads);
+          }
+          return;
         }
       } else {
         setAddressProofLoader(false);
