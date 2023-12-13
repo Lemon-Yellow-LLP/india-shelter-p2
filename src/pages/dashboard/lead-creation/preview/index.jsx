@@ -28,6 +28,7 @@ export default function Preview() {
     setFieldValue,
     propertyValueEstimateError,
     updateProgressUploadDocumentSteps,
+    primaryIndex,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
@@ -46,7 +47,7 @@ export default function Preview() {
   const navigate = useNavigate();
 
   const [activeStep, setActiveStep] = useState(0);
-  const [primaryIndex, setPrimaryIndex] = useState(null);
+  const [primaryIndexPreview, setprimaryIndexPreview] = useState(null);
   const [coApplicantIndex, setCoApplicantIndex] = useState(null);
   const [coApplicantIndexes, setCoApplicantIndexes] = useState([]);
   const [flattedErrors, setFlattedErrors] = useState({});
@@ -140,21 +141,21 @@ export default function Preview() {
   }, [errors]);
 
   useEffect(() => {
-    const _primaryIndex = values?.applicants?.findIndex(
+    const _primaryIndexPreview = values?.applicants?.findIndex(
       (applicant) => applicant?.applicant_details?.is_primary,
     );
 
     const _coApplicantIndexes = [];
     for (let i = 0; i < values?.applicants?.length; i++) {
-      if (i === _primaryIndex) continue;
+      if (i === _primaryIndexPreview) continue;
       _coApplicantIndexes.push(i);
     }
 
-    setPrimaryIndex(_primaryIndex);
+    setprimaryIndexPreview(_primaryIndexPreview);
     setCoApplicantIndex(0);
     setCoApplicantIndexes(_coApplicantIndexes);
     setOpenQualifierNotActivePopup(
-      !values?.applicants?.[_primaryIndex]?.applicant_details?.extra_params?.qualifier,
+      !values?.applicants?.[_primaryIndexPreview]?.applicant_details?.extra_params?.qualifier,
     );
 
     // To show errors
@@ -163,9 +164,9 @@ export default function Preview() {
 
   useEffect(() => {
     setCoApplicantIndex(activeStep ? activeStep - 1 : 0);
-    if (activeStep == 0 && primaryIndex != null) {
+    if (activeStep == 0 && primaryIndexPreview != null) {
       setOpenQualifierNotActivePopup(
-        !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.qualifier,
+        !values?.applicants?.[primaryIndexPreview]?.applicant_details?.extra_params?.qualifier,
       );
     } else if (activeStep != 0 && coApplicantIndexes[coApplicantIndex] != null) {
       setOpenQualifierNotActivePopup(
@@ -236,6 +237,7 @@ export default function Preview() {
 
   const nextStep = () => {
     if (activeStep === coApplicantIndexes.length) {
+      setActiveIndex(primaryIndex);
       return;
     }
     setActiveStep((prev) => {
@@ -565,7 +567,7 @@ export default function Preview() {
   const PrimaryApplicantDetails = () => {
     return (
       <>
-        {checkTotalProgress(values?.applicants?.[primaryIndex]) &&
+        {checkTotalProgress(values?.applicants?.[primaryIndexPreview]) &&
         values?.property_details?.extra_params?.progress == 100 &&
         values?.reference_details?.extra_params?.progress == 100 ? (
           <StepCompleted />
@@ -603,28 +605,30 @@ export default function Preview() {
               </p>
             </div>
             <PreviewCard
-              index={primaryIndex}
+              index={primaryIndexPreview}
               hide={
-                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.progress == 100
+                values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
+                  ?.extra_params?.progress == 100
               }
               title={pages.applicant_details.title}
               link={pages.applicant_details.url + '?preview=' + pages.applicant_details.url}
               count={
                 flattedErrors &&
-                flattedErrors?.applicants?.[primaryIndex]?.[pages.applicant_details.name] &&
-                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name] &&
-                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.progress != 0
+                flattedErrors?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name] &&
+                values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name] &&
+                values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
+                  ?.extra_params?.progress != 0
                   ? Object.keys(
-                      flattedErrors?.applicants?.[primaryIndex]?.[pages.applicant_details.name],
+                      flattedErrors?.applicants?.[primaryIndexPreview]?.[
+                        pages.applicant_details.name
+                      ],
                     ).length
                   : 'ALL'
               }
             >
-              {flattedErrors?.applicants?.[primaryIndex]?.[pages.applicant_details.name] &&
+              {flattedErrors?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name] &&
                 Object.keys(
-                  flattedErrors?.applicants?.[primaryIndex]?.[pages.applicant_details.name],
+                  flattedErrors?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name],
                 ).map((val, i) => (
                   <p key={i} className='text-xs pb-[3px] not-italic font-normal text-primary-black'>
                     {fieldLabels[val] ?? '-'}
@@ -634,38 +638,38 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
-              index={primaryIndex}
+              index={primaryIndexPreview}
               hide={
-                values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
-                  ?.progress == 100
+                values?.applicants?.[primaryIndexPreview]?.[pages.personal_details.name]
+                  ?.extra_params?.progress == 100
               }
               title={pages.personal_details.title}
               link={pages.personal_details.url + '?preview=' + pages.personal_details.url}
               count={
-                values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
-                  ?.required_fields_status &&
-                values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
-                  ?.progress != 0
+                values?.applicants?.[primaryIndexPreview]?.[pages.personal_details.name]
+                  ?.extra_params?.required_fields_status &&
+                values?.applicants?.[primaryIndexPreview]?.[pages.personal_details.name]
+                  ?.extra_params?.progress != 0
                   ? Object.keys(
-                      values?.applicants?.[primaryIndex]?.[pages.personal_details.name]
+                      values?.applicants?.[primaryIndexPreview]?.[pages.personal_details.name]
                         ?.extra_params?.required_fields_status,
                     ).filter(
                       (k) =>
-                        !values?.applicants?.[primaryIndex]?.[pages.personal_details.name]
+                        !values?.applicants?.[primaryIndexPreview]?.[pages.personal_details.name]
                           ?.extra_params?.required_fields_status[k],
                     )?.length
                   : 'ALL'
               }
             >
-              {values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
-                ?.required_fields_status &&
+              {values?.applicants?.[primaryIndexPreview]?.[pages.personal_details.name]
+                ?.extra_params?.required_fields_status &&
                 Object.keys(
-                  values?.applicants?.[primaryIndex]?.[pages.personal_details.name]?.extra_params
-                    ?.required_fields_status,
+                  values?.applicants?.[primaryIndexPreview]?.[pages.personal_details.name]
+                    ?.extra_params?.required_fields_status,
                 )
                   .filter(
                     (k) =>
-                      !values?.applicants?.[primaryIndex]?.[pages.personal_details.name]
+                      !values?.applicants?.[primaryIndexPreview]?.[pages.personal_details.name]
                         ?.extra_params?.required_fields_status[k],
                   )
                   .map((val, i) =>
@@ -682,86 +686,38 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
-              index={primaryIndex}
+              index={primaryIndexPreview}
               hide={
-                values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
+                values?.applicants?.[primaryIndexPreview]?.[pages.address_detail.name]?.extra_params
                   ?.progress == 100
               }
               title={pages.address_detail.title}
               link={pages.address_detail.url + '?preview=' + pages.address_detail.url}
               count={
-                values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
+                values?.applicants?.[primaryIndexPreview]?.[pages.address_detail.name]?.extra_params
                   ?.required_fields_status &&
-                values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
+                values?.applicants?.[primaryIndexPreview]?.[pages.address_detail.name]?.extra_params
                   ?.progress != 0
                   ? Object.keys(
-                      values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
-                        ?.required_fields_status,
-                    ).filter(
-                      (k) =>
-                        !values?.applicants?.[primaryIndex]?.[pages.address_detail.name]
-                          ?.extra_params?.required_fields_status[k],
-                    )?.length
-                  : 'ALL'
-              }
-            >
-              {values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
-                ?.required_fields_status &&
-                Object.keys(
-                  values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
-                    ?.required_fields_status,
-                )
-                  .filter(
-                    (k) =>
-                      !values?.applicants?.[primaryIndex]?.[pages.address_detail.name]?.extra_params
-                        ?.required_fields_status[k],
-                  )
-                  .map((val, i) =>
-                    fieldLabels[val] ? (
-                      <p
-                        key={i}
-                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
-                      >
-                        {fieldLabels[val]}
-                        <span className='text-primary-red text-xs'>*</span>
-                      </p>
-                    ) : null,
-                  )}
-            </PreviewCard>
-
-            <PreviewCard
-              index={primaryIndex}
-              hide={
-                values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
-                  ?.progress == 100
-              }
-              title={pages.work_income_detail.title}
-              link={pages.work_income_detail.url + '?preview=' + pages.work_income_detail.url}
-              count={
-                values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
-                  ?.required_fields_status &&
-                values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
-                  ?.progress != 0
-                  ? Object.keys(
-                      values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]
+                      values?.applicants?.[primaryIndexPreview]?.[pages.address_detail.name]
                         ?.extra_params?.required_fields_status,
                     ).filter(
                       (k) =>
-                        !values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]
+                        !values?.applicants?.[primaryIndexPreview]?.[pages.address_detail.name]
                           ?.extra_params?.required_fields_status[k],
                     )?.length
                   : 'ALL'
               }
             >
-              {values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
+              {values?.applicants?.[primaryIndexPreview]?.[pages.address_detail.name]?.extra_params
                 ?.required_fields_status &&
                 Object.keys(
-                  values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]?.extra_params
-                    ?.required_fields_status,
+                  values?.applicants?.[primaryIndexPreview]?.[pages.address_detail.name]
+                    ?.extra_params?.required_fields_status,
                 )
                   .filter(
                     (k) =>
-                      !values?.applicants?.[primaryIndex]?.[pages.work_income_detail.name]
+                      !values?.applicants?.[primaryIndexPreview]?.[pages.address_detail.name]
                         ?.extra_params?.required_fields_status[k],
                   )
                   .map((val, i) =>
@@ -778,7 +734,55 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
-              index={primaryIndex}
+              index={primaryIndexPreview}
+              hide={
+                values?.applicants?.[primaryIndexPreview]?.[pages.work_income_detail.name]
+                  ?.extra_params?.progress == 100
+              }
+              title={pages.work_income_detail.title}
+              link={pages.work_income_detail.url + '?preview=' + pages.work_income_detail.url}
+              count={
+                values?.applicants?.[primaryIndexPreview]?.[pages.work_income_detail.name]
+                  ?.extra_params?.required_fields_status &&
+                values?.applicants?.[primaryIndexPreview]?.[pages.work_income_detail.name]
+                  ?.extra_params?.progress != 0
+                  ? Object.keys(
+                      values?.applicants?.[primaryIndexPreview]?.[pages.work_income_detail.name]
+                        ?.extra_params?.required_fields_status,
+                    ).filter(
+                      (k) =>
+                        !values?.applicants?.[primaryIndexPreview]?.[pages.work_income_detail.name]
+                          ?.extra_params?.required_fields_status[k],
+                    )?.length
+                  : 'ALL'
+              }
+            >
+              {values?.applicants?.[primaryIndexPreview]?.[pages.work_income_detail.name]
+                ?.extra_params?.required_fields_status &&
+                Object.keys(
+                  values?.applicants?.[primaryIndexPreview]?.[pages.work_income_detail.name]
+                    ?.extra_params?.required_fields_status,
+                )
+                  .filter(
+                    (k) =>
+                      !values?.applicants?.[primaryIndexPreview]?.[pages.work_income_detail.name]
+                        ?.extra_params?.required_fields_status[k],
+                  )
+                  .map((val, i) =>
+                    fieldLabels[val] ? (
+                      <p
+                        key={i}
+                        className='text-xs pb-[3px] not-italic font-normal text-primary-black'
+                      >
+                        {fieldLabels[val]}
+                        <span className='text-primary-red text-xs'>*</span>
+                      </p>
+                    ) : null,
+                  )}
+            </PreviewCard>
+
+            <PreviewCard
+              index={primaryIndexPreview}
               hide={values?.[pages.property_details.name]?.extra_params?.progress == 100}
               title={pages.property_details.title}
               link={pages.property_details.url + '?preview=' + pages.property_details.url}
@@ -819,25 +823,26 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
-              index={primaryIndex}
+              index={primaryIndexPreview}
               hide={
-                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.banking_progress == 100 ||
-                !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.qualifier
+                values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
+                  ?.extra_params?.banking_progress == 100 ||
+                !values?.applicants?.[primaryIndexPreview]?.applicant_details?.extra_params
+                  ?.qualifier
               }
               title={pages.banking_details.title}
               link={pages.banking_details.url + '?preview=' + pages.banking_details.url}
               hideLabel={true}
               count={
-                values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.banking_progress == 100
+                values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
+                  ?.extra_params?.banking_progress == 100
                   ? 'Banking completed'
                   : 'No bank added'
               }
             >
-              {flattedErrors?.applicants?.[primaryIndex]?.[pages.banking_details.name] &&
+              {flattedErrors?.applicants?.[primaryIndexPreview]?.[pages.banking_details.name] &&
                 Object.keys(
-                  flattedErrors?.applicants?.[primaryIndex]?.[pages.banking_details.name],
+                  flattedErrors?.applicants?.[primaryIndexPreview]?.[pages.banking_details.name],
                 ).map((val, i) =>
                   fieldLabels[val] ? (
                     <p
@@ -852,7 +857,7 @@ export default function Preview() {
             </PreviewCard>
 
             <PreviewCard
-              index={primaryIndex}
+              index={primaryIndexPreview}
               hide={values?.[pages.reference_details.name]?.extra_params?.progress == 100}
               title={pages.reference_details.title}
               link={pages.reference_details.url + '?preview=' + pages.reference_details.url}
@@ -885,38 +890,38 @@ export default function Preview() {
               </div>
             ) : (
               <PreviewCard
-                index={primaryIndex}
+                index={primaryIndexPreview}
                 hide={
-                  values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                    ?.upload_progress == 100
+                  values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
+                    ?.extra_params?.upload_progress == 100
                 }
                 title={pages.upload_documents.title}
                 link={pages.upload_documents.url + '?preview=' + pages.upload_documents.url}
                 count={
-                  values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                    ?.upload_required_fields_status &&
-                  values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                    ?.upload_progress != 0
+                  values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
+                    ?.extra_params?.upload_required_fields_status &&
+                  values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
+                    ?.extra_params?.upload_progress != 0
                     ? Object.keys(
-                        values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
+                        values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
                           ?.extra_params?.upload_required_fields_status,
                       ).filter(
                         (k) =>
-                          !values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
+                          !values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
                             ?.extra_params?.upload_required_fields_status[k],
                       )?.length
                     : 'ALL'
                 }
               >
-                {values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                  ?.upload_required_fields_status &&
+                {values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
+                  ?.extra_params?.upload_required_fields_status &&
                   Object.keys(
-                    values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]?.extra_params
-                      ?.upload_required_fields_status,
+                    values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
+                      ?.extra_params?.upload_required_fields_status,
                   )
                     .filter(
                       (k) =>
-                        !values?.applicants?.[primaryIndex]?.[pages.applicant_details.name]
+                        !values?.applicants?.[primaryIndexPreview]?.[pages.applicant_details.name]
                           ?.extra_params?.upload_required_fields_status[k],
                     )
                     .map((val, i) =>
@@ -947,7 +952,7 @@ export default function Preview() {
             <span className='text-xs not-italic font-medium text-dark-grey'>APPLICANTS</span>
             <span className='text-right text-xs not-italic font-normal text-primary-black'>{`${
               values?.applicants?.[
-                activeStep == 0 ? primaryIndex : coApplicantIndexes[coApplicantIndex]
+                activeStep == 0 ? primaryIndexPreview : coApplicantIndexes[coApplicantIndex]
               ]?.applicant_details?.first_name || '-'
             } (${activeStep == 0 ? 'Primary' : 'Co-app'}) `}</span>
           </div>
@@ -1029,7 +1034,7 @@ export default function Preview() {
             primary={true}
             disabled={
               ((activeStep === 0
-                ? !checkTotalProgress(values?.applicants?.[primaryIndex]) ||
+                ? !checkTotalProgress(values?.applicants?.[primaryIndexPreview]) ||
                   values?.property_details?.extra_params?.progress != 100 ||
                   values?.reference_details?.extra_params?.progress != 100
                 : !checkCoApplicantTotalProgress(
@@ -1050,7 +1055,7 @@ export default function Preview() {
 
       {/* Lnt Charges */}
       {activeStep == 0 &&
-      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.qualifier ? (
+      values?.applicants?.[primaryIndexPreview]?.applicant_details?.extra_params?.qualifier ? (
         <Snackbar
           sx={{
             '& .MuiPaper-root': {
