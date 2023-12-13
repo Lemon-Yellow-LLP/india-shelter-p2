@@ -73,7 +73,7 @@ const ApplicantDetails = () => {
   });
 
   const [date, setDate] = useState(null);
-  const [dateError, setDateError] = useState([]);
+  const [dateError, setDateError] = useState(['', '', '', '', '']);
 
   const datePickerInputRef = useRef();
 
@@ -339,15 +339,18 @@ const ApplicantDetails = () => {
 
     if (checkDate === 'INVALID DATE') {
       setDateError((prev) => {
-        prev[activeIndex] = 'Please enter a valid date';
-        return [...prev];
+        const newErrors = [...prev];
+        newErrors[activeIndex] = 'Please enter a valid date';
+        return newErrors;
       });
+
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
     } else if (isEighteenOrAbove(finalDate)) {
       setDateError((prev) => {
-        prev[activeIndex] = '';
-        return [...prev];
+        const newErrors = [...prev];
+        newErrors[activeIndex] = '';
+        return newErrors;
       });
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, finalDate);
       updateFieldsApplicant('date_of_birth', finalDate);
@@ -373,8 +376,9 @@ const ApplicantDetails = () => {
       }
     } else {
       setDateError((prev) => {
-        prev[activeIndex] = 'Date of Birth is Required. Minimum age must be 18 or 18+';
-        return [...prev];
+        const newErrors = [...prev];
+        newErrors[activeIndex] = 'Date of Birth is Required. Minimum age must be 18 or 18+';
+        return newErrors;
       });
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
@@ -502,8 +506,9 @@ const ApplicantDetails = () => {
       });
     } else {
       setDateError((prev) => {
-        prev[activeIndex] = 'Date of Birth is Required. Minimum age must be 18 or 18+';
-        return [...prev];
+        const newErrors = [...prev];
+        newErrors[activeIndex] = 'Date of Birth is Required. Minimum age must be 18 or 18+';
+        return newErrors;
       });
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
       datePickerInputRef.current.focus();
@@ -594,12 +599,6 @@ const ApplicantDetails = () => {
     datePickerInputRef.current.addEventListener('blur', onDatePickerBlur);
     datePickerInputRef.current.name = `applicants[${activeIndex}].applicant_details.date_of_birth`;
   }, [datePickerInputRef, datePickerInputRef.current]);
-
-  // useEffect(() => {
-  //   if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth === '') {
-  //     setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
-  //   }
-  // }, [values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth]);
 
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
