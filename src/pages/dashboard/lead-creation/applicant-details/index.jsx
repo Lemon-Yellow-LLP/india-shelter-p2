@@ -8,7 +8,6 @@ import {
   getMobileOtp,
   verifyMobileOtp,
   addApi,
-  checkExistingCustomer,
 } from '../../../../global/index';
 import {
   CardRadio,
@@ -34,6 +33,7 @@ import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import DatePicker2 from '../../../../components/DatePicker/DatePicker2';
 import moment from 'moment';
+import axios from 'axios';
 
 const ApplicantDetails = () => {
   const {
@@ -73,6 +73,7 @@ const ApplicantDetails = () => {
   });
 
   const [date, setDate] = useState(null);
+  const [dateError, setDateError] = useState(['', '', '', '', '']);
 
   const datePickerInputRef = useRef();
 
@@ -333,15 +334,24 @@ const ApplicantDetails = () => {
     }
 
     const finalDate = date;
+    let checkDate = date.toString();
+    checkDate = checkDate.toUpperCase();
 
-    if (date === 'Invalid date' || !isEighteenOrAbove(finalDate)) {
-      setFieldError(
-        `applicants[${activeIndex}].applicant_details.date_of_birth`,
-        'Date of Birth is Required. Minimum age must be 18 or 18+',
-      );
+    if (checkDate === 'INVALID DATE') {
+      setDateError((prev) => {
+        const newErrors = [...prev];
+        newErrors[activeIndex] = 'Please enter a valid date';
+        return newErrors;
+      });
+
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
-    } else {
+    } else if (isEighteenOrAbove(finalDate)) {
+      setDateError((prev) => {
+        const newErrors = [...prev];
+        newErrors[activeIndex] = '';
+        return newErrors;
+      });
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, finalDate);
       updateFieldsApplicant('date_of_birth', finalDate);
       if (
@@ -364,11 +374,19 @@ const ApplicantDetails = () => {
           },
         );
       }
+    } else {
+      setDateError((prev) => {
+        const newErrors = [...prev];
+        newErrors[activeIndex] = 'Date of Birth is Required. Minimum age must be 18 or 18+';
+        return newErrors;
+      });
+      setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
+      setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
     }
   };
 
   const sendMobileOtp = async () => {
-    if (values.applicants[activeIndex]?.applicant_details.date_of_birth) {
+    if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth) {
       await updateFieldsApplicant().then(async () => {
         // setDisablePhoneNumber((prev) => !prev);
 
@@ -394,13 +412,22 @@ const ApplicantDetails = () => {
             },
           };
 
-          await checkExistingCustomer(bodyForExistingCustomer)
-            .then((body) => {
-              if (body && body?.length !== 0) {
+          await axios
+            .post(
+              'https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run',
+              bodyForExistingCustomer,
+            )
+            .then(({ data }) => {
+              const body = data?.body;
+              if (
+                body &&
+                body?.length !== 0 &&
+                body?.[0]?.existing_customer_is_existing_customer?.toUpperCase() === 'TRUE'
+              ) {
                 const { existing_customer_is_existing_customer } = body[0];
                 if (
                   existing_customer_is_existing_customer &&
-                  existing_customer_is_existing_customer?.toLowercase() === 'false'
+                  existing_customer_is_existing_customer?.toUpperCase() === 'FALSE'
                 ) {
                   editFieldsById(
                     values?.applicants[activeIndex]?.applicant_details?.id,
@@ -463,7 +490,7 @@ const ApplicantDetails = () => {
               }
             })
             .catch((err) => {
-              console.log(err);
+              console.log('Existing customer api error', err);
               editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
                 extra_params: {
                   ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
@@ -478,10 +505,11 @@ const ApplicantDetails = () => {
         });
       });
     } else {
-      setFieldError(
-        `applicants[${activeIndex}].applicant_details.date_of_birth`,
-        'Date of Birth is Required. Minimum age must be 18 or 18+',
-      );
+      setDateError((prev) => {
+        const newErrors = [...prev];
+        newErrors[activeIndex] = 'Date of Birth is Required. Minimum age must be 18 or 18+';
+        return newErrors;
+      });
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
       datePickerInputRef.current.focus();
     }
@@ -563,21 +591,14 @@ const ApplicantDetails = () => {
   };
 
   const onDatePickerBlur = (e) => {
-    let date = moment(e.target.value).format('YYYY-DD-MM');
+    let date = moment(e.target.value, 'DD/MM/YYYY').format('YYYY-MM-DD');
     checkDate(date);
-    //   handleBlur(e);
   };
 
   useEffect(() => {
     datePickerInputRef.current.addEventListener('blur', onDatePickerBlur);
     datePickerInputRef.current.name = `applicants[${activeIndex}].applicant_details.date_of_birth`;
   }, [datePickerInputRef, datePickerInputRef.current]);
-
-  // useEffect(() => {
-  //   if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth === '') {
-  //     setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
-  //   }
-  // }, [values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth]);
 
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
@@ -854,7 +875,8 @@ const ApplicantDetails = () => {
           <DatePicker2
             label='Date of Birth'
             name={`applicants[${activeIndex}].applicant_details.date_of_birth`}
-            error={errors?.applicants?.[activeIndex]?.applicant_details?.date_of_birth}
+            // error={errors?.applicants?.[activeIndex]?.applicant_details?.date_of_birth}
+            error={dateError?.[activeIndex]}
             touched={
               touched?.applicants &&
               touched?.applicants[activeIndex]?.applicant_details?.date_of_birth
@@ -862,7 +884,6 @@ const ApplicantDetails = () => {
             disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
             value={date}
             onAccept={(e) => {
-              console.log(e);
               checkDate(e);
             }}
             inputRef={datePickerInputRef}

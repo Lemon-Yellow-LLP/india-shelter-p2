@@ -361,23 +361,6 @@ async function editAddressById(id, data, options) {
   return res;
 }
 
-async function checkExistingCustomer(body) {
-  let myHeaders = new Headers();
-  myHeaders.append('Content-Type', 'application/json');
-  let requestOptions2 = {
-    method: 'POST',
-    headers: myHeaders,
-    body: body,
-    redirect: 'follow',
-    mode: 'no-cors',
-  };
-  const res = await fetch(
-    'https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run',
-    requestOptions2,
-  );
-  return res.data.body;
-}
-
 // L&T
 export async function getLnTChargesQRCode(leadId, options) {
   const { data } = await axios.post(`${API_URL}/lt-charges/payment-qr/${leadId}`, {}, options);
@@ -520,7 +503,6 @@ export {
   getMobileOtp,
   verifyMobileOtp,
   addApi,
-  checkExistingCustomer,
   getLoginOtp,
   verifyLoginOtp,
   logout,
