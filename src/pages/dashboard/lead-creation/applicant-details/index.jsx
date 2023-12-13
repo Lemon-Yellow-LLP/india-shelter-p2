@@ -73,6 +73,7 @@ const ApplicantDetails = () => {
   });
 
   const [date, setDate] = useState(null);
+  const [dateError, setDateError] = useState([]);
 
   const datePickerInputRef = useRef();
 
@@ -336,14 +337,18 @@ const ApplicantDetails = () => {
     let checkDate = date.toString();
     checkDate = checkDate.toUpperCase();
 
-    if (checkDate === 'INVALID DATE' || !isEighteenOrAbove(finalDate)) {
-      setFieldError(
-        `applicants[${activeIndex}].applicant_details.date_of_birth`,
-        'Date of Birth is Required. Minimum age must be 18 or 18+',
-      );
+    if (checkDate === 'INVALID DATE') {
+      setDateError((prev) => {
+        prev[activeIndex] = 'Please enter a valid date';
+        return [...prev];
+      });
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
-    } else {
+    } else if (isEighteenOrAbove(finalDate)) {
+      setDateError((prev) => {
+        prev[activeIndex] = '';
+        return [...prev];
+      });
       setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, finalDate);
       updateFieldsApplicant('date_of_birth', finalDate);
       if (
@@ -366,11 +371,18 @@ const ApplicantDetails = () => {
           },
         );
       }
+    } else {
+      setDateError((prev) => {
+        prev[activeIndex] = 'Date of Birth is Required. Minimum age must be 18 or 18+';
+        return [...prev];
+      });
+      setFieldValue(`applicants[${activeIndex}].applicant_details.date_of_birth`, '');
+      setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
     }
   };
 
   const sendMobileOtp = async () => {
-    if (values.applicants[activeIndex]?.applicant_details.date_of_birth) {
+    if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth) {
       await updateFieldsApplicant().then(async () => {
         // setDisablePhoneNumber((prev) => !prev);
 
@@ -480,10 +492,10 @@ const ApplicantDetails = () => {
         });
       });
     } else {
-      setFieldError(
-        `applicants[${activeIndex}].applicant_details.date_of_birth`,
-        'Date of Birth is Required. Minimum age must be 18 or 18+',
-      );
+      setDateError((prev) => {
+        prev[activeIndex] = 'Date of Birth is Required. Minimum age must be 18 or 18+';
+        return [...prev];
+      });
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
       datePickerInputRef.current.focus();
     }
@@ -565,15 +577,8 @@ const ApplicantDetails = () => {
   };
 
   const onDatePickerBlur = (e) => {
-    // let date = moment(e.target.value).format('YYYY-DD-MM');
-    var dateParts = e.target.value.split('/');
-    var day = parseInt(dateParts[0], 10);
-    var month = parseInt(dateParts[1], 10) - 1;
-    var year = parseInt(dateParts[2], 10);
-    const date = new Date(year, month, day);
-    console.log(date);
+    let date = moment(e.target.value, 'DD/MM/YYYY').format('YYYY-MM-DD');
     checkDate(date);
-    //   handleBlur(e);
   };
 
   useEffect(() => {
@@ -862,7 +867,8 @@ const ApplicantDetails = () => {
           <DatePicker2
             label='Date of Birth'
             name={`applicants[${activeIndex}].applicant_details.date_of_birth`}
-            error={errors?.applicants?.[activeIndex]?.applicant_details?.date_of_birth}
+            // error={errors?.applicants?.[activeIndex]?.applicant_details?.date_of_birth}
+            error={dateError?.[activeIndex]}
             touched={
               touched?.applicants &&
               touched?.applicants[activeIndex]?.applicant_details?.date_of_birth
@@ -870,7 +876,6 @@ const ApplicantDetails = () => {
             disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
             value={date}
             onAccept={(e) => {
-              console.log(e);
               checkDate(e);
             }}
             inputRef={datePickerInputRef}
