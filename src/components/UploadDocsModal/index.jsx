@@ -79,7 +79,7 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, sin
                         <img
                           src={photo.document_fetch_url}
                           alt={photo.document_fetch_url}
-                          className='h-full w-full object-cover object-center rounded-t-lg'
+                          className='h-full w-full object-fill object-center rounded-t-lg'
                         />
 
                         <p className='absolute bottom-0 left-0 text-white p-3'>
@@ -103,7 +103,7 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, sin
                 <img
                   src={singlePhoto.document_fetch_url}
                   alt={singlePhoto.document_fetch_url}
-                  className='h-full w-full object-cover object-center rounded-t-lg'
+                  className='h-full w-full object-fill object-center rounded-t-lg'
                 />
                 <p className='absolute bottom-0 left-0 text-white p-3'>
                   CAF: {values.applicants?.[activeIndex]?.applicant_details?.lead_id}; Lat:{' '}
