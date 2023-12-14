@@ -609,8 +609,8 @@ const UploadDocuments = ({ activeIndex }) => {
 
       if (editPropertyPaper.file.type === 'image/jpeg') {
         const options = {
-          maxSizeMB: 0.02,
-          maxWidthOrHeight: 1920,
+          maxSizeMB: 4,
+          maxWidthOrHeight: 1024,
           useWebWorker: true,
         };
 
@@ -691,6 +691,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', customerLatLong?.lat);
       data.append('geo_long', customerLatLong?.long);
+      data.append('file', customerPhotosFile);
 
       // if (!customerLatLong && !customerLatLong) {
       //   setCustomerLoader(false);
@@ -704,24 +705,6 @@ const UploadDocuments = ({ activeIndex }) => {
       //   }
       //   return;
       // }
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(customerPhotosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
 
       let fileSize = data.get('file');
 
@@ -742,7 +725,7 @@ const UploadDocuments = ({ activeIndex }) => {
               },
             },
           );
-          // console.log(applicant);
+
           const document_meta = applicant.document_meta;
           if ('customer_photos' in document_meta == false) {
             document_meta['customer_photos'] = [];
@@ -805,12 +788,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', idProofLatLong?.lat);
       data.append('geo_long', idProofLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
+      data.append('file', idProofPhotosFile);
 
       const active_photos = idProofUploads?.data?.filter((file) => file.active == true);
 
@@ -818,18 +796,6 @@ const UploadDocuments = ({ activeIndex }) => {
         setIdProofLoader(false);
         setIdProofError('Maximum One Image can be uploaded');
         return;
-      }
-
-      try {
-        const compressedFile = await imageCompression(idProofPhotosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
       }
 
       let fileSize = data.get('file');
@@ -912,24 +878,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', idProofLatLong?.lat);
       data.append('geo_long', idProofLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editIdProof.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editIdProof.file);
 
       let fileSize = data.get('file');
 
@@ -1006,6 +955,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', addressProofLatLong?.lat);
       data.append('geo_long', addressProofLatLong?.long);
+      data.append('file', addressProofPhotosFile);
 
       const active_photos = addressProofUploads?.data?.filter((file) => file.active == true);
 
@@ -1013,24 +963,6 @@ const UploadDocuments = ({ activeIndex }) => {
         setAddressProofLoader(false);
         setAddressProofError('Maximum Two Images can be uploaded');
         return;
-      }
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(addressProofPhotosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
       }
 
       let fileSize = data.get('file');
@@ -1119,24 +1051,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', addressProofLatLong?.lat);
       data.append('geo_long', addressProofLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editAddressProof.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editAddressProof.file);
 
       let fileSize = data.get('file');
 
@@ -1211,24 +1126,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', salarySlipLatLong?.lat);
       data.append('geo_long', salarySlipLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(salarySlipPhotosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', salarySlipPhotosFile);
 
       let fileSize = data.get('file');
 
@@ -1295,24 +1193,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', salarySlipLatLong?.lat);
       data.append('geo_long', salarySlipLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editSalarySlip.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editSalarySlip.file);
 
       let fileSize = data.get('file');
 
@@ -1375,24 +1256,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', form60LatLong?.lat);
       data.append('geo_long', form60LatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(form60photosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', form60photosFile);
 
       let fileSize = data.get('file');
 
@@ -1456,24 +1320,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', form60LatLong?.lat);
       data.append('geo_long', form60LatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editForm60.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editForm60.file);
 
       let fileSize = data.get('file');
 
@@ -1536,24 +1383,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', propertyLatLong?.lat);
       data.append('geo_long', propertyLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(propertyPhotosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', propertyPhotosFile);
 
       let fileSize = data.get('file');
 
@@ -1617,24 +1447,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', propertyLatLong?.lat);
       data.append('geo_long', propertyLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editProperty.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editProperty.file);
 
       let fileSize = data.get('file');
 
@@ -1697,24 +1510,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', loSelfieLatLong?.lat);
       data.append('geo_long', loSelfieLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(selfieFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', selfieFile);
 
       let fileSize = data.get('file');
 
@@ -1795,24 +1591,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', otherDocsLatLong?.lat);
       data.append('geo_long', otherDocsLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(docsFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', docsFile);
 
       let fileSize = data.get('file');
 
@@ -1874,24 +1653,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', otherDocsLatLong?.lat);
       data.append('geo_long', otherDocsLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editDoc.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editDoc.file);
 
       let fileSize = data.get('file');
 
