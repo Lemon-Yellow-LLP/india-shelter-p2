@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, CardRadio, DropDown, TextInput } from '../../../../components';
 import { IconBackBanking, IconClose } from '../../../../assets/icons';
@@ -118,8 +118,6 @@ export default function BankingManual() {
       verify();
     },
   });
-
-  const canvasRef = useRef();
 
   const [confirmation, setConfirmation] = useState(false);
 
@@ -487,7 +485,6 @@ export default function BankingManual() {
   useEffect(() => {
     const addPropertyPaperPhotos = async () => {
       await generateImageWithTextWatermark(
-        canvasRef,
         leadValues?.lead?.id,
         session?.employee_code,
         session?.first_name,

@@ -1,10 +1,8 @@
 import moment from 'moment';
 
 const base64ToBlob = async (base64String) => {
-  // Extract content type and base64 data
   const [, contentType, base64Data] = base64String.match(/^data:(.*);base64,(.*)$/);
 
-  // Convert base64 to Blob
   const byteCharacters = atob(base64Data);
   const byteNumbers = new Array(byteCharacters.length);
 
@@ -29,7 +27,6 @@ const splitTextToMultiline = (CAF, Lat, Long, EMP, Timestamp, LO) => {
 };
 
 const generateImageWithTextWatermark = async (
-  canvasRef,
   lead_id,
   employee_code,
   first_name,
@@ -67,7 +64,7 @@ const generateImageWithTextWatermark = async (
         `LO Name: ${first_name} ${middle_name} ${last_name}`,
       );
 
-      const padding = 10;
+      const padding = 20;
       const textX = padding;
       const textY = canvas.height - padding;
       ctx.textAlign = 'left';
