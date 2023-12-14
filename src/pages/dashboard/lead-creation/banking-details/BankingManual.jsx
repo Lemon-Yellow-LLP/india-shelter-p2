@@ -91,7 +91,7 @@ export default function BankingManual() {
     setBankErrorTost,
   } = useContext(LeadContext);
 
-  const { token } = useContext(AuthContext);
+  const { token, session } = useContext(AuthContext);
 
   const {
     values,
@@ -118,6 +118,8 @@ export default function BankingManual() {
       verify();
     },
   });
+
+  const canvasRef = useRef();
 
   const [confirmation, setConfirmation] = useState(false);
 
@@ -483,80 +485,93 @@ export default function BankingManual() {
   }, []);
 
   useEffect(() => {
-    async function addPropertyPaperPhotos() {
-      const data = new FormData();
-      const filename = bankStatementFile.name;
-      const processedImage = generateImageWithTextWatermark(
-        bankStatementLatLong,
+    const addPropertyPaperPhotos = async () => {
+      await generateImageWithTextWatermark(
+        canvasRef,
+        values?.lead?.id,
+        session?.employee_code,
+        session?.first_name,
+        session?.middle_name,
+        session?.last_name,
+        bankStatementLatLong?.lat,
+        bankStatementLatLong?.long,
         bankStatementFile,
-      );
-      data.append('applicant_id', leadValues?.applicants?.[activeIndex]?.applicant_details?.id);
-      data.append('document_type', 'bank_statement_photo');
-      data.append('document_name', filename);
-      data.append('geo_lat', bankStatementLatLong?.lat);
-      data.append('geo_long', bankStatementLatLong?.long);
+      )
+        .then(async (image) => {
+          const data = new FormData();
 
-      if (bankStatementFile.type === 'image/jpeg') {
-        const options = {
-          maxSizeMB: 4,
-          maxWidthOrHeight: 1024,
-          useWebWorker: true,
-        };
+          const filename = bankStatementFile.name;
+          data.append('applicant_id', leadValues?.applicants?.[activeIndex]?.applicant_details?.id);
+          data.append('document_type', 'bank_statement_photo');
+          data.append('document_name', filename);
+          data.append('geo_lat', bankStatementLatLong?.lat);
+          data.append('geo_long', bankStatementLatLong?.long);
 
-        try {
-          const compressedFile = await imageCompression(processedImage, options);
-
-          const compressedImageFile = new File([compressedFile], filename, {
-            type: compressedFile.type,
-          });
-
-          data.append('file', compressedImageFile);
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-        data.append('file', bankStatementFile);
-      }
-
-      let fileSize = data.get('file');
-
-      if (fileSize.size <= 5000000) {
-        const res = await uploadDoc(data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: token,
-          },
-        });
-
-        if (res) {
-          let newData = { ...values };
-
-          newData.bank_statement_image.push(res.document);
-
-          setValues(newData);
-
-          const pdf = values.bank_statement_image.find((data) => {
-            if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
-              return data;
+          if (image.type.includes('image')) {
+            if (image.fileSize > 5000000) {
+              const options = {
+                maxSizeMB: 4,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+              };
+              const compressedFile = await imageCompression(image, options);
+              const compressedImageFile = new File([compressedFile], filename, {
+                type: compressedFile.type,
+              });
+              data.append('file', compressedImageFile);
+            } else {
+              data.append('file', image);
             }
-          });
+          } else {
+            data.append('file', bankStatementFile);
+          }
 
-          if (bankStatementFile.type === 'image/jpeg') {
-            const active_uploads = values.bank_statement_image.filter((data) => {
-              return data.active === true;
+          let fileSize = data.get('file');
+
+          if (fileSize.size <= 5000000) {
+            const res = await uploadDoc(data, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: token,
+              },
             });
 
-            setBankStatementUploads({ data: active_uploads });
+            if (res) {
+              let newData = { ...values };
+
+              newData.bank_statement_image.push(res.document);
+
+              setValues(newData);
+
+              const pdf = values.bank_statement_image.find((data) => {
+                if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+                  return data;
+                }
+              });
+
+              if (bankStatementFile.type === 'image/jpeg') {
+                const active_uploads = values.bank_statement_image.filter((data) => {
+                  return data.active === true;
+                });
+
+                setBankStatementUploads({ data: active_uploads });
+              } else {
+                setBankStatementPdf(pdf);
+              }
+            }
           } else {
-            setBankStatementPdf(pdf);
+            setLoader(false);
+            setMessage('File size should be less than 5MB');
           }
-        }
-      } else {
-        setLoader(false);
-        setMessage('File size should be less than 5MB');
-      }
+        })
+        .catch((err) => {
+          setLoader(false);
+          setMessage('Error loading image');
+        });
+    };
+    if (bankStatement.length > 0) {
+      addPropertyPaperPhotos();
     }
-    bankStatement.length > 0 && addPropertyPaperPhotos();
   }, [bankStatementFile]);
 
   useEffect(() => {
@@ -693,7 +708,6 @@ export default function BankingManual() {
             }
             min='0'
           />
-
           <TextInput
             label='Account holder name'
             placeholder='Eg: Sanjay Shah'
@@ -705,7 +719,6 @@ export default function BankingManual() {
             touched={touched && touched?.account_holder_name}
             onBlur={handleBlur}
           />
-
           <ClickableEndIcon
             label='IFSC Code'
             placeholder='Eg: ICICI0001234'
@@ -727,7 +740,6 @@ export default function BankingManual() {
                 : null
             }
           />
-
           <DropDown
             label='Entity type'
             name='entity_type'
@@ -741,7 +753,6 @@ export default function BankingManual() {
             defaultSelected={values?.entity_type}
             inputClasses='mt-2'
           />
-
           <div className='flex flex-col gap-2'>
             <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-primary-black'>
               Account type <span className='text-primary-red text-xs'>*</span>
@@ -774,7 +785,6 @@ export default function BankingManual() {
               ''
             )}
           </div>
-
           <PdfAndImageUploadBanking
             files={bankStatement}
             setFile={setBankStatement}
