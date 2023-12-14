@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, CardRadio, DropDown, TextInput } from '../../../../components';
 import { IconBackBanking, IconClose } from '../../../../assets/icons';
@@ -17,6 +17,7 @@ import imageCompression from 'browser-image-compression';
 import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 import PdfAndImageUploadBanking from '../../../../components/PdfAndImageUpload/PdfAndImageUploadBanking';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import generateImageWithTextWatermark from '../../../../utils/GenerateImageWithTextWatermark';
 
 export const entityType = [
   {
@@ -485,6 +486,10 @@ export default function BankingManual() {
     async function addPropertyPaperPhotos() {
       const data = new FormData();
       const filename = bankStatementFile.name;
+      const processedImage = generateImageWithTextWatermark(
+        bankStatementLatLong,
+        bankStatementFile,
+      );
       data.append('applicant_id', leadValues?.applicants?.[activeIndex]?.applicant_details?.id);
       data.append('document_type', 'bank_statement_photo');
       data.append('document_name', filename);
@@ -499,7 +504,7 @@ export default function BankingManual() {
         };
 
         try {
-          const compressedFile = await imageCompression(bankStatementFile, options);
+          const compressedFile = await imageCompression(processedImage, options);
 
           const compressedImageFile = new File([compressedFile], filename, {
             type: compressedFile.type,
@@ -663,7 +668,6 @@ export default function BankingManual() {
             Add a bank account
           </span>
         </div>
-
         <div className='flex flex-col p-[16px] flex-1 gap-[16px] overflow-auto'>
           <TextInput
             label='Account number'
