@@ -610,7 +610,7 @@ const UploadDocuments = ({ activeIndex }) => {
       if (editPropertyPaper.file.type === 'image/jpeg') {
         const options = {
           maxSizeMB: 4,
-          maxWidthOrHeight: 1024,
+          maxWidthOrHeight: 1920,
           useWebWorker: true,
         };
 
