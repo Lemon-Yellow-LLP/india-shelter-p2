@@ -609,7 +609,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
       if (editPropertyPaper.file.type === 'image/jpeg') {
         const options = {
-          maxSizeMB: 0.02,
+          maxSizeMB: 4,
           maxWidthOrHeight: 1920,
           useWebWorker: true,
         };
@@ -691,6 +691,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', customerLatLong?.lat);
       data.append('geo_long', customerLatLong?.long);
+      data.append('file', customerPhotosFile);
 
       // if (!customerLatLong && !customerLatLong) {
       //   setCustomerLoader(false);
@@ -704,24 +705,6 @@ const UploadDocuments = ({ activeIndex }) => {
       //   }
       //   return;
       // }
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(customerPhotosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
 
       let fileSize = data.get('file');
 
@@ -742,7 +725,7 @@ const UploadDocuments = ({ activeIndex }) => {
               },
             },
           );
-          // console.log(applicant);
+
           const document_meta = applicant.document_meta;
           if ('customer_photos' in document_meta == false) {
             document_meta['customer_photos'] = [];
@@ -805,12 +788,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', idProofLatLong?.lat);
       data.append('geo_long', idProofLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
+      data.append('file', idProofPhotosFile);
 
       // const active_photos = idProofUploads?.data?.filter((file) => file.active == true);
 
@@ -820,65 +798,67 @@ const UploadDocuments = ({ activeIndex }) => {
       //   return;
       // }
 
-      try {
-        const compressedFile = await imageCompression(idProofPhotosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
-
       let fileSize = data.get('file');
 
       if (fileSize.size <= 5000000) {
-        const res = await uploadDoc(data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: token,
-          },
-        });
-
-        if (res) {
-          const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details?.id,
-            {
-              headers: {
-                Authorization: token,
-              },
+        try {
+          const res = await uploadDoc(data, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: token,
             },
-          );
-          const document_meta = applicant.document_meta;
-          if ('id_proof_photos' in document_meta == false) {
-            document_meta['id_proof_photos'] = [];
-          }
-
-          document_meta['id_proof_photos'].push(res.document);
-
-          const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details?.id,
-            'applicant',
-            {
-              document_meta: document_meta,
-            },
-            {
-              headers: {
-                Authorization: token,
-              },
-            },
-          );
-
-          const active_uploads = edited_applicant.document_meta.id_proof_photos.filter((data) => {
-            return (
-              data.active === true &&
-              data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
-            );
           });
 
-          setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+          if (res) {
+            const applicant = await getApplicantById(
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+            const document_meta = applicant.document_meta;
+            if ('id_proof_photos' in document_meta == false) {
+              document_meta['id_proof_photos'] = [];
+            }
+
+            document_meta['id_proof_photos'].push(res.document);
+
+            const edited_applicant = await editFieldsById(
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
+              'applicant',
+              {
+                document_meta: document_meta,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
+            const active_uploads = edited_applicant.document_meta.id_proof_photos.filter((data) => {
+              return (
+                data.active === true &&
+                data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+              );
+            });
+
+            setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+          }
+        } catch (error) {
+          console.log('AADHAR_ERR', error);
+          setIdProofLoader(false);
+          setIdProofError('Upload a valid Aadhar Image');
+
+          if (!idProofUploads) {
+            setIdProofUploads(null);
+            setIdProofPhotos([]);
+          } else {
+            setIdProofUploads(idProofUploads);
+          }
+          return;
         }
       } else {
         setIdProofLoader(false);
@@ -898,54 +878,45 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', idProofLatLong?.lat);
       data.append('geo_long', idProofLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editIdProof.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editIdProof.file);
 
       let fileSize = data.get('file');
 
       if (fileSize.size <= 5000000) {
-        const res = await reUploadDoc(editIdProof.id, data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: token,
-          },
-        });
-
-        if (!res) return;
-
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details?.id,
-          {
+        try {
+          const res = await reUploadDoc(editIdProof.id, data, {
             headers: {
+              'Content-Type': 'multipart/form-data',
               Authorization: token,
             },
-          },
-        );
+          });
 
-        const active_uploads = applicant.document_meta.id_proof_photos.filter((data) => {
-          return (
-            data.active === true &&
-            data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+          if (!res) return;
+
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
           );
-        });
 
-        setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+          const active_uploads = applicant.document_meta.id_proof_photos.filter((data) => {
+            return (
+              data.active === true &&
+              data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+            );
+          });
+
+          setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+        } catch (error) {
+          console.log('AADHAR_ERR', error);
+          setIdProofLoader(false);
+          setIdProofError(
+            'You cannot edit Aadhar Image, Delete the previous one and reupload a new Image',
+          );
+        }
       } else {
         setIdProofLoader(false);
         setIdProofError('File size should be less than 5MB');
@@ -984,6 +955,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', addressProofLatLong?.lat);
       data.append('geo_long', addressProofLatLong?.long);
+      data.append('file', addressProofPhotosFile);
 
       // const active_photos = addressProofUploads?.data?.filter((file) => file.active == true);
 
@@ -992,24 +964,6 @@ const UploadDocuments = ({ activeIndex }) => {
       //   setAddressProofError('Maximum Two Images can be uploaded');
       //   return;
       // }
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(addressProofPhotosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
 
       let fileSize = data.get('file');
 
@@ -1067,6 +1021,14 @@ const UploadDocuments = ({ activeIndex }) => {
           console.log('AADHAR_ERR', error);
           setAddressProofLoader(false);
           setAddressProofError('Upload a valid Aadhar Image');
+
+          if (!addressProofUploads) {
+            setAddressProofUploads(null);
+            setAddressProofPhotos([]);
+          } else {
+            setAddressProofUploads(addressProofUploads);
+          }
+          return;
         }
       } else {
         setAddressProofLoader(false);
@@ -1089,24 +1051,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', addressProofLatLong?.lat);
       data.append('geo_long', addressProofLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editAddressProof.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editAddressProof.file);
 
       let fileSize = data.get('file');
 
@@ -1181,24 +1126,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', salarySlipLatLong?.lat);
       data.append('geo_long', salarySlipLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(salarySlipPhotosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', salarySlipPhotosFile);
 
       let fileSize = data.get('file');
 
@@ -1265,24 +1193,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', salarySlipLatLong?.lat);
       data.append('geo_long', salarySlipLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editSalarySlip.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editSalarySlip.file);
 
       let fileSize = data.get('file');
 
@@ -1345,24 +1256,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', form60LatLong?.lat);
       data.append('geo_long', form60LatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(form60photosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', form60photosFile);
 
       let fileSize = data.get('file');
 
@@ -1426,24 +1320,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', form60LatLong?.lat);
       data.append('geo_long', form60LatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editForm60.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editForm60.file);
 
       let fileSize = data.get('file');
 
@@ -1506,24 +1383,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', propertyLatLong?.lat);
       data.append('geo_long', propertyLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(propertyPhotosFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', propertyPhotosFile);
 
       let fileSize = data.get('file');
 
@@ -1587,24 +1447,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', propertyLatLong?.lat);
       data.append('geo_long', propertyLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editProperty.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editProperty.file);
 
       let fileSize = data.get('file');
 
@@ -1667,24 +1510,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', loSelfieLatLong?.lat);
       data.append('geo_long', loSelfieLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(selfieFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', selfieFile);
 
       let fileSize = data.get('file');
 
@@ -1765,24 +1591,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', otherDocsLatLong?.lat);
       data.append('geo_long', otherDocsLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(docsFile, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', docsFile);
 
       let fileSize = data.get('file');
 
@@ -1844,24 +1653,7 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('document_name', filename);
       data.append('geo_lat', otherDocsLatLong?.lat);
       data.append('geo_long', otherDocsLatLong?.long);
-
-      const options = {
-        maxSizeMB: 0.02,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      };
-
-      try {
-        const compressedFile = await imageCompression(editDoc.file, options);
-
-        const compressedImageFile = new File([compressedFile], filename, {
-          type: compressedFile.type,
-        });
-
-        data.append('file', compressedImageFile);
-      } catch (error) {
-        console.log(error);
-      }
+      data.append('file', editDoc.file);
 
       let fileSize = data.get('file');
 
