@@ -488,7 +488,7 @@ export default function BankingManual() {
     const addPropertyPaperPhotos = async () => {
       await generateImageWithTextWatermark(
         canvasRef,
-        values?.lead?.id,
+        leadValues?.lead?.id,
         session?.employee_code,
         session?.first_name,
         session?.middle_name,
