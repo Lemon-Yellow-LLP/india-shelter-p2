@@ -1699,7 +1699,7 @@ const UploadDocuments = ({ activeIndex }) => {
       if (!res) return;
       if (res.document_meta.customer_photos) {
         const active_upload = res.document_meta.customer_photos.find((data) => {
-          return data.active === true;
+          if (data !== null) return data.active === true;
         });
         if (active_upload) {
           setCustomerUploads({ type: 'customer_photos', data: active_upload });
@@ -1714,10 +1714,11 @@ const UploadDocuments = ({ activeIndex }) => {
       }
       if (res.document_meta.id_proof_photos) {
         const active_uploads = res.document_meta.id_proof_photos.filter((data) => {
-          return (
-            data.active === true &&
-            data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
-          );
+          if (data !== null)
+            return (
+              data.active === true &&
+              data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+            );
         });
         if (active_uploads.length) {
           setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
@@ -1732,16 +1733,17 @@ const UploadDocuments = ({ activeIndex }) => {
       }
       if (res.document_meta.property_paper_photos) {
         const pdf = res.document_meta.property_paper_photos.find((data) => {
-          if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
-            return data;
-          }
+          if (data !== null)
+            if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+              return data;
+            }
         });
         if (pdf) {
           setPropertyPdf(pdf);
           setPropertyPapers([1]);
         } else {
           const active_uploads = res.document_meta.property_paper_photos.filter((data) => {
-            return data.active === true;
+            if (data !== null) return data.active === true;
           });
           if (active_uploads.length) {
             setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
@@ -1757,11 +1759,12 @@ const UploadDocuments = ({ activeIndex }) => {
       }
       if (res.document_meta.address_proof_photos) {
         const active_uploads = res.document_meta.address_proof_photos.filter((data) => {
-          return (
-            data.active === true &&
-            data.document_type ==
-              values?.applicants[activeIndex]?.personal_details?.selected_address_proof
-          );
+          if (data !== null)
+            return (
+              data.active === true &&
+              data.document_type ==
+                values?.applicants[activeIndex]?.personal_details?.selected_address_proof
+            );
         });
         if (active_uploads.length) {
           setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
@@ -1776,7 +1779,7 @@ const UploadDocuments = ({ activeIndex }) => {
       }
       if (res.document_meta.salary_slip_photos) {
         const active_uploads = res.document_meta.salary_slip_photos.filter((data) => {
-          return data.active === true;
+          if (data !== null) return data.active === true;
         });
         if (active_uploads.length) {
           setSalarySlipUploads({ type: 'salary_slip_photos', data: active_uploads });
@@ -1791,7 +1794,7 @@ const UploadDocuments = ({ activeIndex }) => {
       }
       if (res.document_meta.form_60_photos) {
         const active_uploads = res.document_meta.form_60_photos.filter((data) => {
-          return data.active === true;
+          if (data !== null) return data.active === true;
         });
         if (active_uploads.length) {
           setForm60Uploads({ type: 'form_60_photos', data: active_uploads });
@@ -1806,7 +1809,7 @@ const UploadDocuments = ({ activeIndex }) => {
       }
       if (res.document_meta.property_photos) {
         const active_uploads = res.document_meta.property_photos.filter((data) => {
-          return data.active === true;
+          if (data !== null) return data.active === true;
         });
         if (active_uploads.length) {
           setPropertyUploads({ type: 'property_photos', data: active_uploads });
@@ -1821,7 +1824,7 @@ const UploadDocuments = ({ activeIndex }) => {
       }
       if (res.document_meta.lo_selfie) {
         const active_upload = res.document_meta.lo_selfie.find((data) => {
-          return data.active === true;
+          if (data !== null) return data.active === true;
         });
         if (active_upload) {
           setSelfieUploads({ type: 'lo_selfie', data: active_upload });
@@ -1836,7 +1839,7 @@ const UploadDocuments = ({ activeIndex }) => {
       }
       if (res.document_meta.other_docs) {
         const active_uploads = res.document_meta.other_docs.filter((data) => {
-          return data.active === true;
+          if (data !== null) return data.active === true;
         });
         if (active_uploads.length) {
           setDocUploads({ type: 'other_docs', data: active_uploads });
