@@ -790,13 +790,13 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_long', idProofLatLong?.long);
       data.append('file', idProofPhotosFile);
 
-      // const active_photos = idProofUploads?.data?.filter((file) => file.active == true);
+      const active_photos = idProofUploads?.data?.filter((file) => file.active == true);
 
-      // if (active_photos?.length >= 1) {
-      //   setIdProofLoader(false);
-      //   setIdProofError('Maximum One Image can be uploaded');
-      //   return;
-      // }
+      if (active_photos?.length >= 1) {
+        setIdProofLoader(false);
+        setIdProofError('Maximum One Image can be uploaded');
+        return;
+      }
 
       let fileSize = data.get('file');
 
@@ -957,13 +957,13 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_long', addressProofLatLong?.long);
       data.append('file', addressProofPhotosFile);
 
-      // const active_photos = addressProofUploads?.data?.filter((file) => file.active == true);
+      const active_photos = addressProofUploads?.data?.filter((file) => file.active == true);
 
-      // if (active_photos?.length >= 2) {
-      //   setAddressProofLoader(false);
-      //   setAddressProofError('Maximum Two Images can be uploaded');
-      //   return;
-      // }
+      if (active_photos?.length >= 2) {
+        setAddressProofLoader(false);
+        setAddressProofError('Maximum Two Images can be uploaded');
+        return;
+      }
 
       let fileSize = data.get('file');
 
