@@ -14,14 +14,11 @@ const base64ToBlob = async (base64String) => {
   return new Blob([byteArray], { type: contentType });
 };
 
-const splitTextToMultiline = (CAF, Lat, Long, EMP, Timestamp, LO) => {
+const splitTextToMultiline = (line1, line2, line3) => {
   let lines = [];
-  lines.push(Timestamp);
-  lines.push(LO);
-  lines.push(EMP);
-  lines.push(Long);
-  lines.push(Lat);
-  lines.push(CAF);
+  lines.push(line3);
+  lines.push(line2);
+  lines.push(line1);
 
   return lines;
 };
@@ -41,30 +38,34 @@ const generateImageWithTextWatermark = async (
 
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.height = 1080;
-    canvas.width = 1920;
 
     const img = new Image();
 
     img.src = URL.createObjectURL(bankStatementFile);
 
     img.onload = async () => {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      if (img?.height > img?.width) {
+        canvas.height = 1920;
+        canvas.width = 1080;
+      } else {
+        canvas.height = 1080;
+        canvas.width = 1920;
+      }
 
-      ctx.font = '30px Poppins';
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height - 180);
+      ctx.font = '32px Poppins';
       ctx.fillStyle = 'white';
       //ctx.fillStyle = '#E33439';
 
       const multilineText = splitTextToMultiline(
-        `CAF: ${lead_id}`,
-        `Lat:${lat}`,
-        `Long:${long}`,
-        `EMP code: ${employee_code}`,
-        `Timestamp: ${timeStamp}`,
+        `CAF: ${lead_id}; Lat:${lat}; Long:${long}`,
+        `EMP code: ${employee_code}; Timestamp: ${timeStamp}`,
         `LO Name: ${first_name} ${middle_name} ${last_name}`,
       );
 
-      const padding = 20;
+      const padding = 30;
       const textX = padding;
       const textY = canvas.height - padding;
       ctx.textAlign = 'left';
