@@ -1189,7 +1189,7 @@ const Eligibility = () => {
                     </svg>
                   )} */}
 
-                  <p className='text-sm text-primary-black'>BRE 99</p>
+                  <p className='text-sm text-primary-black'>Bureau Decider</p>
                 </div>
                 <div>
                   {bre99.loader ? (

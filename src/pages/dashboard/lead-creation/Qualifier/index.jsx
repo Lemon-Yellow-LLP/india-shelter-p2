@@ -518,6 +518,26 @@ const Qualifier = () => {
         }
       } catch (err) {
         console.log(err);
+        setDL((prev) => ({
+          ...prev,
+          loader: false,
+        }));
+        setVoterID((prev) => ({
+          ...prev,
+          loader: false,
+        }));
+        setPfUAN((prev) => ({
+          ...prev,
+          loader: false,
+        }));
+        setGST((prev) => ({
+          ...prev,
+          loader: false,
+        }));
+        setPAN((prev) => ({
+          ...prev,
+          loader: false,
+        }));
         setBre101((prev) => ({ ...prev, res: true }));
       }
     }
@@ -945,7 +965,7 @@ const Qualifier = () => {
                 </svg>
               )} */}
 
-              <p className='text-sm text-primary-black'>BRE 99</p>
+              <p className='text-sm text-primary-black'>Bureau Decider</p>
             </div>
             <div>
               {bre99.loader ? (
