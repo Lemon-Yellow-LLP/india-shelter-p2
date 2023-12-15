@@ -27,6 +27,7 @@ import Topbar from '../../../../components/Topbar';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import Popup from '../../../../components/Popup';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import generateImageWithTextWatermark from '../../../../utils/GenerateImageWithTextWatermark';
 
 const UploadDocuments = ({ activeIndex }) => {
   const {
@@ -37,6 +38,7 @@ const UploadDocuments = ({ activeIndex }) => {
     setIsQaulifierActivated,
     setOtpFailCount,
     token,
+    session,
   } = useContext(AuthContext);
   const {
     // activeIndex,
@@ -503,163 +505,190 @@ const UploadDocuments = ({ activeIndex }) => {
 
   useEffect(() => {
     async function addPropertyPaperPhotos() {
-      const data = new FormData();
-      const filename = propertyPapersFile.name;
-      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
-      data.append('document_type', 'property_paper_photos');
-      data.append('document_name', filename);
-      data.append('geo_lat', propertyPapersLatLong?.lat);
-      data.append('geo_long', propertyPapersLatLong?.long);
+      await generateImageWithTextWatermark(
+        values?.lead?.id,
+        session?.employee_code,
+        session?.first_name,
+        session?.middle_name,
+        session?.last_name,
+        propertyPapersLatLong?.lat,
+        propertyPapersLatLong?.long,
+        propertyPapersFile?.file,
+      )
+        .then(async (image) => {
+          const data = new FormData();
+          const filename = propertyPapersFile.name;
+          data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
+          data.append('document_type', 'property_paper_photos');
+          data.append('document_name', filename);
+          data.append('geo_lat', propertyPapersLatLong?.lat);
+          data.append('geo_long', propertyPapersLatLong?.long);
 
-      if (propertyPapersFile.type === 'image/jpeg') {
-        const options = {
-          maxSizeMB: 4,
-          maxWidthOrHeight: 1920,
-          useWebWorker: true,
-        };
-
-        try {
-          const compressedFile = await imageCompression(propertyPapersFile, options);
-          const compressedImageFile = new File([compressedFile], filename, {
-            type: compressedFile.type,
-          });
-
-          data.append('file', compressedImageFile);
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-        data.append('file', propertyPapersFile);
-      }
-
-      let fileSize = data.get('file');
-
-      if (fileSize.size <= 5000000) {
-        const res = await uploadDoc(data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: token,
-          },
-        });
-
-        if (res) {
-          const applicant = await getApplicantById(
-            values?.applicants?.[activeIndex]?.applicant_details?.id,
-            {
-              headers: {
-                Authorization: token,
-              },
-            },
-          );
-          const document_meta = applicant.document_meta;
-          if ('property_paper_photos' in document_meta == false) {
-            document_meta['property_paper_photos'] = [];
-          }
-          document_meta['property_paper_photos'].push(res.document);
-
-          const edited_applicant = await editFieldsById(
-            values?.applicants?.[activeIndex]?.applicant_details?.id,
-            'applicant',
-            {
-              document_meta: document_meta,
-            },
-            {
-              headers: {
-                Authorization: token,
-              },
-            },
-          );
-
-          const pdf = edited_applicant.document_meta.property_paper_photos.find((data) => {
-            if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
-              return data;
+          if (image?.type?.includes('image')) {
+            if (image?.fileSize > 5000000) {
+              const options = {
+                maxSizeMB: 4,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+              };
+              const compressedFile = await imageCompression(image, options);
+              const compressedImageFile = new File([compressedFile], filename, {
+                type: compressedFile.type,
+              });
+              data.append('file', compressedImageFile);
+            } else {
+              data.append('file', image);
             }
-          });
-
-          if (pdf) {
-            setPropertyPdf(pdf);
           } else {
-            const active_uploads = edited_applicant.document_meta.property_paper_photos.filter(
-              (data) => {
-                return data.active === true;
-              },
-            );
-
-            setPropertyPaperUploads({ data: active_uploads });
+            data.append('file', propertyPapersFile);
           }
-        }
-      } else {
-        setPropertyLoader(false);
-        setPropertyPaperError('File size should be less than 5MB');
-      }
 
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: true }));
+          let fileSize = data.get('file');
+
+          if (fileSize.size <= 5000000) {
+            const res = await uploadDoc(data, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: token,
+              },
+            });
+
+            if (res) {
+              const applicant = await getApplicantById(
+                values?.applicants?.[activeIndex]?.applicant_details?.id,
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
+              const document_meta = applicant.document_meta;
+              if ('property_paper_photos' in document_meta == false) {
+                document_meta['property_paper_photos'] = [];
+              }
+              document_meta['property_paper_photos'].push(res.document);
+
+              const edited_applicant = await editFieldsById(
+                values?.applicants?.[activeIndex]?.applicant_details?.id,
+                'applicant',
+                {
+                  document_meta: document_meta,
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
+
+              const pdf = edited_applicant.document_meta.property_paper_photos.find((data) => {
+                if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+                  return data;
+                }
+              });
+
+              if (pdf) {
+                setPropertyPdf(pdf);
+              } else {
+                const active_uploads = edited_applicant.document_meta.property_paper_photos.filter(
+                  (data) => {
+                    return data.active === true;
+                  },
+                );
+
+                setPropertyPaperUploads({ data: active_uploads });
+              }
+            }
+          } else {
+            setPropertyLoader(false);
+            setPropertyPaperError('File size should be less than 5MB');
+          }
+
+          setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: true }));
+        })
+        .catch((err) => {
+          setPropertyLoader(false);
+          setPropertyPaperError('Error loading image');
+        });
     }
     propertyPapers.length > 0 && addPropertyPaperPhotos();
   }, [propertyPapersFile]);
 
   useEffect(() => {
     async function editPropertyPaperPhotos() {
-      const data = new FormData();
-      const filename = editPropertyPaper.file.name;
-      data.append('document_type', 'property_paper_photos');
-      data.append('document_name', filename);
-      data.append('geo_lat', propertyPapersLatLong?.lat);
-      data.append('geo_long', propertyPapersLatLong?.long);
+      await generateImageWithTextWatermark(
+        values?.lead?.id,
+        session?.employee_code,
+        session?.first_name,
+        session?.middle_name,
+        session?.last_name,
+        propertyPapersLatLong?.lat,
+        propertyPapersLatLong?.long,
+        propertyPapersFile?.file,
+      )
+        .then(async (image) => {
+          const data = new FormData();
+          const filename = editPropertyPaper.file.name;
+          data.append('document_type', 'property_paper_photos');
+          data.append('document_name', filename);
+          data.append('geo_lat', propertyPapersLatLong?.lat);
+          data.append('geo_long', propertyPapersLatLong?.long);
 
-      if (editPropertyPaper.file.type === 'image/jpeg') {
-        const options = {
-          maxSizeMB: 4,
-          maxWidthOrHeight: 1920,
-          useWebWorker: true,
-        };
+          if (image?.type?.includes('image')) {
+            if (image?.fileSize > 5000000) {
+              const options = {
+                maxSizeMB: 4,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+              };
+              const compressedFile = await imageCompression(image, options);
+              const compressedImageFile = new File([compressedFile], filename, {
+                type: compressedFile.type,
+              });
+              data.append('file', compressedImageFile);
+            } else {
+              data.append('file', image);
+            }
+          } else {
+            data.append('file', editPropertyPaper.file);
+          }
 
-        try {
-          const compressedFile = await imageCompression(editPropertyPaper.file, options);
+          let fileSize = data.get('file');
 
-          const compressedImageFile = new File([compressedFile], filename, {
-            type: compressedFile.type,
-          });
+          if (fileSize.size <= 5000000) {
+            const res = await reUploadDoc(editPropertyPaper.id, data, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: token,
+              },
+            });
 
-          data.append('file', compressedImageFile);
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-        data.append('file', editPropertyPaper.file);
-      }
+            if (!res) return;
 
-      let fileSize = data.get('file');
+            const applicant = await getApplicantById(
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
 
-      if (fileSize.size <= 5000000) {
-        const res = await reUploadDoc(editPropertyPaper.id, data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: token,
-          },
+            const active_uploads = applicant.document_meta.property_paper_photos.filter((data) => {
+              return data.active === true;
+            });
+
+            setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
+            setPropertyPapers(active_uploads);
+          } else {
+            setPropertyLoader(false);
+            setPropertyPaperError('File size should be less than 5MB');
+          }
+        })
+        .catch((err) => {
+          setPropertyLoader(false);
+          setPropertyPaperError('Error loading image');
         });
-
-        if (!res) return;
-
-        const applicant = await getApplicantById(
-          values?.applicants?.[activeIndex]?.applicant_details?.id,
-          {
-            headers: {
-              Authorization: token,
-            },
-          },
-        );
-
-        const active_uploads = applicant.document_meta.property_paper_photos.filter((data) => {
-          return data.active === true;
-        });
-
-        setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
-        setPropertyPapers(active_uploads);
-      } else {
-        setPropertyLoader(false);
-        setPropertyPaperError('File size should be less than 5MB');
-      }
     }
     editPropertyPaper.id && editPropertyPaperPhotos();
   }, [editPropertyPaper]);

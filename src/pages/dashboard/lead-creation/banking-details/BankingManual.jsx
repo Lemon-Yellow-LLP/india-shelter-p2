@@ -505,7 +505,7 @@ export default function BankingManual() {
           data.append('geo_long', bankStatementLatLong?.long);
 
           if (image.type.includes('image')) {
-            if (image.fileSize > 5000000) {
+            if (image?.fileSize > 5000000) {
               const options = {
                 maxSizeMB: 4,
                 maxWidthOrHeight: 1920,
@@ -585,7 +585,7 @@ export default function BankingManual() {
           data.append('geo_long', bankStatementLatLong?.long);
 
           if (image.type.includes('image')) {
-            if (image.fileSize > 5000000) {
+            if (image?.fileSize > 5000000) {
               const options = {
                 maxSizeMB: 4,
                 maxWidthOrHeight: 1920,
