@@ -524,14 +524,14 @@ export default function AddressDetails() {
       existing_customer_current_state,
       existing_customer_current_no_of_year_residing,
 
-      existing_customer_permanent_flat_no_building_name,
-      existing_customer_permanent_street_area_locality,
-      existing_customer_permanent_town,
-      existing_customer_permanent_landmark,
-      existing_customer_permanent_pincode,
-      existing_customer_permanent_city,
-      existing_customer_permanent_state,
-      existing_customer_permanent_no_of_year_residing,
+      existing_customer_additional_flat_no_building_name,
+      existing_customer_additional_street_area_locality,
+      existing_customer_additional_town,
+      existing_customer_additional_landmark,
+      existing_customer_additional_pincode,
+      existing_customer_additional_city,
+      existing_customer_additional_state,
+      existing_customer_additional_no_of_year_residing,
     } = fillData;
 
     const mappedData = {
@@ -544,14 +544,14 @@ export default function AddressDetails() {
       current_state: existing_customer_current_state,
       current_no_of_year_residing: existing_customer_current_no_of_year_residing,
 
-      additional_flat_no_building_name: existing_customer_permanent_flat_no_building_name,
-      additional_street_area_locality: existing_customer_permanent_street_area_locality,
-      additional_town: existing_customer_permanent_town,
-      additional_landmark: existing_customer_permanent_landmark,
-      additional_pincode: existing_customer_permanent_pincode,
-      additional_city: existing_customer_permanent_city,
-      additional_state: existing_customer_permanent_state,
-      additional_no_of_year_residing: existing_customer_permanent_no_of_year_residing,
+      additional_flat_no_building_name: existing_customer_additional_flat_no_building_name,
+      additional_street_area_locality: existing_customer_additional_street_area_locality,
+      additional_town: existing_customer_additional_town,
+      additional_landmark: existing_customer_additional_landmark,
+      additional_pincode: existing_customer_additional_pincode,
+      additional_city: existing_customer_additional_city,
+      additional_state: existing_customer_additional_state,
+      additional_no_of_year_residing: existing_customer_additional_no_of_year_residing,
     };
 
     let finalData = structuredClone(values);
@@ -1919,7 +1919,7 @@ export default function AddressDetails() {
                 <Checkbox
                   checked={
                     values?.applicants?.[activeIndex]?.applicant_details
-                      ?.existing_customer_permanent_address_same_as_current || false
+                      ?.existing_customer_additional_address_same_as_current || false
                   }
                   name='additional_address_same_as_current'
                   onTouchEnd
@@ -1934,7 +1934,7 @@ export default function AddressDetails() {
                 <span className='w-full text-[12px]'>
                   {
                     values?.applicants?.[activeIndex]?.applicant_details
-                      ?.existing_customer_permanent_flat_no_building_name
+                      ?.existing_customer_additional_flat_no_building_name
                   }
                 </span>
               </div>
@@ -1944,7 +1944,7 @@ export default function AddressDetails() {
                 <span className='w-full text-[12px]'>
                   {
                     values?.applicants?.[activeIndex]?.applicant_details
-                      ?.existing_customer_permanent_street_area_locality
+                      ?.existing_customer_additional_street_area_locality
                   }
                 </span>
               </div>
@@ -1954,7 +1954,7 @@ export default function AddressDetails() {
                 <span className='w-full text-[12px]'>
                   {
                     values?.applicants?.[activeIndex]?.applicant_details
-                      ?.existing_customer_permanent_town
+                      ?.existing_customer_additional_town
                   }
                 </span>
               </div>
@@ -1964,7 +1964,7 @@ export default function AddressDetails() {
                 <span className='w-full text-[12px]'>
                   {
                     values?.applicants?.[activeIndex]?.applicant_details
-                      ?.existing_customer_permanent_landmark
+                      ?.existing_customer_additional_landmark
                   }
                 </span>
               </div>
@@ -1973,7 +1973,7 @@ export default function AddressDetails() {
                 <span className='w-full text-[12px]'>
                   {
                     values?.applicants?.[activeIndex]?.applicant_details
-                      ?.existing_customer_permanent_pincode
+                      ?.existing_customer_additional_pincode
                   }
                 </span>
               </div>
@@ -1982,7 +1982,7 @@ export default function AddressDetails() {
                 <span className='w-full text-[12px]'>
                   {
                     values?.applicants?.[activeIndex]?.applicant_details
-                      ?.existing_customer_permanent_city
+                      ?.existing_customer_additional_city
                   }
                 </span>
               </div>
@@ -1991,7 +1991,7 @@ export default function AddressDetails() {
                 <span className='w-full text-[12px]'>
                   {
                     values?.applicants?.[activeIndex]?.applicant_details
-                      ?.existing_customer_permanent_state
+                      ?.existing_customer_additional_state
                   }
                 </span>
               </div>
@@ -2000,7 +2000,7 @@ export default function AddressDetails() {
                 <span className='w-full text-[12px]'>
                   {
                     values?.applicants?.[activeIndex]?.applicant_details
-                      ?.existing_customer_permanent_no_of_year_residing
+                      ?.existing_customer_additional_no_of_year_residing
                   }
                 </span>
               </div>
