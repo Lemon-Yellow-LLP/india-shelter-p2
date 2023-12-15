@@ -523,42 +523,35 @@ export default function BankingManual() {
             data.append('file', bankStatementFile);
           }
 
-          let fileSize = data.get('file');
+          const res = await uploadDoc(data, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: token,
+            },
+          });
 
-          if (fileSize.size <= 5000000) {
-            const res = await uploadDoc(data, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: token,
-              },
+          if (res) {
+            let newData = { ...values };
+
+            newData.bank_statement_image.push(res.document);
+
+            setValues(newData);
+
+            const pdf = values.bank_statement_image.find((data) => {
+              if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+                return data;
+              }
             });
 
-            if (res) {
-              let newData = { ...values };
-
-              newData.bank_statement_image.push(res.document);
-
-              setValues(newData);
-
-              const pdf = values.bank_statement_image.find((data) => {
-                if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
-                  return data;
-                }
+            if (bankStatementFile.type === 'image/jpeg') {
+              const active_uploads = values.bank_statement_image.filter((data) => {
+                return data.active === true;
               });
 
-              if (bankStatementFile.type === 'image/jpeg') {
-                const active_uploads = values.bank_statement_image.filter((data) => {
-                  return data.active === true;
-                });
-
-                setBankStatementUploads({ data: active_uploads });
-              } else {
-                setBankStatementPdf(pdf);
-              }
+              setBankStatementUploads({ data: active_uploads });
+            } else {
+              setBankStatementPdf(pdf);
             }
-          } else {
-            setLoader(false);
-            setMessage('File size should be less than 5MB');
           }
         })
         .catch((err) => {
@@ -573,61 +566,74 @@ export default function BankingManual() {
 
   useEffect(() => {
     async function editPropertyPaperPhotos() {
-      const data = new FormData();
-      const filename = editBankStatement.file.name;
-      data.append('document_type', 'bank_statement_photo');
-      data.append('document_name', filename);
-      data.append('geo_lat', bankStatementLatLong?.lat);
-      data.append('geo_long', bankStatementLatLong?.long);
+      await generateImageWithTextWatermark(
+        leadValues?.lead?.id,
+        session?.employee_code,
+        session?.first_name,
+        session?.middle_name,
+        session?.last_name,
+        bankStatementLatLong?.lat,
+        bankStatementLatLong?.long,
+        editBankStatement?.file,
+      )
+        .then(async (image) => {
+          const data = new FormData();
+          const filename = editBankStatement.file.name;
+          data.append('document_type', 'bank_statement_photo');
+          data.append('document_name', filename);
+          data.append('geo_lat', bankStatementLatLong?.lat);
+          data.append('geo_long', bankStatementLatLong?.long);
 
-      if (editBankStatement.file.type === 'image/jpeg') {
-        const options = {
-          maxSizeMB: 4,
-          maxWidthOrHeight: 1920,
-          useWebWorker: true,
-        };
+          if (image.type.includes('image')) {
+            if (image.fileSize > 5000000) {
+              const options = {
+                maxSizeMB: 4,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+              };
+              const compressedFile = await imageCompression(image, options);
+              const compressedImageFile = new File([compressedFile], filename, {
+                type: compressedFile.type,
+              });
+              data.append('file', compressedImageFile);
+            } else {
+              data.append('file', image);
+            }
+          } else {
+            data.append('file', editBankStatement.file);
+          }
 
-        try {
-          const compressedFile = await imageCompression(editBankStatement.file, options);
-
-          const compressedImageFile = new File([compressedFile], filename, {
-            type: compressedFile.type,
+          const res = await reUploadDoc(editBankStatement.id, data, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: token,
+            },
           });
 
-          data.append('file', compressedImageFile);
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-        data.append('file', editBankStatement.file);
-      }
+          if (!res) return;
 
-      const res = await reUploadDoc(editBankStatement.id, data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: token,
-        },
-      });
+          let newData = { ...values };
 
-      if (!res) return;
+          newData.bank_statement_image = newData.bank_statement_image.map((data) => {
+            if (data.id === res.document.id) {
+              return res.document;
+            }
+            return data;
+          });
 
-      let newData = { ...values };
+          setValues(newData);
 
-      newData.bank_statement_image = newData.bank_statement_image.map((data) => {
-        if (data.id === res.document.id) {
-          return res.document;
-        }
-        return data;
-      });
+          const active_uploads = newData.bank_statement_image.filter((data) => {
+            return data.active === true;
+          });
 
-      setValues(newData);
-
-      const active_uploads = newData.bank_statement_image.filter((data) => {
-        return data.active === true;
-      });
-
-      setBankStatementUploads({ type: 'bank_statement_photo', data: active_uploads });
-      setBankStatement(active_uploads);
+          setBankStatementUploads({ type: 'bank_statement_photo', data: active_uploads });
+          setBankStatement(active_uploads);
+        })
+        .catch((err) => {
+          setLoader(false);
+          setMessage('Error loading image');
+        });
     }
     editBankStatement.id && editPropertyPaperPhotos();
   }, [editBankStatement]);
