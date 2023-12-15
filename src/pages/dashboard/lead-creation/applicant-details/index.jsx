@@ -446,7 +446,7 @@ const ApplicantDetails = () => {
                   return;
                 }
 
-                const { loan_type, ...dataWithoutLoanType } = body[0];
+                const { existing_customer_loan_type, ...dataWithoutLoanType } = body[0];
                 setFieldValue(`applicants[${activeIndex}].applicant_details`, {
                   ...values?.applicants[activeIndex]?.applicant_details,
                   ...dataWithoutLoanType,
