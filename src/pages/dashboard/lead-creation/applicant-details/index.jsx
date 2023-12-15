@@ -418,9 +418,6 @@ const ApplicantDetails = () => {
               bodyForExistingCustomer,
             )
             .then(({ data }) => {
-              editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
-                ...data?.body[0],
-              });
               const body = data?.body;
               if (
                 body &&
@@ -449,7 +446,7 @@ const ApplicantDetails = () => {
                   return;
                 }
 
-                const { loan_type, ...dataWithoutLoanType } = body[0];
+                const { existing_customer_loan_type, ...dataWithoutLoanType } = body[0];
                 setFieldValue(`applicants[${activeIndex}].applicant_details`, {
                   ...values?.applicants[activeIndex]?.applicant_details,
                   ...dataWithoutLoanType,
