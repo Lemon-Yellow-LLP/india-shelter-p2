@@ -418,6 +418,9 @@ const ApplicantDetails = () => {
               bodyForExistingCustomer,
             )
             .then(({ data }) => {
+              editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
+                ...data?.body[0],
+              });
               const body = data?.body;
               if (
                 body &&

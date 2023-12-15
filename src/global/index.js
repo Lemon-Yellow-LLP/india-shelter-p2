@@ -286,12 +286,12 @@ async function reUploadDoc(id, data, options) {
 }
 
 async function getUploadOtp(id, options) {
-  const res = await axios.get(`${API_URL}/account/send-sms/${id}`, options, requestOptions);
+  const res = await axios.get(`${API_URL}/doc/send-lo-selfie-sms/${id}`, options, requestOptions);
   return res;
 }
 
 async function verifyUploadOtp(id, otp, options) {
-  const res = await axios.post(`${API_URL}/account/verify-sms/${id}`, { otp }, options);
+  const res = await axios.post(`${API_URL}/doc/verify-lo-selfie-sms/${id}`, { otp }, options);
   return res;
 }
 

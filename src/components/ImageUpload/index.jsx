@@ -56,7 +56,7 @@ function ImageUpload({
           if (validImageTypes.includes(fileType)) {
             const options = {
               maxSizeMB: 4,
-              maxWidthOrHeight: 1024,
+              maxWidthOrHeight: 1920,
               useWebWorker: true,
             };
 
@@ -123,7 +123,7 @@ function ImageUpload({
           if (validImageTypes.includes(fileType)) {
             const options = {
               maxSizeMB: 4,
-              maxWidthOrHeight: 1024,
+              maxWidthOrHeight: 1920,
               useWebWorker: true,
             };
 

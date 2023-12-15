@@ -582,7 +582,7 @@ export default function BankingManual() {
 
       if (editBankStatement.file.type === 'image/jpeg') {
         const options = {
-          maxSizeMB: 0.02,
+          maxSizeMB: 4,
           maxWidthOrHeight: 1920,
           useWebWorker: true,
         };
