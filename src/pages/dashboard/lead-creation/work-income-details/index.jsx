@@ -119,7 +119,7 @@ const WorkIncomeDetails = () => {
               no_of_dependents: true,
             };
           }
-        } else if (e.value === 'Self-employed') {
+        } else if (e.value === 'Self employed') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
               pan_number:
@@ -167,7 +167,7 @@ const WorkIncomeDetails = () => {
               no_of_dependents: true,
             };
           }
-        } else if (e.value === 'Unemployed') {
+        } else if (e.value === 'Un-Employed') {
           if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
             _requiredFieldStatus = {
               income_proof: false,
@@ -555,7 +555,7 @@ const WorkIncomeDetails = () => {
               })}
             </div>
 
-            {values?.applicants?.[activeIndex]?.work_income_detail?.profession !== 'Unemployed' &&
+            {values?.applicants?.[activeIndex]?.work_income_detail?.profession !== 'Un-Employed' &&
             !!values?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
               <TextInput
                 label='Enter PAN number'
@@ -655,14 +655,14 @@ const WorkIncomeDetails = () => {
           )}
 
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession ===
-            'Self-employed' && (
+            'Self employed' && (
             <SelfEmployed
               requiredFieldsStatus={requiredFieldsStatus}
               setRequiredFieldsStatus={setRequiredFieldsStatus}
             />
           )}
 
-          {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Unemployed' && (
+          {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Un-Employed' && (
             <UnEmployed
               requiredFieldsStatus={requiredFieldsStatus}
               setRequiredFieldsStatus={setRequiredFieldsStatus}
@@ -677,7 +677,7 @@ const WorkIncomeDetails = () => {
           )}
 
           {values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Salaried' ||
-          values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Self-employed' ? (
+          values?.applicants?.[activeIndex]?.work_income_detail?.profession === 'Self employed' ? (
             <>
               <TextInput
                 label='Plot no/Building name'
