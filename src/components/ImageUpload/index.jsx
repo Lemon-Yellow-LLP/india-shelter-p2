@@ -28,7 +28,7 @@ function ImageUpload({
   setLoader,
   ...props
 }) {
-  const { token, session } = useContext(AuthContext);
+  const { token, loAllDetails } = useContext(AuthContext);
   const { values, activeIndex } = useContext(LeadContext);
 
   const [show, setShow] = useState(false);
@@ -57,10 +57,10 @@ function ImageUpload({
           if (validImageTypes.includes(fileType)) {
             await generateImageWithTextWatermark(
               values?.lead?.id,
-              session?.employee_code,
-              session?.first_name,
-              session?.middle_name,
-              session?.last_name,
+              loAllDetails?.employee_code,
+              loAllDetails?.first_name,
+              loAllDetails?.middle_name,
+              loAllDetails?.last_name,
               data.coords.latitude,
               data.coords.longitude,
               file[i],
@@ -132,10 +132,10 @@ function ImageUpload({
           if (validImageTypes.includes(fileType)) {
             await generateImageWithTextWatermark(
               values?.lead?.id,
-              session?.employee_code,
-              session?.first_name,
-              session?.middle_name,
-              session?.last_name,
+              loAllDetails?.employee_code,
+              loAllDetails?.first_name,
+              loAllDetails?.middle_name,
+              loAllDetails?.last_name,
               data.coords.latitude,
               data.coords.longitude,
               file[i],

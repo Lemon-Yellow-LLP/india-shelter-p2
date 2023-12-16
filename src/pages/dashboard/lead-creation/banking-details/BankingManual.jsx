@@ -91,7 +91,7 @@ export default function BankingManual() {
     setBankErrorTost,
   } = useContext(LeadContext);
 
-  const { token, session } = useContext(AuthContext);
+  const { token, loAllDetails } = useContext(AuthContext);
 
   const {
     values,
@@ -486,10 +486,10 @@ export default function BankingManual() {
     const addPropertyPaperPhotos = async () => {
       await generateImageWithTextWatermark(
         leadValues?.lead?.id,
-        session?.employee_code,
-        session?.first_name,
-        session?.middle_name,
-        session?.last_name,
+        loAllDetails?.employee_code,
+        loAllDetails?.first_name,
+        loAllDetails?.middle_name,
+        loAllDetails?.last_name,
         bankStatementLatLong?.lat,
         bankStatementLatLong?.long,
         bankStatementFile,
@@ -568,10 +568,10 @@ export default function BankingManual() {
     async function editPropertyPaperPhotos() {
       await generateImageWithTextWatermark(
         leadValues?.lead?.id,
-        session?.employee_code,
-        session?.first_name,
-        session?.middle_name,
-        session?.last_name,
+        loAllDetails?.employee_code,
+        loAllDetails?.first_name,
+        loAllDetails?.middle_name,
+        loAllDetails?.last_name,
         bankStatementLatLong?.lat,
         bankStatementLatLong?.long,
         editBankStatement?.file,
