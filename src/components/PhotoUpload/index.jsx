@@ -25,7 +25,7 @@ function PhotoUpload({
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
-  const { token, session } = useContext(AuthContext);
+  const { token, loAllDetails } = useContext(AuthContext);
   const [show, setShow] = useState(false);
 
   const handleFile = async (e) => {
@@ -51,10 +51,10 @@ function PhotoUpload({
           if (validImageTypes.includes(fileType)) {
             await generateImageWithTextWatermark(
               values?.lead?.id,
-              session?.employee_code,
-              session?.first_name,
-              session?.middle_name,
-              session?.last_name,
+              loAllDetails?.employee_code,
+              loAllDetails?.first_name,
+              loAllDetails?.middle_name,
+              loAllDetails?.last_name,
               data.coords.latitude,
               data.coords.longitude,
               file[i],

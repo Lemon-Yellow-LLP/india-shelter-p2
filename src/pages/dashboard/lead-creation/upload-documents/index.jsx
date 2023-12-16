@@ -38,7 +38,7 @@ const UploadDocuments = ({ activeIndex }) => {
     setIsQaulifierActivated,
     setOtpFailCount,
     token,
-    session,
+    loAllDetails,
   } = useContext(AuthContext);
   const {
     // activeIndex,
@@ -507,10 +507,10 @@ const UploadDocuments = ({ activeIndex }) => {
     async function addPropertyPaperPhotos() {
       await generateImageWithTextWatermark(
         values?.lead?.id,
-        session?.employee_code,
-        session?.first_name,
-        session?.middle_name,
-        session?.last_name,
+        loAllDetails?.employee_code,
+        loAllDetails?.first_name,
+        loAllDetails?.middle_name,
+        loAllDetails?.last_name,
         propertyPapersLatLong?.lat,
         propertyPapersLatLong?.long,
         propertyPapersFile,
@@ -618,10 +618,10 @@ const UploadDocuments = ({ activeIndex }) => {
     async function editPropertyPaperPhotos() {
       await generateImageWithTextWatermark(
         values?.lead?.id,
-        session?.employee_code,
-        session?.first_name,
-        session?.middle_name,
-        session?.last_name,
+        loAllDetails?.employee_code,
+        loAllDetails?.first_name,
+        loAllDetails?.middle_name,
+        loAllDetails?.last_name,
         propertyPapersLatLong?.lat,
         propertyPapersLatLong?.long,
         editPropertyPaper?.file,
