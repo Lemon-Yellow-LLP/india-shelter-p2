@@ -75,14 +75,17 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, sin
               ? photos.map(
                   (photo, index) =>
                     index === activeStep && (
-                      <div key={index} className='h-full w-full'>
+                      <div
+                        key={index}
+                        className='h-full w-full flex justify-center items-center bg-black'
+                      >
                         <img
                           src={photo.document_fetch_url}
                           alt={photo.document_fetch_url}
-                          className='h-full w-full object-fill object-center rounded-t-lg'
+                          className='h-full w-full object-contain object-center rounded-t-lg'
                         />
 
-                        <p className='absolute bottom-0 left-0 text-white p-3'>
+                        {/* <p className='absolute bottom-0 left-0 text-white p-3'>
                           CAF: {values.applicants?.[activeIndex]?.applicant_details?.lead_id}; Lat:{' '}
                           {photo.geo_lat}; Long: {photo.geo_long}; EMP code:{' '}
                           {userData?.employee_code}; Timestamp: {Timestamp?.toLocaleString()}; LO
@@ -92,25 +95,25 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, sin
                             userData?.middle_name +
                             ' ' +
                             userData?.last_name}
-                        </p>
+                        </p> */}
                       </div>
                     ),
                 )
               : null}
 
             {singlePhoto && (
-              <div key={index} className='h-full w-full'>
+              <div key={index} className='h-full w-full flex justify-center items-center bg-black'>
                 <img
                   src={singlePhoto.document_fetch_url}
                   alt={singlePhoto.document_fetch_url}
-                  className='h-full w-full object-fill object-center rounded-t-lg'
+                  className='h-full w-full object-contain object-center rounded-t-lg'
                 />
-                <p className='absolute bottom-0 left-0 text-white p-3'>
+                {/* <p className='absolute bottom-0 left-0 text-white p-3'>
                   CAF: {values.applicants?.[activeIndex]?.applicant_details?.lead_id}; Lat:{' '}
                   {singlePhoto.geo_lat}; Long: {singlePhoto.geo_long}; EMP code:{' '}
                   {userData?.employee_code}; Timestamp: {Timestamp?.toLocaleString()}; LO Name:{' '}
                   {userData?.first_name + ' ' + userData?.middle_name + ' ' + userData?.last_name}
-                </p>
+                </p> */}
               </div>
             )}
           </div>
