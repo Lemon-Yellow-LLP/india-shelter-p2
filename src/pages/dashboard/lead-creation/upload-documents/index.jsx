@@ -513,7 +513,7 @@ const UploadDocuments = ({ activeIndex }) => {
         session?.last_name,
         propertyPapersLatLong?.lat,
         propertyPapersLatLong?.long,
-        propertyPapersFile?.file,
+        propertyPapersFile,
       )
         .then(async (image) => {
           const data = new FormData();
@@ -624,7 +624,7 @@ const UploadDocuments = ({ activeIndex }) => {
         session?.last_name,
         propertyPapersLatLong?.lat,
         propertyPapersLatLong?.long,
-        propertyPapersFile?.file,
+        editPropertyPaper?.file,
       )
         .then(async (image) => {
           const data = new FormData();
