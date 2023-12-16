@@ -115,7 +115,6 @@ export default function Dashboard() {
   }, [selectionRange]);
 
   useEffect(() => {
-    if (leadList.length === 0) return;
     setLoading(true);
     const data = leadList;
     setPrimaryApplicantList(data);
