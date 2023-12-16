@@ -2784,7 +2784,7 @@ const UploadDocuments = ({ activeIndex }) => {
             </div>
           ) : null}
 
-          {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Self-employed' ? (
+          {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Self employed' ? (
             <div>
               <TextInput
                 label='GST number'

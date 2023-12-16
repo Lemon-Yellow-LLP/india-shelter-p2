@@ -74,8 +74,12 @@ export const loanPurposeData = [
     value: 'Home Construction',
   },
   {
-    label: 'Home Renovation/Extension',
-    value: 'Home Renovation/Extension',
+    label: 'Home Renovation',
+    value: 'Home Renovation',
+  },
+  {
+    label: 'Home Extension',
+    value: 'Home Extension',
   },
   {
     label: 'BT+Top-up',

@@ -70,12 +70,12 @@ export const professionOptions = [
   },
   {
     label: 'Self employed',
-    value: 'Self-employed',
+    value: 'Self employed',
     icon: <IconSelfEmployed />,
   },
   {
     label: 'Un employed',
-    value: 'Unemployed',
+    value: 'Un-Employed',
     icon: <IconUnemployed />,
   },
   {
@@ -88,37 +88,37 @@ export const professionOptions = [
 export const noOfDependentsOptions = [
   {
     label: '0-1',
-    value: '0-1',
+    value: '1',
   },
   {
     label: '2-5',
-    value: '2-5',
+    value: '5',
   },
   {
     label: '6-10',
-    value: '6-10',
+    value: '10',
   },
   {
     label: '10+',
-    value: '10+',
+    value: '10',
   },
 ];
 
 export const totalFamilyMembersOptions = [
   {
     label: '0-1',
-    value: '0-1',
+    value: '1',
   },
   {
     label: '2-5',
-    value: '2-5',
+    value: '5',
   },
   {
     label: '6-10',
-    value: '6-10',
+    value: '10',
   },
   {
     label: '10+',
-    value: '10+',
+    value: '10',
   },
 ];
