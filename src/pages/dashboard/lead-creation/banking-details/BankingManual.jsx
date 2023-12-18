@@ -484,27 +484,27 @@ export default function BankingManual() {
 
   useEffect(() => {
     const addPropertyPaperPhotos = async () => {
-      await generateImageWithTextWatermark(
-        leadValues?.lead?.id,
-        loAllDetails?.employee_code,
-        loAllDetails?.first_name,
-        loAllDetails?.middle_name,
-        loAllDetails?.last_name,
-        bankStatementLatLong?.lat,
-        bankStatementLatLong?.long,
-        bankStatementFile,
-      )
-        .then(async (image) => {
-          const data = new FormData();
+      const data = new FormData();
 
-          const filename = bankStatementFile.name;
-          data.append('applicant_id', leadValues?.applicants?.[activeIndex]?.applicant_details?.id);
-          data.append('document_type', 'bank_statement_photo');
-          data.append('document_name', filename);
-          data.append('geo_lat', bankStatementLatLong?.lat);
-          data.append('geo_long', bankStatementLatLong?.long);
+      const filename = bankStatementFile.name;
+      data.append('applicant_id', leadValues?.applicants?.[activeIndex]?.applicant_details?.id);
+      data.append('document_type', 'bank_statement_photo');
+      data.append('document_name', filename);
+      data.append('geo_lat', bankStatementLatLong?.lat);
+      data.append('geo_long', bankStatementLatLong?.long);
 
-          if (image.type.includes('image')) {
+      if (bankStatementFile?.type.includes('image')) {
+        await generateImageWithTextWatermark(
+          leadValues?.lead?.id,
+          loAllDetails?.employee_code,
+          loAllDetails?.first_name,
+          loAllDetails?.middle_name,
+          loAllDetails?.last_name,
+          bankStatementLatLong?.lat,
+          bankStatementLatLong?.long,
+          bankStatementFile,
+        )
+          .then(async (image) => {
             if (image?.fileSize > 5000000) {
               const options = {
                 maxSizeMB: 4,
@@ -519,45 +519,45 @@ export default function BankingManual() {
             } else {
               data.append('file', image);
             }
-          } else {
-            data.append('file', bankStatementFile);
-          }
+          })
+          .catch((err) => {
+            setLoader(false);
+            setMessage('Error loading image');
+          });
+      } else {
+        data.append('file', bankStatementFile);
+      }
 
-          const res = await uploadDoc(data, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: token,
-            },
+      const res = await uploadDoc(data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: token,
+        },
+      });
+
+      if (res) {
+        let newData = { ...values };
+
+        newData.bank_statement_image.push(res.document);
+
+        setValues(newData);
+
+        const pdf = values.bank_statement_image.find((data) => {
+          if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+            return data;
+          }
+        });
+
+        if (bankStatementFile.type === 'image/jpeg') {
+          const active_uploads = values.bank_statement_image.filter((data) => {
+            return data.active === true;
           });
 
-          if (res) {
-            let newData = { ...values };
-
-            newData.bank_statement_image.push(res.document);
-
-            setValues(newData);
-
-            const pdf = values.bank_statement_image.find((data) => {
-              if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
-                return data;
-              }
-            });
-
-            if (bankStatementFile.type === 'image/jpeg') {
-              const active_uploads = values.bank_statement_image.filter((data) => {
-                return data.active === true;
-              });
-
-              setBankStatementUploads({ data: active_uploads });
-            } else {
-              setBankStatementPdf(pdf);
-            }
-          }
-        })
-        .catch((err) => {
-          setLoader(false);
-          setMessage('Error loading image');
-        });
+          setBankStatementUploads({ data: active_uploads });
+        } else {
+          setBankStatementPdf(pdf);
+        }
+      }
     };
     if (bankStatement.length > 0) {
       addPropertyPaperPhotos();
@@ -566,25 +566,25 @@ export default function BankingManual() {
 
   useEffect(() => {
     async function editPropertyPaperPhotos() {
-      await generateImageWithTextWatermark(
-        leadValues?.lead?.id,
-        loAllDetails?.employee_code,
-        loAllDetails?.first_name,
-        loAllDetails?.middle_name,
-        loAllDetails?.last_name,
-        bankStatementLatLong?.lat,
-        bankStatementLatLong?.long,
-        editBankStatement?.file,
-      )
-        .then(async (image) => {
-          const data = new FormData();
-          const filename = editBankStatement.file.name;
-          data.append('document_type', 'bank_statement_photo');
-          data.append('document_name', filename);
-          data.append('geo_lat', bankStatementLatLong?.lat);
-          data.append('geo_long', bankStatementLatLong?.long);
+      const data = new FormData();
+      const filename = editBankStatement.file.name;
+      data.append('document_type', 'bank_statement_photo');
+      data.append('document_name', filename);
+      data.append('geo_lat', bankStatementLatLong?.lat);
+      data.append('geo_long', bankStatementLatLong?.long);
 
-          if (image.type.includes('image')) {
+      if (editBankStatement?.file?.type.includes('image')) {
+        await generateImageWithTextWatermark(
+          leadValues?.lead?.id,
+          loAllDetails?.employee_code,
+          loAllDetails?.first_name,
+          loAllDetails?.middle_name,
+          loAllDetails?.last_name,
+          bankStatementLatLong?.lat,
+          bankStatementLatLong?.long,
+          editBankStatement?.file,
+        )
+          .then(async (image) => {
             if (image?.fileSize > 5000000) {
               const options = {
                 maxSizeMB: 4,
@@ -599,41 +599,41 @@ export default function BankingManual() {
             } else {
               data.append('file', image);
             }
-          } else {
-            data.append('file', editBankStatement.file);
-          }
-
-          const res = await reUploadDoc(editBankStatement.id, data, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: token,
-            },
+          })
+          .catch((err) => {
+            setLoader(false);
+            setMessage('Error loading image');
           });
+      } else {
+        data.append('file', editBankStatement.file);
+      }
 
-          if (!res) return;
+      const res = await reUploadDoc(editBankStatement.id, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: token,
+        },
+      });
 
-          let newData = { ...values };
+      if (!res) return;
 
-          newData.bank_statement_image = newData.bank_statement_image.map((data) => {
-            if (data.id === res.document.id) {
-              return res.document;
-            }
-            return data;
-          });
+      let newData = { ...values };
 
-          setValues(newData);
+      newData.bank_statement_image = newData.bank_statement_image.map((data) => {
+        if (data.id === res.document.id) {
+          return res.document;
+        }
+        return data;
+      });
 
-          const active_uploads = newData.bank_statement_image.filter((data) => {
-            return data.active === true;
-          });
+      setValues(newData);
 
-          setBankStatementUploads({ type: 'bank_statement_photo', data: active_uploads });
-          setBankStatement(active_uploads);
-        })
-        .catch((err) => {
-          setLoader(false);
-          setMessage('Error loading image');
-        });
+      const active_uploads = newData.bank_statement_image.filter((data) => {
+        return data.active === true;
+      });
+
+      setBankStatementUploads({ type: 'bank_statement_photo', data: active_uploads });
+      setBankStatement(active_uploads);
     }
     editBankStatement.id && editPropertyPaperPhotos();
   }, [editBankStatement]);

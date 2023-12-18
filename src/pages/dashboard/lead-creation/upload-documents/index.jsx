@@ -505,26 +505,26 @@ const UploadDocuments = ({ activeIndex }) => {
 
   useEffect(() => {
     async function addPropertyPaperPhotos() {
-      await generateImageWithTextWatermark(
-        values?.lead?.id,
-        loAllDetails?.employee_code,
-        loAllDetails?.first_name,
-        loAllDetails?.middle_name,
-        loAllDetails?.last_name,
-        propertyPapersLatLong?.lat,
-        propertyPapersLatLong?.long,
-        propertyPapersFile,
-      )
-        .then(async (image) => {
-          const data = new FormData();
-          const filename = propertyPapersFile.name;
-          data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
-          data.append('document_type', 'property_paper_photos');
-          data.append('document_name', filename);
-          data.append('geo_lat', propertyPapersLatLong?.lat);
-          data.append('geo_long', propertyPapersLatLong?.long);
+      const data = new FormData();
+      const filename = propertyPapersFile.name;
+      data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
+      data.append('document_type', 'property_paper_photos');
+      data.append('document_name', filename);
+      data.append('geo_lat', propertyPapersLatLong?.lat);
+      data.append('geo_long', propertyPapersLatLong?.long);
 
-          if (image?.type?.includes('image')) {
+      if (propertyPapersFile?.type?.includes('image')) {
+        await generateImageWithTextWatermark(
+          values?.lead?.id,
+          loAllDetails?.employee_code,
+          loAllDetails?.first_name,
+          loAllDetails?.middle_name,
+          loAllDetails?.last_name,
+          propertyPapersLatLong?.lat,
+          propertyPapersLatLong?.long,
+          propertyPapersFile,
+        )
+          .then(async (image) => {
             if (image?.fileSize > 5000000) {
               const options = {
                 maxSizeMB: 4,
@@ -539,102 +539,102 @@ const UploadDocuments = ({ activeIndex }) => {
             } else {
               data.append('file', image);
             }
-          } else {
-            data.append('file', propertyPapersFile);
-          }
+          })
+          .catch((err) => {
+            setPropertyLoader(false);
+            setPropertyPaperError('Error loading image');
+          });
+      } else {
+        data.append('file', propertyPapersFile);
+      }
 
-          let fileSize = data.get('file');
+      let fileSize = data.get('file');
 
-          if (fileSize.size <= 5000000) {
-            const res = await uploadDoc(data, {
+      if (fileSize.size <= 5000000) {
+        const res = await uploadDoc(data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: token,
+          },
+        });
+
+        if (res) {
+          const applicant = await getApplicantById(
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
+            {
               headers: {
-                'Content-Type': 'multipart/form-data',
                 Authorization: token,
               },
-            });
-
-            if (res) {
-              const applicant = await getApplicantById(
-                values?.applicants?.[activeIndex]?.applicant_details?.id,
-                {
-                  headers: {
-                    Authorization: token,
-                  },
-                },
-              );
-              const document_meta = applicant.document_meta;
-              if ('property_paper_photos' in document_meta == false) {
-                document_meta['property_paper_photos'] = [];
-              }
-              document_meta['property_paper_photos'].push(res.document);
-
-              const edited_applicant = await editFieldsById(
-                values?.applicants?.[activeIndex]?.applicant_details?.id,
-                'applicant',
-                {
-                  document_meta: document_meta,
-                },
-                {
-                  headers: {
-                    Authorization: token,
-                  },
-                },
-              );
-
-              const pdf = edited_applicant.document_meta.property_paper_photos.find((data) => {
-                if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
-                  return data;
-                }
-              });
-
-              if (pdf) {
-                setPropertyPdf(pdf);
-              } else {
-                const active_uploads = edited_applicant.document_meta.property_paper_photos.filter(
-                  (data) => {
-                    return data.active === true;
-                  },
-                );
-
-                setPropertyPaperUploads({ data: active_uploads });
-              }
-            }
-          } else {
-            setPropertyLoader(false);
-            setPropertyPaperError('File size should be less than 5MB');
+            },
+          );
+          const document_meta = applicant.document_meta;
+          if ('property_paper_photos' in document_meta == false) {
+            document_meta['property_paper_photos'] = [];
           }
+          document_meta['property_paper_photos'].push(res.document);
 
-          setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: true }));
-        })
-        .catch((err) => {
-          setPropertyLoader(false);
-          setPropertyPaperError('Error loading image');
-        });
+          const edited_applicant = await editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
+            'applicant',
+            {
+              document_meta: document_meta,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          );
+
+          const pdf = edited_applicant.document_meta.property_paper_photos.find((data) => {
+            if (data.document_meta.mimetype === 'application/pdf' && data.active === true) {
+              return data;
+            }
+          });
+
+          if (pdf) {
+            setPropertyPdf(pdf);
+          } else {
+            const active_uploads = edited_applicant.document_meta.property_paper_photos.filter(
+              (data) => {
+                return data.active === true;
+              },
+            );
+
+            setPropertyPaperUploads({ data: active_uploads });
+          }
+        }
+      } else {
+        setPropertyLoader(false);
+        setPropertyPaperError('File size should be less than 5MB');
+      }
+
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: true }));
     }
     propertyPapers.length > 0 && addPropertyPaperPhotos();
   }, [propertyPapersFile]);
 
   useEffect(() => {
     async function editPropertyPaperPhotos() {
-      await generateImageWithTextWatermark(
-        values?.lead?.id,
-        loAllDetails?.employee_code,
-        loAllDetails?.first_name,
-        loAllDetails?.middle_name,
-        loAllDetails?.last_name,
-        propertyPapersLatLong?.lat,
-        propertyPapersLatLong?.long,
-        editPropertyPaper?.file,
-      )
-        .then(async (image) => {
-          const data = new FormData();
-          const filename = editPropertyPaper.file.name;
-          data.append('document_type', 'property_paper_photos');
-          data.append('document_name', filename);
-          data.append('geo_lat', propertyPapersLatLong?.lat);
-          data.append('geo_long', propertyPapersLatLong?.long);
+      const data = new FormData();
+      const filename = editPropertyPaper.file.name;
+      data.append('document_type', 'property_paper_photos');
+      data.append('document_name', filename);
+      data.append('geo_lat', propertyPapersLatLong?.lat);
+      data.append('geo_long', propertyPapersLatLong?.long);
 
-          if (image?.type?.includes('image')) {
+      if (editPropertyPaper?.file?.type?.includes('image')) {
+        await generateImageWithTextWatermark(
+          values?.lead?.id,
+          loAllDetails?.employee_code,
+          loAllDetails?.first_name,
+          loAllDetails?.middle_name,
+          loAllDetails?.last_name,
+          propertyPapersLatLong?.lat,
+          propertyPapersLatLong?.long,
+          editPropertyPaper?.file,
+        )
+          .then(async (image) => {
             if (image?.fileSize > 5000000) {
               const options = {
                 maxSizeMB: 4,
@@ -649,46 +649,46 @@ const UploadDocuments = ({ activeIndex }) => {
             } else {
               data.append('file', image);
             }
-          } else {
-            data.append('file', editPropertyPaper.file);
-          }
-
-          let fileSize = data.get('file');
-
-          if (fileSize.size <= 5000000) {
-            const res = await reUploadDoc(editPropertyPaper.id, data, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: token,
-              },
-            });
-
-            if (!res) return;
-
-            const applicant = await getApplicantById(
-              values?.applicants?.[activeIndex]?.applicant_details?.id,
-              {
-                headers: {
-                  Authorization: token,
-                },
-              },
-            );
-
-            const active_uploads = applicant.document_meta.property_paper_photos.filter((data) => {
-              return data.active === true;
-            });
-
-            setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
-            setPropertyPapers(active_uploads);
-          } else {
+          })
+          .catch((err) => {
             setPropertyLoader(false);
-            setPropertyPaperError('File size should be less than 5MB');
-          }
-        })
-        .catch((err) => {
-          setPropertyLoader(false);
-          setPropertyPaperError('Error loading image');
+            setPropertyPaperError('Error loading image');
+          });
+      } else {
+        data.append('file', editPropertyPaper.file);
+      }
+
+      let fileSize = data.get('file');
+
+      if (fileSize.size <= 5000000) {
+        const res = await reUploadDoc(editPropertyPaper.id, data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: token,
+          },
         });
+
+        if (!res) return;
+
+        const applicant = await getApplicantById(
+          values?.applicants?.[activeIndex]?.applicant_details?.id,
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+
+        const active_uploads = applicant.document_meta.property_paper_photos.filter((data) => {
+          return data.active === true;
+        });
+
+        setPropertyPaperUploads({ type: 'property_paper_photos', data: active_uploads });
+        setPropertyPapers(active_uploads);
+      } else {
+        setPropertyLoader(false);
+        setPropertyPaperError('File size should be less than 5MB');
+      }
     }
     editPropertyPaper.id && editPropertyPaperPhotos();
   }, [editPropertyPaper]);

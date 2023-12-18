@@ -44,8 +44,18 @@ function PdfAndImageUploadBanking({
           const validImageTypes = ['image/jpeg', 'application/pdf'];
 
           if (validImageTypes.includes(fileType)) {
-            setSingleFile(file[i]);
-            setFile([...files, file[i]]);
+            if (file[i].type === 'application/pdf') {
+              if (file[i].size <= 5000000) {
+                setSingleFile(file[i]);
+                setFile([...files, file[i]]);
+              } else {
+                setLoader(false);
+                setMessage('File size should be less than 5MB');
+              }
+            } else {
+              setSingleFile(file[i]);
+              setFile([...files, file[i]]);
+            }
           } else {
             setLoader(false);
             setMessage('File format not supported');
