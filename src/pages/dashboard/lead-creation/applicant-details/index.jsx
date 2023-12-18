@@ -399,23 +399,14 @@ const ApplicantDetails = () => {
           setHasSentOTPOnce(true);
           setToastMessage('OTP has been sent to your mail id');
 
-          const bodyForExistingCustomer = {
-            resource: '/customer_check',
-            path: '/customer_check',
-            httpMethod: 'POST',
-            auth: 'exi$t_Sys@85',
-            'source flag': '1',
-            body: {
-              loan_type: values.lead.loan_type,
-              date_of_birth: values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth,
-              mobile_number: values?.applicants?.[activeIndex]?.applicant_details?.mobile_number,
-            },
-          };
-
           await axios
             .post(
-              'https://eyt7u5wx9l.execute-api.ap-south-1.amazonaws.com/v1/digibre-run',
-              bodyForExistingCustomer,
+              `https://uatagile.indiashelter.in/api/applicant/existing-customer/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
             )
             .then(({ data }) => {
               const body = data?.body;
