@@ -412,6 +412,7 @@ export default function SwipeableDrawerComponent() {
                         ?.progress !== 100
                     }
                   />
+
                   <EligibilityStep
                     key={11}
                     details={applicantStepsProgress[11]}
@@ -419,7 +420,10 @@ export default function SwipeableDrawerComponent() {
                     index={primaryIndex}
                     stepIndex={11}
                     noProgress={true}
-                    lock={values?.lead?.extra_params?.progress_without_eligibility !== 100}
+                    lock={
+                      values?.lead?.extra_params?.progress_without_eligibility !== 100 ||
+                      values?.applicants?.length < 2
+                    }
                   />
                 </div>
               </TabPanel>
