@@ -100,7 +100,7 @@ export const noOfDependentsOptions = [
   },
   {
     label: '10+',
-    value: '10',
+    value: '11',
   },
 ];
 
@@ -119,6 +119,6 @@ export const totalFamilyMembersOptions = [
   },
   {
     label: '10+',
-    value: '10',
+    value: '11',
   },
 ];
