@@ -5,6 +5,7 @@ import { editDoc, editFieldsById, getApplicantById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
 import imageCompression from 'browser-image-compression';
+import generateImageWithTextWatermark from '../../utils/GenerateImageWithTextWatermark';
 
 function PhotoUpload({
   files,
@@ -24,7 +25,7 @@ function PhotoUpload({
   ...props
 }) {
   const { values, activeIndex } = useContext(LeadContext);
-  const { token } = useContext(AuthContext);
+  const { token, loAllDetails } = useContext(AuthContext);
   const [show, setShow] = useState(false);
 
   const handleFile = async (e) => {
@@ -48,29 +49,38 @@ function PhotoUpload({
           const filename = file[i].name;
 
           if (validImageTypes.includes(fileType)) {
-            const options = {
-              maxSizeMB: 4,
-              maxWidthOrHeight: 1920,
-              useWebWorker: true,
-            };
-
-            try {
-              const compressedFile = await imageCompression(file[i], options);
-              const compressedImageFile = new File([compressedFile], filename, {
-                type: compressedFile.type,
-              });
-
-              if (compressedImageFile.size <= 5000000) {
-                setSingleFile(compressedImageFile);
-                setFile([...files, compressedImageFile]);
-              } else {
+            await generateImageWithTextWatermark(
+              values?.lead?.id,
+              loAllDetails?.employee_code,
+              loAllDetails?.first_name,
+              loAllDetails?.middle_name,
+              loAllDetails?.last_name,
+              data.coords.latitude,
+              data.coords.longitude,
+              file[i],
+            )
+              .then(async (image) => {
+                if (image?.fileSize > 5000000) {
+                  const options = {
+                    maxSizeMB: 4,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                  };
+                  const compressedFile = await imageCompression(image, options);
+                  const compressedImageFile = new File([compressedFile], filename, {
+                    type: compressedFile.type,
+                  });
+                  setSingleFile(compressedImageFile);
+                  setFile([...files, compressedImageFile]);
+                } else {
+                  setSingleFile(image);
+                  setFile([...files, image]);
+                }
+              })
+              .catch((err) => {
                 setLoader(false);
-                setMessage('File size should be less than 5MB');
-              }
-            } catch (error) {
-              setLoader(false);
-              setMessage('File format not supported');
-            }
+                setMessage('Error loading image');
+              });
           } else {
             setLoader(false);
             setMessage('File format not supported');

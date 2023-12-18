@@ -455,7 +455,6 @@ const ApplicantDetails = () => {
                   values?.applicants[activeIndex]?.applicant_details?.id,
                   'applicant',
                   {
-                    ...values?.applicants[activeIndex]?.applicant_details,
                     ...dataWithoutLoanType,
                     extra_params: {
                       ...values?.applicants[activeIndex]?.applicant_details?.extra_params,

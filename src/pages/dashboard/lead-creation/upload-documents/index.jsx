@@ -27,6 +27,7 @@ import Topbar from '../../../../components/Topbar';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import Popup from '../../../../components/Popup';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import generateImageWithTextWatermark from '../../../../utils/GenerateImageWithTextWatermark';
 
 const UploadDocuments = ({ activeIndex }) => {
   const {
@@ -37,6 +38,7 @@ const UploadDocuments = ({ activeIndex }) => {
     setIsQaulifierActivated,
     setOtpFailCount,
     token,
+    loAllDetails,
   } = useContext(AuthContext);
   const {
     // activeIndex,
@@ -511,23 +513,37 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', propertyPapersLatLong?.lat);
       data.append('geo_long', propertyPapersLatLong?.long);
 
-      if (propertyPapersFile.type === 'image/jpeg') {
-        const options = {
-          maxSizeMB: 4,
-          maxWidthOrHeight: 1920,
-          useWebWorker: true,
-        };
-
-        try {
-          const compressedFile = await imageCompression(propertyPapersFile, options);
-          const compressedImageFile = new File([compressedFile], filename, {
-            type: compressedFile.type,
+      if (propertyPapersFile?.type?.includes('image')) {
+        await generateImageWithTextWatermark(
+          values?.lead?.id,
+          loAllDetails?.employee_code,
+          loAllDetails?.first_name,
+          loAllDetails?.middle_name,
+          loAllDetails?.last_name,
+          propertyPapersLatLong?.lat,
+          propertyPapersLatLong?.long,
+          propertyPapersFile,
+        )
+          .then(async (image) => {
+            if (image?.fileSize > 5000000) {
+              const options = {
+                maxSizeMB: 4,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+              };
+              const compressedFile = await imageCompression(image, options);
+              const compressedImageFile = new File([compressedFile], filename, {
+                type: compressedFile.type,
+              });
+              data.append('file', compressedImageFile);
+            } else {
+              data.append('file', image);
+            }
+          })
+          .catch((err) => {
+            setPropertyLoader(false);
+            setPropertyPaperError('Error loading image');
           });
-
-          data.append('file', compressedImageFile);
-        } catch (error) {
-          console.log(error);
-        }
       } else {
         data.append('file', propertyPapersFile);
       }
@@ -607,24 +623,37 @@ const UploadDocuments = ({ activeIndex }) => {
       data.append('geo_lat', propertyPapersLatLong?.lat);
       data.append('geo_long', propertyPapersLatLong?.long);
 
-      if (editPropertyPaper.file.type === 'image/jpeg') {
-        const options = {
-          maxSizeMB: 4,
-          maxWidthOrHeight: 1920,
-          useWebWorker: true,
-        };
-
-        try {
-          const compressedFile = await imageCompression(editPropertyPaper.file, options);
-
-          const compressedImageFile = new File([compressedFile], filename, {
-            type: compressedFile.type,
+      if (editPropertyPaper?.file?.type?.includes('image')) {
+        await generateImageWithTextWatermark(
+          values?.lead?.id,
+          loAllDetails?.employee_code,
+          loAllDetails?.first_name,
+          loAllDetails?.middle_name,
+          loAllDetails?.last_name,
+          propertyPapersLatLong?.lat,
+          propertyPapersLatLong?.long,
+          editPropertyPaper?.file,
+        )
+          .then(async (image) => {
+            if (image?.fileSize > 5000000) {
+              const options = {
+                maxSizeMB: 4,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+              };
+              const compressedFile = await imageCompression(image, options);
+              const compressedImageFile = new File([compressedFile], filename, {
+                type: compressedFile.type,
+              });
+              data.append('file', compressedImageFile);
+            } else {
+              data.append('file', image);
+            }
+          })
+          .catch((err) => {
+            setPropertyLoader(false);
+            setPropertyPaperError('Error loading image');
           });
-
-          data.append('file', compressedImageFile);
-        } catch (error) {
-          console.log(error);
-        }
       } else {
         data.append('file', editPropertyPaper.file);
       }
@@ -2755,7 +2784,7 @@ const UploadDocuments = ({ activeIndex }) => {
             </div>
           ) : null}
 
-          {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Self-employed' ? (
+          {values?.applicants[activeIndex]?.work_income_detail?.profession === 'Self employed' ? (
             <div>
               <TextInput
                 label='GST number'

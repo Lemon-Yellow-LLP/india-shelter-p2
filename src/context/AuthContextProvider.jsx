@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { signInSchema } from '../schemas/index';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 export const defaultValues = {
   employee_code: '',
@@ -25,6 +26,7 @@ const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loData, setLoData] = useState(null);
+  const [loAllDetails, setLoAllDetails] = useState(null);
   const [phoneNumberList, setPhoneNumberList] = useState({});
   const [otpFailCount, setOtpFailCount] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
@@ -36,7 +38,25 @@ const AuthContextProvider = ({ children }) => {
     validationSchema: signInSchema,
   });
 
+  const getLoAllDetails = async () => {
+    if (loData?.session?.user_id) {
+      await axios
+        .get(`https://uatagile.indiashelter.in/api/account/${loData?.session?.user_id}`)
+        .then(({ data }) => {
+          setLoAllDetails(data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
   useEffect(() => {
+    console.log('LoAllDetails', loAllDetails);
+  }, [loAllDetails]);
+
+  useEffect(() => {
+    getLoAllDetails();
     console.log('Lo Data', { loData, token, isAuthenticated });
   }, [loData, token, isAuthenticated]);
 
@@ -60,6 +80,7 @@ const AuthContextProvider = ({ children }) => {
         setPhoneNumberList,
         errorToastMessage,
         setErrorToastMessage,
+        loAllDetails,
       }}
     >
       {children}

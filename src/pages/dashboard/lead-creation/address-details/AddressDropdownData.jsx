@@ -19,19 +19,19 @@ export const residenceData = [
 export const yearsResidingData = [
   {
     label: '0-1',
-    value: '0-1',
+    value: '1',
   },
   {
     label: '2-5',
-    value: '2-5',
+    value: '5',
   },
   {
     label: '6-10',
-    value: '6-10',
+    value: '10',
   },
   {
     label: '10+',
-    value: '10+',
+    value: '11',
   },
 ];
 
