@@ -125,6 +125,8 @@ const LeadContextProvider = ({ children }) => {
       formik.setFieldValue('lead.extra_params.progress', finalProgress);
       formik.setFieldValue('lead.extra_params.progress_without_eligibility', tempFinalProgress);
 
+      console.log(finalProgress);
+
       if (formik?.values?.lead?.id) {
         await editFieldsById(
           formik?.values?.lead?.id,
