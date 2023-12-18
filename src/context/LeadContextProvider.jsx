@@ -313,7 +313,10 @@ const LeadContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (location.pathname !== '/lead/applicant-details') {
+    if (
+      location.pathname !== '/lead/applicant-details' &&
+      !location.pathname.includes('dashboard')
+    ) {
       let newApplicants = formik.values.applicants.filter(
         (e) => e.applicant_details.is_mobile_verified,
       );
