@@ -704,7 +704,7 @@ const UploadDocuments = ({ activeIndex }) => {
         return data.active === true;
       });
 
-      if (!active_uploads) {
+      if (!active_uploads && !isCoApplicant) {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['property_paper']: false }));
       }
     }
@@ -1523,7 +1523,7 @@ const UploadDocuments = ({ activeIndex }) => {
         return data.active === true;
       });
 
-      if (!active_uploads) {
+      if (!active_uploads && !isCoApplicant) {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['property_image']: false }));
       }
     }
@@ -1725,6 +1725,7 @@ const UploadDocuments = ({ activeIndex }) => {
           Authorization: token,
         },
       });
+
       if (!res) return;
       if (res.document_meta.customer_photos) {
         const active_upload = res.document_meta.customer_photos.find((data) => {
