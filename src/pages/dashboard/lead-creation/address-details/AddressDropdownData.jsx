@@ -31,7 +31,7 @@ export const yearsResidingData = [
   },
   {
     label: '10+',
-    value: '10',
+    value: '11',
   },
 ];
 
