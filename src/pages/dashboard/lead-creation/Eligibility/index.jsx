@@ -778,7 +778,10 @@ const Eligibility = () => {
                 ? final_api.length + values.applicants.length + 3
                 : values.applicants.length + 1,
           };
-
+          setFieldValue(
+            `applicants[${activeIndex}].applicant_details.extra_params`,
+            edited_extra_params,
+          );
           await editFieldsById(
             values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
@@ -791,17 +794,10 @@ const Eligibility = () => {
               },
             },
           );
-
-          setFieldValue(
-            `applicants[${activeIndex}].applicant_details.extra_params`,
-            edited_extra_params,
-          );
         }
       } catch (err) {
         console.log(err);
       }
-
-      updateCompleteFormProgress();
 
       try {
         const sdfc_res = await pushToSalesforce(
@@ -816,18 +812,23 @@ const Eligibility = () => {
         if (!sdfc_res) return;
 
         setToastMessage('Data has been successfully pushed to the Salesforce');
-        setSdfcResponse(true);
         setSfdcStatus(false);
       } catch (err) {
         console.log(err);
         setToastMessage('The data push to Salesforce has failed');
-        setSdfcResponse(true);
         setSfdcStatus(true);
       }
+      setSdfcResponse(true);
     }
 
     breTwo();
   }, []);
+
+  useEffect(() => {
+    if (values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.eligibility) {
+      updateCompleteFormProgress();
+    }
+  }, [values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.eligibility]);
 
   return (
     <>
