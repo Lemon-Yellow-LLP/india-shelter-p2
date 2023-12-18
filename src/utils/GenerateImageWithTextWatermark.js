@@ -59,10 +59,24 @@ const generateImageWithTextWatermark = async (
       ctx.fillStyle = 'white';
       //ctx.fillStyle = '#E33439';
 
+      let name = [];
+
+      if (first_name) {
+        name.push(first_name);
+      }
+
+      if (middle_name) {
+        name.push(middle_name);
+      }
+
+      if (last_name) {
+        name.push(last_name);
+      }
+
       const multilineText = splitTextToMultiline(
         `CAF: ${lead_id}; Lat:${lat}; Long:${long}`,
         `EMP code: ${employee_code}; Timestamp: ${timeStamp}`,
-        `LO Name: ${first_name} ${middle_name} ${last_name}`,
+        `LO Name: ${name?.join(' ')}`,
       );
 
       const padding = 30;
