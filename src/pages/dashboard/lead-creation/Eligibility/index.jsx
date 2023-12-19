@@ -31,8 +31,13 @@ const Eligibility = () => {
     updateCompleteFormProgress,
     setActiveIndex,
     primaryIndex,
+    salesforceID,
+    setSalesforceID,
+    setSfdcCount,
+    toastMessage,
+    setToastMessage,
   } = useContext(LeadContext);
-  const { toastMessage, setToastMessage, token } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
 
   const [progress, setProgress] = useState(0);
   const [finalApi, setFinalApi] = useState(0);
@@ -800,7 +805,7 @@ const Eligibility = () => {
       }
 
       try {
-        const sdfc_res = await pushToSalesforce(
+        const sfdcres = await pushToSalesforce(
           values?.applicants?.[activeIndex]?.applicant_details?.lead_id,
           {
             headers: {
@@ -809,14 +814,21 @@ const Eligibility = () => {
           },
         );
 
-        if (!sdfc_res) return;
-
-        setToastMessage('Data has been successfully pushed to the Salesforce');
-        setSfdcStatus(false);
+        if (sfdcres.lead.sfdc_status === 'Complete') {
+          setToastMessage('Data has been successfully pushed to the Salesforce');
+          setSfdcStatus(false);
+          setSalesforceID(sfdcres.salesforce_response.sfdc_submit_pwa.Application_Id);
+          setSfdcCount((sfdcCount) => sfdcCount + 1);
+        } else {
+          setToastMessage('The data push to Salesforce has failed');
+          setSfdcStatus(true);
+          setSfdcCount((sfdcCount) => sfdcCount + 1);
+        }
       } catch (err) {
         console.log(err);
         setToastMessage('The data push to Salesforce has failed');
         setSfdcStatus(true);
+        setSfdcCount((sfdcCount) => sfdcCount + 1);
       }
       setSdfcResponse(true);
     }
@@ -863,7 +875,9 @@ const Eligibility = () => {
                 : null,
             )}
           </p>
-          <p className='text-xs text-primary-black font-normal mt-0.5'>Salesforce ID: 1234567</p>
+          <p className='text-xs text-primary-black font-normal mt-0.5'>
+            Salesforce ID: {salesforceID}
+          </p>
           <div className='flex justify-between text-primary-black font-medium mt-1'>
             {!sdfcResponse ? <h3>Verification in progress</h3> : <h3>Application submitted</h3>}
             <h3>

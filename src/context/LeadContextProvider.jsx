@@ -29,6 +29,8 @@ const LeadContextProvider = ({ children }) => {
   const [coApplicants, setCoApplicants] = useState([]);
   const [pincodeErr, setPincodeErr] = useState({});
   const [propertyValueEstimateError, setPropertyValueEstimateError] = useState('');
+  const [salesforceID, setSalesforceID] = useState(null);
+  const [sfdcCount, setSfdcCount] = useState(0);
 
   const { token } = useContext(AuthContext);
 
@@ -353,6 +355,12 @@ const LeadContextProvider = ({ children }) => {
     console.log('Lead Context Values', formik.values);
   }, [formik.values]);
 
+  useEffect(() => {
+    if (sfdcCount > 1) {
+      setToastMessage(null);
+    }
+  }, [sfdcCount]);
+
   return (
     <LeadContext.Provider
       value={{
@@ -392,6 +400,10 @@ const LeadContextProvider = ({ children }) => {
         setPincodeErr,
         propertyValueEstimateError,
         setPropertyValueEstimateError,
+        salesforceID,
+        setSalesforceID,
+        sfdcCount,
+        setSfdcCount,
       }}
     >
       {children}

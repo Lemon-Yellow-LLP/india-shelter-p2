@@ -288,57 +288,63 @@ function LeadCard({ title, progress, id, mobile, created, lead }) {
       </div>
 
       {lead.sfdc_count !== 0 && lead.sfdc_count <= 4 ? (
-        lead.sfdc_status === 'Complete' ? (
-          <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-secondary-green'>
-            <svg
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M4.843 16.372C3.273 16.372 2 15.099 2 13.529C2 11.959 3.273 10.686 4.843 10.686C4.843 7.546 7.389 5 10.529 5C12.879 5 14.895 6.426 15.762 8.46C16.051 8.394 16.349 8.351 16.658 8.351C18.873 8.351 20.668 10.146 20.668 12.361C20.668 14.576 18.873 16.371 16.658 16.371'
-                stroke='#147257'
-                strokeMiterlimit='10'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-              <path
-                d='M15 13L10.1875 18L8 15.7273'
-                stroke='#147257'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-            </svg>
-            DATA PUSH IS SUCCESSFUL
-          </div>
-        ) : (
-          <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-[#EF8D32]'>
-            <svg
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M5.843 16.372C4.273 16.372 3 15.099 3 13.529C3 11.959 4.273 10.686 5.843 10.686C5.843 7.546 8.389 5 11.529 5C13.879 5 15.895 6.426 16.762 8.46C17.051 8.394 17.349 8.351 17.658 8.351C19.873 8.351 21.668 10.146 21.668 12.361C21.668 14.576 19.873 16.371 17.658 16.371'
-                stroke='#EF8D32'
-                strokeMiterlimit='10'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-              <path
-                d='M8 15C8 12.7909 9.79086 11 12 11C14.2091 11 16 12.7909 16 15C16 17.2091 14.2091 19 12 19C10.5194 19 9.22675 18.1956 8.53513 17M8.53513 17V19M8.53513 17H10.5'
-                stroke='#EF8D32'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-            </svg>
-            RETRY SALESFORCE PUSH
-          </div>
-        )
+        <div className='flex justify-between items-center'>
+          <p className='text-[10px] leading-4 text-primary-black font-light'>
+            Salesforce ID: {lead?.sfdc_submit_pwa?.Application_Id}
+          </p>
+
+          {lead.sfdc_status === 'Complete' ? (
+            <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-secondary-green'>
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M4.843 16.372C3.273 16.372 2 15.099 2 13.529C2 11.959 3.273 10.686 4.843 10.686C4.843 7.546 7.389 5 10.529 5C12.879 5 14.895 6.426 15.762 8.46C16.051 8.394 16.349 8.351 16.658 8.351C18.873 8.351 20.668 10.146 20.668 12.361C20.668 14.576 18.873 16.371 16.658 16.371'
+                  stroke='#147257'
+                  strokeMiterlimit='10'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+                <path
+                  d='M15 13L10.1875 18L8 15.7273'
+                  stroke='#147257'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+              DATA PUSH IS SUCCESSFUL
+            </div>
+          ) : (
+            <div className='flex gap-1 items-center justify-end text-[10px] font-medium leading-4 text-[#EF8D32]'>
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M5.843 16.372C4.273 16.372 3 15.099 3 13.529C3 11.959 4.273 10.686 5.843 10.686C5.843 7.546 8.389 5 11.529 5C13.879 5 15.895 6.426 16.762 8.46C17.051 8.394 17.349 8.351 17.658 8.351C19.873 8.351 21.668 10.146 21.668 12.361C21.668 14.576 19.873 16.371 17.658 16.371'
+                  stroke='#EF8D32'
+                  strokeMiterlimit='10'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+                <path
+                  d='M8 15C8 12.7909 9.79086 11 12 11C14.2091 11 16 12.7909 16 15C16 17.2091 14.2091 19 12 19C10.5194 19 9.22675 18.1956 8.53513 17M8.53513 17V19M8.53513 17H10.5'
+                  stroke='#EF8D32'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+              RETRY SALESFORCE PUSH
+            </div>
+          )}
+        </div>
       ) : null}
 
       {lead.sfdc_count > 4 && lead.sfdc_status !== 'Complete' && (
