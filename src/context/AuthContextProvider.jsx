@@ -52,7 +52,7 @@ const AuthContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    console.log('LoAllDetails', loAllDetails);
+    console.log('Lo All Details', loAllDetails);
   }, [loAllDetails]);
 
   useEffect(() => {
