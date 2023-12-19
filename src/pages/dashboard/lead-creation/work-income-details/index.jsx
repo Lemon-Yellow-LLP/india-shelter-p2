@@ -278,6 +278,31 @@ const WorkIncomeDetails = () => {
             },
           );
 
+          if (
+            values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+            values?.applicants?.[activeIndex]?.personal_details?.id_number
+          ) {
+            setFieldValue(
+              `applicants[${activeIndex}].work_income_detail.pan_number`,
+              values?.applicants?.[activeIndex]?.personal_details?.id_number,
+            );
+
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.work_income_detail?.id,
+              'work-income',
+              {
+                pan_number: values?.applicants?.[activeIndex]?.personal_details?.id_number,
+              },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
+            setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
+          }
+
           return;
         } else {
           await addApi('work-income', newData.applicants[activeIndex].work_income_detail, {
@@ -307,6 +332,30 @@ const WorkIncomeDetails = () => {
                   },
                 },
               );
+              if (
+                values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+                values?.applicants?.[activeIndex]?.personal_details?.id_number
+              ) {
+                setFieldValue(
+                  `applicants[${activeIndex}].work_income_detail.pan_number`,
+                  values?.applicants?.[activeIndex]?.personal_details?.id_number,
+                );
+
+                editFieldsById(
+                  res.id,
+                  'work-income',
+                  {
+                    pan_number: values?.applicants?.[activeIndex]?.personal_details?.id_number,
+                  },
+                  {
+                    headers: {
+                      Authorization: token,
+                    },
+                  },
+                );
+
+                setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
+              }
               return res;
             })
             .catch((err) => {
@@ -467,6 +516,11 @@ const WorkIncomeDetails = () => {
       values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
       values?.applicants?.[activeIndex]?.personal_details?.id_number
     ) {
+      setFieldValue(
+        `applicants[${activeIndex}].work_income_detail.pan_number`,
+        values?.applicants?.[activeIndex]?.personal_details?.id_number,
+      );
+
       editFieldsById(
         values?.applicants?.[activeIndex]?.work_income_detail?.id,
         'work-income',
@@ -505,7 +559,11 @@ const WorkIncomeDetails = () => {
         ['pan_number']: !!values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
       }));
     }
-  }, []);
+  }, [
+    values?.applicants?.[activeIndex]?.personal_details?.id_type,
+    values?.applicants?.[activeIndex]?.personal_details?.id_number,
+    values?.applicants?.[activeIndex]?.work_income_detail?.profession,
+  ]);
 
   return (
     <>
