@@ -1323,7 +1323,7 @@ export default function DashboardApplicant() {
 }
 
 const Titlebar = ({ title, id, primaryApplicant }) => {
-  const { setValues, setActiveIndex } = useContext(LeadContext);
+  const { setValues, setActiveIndex, setSalesforceID } = useContext(LeadContext);
   const { setPhoneNumberList, toastMessage, setToastMessage, token } = useContext(AuthContext);
 
   const [totalProgress, setTotalProgress] = useState(0);
@@ -1400,9 +1400,13 @@ const Titlebar = ({ title, id, primaryApplicant }) => {
         },
       });
 
-      if (sfdc_res) {
+      if (sfdc_res.lead.sfdc_status === 'Complete') {
+        setSalesforceID(sfdc_res.salesforce_response.sfdc_submit_pwa.Application_Id);
         setToastMessage('Data has been successfully pushed to the Salesforce');
         setSfdcPush({ ...sfdcPush, loader: false, status: sfdc_res.lead.sfdc_status });
+      } else {
+        setToastMessage('The data push to Salesforce has failed');
+        setSfdcPush({ ...sfdcPush, loader: false, status: 'Error' });
       }
     } catch (err) {
       console.log(err);
