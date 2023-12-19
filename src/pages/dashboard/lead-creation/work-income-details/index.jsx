@@ -513,6 +513,7 @@ const WorkIncomeDetails = () => {
   }, [
     values?.applicants?.[activeIndex]?.personal_details?.id_type,
     values?.applicants?.[activeIndex]?.personal_details?.id_number,
+    values?.applicants?.[activeIndex]?.work_income_detail?.profession,
   ]);
 
   return (
