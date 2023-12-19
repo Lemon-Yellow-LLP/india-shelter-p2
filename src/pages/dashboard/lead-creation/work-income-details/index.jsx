@@ -360,6 +360,31 @@ const WorkIncomeDetails = () => {
       //       return err;
       //     });
       // }
+
+      if (
+        values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
+        values?.applicants?.[activeIndex]?.personal_details?.id_number
+      ) {
+        setFieldValue(
+          `applicants[${activeIndex}].work_income_detail.pan_number`,
+          values?.applicants?.[activeIndex]?.personal_details?.id_number,
+        );
+
+        editFieldsById(
+          values?.applicants?.[activeIndex]?.work_income_detail?.id,
+          'work-income',
+          {
+            pan_number: values?.applicants?.[activeIndex]?.personal_details?.id_number,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+
+        setRequiredFieldsStatus((prev) => ({ ...prev, ['pan_number']: true }));
+      }
     },
     [values, requiredFieldsStatus, setRequiredFieldsStatus],
   );
