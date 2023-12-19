@@ -467,6 +467,11 @@ const WorkIncomeDetails = () => {
       values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN' &&
       values?.applicants?.[activeIndex]?.personal_details?.id_number
     ) {
+      setFieldValue(
+        `applicants[${activeIndex}].work_income_detail.pan_number`,
+        values?.applicants?.[activeIndex]?.personal_details?.id_number,
+      );
+
       editFieldsById(
         values?.applicants?.[activeIndex]?.work_income_detail?.id,
         'work-income',
@@ -505,7 +510,10 @@ const WorkIncomeDetails = () => {
         ['pan_number']: !!values?.applicants?.[activeIndex]?.work_income_detail?.pan_number,
       }));
     }
-  }, []);
+  }, [
+    values?.applicants?.[activeIndex]?.personal_details?.id_type,
+    values?.applicants?.[activeIndex]?.personal_details?.id_number,
+  ]);
 
   return (
     <>
