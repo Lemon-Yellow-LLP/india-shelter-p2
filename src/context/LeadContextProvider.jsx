@@ -71,7 +71,8 @@ const LeadContextProvider = ({ children }) => {
       let progressMapTemp = {};
       Object.keys(newData).forEach((key) => {
         if (key !== 'lead') {
-          progressMap[key] = getProgress(newData[key]);
+          let newDataKeyprogress = getProgress(newData[key]);
+          progressMap[key] = newDataKeyprogress ? newDataKeyprogress : 0;
         }
       });
 
@@ -79,7 +80,7 @@ const LeadContextProvider = ({ children }) => {
       progressMapTemp = structuredClone(progressMap);
       progressMapTemp.applicants = [];
 
-      newData?.applicants.map((applicant, index) => {
+      newData?.applicants?.map((applicant, index) => {
         progressMap.applicants[index] = {};
         progressMapTemp.applicants[index] = {};
         Object.keys(applicant).forEach((key) => {
@@ -91,11 +92,14 @@ const LeadContextProvider = ({ children }) => {
                 : 0;
             }
           } else {
-            progressMap.applicants[index][key] = getProgress(applicant[key]);
+            let newDataKeyprogress = getProgress(applicant[key]);
+            progressMap.applicants[index][key] = newDataKeyprogress ? newDataKeyprogress : 0;
           }
         });
-        progressMap.applicants[index].upload_progress =
-          applicant?.applicant_details?.extra_params?.upload_progress;
+        progressMap.applicants[index].upload_progress = applicant?.applicant_details?.extra_params
+          ?.upload_progress
+          ? applicant?.applicant_details?.extra_params?.upload_progress
+          : 0;
 
         progressMap.applicants[index].qualifier = applicant?.applicant_details?.extra_params
           ?.qualifier
@@ -148,6 +152,10 @@ const LeadContextProvider = ({ children }) => {
   };
 
   const updateProgressApplicantSteps = async (updateStep, requiredFieldsStatus, page) => {
+    if (!requiredFieldsStatus || !updateStep) {
+      return;
+    }
+
     let trueCount = 0;
 
     for (const field in requiredFieldsStatus) {
@@ -160,7 +168,7 @@ const LeadContextProvider = ({ children }) => {
       (parseInt(trueCount) / parseInt(Object.keys(requiredFieldsStatus).length)) * 100,
     );
 
-    let newData = formik.values;
+    let newData = structuredClone(formik.values);
 
     if (page === 'reference' || page === 'property') {
       if (newData?.[updateStep] && typeof newData[updateStep]?.extra_params === 'object') {
@@ -201,10 +209,10 @@ const LeadContextProvider = ({ children }) => {
             },
           },
         );
-        console.log(newData[updateStep]);
+
         formik.setFieldValue(
           `applicants[${activeIndex}].${updateStep}.extra_params`,
-          newData[updateStep].extra_params,
+          newData.applicants[activeIndex][updateStep].extra_params,
         );
       }
     }
@@ -215,6 +223,10 @@ const LeadContextProvider = ({ children }) => {
   };
 
   const updateProgressUploadDocumentSteps = async (requiredFieldsStatus) => {
+    if (!requiredFieldsStatus) {
+      return;
+    }
+
     let trueCount = 0;
 
     for (const field in requiredFieldsStatus) {
@@ -258,8 +270,6 @@ const LeadContextProvider = ({ children }) => {
       upload_required_fields_status: updated_required_fields,
       upload_progress: finalProgress,
     };
-
-    console.log(requiredFieldsStatus);
 
     await editFieldsById(
       formik.values.applicants[activeIndex].applicant_details.id,
@@ -315,18 +325,15 @@ const LeadContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (
-      location.pathname !== '/lead/applicant-details' &&
-      !location.pathname.includes('dashboard')
-    ) {
+    if (!location.pathname.includes('dashboard')) {
       let newApplicants = formik.values.applicants.filter(
-        (e) => e.applicant_details.is_mobile_verified,
+        (e, index) => index === activeIndex || e.applicant_details.is_mobile_verified,
       );
-
+      console.log(activeIndex, newApplicants);
       formik.setFieldValue('applicants', newApplicants);
       updateCompleteFormProgress();
     }
-  }, [location.pathname]);
+  }, [activeIndex]);
 
   useEffect(() => {
     let newData = [];
