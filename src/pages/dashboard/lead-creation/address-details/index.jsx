@@ -33,6 +33,7 @@ export default function AddressDetails() {
     setCurrentStepIndex,
     pincodeErr,
     setPincodeErr,
+    setFieldTouched,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
@@ -203,6 +204,11 @@ export default function AddressDetails() {
         );
       }
 
+      setFieldError(`applicants[${activeIndex}].address_detail.current_pincode`, 'Invalid Pincode');
+      setFieldTouched(`applicants[${activeIndex}].address_detail.current_pincode`);
+
+      setPincodeErr((prev) => ({ ...prev, [`address_current_${activeIndex}`]: 'Invalid Pincode' }));
+
       return;
     }
 
@@ -217,6 +223,7 @@ export default function AddressDetails() {
     if (!res) {
       setFieldError(`applicants[${activeIndex}].address_detail.current_pincode`, 'Invalid Pincode');
       setPincodeErr((prev) => ({ ...prev, [`address_current_${activeIndex}`]: 'Invalid Pincode' }));
+      setFieldTouched(`applicants[${activeIndex}].address_detail.current_pincode`);
 
       setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, '');
       setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, '');
@@ -418,6 +425,19 @@ export default function AddressDetails() {
           },
         },
       );
+
+      setFieldError(
+        `applicants[${activeIndex}].address_detail.additional_pincode`,
+        'Invalid Pincode',
+      );
+
+      setFieldTouched(`applicants[${activeIndex}].address_detail.additional_pincode`);
+
+      setPincodeErr((prev) => ({
+        ...prev,
+        [`address_additional_${activeIndex}`]: 'Invalid Pincode',
+      }));
+
       return;
     }
 
@@ -443,6 +463,7 @@ export default function AddressDetails() {
       setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, '');
       setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: false }));
+      setFieldTouched(`applicants[${activeIndex}].address_detail.additional_pincode`);
 
       editAddressById(
         values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -605,6 +626,10 @@ export default function AddressDetails() {
     setRequiredFieldsStatus(updatedRequiredFieldsStatus);
 
     setOpenExistingPopup(false);
+
+    // handleCurrentPincodeChange();
+
+    // handleAdditionalPincodeChange();
   };
 
   return (
