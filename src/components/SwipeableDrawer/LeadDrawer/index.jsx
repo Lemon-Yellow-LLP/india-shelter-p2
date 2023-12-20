@@ -2,7 +2,7 @@ import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
 import Box from '@mui/material/Box';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import propTypes from 'prop-types';
 import BottomSheetHandle from '../../BottomSheetHandle';
 import SwipeableViews from 'react-swipeable-views';
@@ -10,20 +10,15 @@ import { useTheme } from '@mui/material/styles';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import DrawerFooter from './DrawerFooter';
-import DrawerSteps from './DrawerSteps';
 import { LeadContext } from '../../../context/LeadContextProvider';
-import { CommingSoon, DustbinIcon, IconClose, ToolTipIcon } from '../../../assets/icons';
-import { ClickAwayListener, IconButton, Tooltip } from '@mui/material';
-import DropDown from '../../DropDown';
-import ToggleSwitch from '../../ToggleSwitch';
-import { editFieldsById } from '../../../global';
+import PrimaryApplicantTab from './PrimaryApplicantTab';
+import CoApplicantTab from './CoApplicantTab';
+import ToolsTab from './ToolsTab';
 import DynamicDrawer from '../DynamicDrawer';
-import Button from '../../Button';
-import DrawerStepBanking from './DrawerStepBanking';
-import QualifierStep from './QualifierStep';
-import EligibilityStep from './EligibilityStep';
-import UploadSteps from './UplodSteps';
 import { AuthContext } from '../../../context/AuthContextProvider';
+import { editFieldsById } from '../../../global';
+import { IconClose } from '../../../assets/icons';
+import Button from '../../Button';
 
 const drawerBleeding = 0;
 
@@ -62,42 +57,27 @@ function a11yProps(index) {
 
 export default function SwipeableDrawerComponent() {
   const {
-    applicantStepsProgress,
-    addApplicant,
     drawerOpen,
     setDrawerOpen,
     values,
-    setActiveIndex,
-    coApplicantStepsProgress,
-    setValues,
     drawerTabIndex,
     setDrawerTabIndex,
     primaryIndex,
     setPrimaryIndex,
+    setValues,
+    setActiveIndex,
     activeCoApplicantIndex,
-    setActiveCoApplicantIndex,
-    coApplicants,
   } = useContext(LeadContext);
 
   const { token, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
 
   const theme = useTheme();
 
-  const [open, setOpen] = useState(false);
-
   const [toggle, setToggle] = useState(false);
 
   const [changePrimaryAlert, setChangePrimaryAlert] = useState(false);
 
   const [deleteAlert, setDeleteAlert] = useState(false);
-
-  const handleTooltipClose = () => {
-    setOpen(false);
-  };
-
-  const handleTooltipToggle = () => {
-    setOpen((prev) => !prev);
-  };
 
   const handleChange = (event, newValue) => {
     setDrawerTabIndex(newValue);
@@ -285,410 +265,21 @@ export default function SwipeableDrawerComponent() {
               index={drawerTabIndex}
               onChangeIndex={handleChangeIndex}
             >
-              <TabPanel
-                className='tabPanel'
-                style={{ maxHeight: `calc(100vh - 175px)`, overflow: 'auto' }}
-                value={drawerTabIndex}
-                index={0}
-                dir={theme.direction}
-              >
-                <div className='flex flex-col gap-[16px] w-[100%] pb-[80px] p-[15px]'>
-                  <DrawerSteps
-                    key={0}
-                    details={applicantStepsProgress[0]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={0}
-                  />
-                  <DrawerSteps
-                    key={1}
-                    details={applicantStepsProgress[1]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={1}
-                    lock={
-                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100
-                    }
-                  />
-                  <DrawerSteps
-                    key={2}
-                    details={applicantStepsProgress[2]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={2}
-                    lock={
-                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100
-                    }
-                  />
-                  <DrawerSteps
-                    key={3}
-                    details={applicantStepsProgress[3]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={3}
-                    lock={
-                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100
-                    }
-                  />
-                  <QualifierStep
-                    key={4}
-                    details={applicantStepsProgress[4]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={4}
-                    noProgress={true}
-                    lock={
-                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100 ||
-                      values?.applicants?.[primaryIndex]?.personal_details?.extra_params
-                        ?.progress !== 100 ||
-                      values?.applicants?.[primaryIndex]?.address_detail?.extra_params?.progress !==
-                        100 ||
-                      values?.applicants?.[primaryIndex]?.work_income_detail?.extra_params
-                        ?.progress !== 100
-                    }
-                  />
-                  <DrawerSteps
-                    key={5}
-                    details={applicantStepsProgress[5]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={5}
-                    noProgress={true}
-                    lock={
-                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100 ||
-                      !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.qualifier
-                    }
-                  />
-                  <DrawerSteps
-                    key={6}
-                    details={applicantStepsProgress[6]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={6}
-                    lock={
-                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100
-                    }
-                  />
-                  <DrawerStepBanking
-                    key={7}
-                    details={applicantStepsProgress[7]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={7}
-                    lock={
-                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100 ||
-                      !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.qualifier
-                    }
-                  />
-                  <DrawerSteps
-                    key={8}
-                    details={applicantStepsProgress[8]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={8}
-                    lock={
-                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100
-                    }
-                  />
-                  <UploadSteps
-                    key={9}
-                    details={applicantStepsProgress[9]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={9}
-                    lock={
-                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100
-                    }
-                  />
-                  <DrawerSteps
-                    key={10}
-                    details={applicantStepsProgress[10]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={10}
-                    noProgress={true}
-                    lock={
-                      values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100
-                    }
-                  />
-
-                  <EligibilityStep
-                    key={11}
-                    details={applicantStepsProgress[11]}
-                    steps={true}
-                    index={primaryIndex}
-                    stepIndex={11}
-                    noProgress={true}
-                    lock={
-                      values?.lead?.extra_params?.progress_without_eligibility !== 100 ||
-                      values?.applicants?.length < 2
-                    }
-                  />
-                </div>
-              </TabPanel>
-              <TabPanel
-                className='tabPanel'
-                style={{ height: `calc(100vh - 175px)`, overflow: 'auto' }}
-                value={drawerTabIndex}
-                index={1}
-                dir={theme.direction}
-              >
-                <div className='flex flex-col justify-between w-[100%] h-[100%] p-[15px]'>
-                  <div className='flex flex-col gap-[16px] w-[100%]'>
-                    <div className='flex flex-col justify-end gap-4 mt-[5px]'>
-                      <div className='flex flex-col gap-1'>
-                        <div className='flex justify-between'>
-                          <div className='flex gap-2 items-center'>
-                            <span className='font-medium text-[16px] leading-[24px]'>
-                              Co-applicants
-                            </span>
-                            <ClickAwayListener onClickAway={handleTooltipClose}>
-                              <div>
-                                <Tooltip
-                                  PopperProps={{
-                                    disablePortal: true,
-                                  }}
-                                  onClose={handleTooltipClose}
-                                  open={open}
-                                  title='You can add upto 4 Co-applicants'
-                                  placement='bottom-start'
-                                  arrow
-                                >
-                                  <IconButton onClick={handleTooltipToggle}>
-                                    <ToolTipIcon />
-                                  </IconButton>
-                                </Tooltip>
-                              </div>
-                            </ClickAwayListener>
-
-                            <span className='font-semibold text-[16px] leading-[24px] text-[#373435]'>
-                              {
-                                values.applicants.filter(
-                                  (e) =>
-                                    !e.applicant_details.is_primary &&
-                                    e.applicant_details.is_mobile_verified,
-                                ).length
-                              }
-                              <span className='text-[#96989A]'>/4</span>
-                            </span>
-                          </div>
-
-                          <button
-                            onClick={() => {
-                              // setActiveCoApplicantIndex(values?.applicants?.length);
-                              addApplicant();
-                            }}
-                            className={
-                              values.applicants.filter(
-                                (e) => e.applicant_details.is_mobile_verified,
-                              ).length >= 5 ||
-                              values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                                ?.progress !== 100
-                                ? 'text-[#96989A] font-medium text-[16px]'
-                                : 'text-primary-red font-medium text-[16px]'
-                            }
-                            disabled={
-                              values.applicants.filter(
-                                (e) => e.applicant_details.is_mobile_verified,
-                              ).length >= 5 ||
-                              values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                                ?.progress !== 100
-                            }
-                          >
-                            + Add
-                          </button>
-                        </div>
-                        {/* <span className='font-normal text-[12px] leading-[18px] text-[#727376]'>
-                          After the qualifier is complete, co-applicants can be made primary
-                        </span> */}
-                      </div>
-
-                      {values?.applicants &&
-                      values.applicants.length >= 2 &&
-                      !!values.applicants?.find((e) => e.applicant_details.is_mobile_verified) ? (
-                        <div className='flex flex-col gap-4'>
-                          <DropDown
-                            options={coApplicants}
-                            onChange={(e) => setActiveCoApplicantIndex(e)}
-                            value={coApplicants?.[activeCoApplicantIndex]?.value}
-                            defaultSelected={coApplicants?.[0]?.value}
-                            disabledError={true}
-                          />
-                          <div className='flex justify-between'>
-                            <div className='flex gap-1 items-center'>
-                              <span className='text-[12px] font-[400] text-[#727376]'>
-                                Make it primary
-                              </span>
-                              <ToggleSwitch
-                                name='make_it_primary'
-                                checked={toggle}
-                                onChange={(e) => setChangePrimaryAlert(true)}
-                              />
-                            </div>
-
-                            <div className='flex justify-end gap-2 items-center'>
-                              <span className='text-[#727376] text-[12px] font-normal'>
-                                Qualifier:
-                                {values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.bre_101_response?.body?.Display?.red_amber_green === 'Red' ? (
-                                  <span className='text-[#E33439] text-[12px] font-semibold ml-[5px]'>
-                                    Red
-                                  </span>
-                                ) : values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                    ?.bre_101_response?.body?.Display?.red_amber_green ===
-                                  'Amber' ? (
-                                  <span className='text-[#FF9D4A] text-[12px] font-semibold ml-[5px]'>
-                                    Amber
-                                  </span>
-                                ) : values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                    ?.bre_101_response?.body?.Display?.red_amber_green ===
-                                  'Green' ? (
-                                  <span className='text-[#147257] text-[12px] font-semibold ml-[5px]'>
-                                    Green
-                                  </span>
-                                ) : null}
-                              </span>
-                              <button onClick={() => setDeleteAlert(true)}>
-                                <DustbinIcon />
-                              </button>
-                            </div>
-                          </div>
-                          <div className='flex flex-col gap-[16px] w-[100%] pb-[80px]'>
-                            <DrawerSteps
-                              key={0}
-                              details={coApplicantStepsProgress[0]}
-                              steps={true}
-                              index={activeCoApplicantIndex}
-                              stepIndex={0}
-                            />
-                            <DrawerSteps
-                              key={1}
-                              details={coApplicantStepsProgress[1]}
-                              steps={true}
-                              index={activeCoApplicantIndex}
-                              stepIndex={1}
-                              lock={
-                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.progress !== 100
-                              }
-                            />
-                            <DrawerSteps
-                              key={2}
-                              details={coApplicantStepsProgress[2]}
-                              steps={true}
-                              index={activeCoApplicantIndex}
-                              stepIndex={2}
-                              lock={
-                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.progress !== 100
-                              }
-                            />
-                            <DrawerSteps
-                              key={3}
-                              details={coApplicantStepsProgress[3]}
-                              steps={true}
-                              index={activeCoApplicantIndex}
-                              stepIndex={3}
-                              lock={
-                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.progress !== 100
-                              }
-                            />
-                            <QualifierStep
-                              key={4}
-                              details={coApplicantStepsProgress[4]}
-                              steps={true}
-                              index={activeCoApplicantIndex}
-                              stepIndex={4}
-                              noProgress={true}
-                              lock={
-                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.progress !== 100 ||
-                                values?.applicants?.[activeCoApplicantIndex]?.personal_details
-                                  ?.extra_params?.progress !== 100 ||
-                                values?.applicants?.[activeCoApplicantIndex]?.address_detail
-                                  ?.extra_params?.progress !== 100 ||
-                                values?.applicants?.[activeCoApplicantIndex]?.work_income_detail
-                                  ?.extra_params?.progress !== 100
-                              }
-                            />
-                            <DrawerStepBanking
-                              key={5}
-                              details={coApplicantStepsProgress[5]}
-                              steps={true}
-                              index={activeCoApplicantIndex}
-                              stepIndex={5}
-                              lock={
-                                values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.progress !== 100 ||
-                                !values?.applicants?.[activeCoApplicantIndex]?.applicant_details
-                                  ?.extra_params?.qualifier
-                              }
-                            />
-                            <UploadSteps
-                              key={6}
-                              details={coApplicantStepsProgress[6]}
-                              steps={true}
-                              index={activeCoApplicantIndex}
-                              stepIndex={6}
-                              lock={
-                                values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                                  ?.progress !== 100
-                              }
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          disabled={
-                            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                              ?.progress !== 100
-                          }
-                          onClick={() => {
-                            // setActiveCoApplicantIndex(values?.applicants?.length);
-                            addApplicant();
-                          }}
-                          className={`w-[100%] h-[48px] border rounded-[4px] flex items-center justify-center text-[16px] font-normal
-                          ${
-                            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                              ?.progress !== 100
-                              ? 'text-[#96989A] border-[#96989A]'
-                              : 'text-white bg-[#E33439]'
-                          }`}
-                        >
-                          Add Co-applicant
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </TabPanel>
-              <TabPanel
-                className='tabPanel p-0'
-                style={{ height: `calc(80vh - 65px)`, overflow: 'auto' }}
-                value={drawerTabIndex}
-                index={2}
-                dir={theme.direction}
-              >
-                <img src={CommingSoon} alt='' className='w-full' />
-              </TabPanel>
+              {/* Tabs start ---------------*/}
+              <PrimaryApplicantTab />
+              <CoApplicantTab
+                toggle={toggle}
+                setChangePrimaryAlert={setChangePrimaryAlert}
+                setDeleteAlert={setDeleteAlert}
+              />
+              <ToolsTab />
+              {/* Tabs end ---------------*/}
             </SwipeableViews>
           </Box>
         </StyledBox>
       </SwipeableDrawer>
       <DrawerFooter />
+
       <DynamicDrawer open={changePrimaryAlert} setOpen={setChangePrimaryAlert} height='223px'>
         <div className='flex gap-1'>
           <div className=''>

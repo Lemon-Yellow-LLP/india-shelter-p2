@@ -258,6 +258,7 @@ async function pushToSalesforce(id, options) {
 }
 
 async function getLeadById(id, options) {
+  if (!id) return;
   const res = await axios.get(`${API_URL}/lead/${id}`, options);
   return res.data;
 }
@@ -336,6 +337,7 @@ async function verifyEmailOtp(id, otp, options) {
 }
 
 async function editFieldsById(id, page, values, options) {
+  if (!id) return;
   const { data } = await axios.patch(`${API_URL}/${page}/edit/${id}`, values, options);
   return data;
 }
@@ -356,6 +358,7 @@ async function verifyMobileOtp(id, otp, options) {
 }
 
 async function editAddressById(id, data, options) {
+  if (!id) return;
   const res = await axios.patch(`${API_URL}/address/edit/${id}`, data, options);
   return res;
 }
