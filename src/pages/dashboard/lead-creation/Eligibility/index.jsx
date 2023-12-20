@@ -33,11 +33,8 @@ const Eligibility = () => {
     primaryIndex,
     salesforceID,
     setSalesforceID,
-    setSfdcCount,
-    toastMessage,
-    setToastMessage,
   } = useContext(LeadContext);
-  const { token } = useContext(AuthContext);
+  const { token, toastMessage, setToastMessage, setSfdcCount } = useContext(AuthContext);
 
   const [progress, setProgress] = useState(0);
   const [finalApi, setFinalApi] = useState(0);

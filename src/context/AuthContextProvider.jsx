@@ -32,6 +32,13 @@ const AuthContextProvider = ({ children }) => {
   const [toastMessage, setToastMessage] = useState(null);
   const [errorToastMessage, setErrorToastMessage] = useState(null);
   const [isQaulifierActivated, setIsQaulifierActivated] = useState(null);
+  const [sfdcCount, setSfdcCount] = useState(0);
+
+  useEffect(() => {
+    if (sfdcCount > 1) {
+      setToastMessage(null);
+    }
+  }, [sfdcCount]);
 
   const formik = useFormik({
     initialValues: { ...defaultValues },
@@ -81,6 +88,8 @@ const AuthContextProvider = ({ children }) => {
         errorToastMessage,
         setErrorToastMessage,
         loAllDetails,
+        sfdcCount,
+        setSfdcCount,
       }}
     >
       {children}
