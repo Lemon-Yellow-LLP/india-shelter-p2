@@ -344,7 +344,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         address_proof_number: values?.applicants[activeIndex]?.personal_details?.id_number,
       };
 
-      setValues(newData);
+      setFieldValue(
+        `applicants[${activeIndex}].personal_details`,
+        newData.applicants[activeIndex].personal_details,
+      );
     }
 
     if (
@@ -361,7 +364,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
       newData.applicants[activeIndex].personal_details.extra_params.same_as_id_type = false;
 
-      setValues(newData);
+      setFieldValue(
+        `applicants[${activeIndex}].personal_details`,
+        newData.applicants[activeIndex].personal_details,
+      );
     }
   }, [
     values?.applicants?.[activeIndex]?.personal_details?.id_type,

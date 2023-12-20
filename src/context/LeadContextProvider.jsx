@@ -325,14 +325,15 @@ const LeadContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (!location.pathname.includes('dashboard')) {
-      let newApplicants = formik.values.applicants.filter(
+      let newApplicants = structuredClone(formik.values);
+
+      const updatedValues = newApplicants.applicants.filter(
         (e, index) => index === activeIndex || e.applicant_details.is_mobile_verified,
       );
-      console.log(activeIndex, newApplicants);
-      formik.setFieldValue('applicants', newApplicants);
-      updateCompleteFormProgress();
+
+      formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
     }
-  }, [activeIndex]);
+  }, [activeIndex, location.pathname]);
 
   useEffect(() => {
     let newData = [];
@@ -340,7 +341,10 @@ const LeadContextProvider = ({ children }) => {
     formik.values.applicants.map((e, index) => {
       if (!e.applicant_details.is_primary && e.applicant_details.is_mobile_verified) {
         newData.push({
-          label: e.applicant_details.first_name || e.applicant_details.mobile_number,
+          label:
+            e.applicant_details.first_name ||
+            e.applicant_details.mobile_number ||
+            'New Co-Applicant',
           value: index,
         });
       }
