@@ -292,13 +292,12 @@ const LeadContextProvider = ({ children }) => {
   };
 
   const addApplicant = () => {
-    formik.setValues((prev) => {
-      let newData = { ...prev };
-      newData.applicants.push(structuredClone(newCoApplicantValues));
-      return newData;
-    });
+    let newData = structuredClone(formik?.values?.applicants);
+    newData.push(structuredClone(newCoApplicantValues));
 
-    setActiveIndex(formik.values.applicants.length - 1);
+    formik.setFieldValue('applicants', newData);
+
+    setActiveIndex(newData.length - 1);
 
     navigate('/lead/applicant-details');
 
@@ -307,12 +306,11 @@ const LeadContextProvider = ({ children }) => {
     updateCompleteFormProgress();
   };
 
-  const removeCoApplicant = (activeIndex) => {
-    formik.setValues((prev) => {
-      let newData = { ...prev };
-      newData.applicants.splice(activeIndex, 1);
-      return newData;
-    });
+  const removeCoApplicant = (applicantIndex) => {
+    let newData = structuredClone(formik?.values?.applicants);
+    newData.splice(applicantIndex, 1);
+
+    formik.setFieldValue('applicants', newData);
 
     setActiveIndex(0);
 
