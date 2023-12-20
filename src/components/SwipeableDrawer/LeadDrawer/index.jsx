@@ -79,7 +79,7 @@ export default function SwipeableDrawerComponent() {
     coApplicants,
   } = useContext(LeadContext);
 
-  const { token } = useContext(AuthContext);
+  const { token, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
 
   const theme = useTheme();
 
@@ -191,6 +191,17 @@ export default function SwipeableDrawerComponent() {
         },
       },
     );
+
+    let newPhoneNumbers = {
+      lo: phoneNumberList.lo,
+      reference_1: newData?.reference_details?.reference_1_phone_number ?? '',
+      reference_2: newData?.reference_details?.reference_2_phone_number ?? '',
+    };
+    newData.applicants.map((applicant, idx) => {
+      newPhoneNumbers[`applicant_${idx}`] = applicant?.applicant_details?.mobile_number ?? '';
+    });
+
+    setPhoneNumberList(newPhoneNumbers);
 
     setDeleteAlert(false);
   };
