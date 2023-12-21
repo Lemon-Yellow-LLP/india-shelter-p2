@@ -111,7 +111,7 @@ const BankingDetails = () => {
         if (
           values?.applicants?.[activeIndex]?.banking_details?.find(
             (e) => e.account_aggregator_response,
-          )
+          )?.length
         ) {
           setFieldValue(
             `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
@@ -130,12 +130,11 @@ const BankingDetails = () => {
             },
           );
         } else if (
-          values?.applicants?.[activeIndex]?.banking_details?.find(
-            (e) =>
-              e.penny_drop_response?.result?.active &&
-              !e.penny_drop_response?.result?.active === 'no',
-          )
+          values?.applicants?.[activeIndex]?.banking_details?.filter(
+            (e) => e.penny_drop_response?.result && e.penny_drop_response?.result?.active !== 'no',
+          )?.length
         ) {
+          console.log('first');
           setFieldValue(
             `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
             100,
