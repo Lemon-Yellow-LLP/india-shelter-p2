@@ -3,6 +3,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from './x-date-pickers/DatePicker';
 import moment from 'moment';
+import { TextField } from '@mui/material';
 
 export default function DatePicker2({
   label,
@@ -12,7 +13,7 @@ export default function DatePicker2({
   disabled,
   value,
   onAccept,
-  inputRef,
+  onBlur,
 }) {
   return (
     <div className={`flex flex-col gap-1`}>
@@ -39,12 +40,14 @@ export default function DatePicker2({
             slotProps={{
               field: { clearable: true },
             }}
+            slots={{
+              textField: (params) => <TextField name={name} {...params} onBlur={onBlur} />,
+            }}
             onAccept={(e) => {
               let date = e?.format('YYYY-MM-DD');
               onAccept(date);
             }}
             value={moment(value, 'DD/MM/YYYY')}
-            inputRef={inputRef}
             name={name}
           />
         </LocalizationProvider>
