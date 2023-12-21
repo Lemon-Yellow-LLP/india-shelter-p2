@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect } from 'react';
 import { useState, useCallback } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
@@ -75,21 +75,26 @@ const ApplicantDetails = () => {
   const [date, setDate] = useState(null);
   const [dateError, setDateError] = useState(['', '', '', '', '']);
 
-  const datePickerInputRef = useRef();
+  const onDatePickerBlur = (e) => {
+    let date = moment(e.target.value, 'DD/MM/YYYY').format('YYYY-MM-DD');
+    checkDate(date);
+  };
 
   useEffect(() => {
-    if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
-      var dateParts = values?.applicants[activeIndex]?.applicant_details?.date_of_birth.split('-');
+    if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth?.length) {
+      var dateParts =
+        values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth.split('-');
       var day = parseInt(dateParts[2], 10);
       var month = parseInt(dateParts[1], 10);
       var year = parseInt(dateParts[0], 10);
       setDate(`${day}/${month}/${year}`);
     }
-  }, [values?.applicants[activeIndex]?.applicant_details.date_of_birth]);
+  }, [values?.applicants?.[activeIndex]?.applicant_details.date_of_birth]);
 
   useEffect(() => {
-    if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
-      var dateParts = values?.applicants[activeIndex]?.applicant_details?.date_of_birth.split('-');
+    if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth?.length) {
+      var dateParts =
+        values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth.split('-');
       var day = parseInt(dateParts[2], 10);
       var month = parseInt(dateParts[1], 10);
       var year = parseInt(dateParts[0], 10);
@@ -102,9 +107,10 @@ const ApplicantDetails = () => {
   const updateFieldsApplicant = async (name, value) => {
     let newData = {};
     newData[name] = value;
-    if (values?.applicants[activeIndex]?.applicant_details?.id) {
+
+    if (values?.applicants?.[activeIndex]?.applicant_details?.id) {
       const res = await editFieldsById(
-        values?.applicants[activeIndex]?.applicant_details?.id,
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
         'applicant',
         newData,
         {
@@ -122,10 +128,11 @@ const ApplicantDetails = () => {
       })
         .then((res) => {
           setFieldValue(`applicants[${activeIndex}].applicant_details.id`, res.id);
-          return res;
+          // return res;
         })
         .catch((err) => {
-          return err;
+          console.log(err);
+          // return err;
         });
     }
   };
@@ -292,9 +299,9 @@ const ApplicantDetails = () => {
       if (phoneNumber.length === 10) {
         setHasSentOTPOnce(false);
         updateFieldsApplicant('mobile_number', phoneNumber);
-        if (values?.applicants[activeIndex]?.applicant_details?.id) {
+        if (values?.applicants?.[activeIndex]?.applicant_details?.id) {
           await editFieldsById(
-            values?.applicants[activeIndex]?.applicant_details?.id,
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
             'applicant',
             {
               otp: null,
@@ -387,88 +394,45 @@ const ApplicantDetails = () => {
 
   const sendMobileOtp = async () => {
     if (values?.applicants?.[activeIndex]?.applicant_details?.date_of_birth) {
-      await updateFieldsApplicant().then(async () => {
-        // setDisablePhoneNumber((prev) => !prev);
+      // await updateFieldsApplicant().then(async () => {
+      // setDisablePhoneNumber((prev) => !prev);
 
-        getMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, {
-          headers: {
-            Authorization: token,
-          },
-        }).then(async (res) => {
-          setShowOTPInput(true);
-          setHasSentOTPOnce(true);
-          setToastMessage('OTP has been sent to your mail id');
+      await getMobileOtp(values.applicants[activeIndex]?.applicant_details?.id, {
+        headers: {
+          Authorization: token,
+        },
+      }).then(async (res) => {
+        setShowOTPInput(true);
+        setHasSentOTPOnce(true);
+        setToastMessage('OTP has been sent to your mail id');
 
-          await axios
-            .post(
-              `https://uatagile.indiashelter.in/api/applicant/existing-customer/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
-              {
-                headers: {
-                  Authorization: token,
-                },
+        await axios
+          .post(
+            `https://uatagile.indiashelter.in/api/applicant/existing-customer/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            {
+              headers: {
+                Authorization: token,
               },
-            )
-            .then(({ data }) => {
-              const body = data?.body;
+            },
+          )
+          .then(({ data }) => {
+            const body = data?.body;
+            if (
+              body &&
+              body?.length !== 0 &&
+              body?.[0]?.existing_customer_is_existing_customer?.toUpperCase() === 'TRUE'
+            ) {
+              const { existing_customer_is_existing_customer } = body[0];
               if (
-                body &&
-                body?.length !== 0 &&
-                body?.[0]?.existing_customer_is_existing_customer?.toUpperCase() === 'TRUE'
+                existing_customer_is_existing_customer &&
+                existing_customer_is_existing_customer?.toUpperCase() === 'FALSE'
               ) {
-                const { existing_customer_is_existing_customer } = body[0];
-                if (
-                  existing_customer_is_existing_customer &&
-                  existing_customer_is_existing_customer?.toUpperCase() === 'FALSE'
-                ) {
-                  editFieldsById(
-                    values?.applicants[activeIndex]?.applicant_details?.id,
-                    'applicant',
-                    {
-                      extra_params: {
-                        ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
-                        is_existing: false,
-                      },
-                    },
-                  );
-                  setFieldValue(
-                    `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
-                    false,
-                  );
-                  return;
-                }
-
-                const { existing_customer_loan_type, ...dataWithoutLoanType } = body[0];
-                setFieldValue(`applicants[${activeIndex}].applicant_details`, {
-                  ...values?.applicants[activeIndex]?.applicant_details,
-                  ...dataWithoutLoanType,
-                });
                 editFieldsById(
-                  values?.applicants[activeIndex]?.applicant_details?.id,
-                  'applicant',
-                  {
-                    ...dataWithoutLoanType,
-                    extra_params: {
-                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
-                      is_existing: true,
-                    },
-                  },
-                  {
-                    headers: {
-                      Authorization: token,
-                    },
-                  },
-                );
-                setFieldValue(
-                  `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
-                  true,
-                );
-              } else {
-                editFieldsById(
-                  values?.applicants[activeIndex]?.applicant_details?.id,
+                  values?.applicants?.[activeIndex]?.applicant_details?.id,
                   'applicant',
                   {
                     extra_params: {
-                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                      ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
                       is_existing: false,
                     },
                   },
@@ -477,23 +441,66 @@ const ApplicantDetails = () => {
                   `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
                   false,
                 );
+                return;
               }
-            })
-            .catch((err) => {
-              console.log('Existing customer api error', err);
-              editFieldsById(values?.applicants[activeIndex]?.applicant_details?.id, 'applicant', {
-                extra_params: {
-                  ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
-                  is_existing: false,
-                },
+
+              const { existing_customer_loan_type, ...dataWithoutLoanType } = body[0];
+              setFieldValue(`applicants[${activeIndex}].applicant_details`, {
+                ...values?.applicants?.[activeIndex]?.applicant_details,
+                ...dataWithoutLoanType,
               });
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.applicant_details?.id,
+                'applicant',
+                {
+                  ...dataWithoutLoanType,
+                  extra_params: {
+                    ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                    is_existing: true,
+                  },
+                },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
+              );
+              setFieldValue(
+                `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+                true,
+              );
+            } else {
+              editFieldsById(
+                values?.applicants?.[activeIndex]?.applicant_details?.id,
+                'applicant',
+                {
+                  extra_params: {
+                    ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                    is_existing: false,
+                  },
+                },
+              );
               setFieldValue(
                 `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
                 false,
               );
+            }
+          })
+          .catch((err) => {
+            console.log('Existing customer api error', err);
+            editFieldsById(values?.applicants?.[activeIndex]?.applicant_details?.id, 'applicant', {
+              extra_params: {
+                ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                is_existing: false,
+              },
             });
-        });
+            setFieldValue(
+              `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
+              false,
+            );
+          });
       });
+      // });
     } else {
       setDateError((prev) => {
         const newErrors = [...prev];
@@ -580,23 +587,13 @@ const ApplicantDetails = () => {
     }
   };
 
-  const onDatePickerBlur = (e) => {
-    let date = moment(e.target.value, 'DD/MM/YYYY').format('YYYY-MM-DD');
-    checkDate(date);
-  };
-
-  useEffect(() => {
-    datePickerInputRef.current.addEventListener('blur', onDatePickerBlur);
-    datePickerInputRef.current.name = `applicants[${activeIndex}].applicant_details.date_of_birth`;
-  }, [datePickerInputRef, datePickerInputRef.current]);
-
   // console.log('errors', errors?.applicants[activeIndex]);
   // console.log('touched', touched?.applicants && touched.applicants[activeIndex]?.applicant_details);
 
   return (
     <>
       <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
-        {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
+        {values?.applicants?.[activeIndex]?.applicant_details?.is_primary ? (
           <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
         ) : (
           <Topbar
@@ -606,7 +603,7 @@ const ApplicantDetails = () => {
             showBack={true}
             coApplicant={true}
             handleBack={handleBack}
-            coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
+            coApplicantName={values?.applicants?.[activeIndex]?.applicant_details?.first_name}
           />
         )}
         <div
@@ -690,7 +687,7 @@ const ApplicantDetails = () => {
               const name = e.currentTarget.name.split('.')[2];
               if (
                 !errors?.applicants[activeIndex]?.applicant_details?.[name] &&
-                values?.applicants[activeIndex]?.applicant_details?.[name]
+                values?.applicants?.[activeIndex]?.applicant_details?.[name]
               ) {
                 updateFieldsApplicant(
                   name,
@@ -876,7 +873,7 @@ const ApplicantDetails = () => {
             onAccept={(e) => {
               checkDate(e);
             }}
-            inputRef={datePickerInputRef}
+            onBlur={onDatePickerBlur}
           />
 
           <TextInputWithSendOtp
@@ -1074,11 +1071,11 @@ const ApplicantDetails = () => {
                   true,
                 );
                 editFieldsById(
-                  values?.applicants[activeIndex]?.applicant_details?.id,
+                  values?.applicants?.[activeIndex]?.applicant_details?.id,
                   'applicant',
                   {
                     extra_params: {
-                      ...values?.applicants[activeIndex]?.applicant_details?.extra_params,
+                      ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
                       is_existing_done: true,
                     },
                   },
