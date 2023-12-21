@@ -107,23 +107,69 @@ const BankingDetails = () => {
         null ||
       values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.banking_progress !== 100
     ) {
-      if (values?.applicants?.[activeIndex]?.banking_details?.length) {
-        setFieldValue(
-          `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
-          100,
-        );
-        let newData = { ...values?.applicants?.[activeIndex]?.applicant_details };
-        newData.extra_params.banking_progress = 100;
-        editFieldsById(
-          values?.applicants?.[activeIndex]?.applicant_details?.id,
-          'applicant',
-          newData,
-          {
-            headers: {
-              Authorization: token,
+      if (values?.applicants?.[activeIndex]?.banking_details?.length > 0) {
+        if (
+          values?.applicants?.[activeIndex]?.banking_details?.find(
+            (e) => e.account_aggregator_response,
+          )
+        ) {
+          setFieldValue(
+            `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
+            100,
+          );
+          let newData = { ...values?.applicants?.[activeIndex]?.applicant_details };
+          newData.extra_params.banking_progress = 100;
+          editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
+            'applicant',
+            newData,
+            {
+              headers: {
+                Authorization: token,
+              },
             },
-          },
-        );
+          );
+        } else if (
+          values?.applicants?.[activeIndex]?.banking_details?.find(
+            (e) =>
+              e.penny_drop_response?.result?.active &&
+              !e.penny_drop_response?.result?.active === 'no',
+          )
+        ) {
+          setFieldValue(
+            `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
+            100,
+          );
+          let newData = { ...values?.applicants?.[activeIndex]?.applicant_details };
+          newData.extra_params.banking_progress = 100;
+          editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
+            'applicant',
+            newData,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          );
+        } else {
+          setFieldValue(
+            `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
+            0,
+          );
+          let newData = { ...values?.applicants?.[activeIndex]?.applicant_details };
+          newData.extra_params.banking_progress = 0;
+          editFieldsById(
+            values?.applicants?.[activeIndex]?.applicant_details?.id,
+            'applicant',
+            newData,
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          );
+        }
       } else {
         setFieldValue(
           `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
