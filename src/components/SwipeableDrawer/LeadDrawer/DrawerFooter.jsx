@@ -32,7 +32,20 @@ export default function DrawerFooter() {
           location?.pathname !== '/lead/preview'
             ? 'CO-APPLICANT '
             : null}
-          STEP: {pages?.indexOf(location.pathname) + 1} / {pages?.length}
+
+          {location?.pathname !== '/lead/preview' ? (
+            <span
+              style={{ fontSize: '10px', fontWeight: '500', lineHeight: '15px', color: '#E33439' }}
+            >
+              STEP: {pages?.indexOf(location.pathname) + 1} / {pages?.length}
+            </span>
+          ) : (
+            <span
+              style={{ fontSize: '10px', fontWeight: '500', lineHeight: '15px', color: '#E33439' }}
+            >
+              STEP: 11 / {primaryPagesRoute?.length}
+            </span>
+          )}
         </span>
         <span style={{ fontSize: '12px', fontWeight: '500', lineHeight: '18px' }}>
           {applicantStepsProgress.map((e) => {
