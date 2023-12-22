@@ -29,7 +29,6 @@ const PropertyDetails = () => {
     errors,
     touched,
     setFieldValue,
-    setValues,
     updateProgressApplicantSteps,
     activeIndex,
     setCurrentStepIndex,
@@ -104,27 +103,26 @@ const PropertyDetails = () => {
               },
             },
           );
-          setValues({
-            ...values,
-            property_details: {
-              ...values.property_details,
-              property_identification_is: e.value,
-              property_value_estimate: '',
-              current_owner_name: '',
-              plot_house_flat: '',
-              project_society_colony: '',
-              pincode: null,
-              city: '',
-              state: '',
-              extra_params: {
-                ...values?.property_details?.extra_params,
-                progress: 100,
-                required_fields_status: {
-                  property_identification_is: true,
-                },
+
+          setFieldValue('property_details', {
+            ...values.property_details,
+            property_identification_is: e.value,
+            property_value_estimate: '',
+            current_owner_name: '',
+            plot_house_flat: '',
+            project_society_colony: '',
+            pincode: null,
+            city: '',
+            state: '',
+            extra_params: {
+              ...values?.property_details?.extra_params,
+              progress: 100,
+              required_fields_status: {
+                property_identification_is: true,
               },
             },
           });
+
           setRequiredFieldsStatus({
             property_identification_is: true,
           });

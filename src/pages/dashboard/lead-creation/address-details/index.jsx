@@ -29,7 +29,6 @@ export default function AddressDetails() {
     setFieldValue,
     updateProgressApplicantSteps,
     activeIndex,
-    setValues,
     setCurrentStepIndex,
     pincodeErr,
     setPincodeErr,
@@ -328,7 +327,10 @@ export default function AddressDetails() {
         },
       };
 
-      setValues(newData);
+      setFieldValue(
+        `applicants[${activeIndex}].address_detail`,
+        newData.applicants[activeIndex].address_detail,
+      );
 
       setRequiredFieldsStatus((prev) => ({
         ...prev,
@@ -358,7 +360,10 @@ export default function AddressDetails() {
         },
       };
 
-      setValues(newData);
+      setFieldValue(
+        `applicants[${activeIndex}].address_detail`,
+        newData.applicants[activeIndex].address_detail,
+      );
 
       setRequiredFieldsStatus((prev) => ({
         ...prev,

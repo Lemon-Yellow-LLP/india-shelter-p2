@@ -20,7 +20,6 @@ const PersonalDetails = () => {
     touched,
     setFieldValue,
     activeIndex,
-    setValues,
     setCurrentStepIndex,
   } = useContext(LeadContext);
 

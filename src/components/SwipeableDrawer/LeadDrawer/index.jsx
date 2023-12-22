@@ -64,9 +64,10 @@ export default function SwipeableDrawerComponent() {
     setDrawerTabIndex,
     primaryIndex,
     setPrimaryIndex,
-    setValues,
+    setFieldValue,
     setActiveIndex,
     activeCoApplicantIndex,
+    updateCompleteFormProgress,
   } = useContext(LeadContext);
 
   const { token, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
@@ -108,7 +109,7 @@ export default function SwipeableDrawerComponent() {
       applicant_type: 'Co Applicant',
     };
 
-    setValues(newData);
+    setFieldValue('applicants', newData.applicants);
 
     setToggle(false);
 
@@ -141,6 +142,8 @@ export default function SwipeableDrawerComponent() {
     );
 
     setChangePrimaryAlert(false);
+
+    updateCompleteFormProgress();
   };
 
   const handleDelete = async () => {
@@ -157,7 +160,7 @@ export default function SwipeableDrawerComponent() {
       }
     });
 
-    setValues(newData);
+    setFieldValue('applicants', newData.applicants);
 
     await editFieldsById(
       ogData?.applicants[activeCoApplicantIndex]?.applicant_details?.id,
@@ -184,6 +187,8 @@ export default function SwipeableDrawerComponent() {
     setPhoneNumberList(newPhoneNumbers);
 
     setDeleteAlert(false);
+
+    updateCompleteFormProgress();
   };
 
   return (
