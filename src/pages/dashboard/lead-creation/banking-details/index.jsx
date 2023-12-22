@@ -137,7 +137,6 @@ const BankingDetails = () => {
             (e) => e.penny_drop_response?.result && e.penny_drop_response?.result?.active !== 'no',
           )?.length
         ) {
-          console.log('first');
           setFieldValue(
             `applicants[${activeIndex}].applicant_details.extra_params.banking_progress`,
             100,
