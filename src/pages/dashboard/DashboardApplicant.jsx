@@ -154,8 +154,11 @@ export default function DashboardApplicant() {
               value: b?.account_number,
             },
             {
-              label: 'Penny drop',
-              value: b?.penny_drop_response?.result?.active === 'yes' ? 'Success' : 'Failed',
+              label: b?.account_aggregator_response ? 'Account Aggregator' : 'Penny drop',
+              value:
+                b?.penny_drop_response?.result?.active === 'yes' || b?.account_aggregator_response
+                  ? 'Success'
+                  : 'Failed',
             },
             {
               label: 'IFSC Code',
