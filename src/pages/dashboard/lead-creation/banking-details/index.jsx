@@ -109,7 +109,7 @@ const BankingDetails = () => {
     ) {
       if (values?.applicants?.[activeIndex]?.banking_details?.length > 0) {
         if (
-          values?.applicants?.[activeIndex]?.banking_details?.find(
+          values?.applicants?.[activeIndex]?.banking_details?.filter(
             (e) => e.account_aggregator_response,
           )?.length
         ) {
