@@ -507,9 +507,9 @@ const WorkIncomeDetails = () => {
     // updateFields();
   };
 
-  const handleAutofill = () => {
-    console.log('autofill work-income');
-  };
+  // const handleAutofill = () => {
+  //   console.log('autofill work-income');
+  // };
 
   useEffect(() => {
     if (

@@ -499,7 +499,7 @@ const LnTCharges = () => {
           back={() => {
             setPaymentStatus('');
           }}
-          next={() => console.log('Goto next page')}
+          // next={() => console.log('Goto next page')}
           skip={showConfirmSkip}
         />
       ) : null}

@@ -948,7 +948,7 @@ const ApplicantDetails = () => {
               label='Enter OTP'
               required
               verified={values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified}
-              setOTPVerified={() => console.log('hii')}
+              // setOTPVerified={() => console.log('hii')}
               verifiedOnce={verifiedOnce}
               setVerifiedOnce={setVerifiedOnce}
               onSendOTPClick={sendMobileOtp}

@@ -879,7 +879,7 @@ export default function BankingManual() {
               setSearchedBranch({});
               setSearchedBank(value.value);
             }}
-            onTextChange={(e) => console.log(e)}
+            // onTextChange={(e) => console.log(e)}
             type='search'
             options={bankNameData}
           />
