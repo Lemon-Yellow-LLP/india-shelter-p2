@@ -11,7 +11,6 @@ import Retired from './Retired';
 import CurrencyInput from '../../../../components/CurrencyInput';
 import { addApi, checkIsValidStatePincode, editFieldsById } from '../../../../global';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
-import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import Popup from '../../../../components/Popup';
@@ -21,7 +20,6 @@ const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified
 
 const WorkIncomeDetails = () => {
   const {
-    setValues,
     values,
     errors,
     touched,
@@ -33,7 +31,6 @@ const WorkIncomeDetails = () => {
     updateProgressApplicantSteps,
     pincodeErr,
     setPincodeErr,
-    handleChange,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
@@ -42,9 +39,9 @@ const WorkIncomeDetails = () => {
     ...values?.applicants?.[activeIndex]?.work_income_detail?.extra_params?.required_fields_status,
   });
 
-  const [openExistingPopup, setOpenExistingPopup] = useState(
-    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing || false,
-  );
+  // const [openExistingPopup, setOpenExistingPopup] = useState(
+  //   values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing || false,
+  // );
 
   const [openQualifierNotActivePopup, setOpenQualifierNotActivePopup] = useState(false);
 
@@ -264,7 +261,10 @@ const WorkIncomeDetails = () => {
           },
         };
 
-        setValues(newData);
+        setFieldValue(
+          `applicants[${activeIndex}].work_income_detail`,
+          newData.applicants[activeIndex].work_income_detail,
+        );
 
         if (values?.applicants?.[activeIndex]?.work_income_detail?.id) {
           editFieldsById(

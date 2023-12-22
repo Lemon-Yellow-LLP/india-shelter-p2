@@ -21,13 +21,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     updateProgressApplicantSteps,
     touched,
     handleBlur,
-    handleSubmit,
     setFieldValue,
     setToastMessage,
     activeIndex,
-    setActiveIndex,
     setFieldError,
-    setValues,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);

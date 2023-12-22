@@ -115,8 +115,6 @@ export default function AccountAggregator() {
       });
   };
 
-  console.log(mobileNoError);
-
   return (
     <>
       <div className='flex flex-col h-[100dvh]'>

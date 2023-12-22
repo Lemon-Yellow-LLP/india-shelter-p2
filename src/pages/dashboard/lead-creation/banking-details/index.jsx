@@ -33,7 +33,6 @@ const BankingDetails = () => {
     values,
     setFieldValue,
     activeIndex,
-    setValues,
     bankSuccessTost,
     setBankSuccessTost,
     bankErrorTost,
@@ -74,7 +73,11 @@ const BankingDetails = () => {
         account.is_primary = false;
       }
     });
-    setValues(newData);
+
+    setFieldValue(
+      `applicants[${activeIndex}].banking_details`,
+      newData.applicants[activeIndex].banking_details,
+    );
 
     editFieldsById(
       id,
