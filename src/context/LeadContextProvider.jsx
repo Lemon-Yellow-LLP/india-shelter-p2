@@ -301,6 +301,8 @@ const LeadContextProvider = ({ children }) => {
 
     setActiveIndex(newData.length - 1);
 
+    setActiveCoApplicantIndex(newData.length - 1);
+
     navigate('/lead/applicant-details');
 
     setDrawerOpen(false);
@@ -319,6 +321,40 @@ const LeadContextProvider = ({ children }) => {
     setDrawerOpen(false);
   };
 
+  const coApplicantDrawerUpdate = (applicants) => {
+    let newData = [];
+
+    let newPrimaryIndex = primaryIndex;
+
+    applicants?.map((e, index) => {
+      if (!e.applicant_details.is_primary) {
+        newData.push({
+          label:
+            e.applicant_details.first_name ||
+            e.applicant_details.mobile_number ||
+            'New Co-Applicant',
+          value: index,
+        });
+      } else if (e.applicant_details.is_primary) {
+        newData.push({
+          label: 'Primary',
+          value: index,
+        });
+        newPrimaryIndex = index;
+        setPrimaryIndex(index);
+      }
+    });
+    setCoApplicants(newData);
+
+    if (
+      activeCoApplicantIndex === newPrimaryIndex ||
+      activeCoApplicantIndex !== applicants?.length - 1
+    ) {
+      const newIndex = newData?.findIndex((obj) => obj.label !== 'Primary');
+      setActiveCoApplicantIndex(newIndex);
+    }
+  };
+
   useEffect(() => {
     if (!location.pathname.includes('dashboard')) {
       let newApplicants = structuredClone(formik.values);
@@ -332,30 +368,10 @@ const LeadContextProvider = ({ children }) => {
   }, [activeIndex, location.pathname]);
 
   useEffect(() => {
-    let newData = [];
-
-    formik.values.applicants.map((e, index) => {
-      if (!e.applicant_details.is_primary && e.applicant_details.is_mobile_verified) {
-        newData.push({
-          label:
-            e.applicant_details.first_name ||
-            e.applicant_details.mobile_number ||
-            'New Co-Applicant',
-          value: index,
-        });
-      }
-    });
-
-    setCoApplicants(newData);
-
-    setActiveCoApplicantIndex(newData?.[0]?.value);
-
-    formik.values.applicants.map((e, index) => {
-      if (e.applicant_details.is_primary) {
-        setPrimaryIndex(index);
-      }
-    });
-  }, [formik.values.applicants]);
+    if (formik?.values?.applicants?.length !== coApplicants?.length) {
+      coApplicantDrawerUpdate(formik?.values?.applicants);
+    }
+  }, [formik?.values?.applicants]);
 
   useEffect(() => {
     console.log('Lead Context Values', formik.values);
@@ -402,6 +418,7 @@ const LeadContextProvider = ({ children }) => {
         setPropertyValueEstimateError,
         salesforceID,
         setSalesforceID,
+        coApplicantDrawerUpdate,
       }}
     >
       {children}
