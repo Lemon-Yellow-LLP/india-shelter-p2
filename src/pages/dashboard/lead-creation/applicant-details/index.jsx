@@ -50,6 +50,7 @@ const ApplicantDetails = () => {
     activeIndex,
     setCurrentStepIndex,
     removeCoApplicant,
+    coApplicantDrawerUpdate,
   } = useContext(LeadContext);
 
   const { setOtpFailCount, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
@@ -684,6 +685,7 @@ const ApplicantDetails = () => {
             }
             onBlur={async (e) => {
               handleBlur(e);
+              coApplicantDrawerUpdate(values?.applicants);
               const name = e.currentTarget.name.split('.')[2];
               if (
                 !errors?.applicants[activeIndex]?.applicant_details?.[name] &&
@@ -909,8 +911,8 @@ const ApplicantDetails = () => {
             }
             onBlur={(e) => {
               handleBlur(e);
+              coApplicantDrawerUpdate(values?.applicants);
               const name = e.target.name.split('.')[1];
-
               if (
                 !errors?.applicants?.[activeIndex]?.applicant_details?.[name] &&
                 values?.applicants?.[activeIndex]?.applicant_details?.[name]

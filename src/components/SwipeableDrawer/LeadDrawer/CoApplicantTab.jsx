@@ -6,11 +6,11 @@ import DrawerSteps from './DrawerSteps';
 import { LeadContext } from '../../../context/LeadContextProvider';
 import { DustbinIcon, ToolTipIcon } from '../../../assets/icons';
 import { ClickAwayListener, IconButton, Tooltip } from '@mui/material';
-import DropDown from '../../DropDown';
 import ToggleSwitch from '../../ToggleSwitch';
 import DrawerStepBanking from './DrawerStepBanking';
 import QualifierStep from './QualifierStep';
 import UploadSteps from './UplodSteps';
+import CoApplicantDropDownDrawer from '../../DropDown/CoApplicantDropDownDrawer';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -93,12 +93,7 @@ export default function CoApplicantTab({ toggle, setChangePrimaryAlert, setDelet
                   </ClickAwayListener>
 
                   <span className='font-semibold text-[16px] leading-[24px] text-[#373435]'>
-                    {
-                      values.applicants.filter(
-                        (e) =>
-                          !e.applicant_details.is_primary && e.applicant_details.is_mobile_verified,
-                      ).length
-                    }
+                    {values.applicants.filter((e) => !e.applicant_details.is_primary).length}
                     <span className='text-[#96989A]'>/4</span>
                   </span>
                 </div>
@@ -135,11 +130,13 @@ export default function CoApplicantTab({ toggle, setChangePrimaryAlert, setDelet
             values.applicants.length >= 2 &&
             !!values.applicants?.find((e) => e.applicant_details.is_mobile_verified) ? (
               <div className='flex flex-col gap-4'>
-                <DropDown
+                <CoApplicantDropDownDrawer
                   options={coApplicants}
-                  onChange={(e) => setActiveCoApplicantIndex(e)}
+                  onChange={(e) => {
+                    setActiveCoApplicantIndex(e);
+                  }}
                   value={coApplicants?.[activeCoApplicantIndex]?.value}
-                  defaultSelected={coApplicants?.[0]?.value}
+                  defaultSelected={coApplicants?.[activeCoApplicantIndex]?.value}
                   disabledError={true}
                 />
                 <div className='flex justify-between'>

@@ -68,6 +68,7 @@ export default function SwipeableDrawerComponent() {
     setActiveIndex,
     activeCoApplicantIndex,
     updateCompleteFormProgress,
+    coApplicantDrawerUpdate,
   } = useContext(LeadContext);
 
   const { token, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
@@ -144,6 +145,8 @@ export default function SwipeableDrawerComponent() {
     setChangePrimaryAlert(false);
 
     updateCompleteFormProgress();
+
+    coApplicantDrawerUpdate(newData.applicants);
   };
 
   const handleDelete = async () => {
