@@ -297,6 +297,8 @@ const LeadContextProvider = ({ children }) => {
 
     formik.setFieldValue('applicants', newData, updateCompleteFormProgress());
 
+    formik.setFieldTouched(`applicants[${newData.length - 1}]`, null);
+
     setActiveIndex(newData.length - 1);
 
     navigate('/lead/applicant-details');
