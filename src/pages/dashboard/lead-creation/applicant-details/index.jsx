@@ -508,7 +508,7 @@ const ApplicantDetails = () => {
         return newErrors;
       });
       setFieldTouched(`applicants[${activeIndex}].applicant_details.date_of_birth`);
-      datePickerInputRef.current.focus();
+      // datePickerInputRef.current.focus();
     }
   };
 
