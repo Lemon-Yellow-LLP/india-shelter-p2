@@ -520,20 +520,25 @@ const ApplicantDetails = () => {
       },
     })
       .then(async (res) => {
-        await updateFieldsLead().then((res) => {
-          setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
-          updateFieldsApplicant('lead_id', res.id);
-          setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
-          updateFieldsApplicant('is_mobile_verified', true);
-          setShowOTPInput(false);
-          if (
-            requiredFieldsStatus['mobile_number'] !== undefined &&
-            !requiredFieldsStatus['mobile_number']
-          ) {
-            setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
-          }
-          return true;
-        });
+        if (values?.lead?.id) {
+          setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, values?.lead?.id);
+          updateFieldsApplicant('lead_id', values?.lead?.id);
+        } else {
+          await updateFieldsLead().then((res) => {
+            setFieldValue(`applicants[${activeIndex}].applicant_details.lead_id`, res.id);
+            updateFieldsApplicant('lead_id', res.id);
+          });
+        }
+        setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, true);
+        updateFieldsApplicant('is_mobile_verified', true);
+        setShowOTPInput(false);
+        if (
+          requiredFieldsStatus['mobile_number'] !== undefined &&
+          !requiredFieldsStatus['mobile_number']
+        ) {
+          setRequiredFieldsStatus((prev) => ({ ...prev, ['mobile_number']: true }));
+        }
+        return true;
       })
       .catch((err) => {
         setFieldValue(`applicants[${activeIndex}].applicant_details.is_mobile_verified`, false);
