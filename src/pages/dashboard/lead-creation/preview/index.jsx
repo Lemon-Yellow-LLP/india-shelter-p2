@@ -174,9 +174,9 @@ export default function Preview() {
       setOpenQualifierNotActivePopup(
         !values?.applicants?.[primaryIndexPreview]?.applicant_details?.extra_params?.qualifier,
       );
-    } else if (activeStep != 0 && coApplicantIndexes[coApplicantIndex] != null) {
+    } else if (activeStep != 0 && coApplicantIndexes[activeStep - 1] != null) {
       setOpenQualifierNotActivePopup(
-        !values?.applicants?.[coApplicantIndexes[coApplicantIndex]]?.applicant_details?.extra_params
+        !values?.applicants?.[coApplicantIndexes[activeStep - 1]]?.applicant_details?.extra_params
           ?.qualifier,
       );
     }
