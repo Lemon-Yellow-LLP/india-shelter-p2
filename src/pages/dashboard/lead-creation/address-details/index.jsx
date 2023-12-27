@@ -157,11 +157,8 @@ export default function AddressDetails() {
     [setFieldValue, values],
   );
 
-  const handleCurrentPincodeChange = useCallback(async () => {
-    if (
-      !values?.applicants?.[activeIndex]?.address_detail?.current_pincode ||
-      values?.applicants?.[activeIndex]?.address_detail?.current_pincode.toString().length < 5
-    ) {
+  const handleCurrentPincodeChange = async (value) => {
+    if (!value || value.toString().length < 5) {
       setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, '');
       setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, '');
       setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: false }));
@@ -206,14 +203,11 @@ export default function AddressDetails() {
       return;
     }
 
-    const res = await checkIsValidStatePincode(
-      values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
-      {
-        headers: {
-          Authorization: token,
-        },
+    const res = await checkIsValidStatePincode(value, {
+      headers: {
+        Authorization: token,
       },
-    );
+    });
     if (!res) {
       setFieldError(`applicants[${activeIndex}].address_detail.current_pincode`, 'Invalid Pincode');
       setFieldTouched(`applicants[${activeIndex}].address_detail.current_pincode`);
@@ -252,7 +246,7 @@ export default function AddressDetails() {
     editAddressById(
       values?.applicants?.[activeIndex]?.address_detail?.id,
       {
-        current_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+        current_pincode: value,
         current_city: res.city,
         current_state: res.state,
       },
@@ -274,7 +268,7 @@ export default function AddressDetails() {
       editAddressById(
         values?.applicants?.[activeIndex]?.address_detail?.id,
         {
-          additional_pincode: values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+          additional_pincode: value,
           additional_city: res.city,
           additional_state: res.state,
         },
@@ -285,10 +279,7 @@ export default function AddressDetails() {
         },
       );
 
-      setFieldValue(
-        `applicants[${activeIndex}].address_detail.additional_pincode`,
-        values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
-      );
+      setFieldValue(`applicants[${activeIndex}].address_detail.additional_pincode`, value);
       setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, res.city);
       setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, res.state);
 
@@ -298,12 +289,89 @@ export default function AddressDetails() {
     if (!requiredFieldsStatus['current_pincode']) {
       setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: true }));
     }
-  }, [
-    errors?.applicants?.[activeIndex]?.address_detail?.current_pincode,
-    values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
-    setFieldError,
-    setFieldValue,
-  ]);
+  };
+
+  const handleAdditionalPincodeChange = async (value) => {
+    if (!value || value.toString().length < 5) {
+      setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, '');
+      setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: false }));
+
+      editAddressById(
+        values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          additional_pincode: '',
+          additional_city: '',
+          additional_state: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      return;
+    }
+    const res = await checkIsValidStatePincode(value, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    if (!res) {
+      setFieldError(
+        `applicants[${activeIndex}].address_detail.additional_pincode`,
+        'Invalid Pincode',
+      );
+
+      setFieldTouched(`applicants[${activeIndex}].address_detail.additional_pincode`);
+      setPincodeErr((prev) => ({
+        ...prev,
+        [`address_additional_${activeIndex}`]: 'Invalid Pincode',
+      }));
+
+      setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, '');
+      setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, '');
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: false }));
+
+      editAddressById(
+        values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          additional_pincode: '',
+          additional_city: '',
+          additional_state: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      return;
+    }
+
+    editAddressById(
+      values?.applicants?.[activeIndex]?.address_detail?.id,
+      {
+        additional_pincode: value,
+        additional_city: res.city,
+        additional_state: res.state,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+
+    setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, res.city);
+    setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, res.state);
+    setPincodeErr((prev) => ({ ...prev, [`address_additional_${activeIndex}`]: '' }));
+
+    if (!requiredFieldsStatus['additional_pincode']) {
+      setRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: true }));
+    }
+  };
 
   const handleAdditionalSameAsCurrentAddress = (isChecked, current_type_of_residence) => {
     if (isChecked) {
@@ -343,6 +411,8 @@ export default function AddressDetails() {
         additional_pincode: true,
         additional_no_of_year_residing: true,
       }));
+
+      setFieldTouched(`applicants[${activeIndex}].address_detail.additional_pincode`, false);
     } else {
       let newData = structuredClone(values);
 
@@ -403,99 +473,6 @@ export default function AddressDetails() {
     }
   };
 
-  const handleAdditionalPincodeChange = useCallback(async () => {
-    if (
-      !values?.applicants?.[activeIndex]?.address_detail?.additional_pincode ||
-      values?.applicants?.[activeIndex]?.address_detail?.additional_pincode.toString().length < 5
-    ) {
-      setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, '');
-      setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, '');
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: false }));
-
-      editAddressById(
-        values?.applicants?.[activeIndex]?.address_detail?.id,
-        {
-          additional_pincode: '',
-          additional_city: '',
-          additional_state: '',
-        },
-        {
-          headers: {
-            Authorization: token,
-          },
-        },
-      );
-      return;
-    }
-    const res = await checkIsValidStatePincode(
-      values?.applicants?.[activeIndex]?.address_detail?.additional_pincode,
-      {
-        headers: {
-          Authorization: token,
-        },
-      },
-    );
-
-    if (!res) {
-      setFieldError(
-        `applicants[${activeIndex}].address_detail.additional_pincode`,
-        'Invalid Pincode',
-      );
-
-      setFieldTouched(`applicants[${activeIndex}].address_detail.additional_pincode`);
-      setPincodeErr((prev) => ({
-        ...prev,
-        [`address_additional_${activeIndex}`]: 'Invalid Pincode',
-      }));
-
-      setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, '');
-      setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, '');
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: false }));
-
-      editAddressById(
-        values?.applicants?.[activeIndex]?.address_detail?.id,
-        {
-          additional_pincode: '',
-          additional_city: '',
-          additional_state: '',
-        },
-        {
-          headers: {
-            Authorization: token,
-          },
-        },
-      );
-      return;
-    }
-
-    editAddressById(
-      values?.applicants?.[activeIndex]?.address_detail?.id,
-      {
-        additional_pincode: values?.applicants?.[activeIndex]?.address_detail?.additional_pincode,
-        additional_city: res.city,
-        additional_state: res.state,
-      },
-      {
-        headers: {
-          Authorization: token,
-        },
-      },
-    );
-
-    setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, res.city);
-    setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, res.state);
-    setPincodeErr((prev) => ({ ...prev, [`address_additional_${activeIndex}`]: '' }));
-
-    if (!requiredFieldsStatus['additional_pincode']) {
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: true }));
-    }
-  }, [
-    errors?.applicants?.[activeIndex]?.address_detail?.additional_pincode,
-    values?.applicants?.[activeIndex]?.address_detail?.additional_pincode,
-    setFieldError,
-    setFieldValue,
-  ]);
-
   const handleNextClick = () => {
     setCurrentStepIndex(3);
     // updateFields();
@@ -516,8 +493,6 @@ export default function AddressDetails() {
     values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
     values?.applicants?.[activeIndex]?.address_detail?.extra_params?.is_existing_done,
   ]);
-
-  // console.log(openExistingPopup);
 
   const handleAutofill = async () => {
     const fillData = { ...values.applicants?.[activeIndex]?.applicant_details };
@@ -614,9 +589,9 @@ export default function AddressDetails() {
 
     setOpenExistingPopup(false);
 
-    handleCurrentPincodeChange();
+    handleCurrentPincodeChange(existing_customer_current_pincode);
 
-    handleAdditionalPincodeChange();
+    handleAdditionalPincodeChange(existing_customer_additional_pincode);
   };
 
   return (
@@ -1123,7 +1098,9 @@ export default function AddressDetails() {
                 }
                 onBlur={(e) => {
                   handleBlur(e);
-                  handleCurrentPincodeChange();
+                  handleCurrentPincodeChange(
+                    values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+                  );
 
                   if (
                     errors?.applicants?.[activeIndex]?.address_detail?.current_landmark ||
@@ -1671,7 +1648,9 @@ export default function AddressDetails() {
                 }
                 onBlur={(e) => {
                   handleBlur(e);
-                  handleAdditionalPincodeChange();
+                  handleAdditionalPincodeChange(
+                    values?.applicants?.[activeIndex]?.address_detail?.additional_pincode,
+                  );
 
                   if (
                     errors?.applicants?.[activeIndex]?.address_detail?.additional_landmark ||
