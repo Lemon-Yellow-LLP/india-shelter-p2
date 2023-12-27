@@ -171,6 +171,7 @@ async function checkDedupe(id, options) {
       },
     },
   );
+  console.log('dedupe response', res);
   return res;
 }
 

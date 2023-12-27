@@ -339,7 +339,8 @@ const Qualifier = () => {
           setDedupe((prev) => ({ ...prev, loader: false, res: 'Valid' }));
         }
       } catch (err) {
-        console.log('error occured');
+        setDedupe((prev) => ({ ...prev, loader: false, res: 'Error' }));
+        console.log('error occured in dedupe');
       }
 
       let callCibilOrCrif = '';
