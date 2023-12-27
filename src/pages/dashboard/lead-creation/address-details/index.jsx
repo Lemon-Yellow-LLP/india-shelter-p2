@@ -32,6 +32,7 @@ export default function AddressDetails() {
     setCurrentStepIndex,
     pincodeErr,
     setPincodeErr,
+    setFieldTouched,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
@@ -215,6 +216,7 @@ export default function AddressDetails() {
     );
     if (!res) {
       setFieldError(`applicants[${activeIndex}].address_detail.current_pincode`, 'Invalid Pincode');
+      setFieldTouched(`applicants[${activeIndex}].address_detail.current_pincode`);
       setPincodeErr((prev) => ({ ...prev, [`address_current_${activeIndex}`]: 'Invalid Pincode' }));
 
       setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, '');
@@ -425,7 +427,6 @@ export default function AddressDetails() {
       );
       return;
     }
-
     const res = await checkIsValidStatePincode(
       values?.applicants?.[activeIndex]?.address_detail?.additional_pincode,
       {
@@ -434,12 +435,14 @@ export default function AddressDetails() {
         },
       },
     );
+
     if (!res) {
       setFieldError(
         `applicants[${activeIndex}].address_detail.additional_pincode`,
         'Invalid Pincode',
       );
 
+      setFieldTouched(`applicants[${activeIndex}].address_detail.additional_pincode`);
       setPincodeErr((prev) => ({
         ...prev,
         [`address_additional_${activeIndex}`]: 'Invalid Pincode',
@@ -545,8 +548,8 @@ export default function AddressDetails() {
       current_town: existing_customer_current_town,
       current_landmark: existing_customer_current_landmark,
       current_pincode: existing_customer_current_pincode,
-      current_city: existing_customer_current_city,
-      current_state: existing_customer_current_state,
+      // current_city: existing_customer_current_city,
+      // current_state: existing_customer_current_state,
       current_no_of_year_residing: existing_customer_current_no_of_year_residing,
 
       additional_flat_no_building_name: existing_customer_additional_flat_no_building_name,
@@ -554,8 +557,8 @@ export default function AddressDetails() {
       additional_town: existing_customer_additional_town,
       additional_landmark: existing_customer_additional_landmark,
       additional_pincode: existing_customer_additional_pincode,
-      additional_city: existing_customer_additional_city,
-      additional_state: existing_customer_additional_state,
+      // additional_city: existing_customer_additional_city,
+      // additional_state: existing_customer_additional_state,
       additional_no_of_year_residing: existing_customer_additional_no_of_year_residing,
     };
 
@@ -610,6 +613,10 @@ export default function AddressDetails() {
     setRequiredFieldsStatus(updatedRequiredFieldsStatus);
 
     setOpenExistingPopup(false);
+
+    handleCurrentPincodeChange();
+
+    handleAdditionalPincodeChange();
   };
 
   return (

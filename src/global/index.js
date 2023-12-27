@@ -16,8 +16,12 @@ async function pingAPI() {
 }
 
 async function checkIsValidStatePincode(pincode, options) {
-  const res = await axios.get(`${API_URL}/state-pin/${pincode}`, options, requestOptions);
-  return res.data;
+  try {
+    const res = await axios.get(`${API_URL}/state-pin/${pincode}`, options, requestOptions);
+    return res.data;
+  } catch (error) {
+    return false;
+  }
 }
 
 async function editReferenceById(id, referenceData, options) {
