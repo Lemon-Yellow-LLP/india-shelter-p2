@@ -85,10 +85,10 @@ export default function AccountAggregator() {
         },
       )
       .then(async ({ data }) => {
-        setChecking(false);
+        // setChecking(false);
         if (data.account_aggregator_response.status === 'COMPLETED') {
-          setAAInitiated(false);
-          setAARunning(false);
+          // setAAInitiated(false);
+          // setAARunning(false);
           await axios
             .get(
               `https://uatagile.indiashelter.in/api/banking/by-applicant/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
@@ -105,6 +105,7 @@ export default function AccountAggregator() {
               setBankSuccessTost('Bank added successfully');
             })
             .catch((err) => {
+              navigate('/lead/banking-details');
               console.log(err);
             });
         }
