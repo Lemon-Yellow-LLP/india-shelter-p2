@@ -329,6 +329,7 @@ const Qualifier = () => {
         setFinalApi(final_api.length + 2);
         response = await Promise.allSettled([...final_api]);
 
+        setDedupe((prev) => ({ ...prev, loader: false }));
         const filtered_dedupe_res = response.find((res) => {
           return res.value.status == 200;
         });
