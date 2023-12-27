@@ -139,32 +139,34 @@ const ApplicantDetails = () => {
   };
 
   const updateFieldsLead = async (name, value) => {
-    if (values?.lead?.id) {
-      let newData = {};
-      newData[name] = value;
-      newData.lo_id = loData.session.user_id;
-      const res = await editFieldsById(values?.lead?.id, 'lead', newData, {
-        headers: {
-          Authorization: token,
-        },
-      });
-      return res;
-    } else {
-      let newData = { ...values?.lead };
-      newData[name] = value;
-      newData.lo_id = loData.session.user_id;
-      await addApi('lead', newData, {
-        headers: {
-          Authorization: token,
-        },
-      })
-        .then((res) => {
-          setFieldValue('lead.id', res.id);
-          return res;
-        })
-        .catch((err) => {
-          return err;
+    if (values?.applicants?.[activeIndex]?.applicant_details?.is_primary) {
+      if (values?.lead?.id) {
+        let newData = {};
+        newData[name] = value;
+        newData.lo_id = loData.session.user_id;
+        const res = await editFieldsById(values?.lead?.id, 'lead', newData, {
+          headers: {
+            Authorization: token,
+          },
         });
+        return res;
+      } else {
+        let newData = { ...values?.lead };
+        newData[name] = value;
+        newData.lo_id = loData.session.user_id;
+        await addApi('lead', newData, {
+          headers: {
+            Authorization: token,
+          },
+        })
+          .then((res) => {
+            setFieldValue('lead.id', res.id);
+            return res;
+          })
+          .catch((err) => {
+            return err;
+          });
+      }
     }
   };
 
