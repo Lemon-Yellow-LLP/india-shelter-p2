@@ -357,14 +357,14 @@ const LnTCharges = () => {
                             />
                           </div>
                         </AccordionItem>
-                        <Separator />
+                        {/* <Separator />
                         <AccordionItem
                           label={'Cash'}
                           iconImage={CashIcon}
                           open={activeItem == 'Cash'}
                           setOpen={handleClick}
                           disabled={checkingStatus && checkingStatus !== 'Cash'}
-                        ></AccordionItem>
+                        ></AccordionItem> */}
                         <Separator />
                         <AccordionItem
                           label={'Pay via Link'}
