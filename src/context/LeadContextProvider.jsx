@@ -68,12 +68,15 @@ const LeadContextProvider = ({ children }) => {
       // Map over the keys of formData and get progress for each key
       let progressMap = {};
       let progressMapTemp = {};
-      Object.keys(newData).forEach((key) => {
-        if (key !== 'lead') {
-          let newDataKeyprogress = getProgress(newData[key]);
-          progressMap[key] = newDataKeyprogress ? newDataKeyprogress : 0;
+      const kv = Object.keys(newData);
+      for (const key of kv) {
+        if (key === 'lead' || key === 'lnt_mobile_number') {
+          continue;
         }
-      });
+        console.log('key', key);
+        let newDataKeyprogress = getProgress(newData[key]);
+        progressMap[key] = newDataKeyprogress ? newDataKeyprogress : 0;
+      }
 
       progressMap.applicants = [];
       progressMapTemp = structuredClone(progressMap);
@@ -117,11 +120,14 @@ const LeadContextProvider = ({ children }) => {
       progressMap.lt_charges = newData?.lt_charges?.find((e) => e.status === 'Completed') ? 100 : 0;
 
       progressMapTemp.lt_charges = structuredClone(progressMap.lt_charges);
+      console.log(progressMap);
 
       const { totalKeys, valuesSum } = countKeysAndValues(progressMap);
       const resValues = countKeysAndValues(progressMapTemp);
 
       let finalProgress = parseInt(parseInt(valuesSum) / parseInt(totalKeys));
+
+      console.log(finalProgress);
 
       let tempFinalProgress = parseInt(
         parseInt(resValues.valuesSum) / parseInt(resValues.totalKeys),
