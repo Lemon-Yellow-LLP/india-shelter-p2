@@ -30,7 +30,12 @@ const suggested_location = [
   },
 ];
 
-const MapSearchDrawer = ({ mapContainerRef, searchDrawerOpen, setSearchDrawerOpen }) => {
+const MapSearchDrawer = ({
+  mapContainerRef,
+  searchDrawerOpen,
+  setSearchDrawerOpen,
+  Autocomplete,
+}) => {
   const [location, setLocation] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -101,6 +106,7 @@ const MapSearchDrawer = ({ mapContainerRef, searchDrawerOpen, setSearchDrawerOpe
         				focus-within:border-secondary-blue focus-within:shadow-secondary-blue focus-within:shadow-primary border-stroke'
             >
               <img src={iconSearch} alt='Search' role='presentation' />
+              {/* <Autocomplete> */}
               <input
                 value={searchQuery}
                 onFocus={() => setSearchDrawerOpen(true)}
@@ -108,6 +114,7 @@ const MapSearchDrawer = ({ mapContainerRef, searchDrawerOpen, setSearchDrawerOpe
                 placeholder='Search for area, apartment name'
                 className='w-full focus:outline-none text-ellipsis text-primary-black'
               />
+              {/* </Autocomplete> */}
             </div>
 
             {searchDrawerOpen && (

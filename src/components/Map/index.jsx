@@ -3,19 +3,20 @@ import { IconClose } from '../../assets/icons';
 import currentLocation from '../../assets/icons/current-location.svg';
 import { useEffect, useRef, useState } from 'react';
 import MapSearchDrawer from './MapSearchDrawer';
-import { useJsApiLoader, GoogleMap } from '@react-google-maps/api';
+import { useJsApiLoader, GoogleMap, Marker, Autocomplete } from '@react-google-maps/api';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyB_VgPtaHSDn21sTi9b6f9Ga15cjvZ6-Sk';
 
 const Map = ({ setShowMap }) => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    // libraries: ['places'],
   });
-
-  // if (!isLoaded) return 'loading';
 
   const mapContainerRef = useRef(null);
   const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
+  const [map, setMap] = useState(/** @type google.maps.Map */ (null));
+  const center = { lat: 48.8584, lng: 2.2945 };
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -23,6 +24,10 @@ const Map = ({ setShowMap }) => {
       document.body.style.overflow = 'auto';
     };
   }, []);
+
+  if (!isLoaded) {
+    return 'loading';
+  }
 
   return (
     <div
@@ -37,15 +42,25 @@ const Map = ({ setShowMap }) => {
         </button>
       </div>
 
-      {/* <div className='h-full bg-blue-300 w-full flex-1'>
+      {/* <div className='h-full bg-blue-300 w-full flex-1'></div> */}
 
-      </div> */}
-
-      <div>
-        <GoogleMap></GoogleMap>
-      </div>
+      <GoogleMap
+        center={center}
+        zoom={15}
+        mapContainerStyle={{ width: '100%', height: '100%' }}
+        options={{
+          zoomControl: false,
+          fullscreenControl: false,
+          mapTypeControl: false,
+          streetViewControl: false,
+        }}
+        onLoad={(map) => setMap(map)}
+      >
+        <Marker position={center} />
+      </GoogleMap>
 
       <button
+        onClick={() => map.panTo(center)}
         style={{
           boxShadow: '0px 0px 14px 0px rgba(163, 163, 163, 0.35)',
         }}
@@ -60,6 +75,7 @@ const Map = ({ setShowMap }) => {
         mapContainerRef={mapContainerRef}
         searchDrawerOpen={searchDrawerOpen}
         setSearchDrawerOpen={setSearchDrawerOpen}
+        Autocomplete={Autocomplete}
       />
     </div>
   );
