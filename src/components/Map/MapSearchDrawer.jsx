@@ -3,10 +3,11 @@ import { CssBaseline, SwipeableDrawer } from '@mui/material';
 import BottomSheetHandle from '../BottomSheetHandle';
 import iconSearch from '../../assets/icons/search.svg';
 import propTypes from 'prop-types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import currentLocation from '../../assets/icons/current-location.svg';
 import { IconArrowRight } from '../../assets/icons';
 import addressNotFound from '../../assets/address-not-found.svg';
+import { LeadContext } from '../../context/LeadContextProvider';
 
 const current_location = [
   {
@@ -35,30 +36,36 @@ const MapSearchDrawer = ({
   searchDrawerOpen,
   setSearchDrawerOpen,
   Autocomplete,
+  mapLocation,
+  setMapLocation,
+  swipeAreaWidth,
+  setSwipeAreaWidth,
 }) => {
-  const [location, setLocation] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [swipeAreaWidth, setSwipeAreaWidth] = useState(90);
+  const { setShowMap, setFieldValue } = useContext(LeadContext);
 
   // const onCurrentLocationClick = useCallback(async () => {
   //   setSearchDrawerOpen(false);
-  //   setLocation(true);
+  //   setMapLocation(true);
   // }, []);
 
   const searchLocation = (e) => {
     setSearchQuery(e.currentTarget.value);
-    setLocation(
+    setMapLocation(
       suggested_location.filter((data) => data.location1.includes(e.currentTarget.value)),
     );
-    if (!e.currentTarget.value) setLocation(null);
+    if (!e.currentTarget.value) setMapLocation(null);
   };
 
-  useEffect(() => {
-    !location ? setSwipeAreaWidth(90) : setSwipeAreaWidth(260);
-  }, [location]);
+  // useEffect(() => {
+  //   if (!mapLocation) {
+  //     setSwipeAreaWidth(90);
+  //   } else {
+  //     setSwipeAreaWidth(260);
+  //   }
+  // }, [mapLocation]);
 
-  console.log(location);
   return (
     <>
       <CssBaseline />
@@ -120,7 +127,7 @@ const MapSearchDrawer = ({
             {searchDrawerOpen && (
               <>
                 <button
-                  onClick={() => setLocation(current_location)}
+                  onClick={() => setMapLocation(current_location)}
                   className='flex gap-2 p-2 items-center'
                 >
                   <img src={currentLocation} alt='current location' role='presentation' />
@@ -139,14 +146,14 @@ const MapSearchDrawer = ({
               </>
             )}
 
-            {location ? (
+            {mapLocation ? (
               <div className={`overflow-auto ${searchDrawerOpen ? 'h-[500px] pb-10' : 'h-auto'}`}>
-                {location.map((data, i) => (
+                {mapLocation.map((data, i) => (
                   <button
                     onClick={() => {
-                      setSwipeAreaWidth(260);
                       setSearchDrawerOpen(false);
-                      setLocation([data]);
+                      setSwipeAreaWidth(260);
+                      setMapLocation([data]);
                       setSearchQuery('');
                     }}
                     key={i}
@@ -193,16 +200,28 @@ const MapSearchDrawer = ({
               </div>
             ) : null}
 
-            {location && !searchDrawerOpen && (
+            {mapLocation && !searchDrawerOpen ? (
               <button
-                onClick={() => setLocation(current_location)}
+                onClick={() => setMapLocation(current_location)}
                 className='p-2 rounded-md text-white bg-primary-red font-medium'
               >
-                <h3 className='text-center'>Confirm location</h3>
+                <h3
+                  className='text-center'
+                  onClick={() => {
+                    setFieldValue('property_details.plot_house_flat', mapLocation[0].location1);
+                    setFieldValue(
+                      'property_details.project_society_colony',
+                      mapLocation[0].location2,
+                    );
+                    setShowMap(false);
+                  }}
+                >
+                  Confirm location
+                </h3>
               </button>
-            )}
+            ) : null}
 
-            {location?.length === 0 && (
+            {mapLocation?.length === 0 && (
               <img
                 className='absolute top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4'
                 src={addressNotFound}

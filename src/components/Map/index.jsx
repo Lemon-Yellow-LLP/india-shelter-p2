@@ -1,11 +1,19 @@
 import propTypes from 'prop-types';
 import { IconClose } from '../../assets/icons';
 import currentLocation from '../../assets/icons/current-location.svg';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import MapSearchDrawer from './MapSearchDrawer';
 import { useJsApiLoader, GoogleMap, Marker, Autocomplete } from '@react-google-maps/api';
+import { LeadContext } from '../../context/LeadContextProvider';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyB_VgPtaHSDn21sTi9b6f9Ga15cjvZ6-Sk';
+
+const current_location = [
+  {
+    location1: 'Neo Valley Real Estates',
+    location2: 'Sai Hill Road, Bhandup West, Mumbai, Maharshtra, India',
+  },
+];
 
 const Map = ({ setShowMap }) => {
   const { isLoaded } = useJsApiLoader({
@@ -17,6 +25,9 @@ const Map = ({ setShowMap }) => {
   const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
   const [map, setMap] = useState(/** @type google.maps.Map */ (null));
   const center = { lat: 48.8584, lng: 2.2945 };
+
+  const [swipeAreaWidth, setSwipeAreaWidth] = useState(90);
+  const [mapLocation, setMapLocation] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -60,7 +71,11 @@ const Map = ({ setShowMap }) => {
       </GoogleMap>
 
       <button
-        onClick={() => map.panTo(center)}
+        onClick={() => {
+          setMapLocation(current_location);
+          setSwipeAreaWidth(260);
+          map.panTo(center);
+        }}
         style={{
           boxShadow: '0px 0px 14px 0px rgba(163, 163, 163, 0.35)',
         }}
@@ -76,6 +91,10 @@ const Map = ({ setShowMap }) => {
         searchDrawerOpen={searchDrawerOpen}
         setSearchDrawerOpen={setSearchDrawerOpen}
         Autocomplete={Autocomplete}
+        mapLocation={mapLocation}
+        setMapLocation={setMapLocation}
+        swipeAreaWidth={swipeAreaWidth}
+        setSwipeAreaWidth={setSwipeAreaWidth}
       />
     </div>
   );
