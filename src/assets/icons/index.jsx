@@ -22,6 +22,7 @@ import IconMarried from './married.jsx';
 import IconSingle from './single.jsx';
 import IconSalarid from './salarid.jsx';
 import IconSelfEmployed from './self-employed.jsx';
+import IconLanguage from './Language.jsx';
 
 import ApplicantDetailsIcon from './ApplicantDetailsIcon';
 import AddressDetailsIcon from './AddressDetailsIcon';
@@ -98,4 +99,5 @@ export {
   IconSalarid,
   IconSelfEmployed,
   TostErrorIcon,
+  IconLanguage,
 };
