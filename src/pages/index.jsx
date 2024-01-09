@@ -8,8 +8,6 @@ import { AuthContext } from '../context/AuthContextProvider';
 import DashboardApplicant from './dashboard/DashboardApplicant';
 import { logout } from '../global';
 import PropTypes from 'prop-types';
-import Audio from '../components/Audio';
-import Consent from '../components/Audio/Consent';
 
 const TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
@@ -67,7 +65,7 @@ const DashboardRoutes = () => {
   return (
     <>
       <Routes>
-        <Route path='/login' element={<Consent />}></Route>
+        <Route path='/login' element={<Login />}></Route>
         <Route
           path='/'
           element={
