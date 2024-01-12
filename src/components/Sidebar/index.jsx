@@ -60,7 +60,7 @@ export default function SideBar() {
   const [activeTab, setActiveTab] = useState(null);
 
   return (
-    <nav className='h-screen flex flex-col w-[252px] border-r border-lighter-grey'>
+    <nav className='h-screen flex flex-col w-[252px] shrink-0 border-r border-lighter-grey'>
       <div className='px-6 py-4'>
         <img src={indiaShelterLogo} alt='India Shelter' style={{ height: '36px' }} />
         <p className='mt-2 text-primary-red text-sm'>iTrust & Agile admin</p>
@@ -84,7 +84,7 @@ export default function SideBar() {
       </div>
       <div className='py-4 grow text-light-grey'>
         {userTabs
-          .filter((userTab) => userTab.key === user)[0]
+          .find((userTab) => userTab.key === user)
           .tabs.map((tab) => {
             const isActive = activeTab === tab.label;
             return (
