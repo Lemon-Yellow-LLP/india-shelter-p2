@@ -1,9 +1,9 @@
 import { styled } from '@mui/material';
 import Switch from '@mui/material/Switch';
 
-const ToggleSwitch = styled((props) => (
+const ToggleSwitch = styled(({ switchColor, ...props }) => (
   <Switch focusVisibleClassName='.Mui-focusVisible' disableRipple {...props} />
-))(({ theme }) => ({
+))(({ theme, switchColor }) => ({
   width: 36,
   height: 20,
   padding: 0,
@@ -15,7 +15,7 @@ const ToggleSwitch = styled((props) => (
       transform: 'translateX(16px)',
       color: '#fff',
       '& + .MuiSwitch-track': {
-        backgroundColor: theme.palette.mode === 'dark' ? '#2ECA45' : '#E33439',
+        backgroundColor: theme.palette.mode === 'dark' ? '#2ECA45' : `${switchColor || '#E33439'}`,
         opacity: 1,
         border: 0,
       },
