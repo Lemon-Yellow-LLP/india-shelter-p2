@@ -9,7 +9,7 @@ import { useState } from 'react';
 export default function StepsAccordion({ options, onChange, children }) {
   return (
     <div className='w-full'>
-      <Accordion defaultExpanded={options.length < 3}>
+      <Accordion defaultExpanded={options.length < 3} style={{ borderRadius: '8px' }}>
         <AccordionSummary
           expandIcon={options.length > 3 && <OpenAccordian />}
           aria-controls='panel1-content'
