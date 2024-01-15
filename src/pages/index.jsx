@@ -3,7 +3,7 @@ import Dashboard from './dashboard';
 import LeadCreationRoutes from './dashboard/lead-creation';
 import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
 import DashboardApplicant from './dashboard/DashboardApplicant';
 import { logout } from '../global';
@@ -11,12 +11,13 @@ import PropTypes from 'prop-types';
 import AdminPagination from '../components/AdminPagination';
 import UserTable from '../components/UserTable';
 import { LeadContext } from '../context/LeadContextProvider';
+import Searchbox from '../components/Searchbox.jsx';
 
 const TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
 const userslist = [
   {
-    employee_code: '1',
+    employee_code: 'ISFC0913',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -25,7 +26,7 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '2',
+    employee_code: 'ISFC0914',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -34,7 +35,7 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '3',
+    employee_code: 'ISFC0915',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -43,7 +44,7 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '4',
+    employee_code: 'ISFC0916',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -52,7 +53,7 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '5',
+    employee_code: 'ISFC0917',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -61,7 +62,7 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '6',
+    employee_code: 'ISFC0918',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -70,7 +71,7 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '7',
+    employee_code: 'ISFC0919',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -79,7 +80,7 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '8',
+    employee_code: 'ISFC0920',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -88,7 +89,7 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '9',
+    employee_code: 'ISFC0921',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -97,7 +98,7 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '10',
+    employee_code: 'ISFC0922',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -106,7 +107,7 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '11',
+    employee_code: 'ISFC0923',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -115,7 +116,215 @@ const userslist = [
     status: 'Active',
   },
   {
-    employee_code: '12',
+    employee_code: 'ISFC0924',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0925',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0926',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0927',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0928',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0929',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0930',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0931',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0932',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0933',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0934',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0935',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+
+  {
+    employee_code: 'ISFC0936',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0937',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0938',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0939',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0940',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0941',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0942',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0943',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0944',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0945',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0946',
+    employee_name: 'Suresh Ramji',
+    branch: 'Gurugram',
+    role: 'Branch Officer',
+    mobile_number: '9238329132',
+    created_on: '09/11/2023',
+    status: 'Active',
+  },
+  {
+    employee_code: 'ISFC0947',
     employee_name: 'Suresh Ramji',
     branch: 'Gurugram',
     role: 'Branch Officer',
@@ -127,51 +336,16 @@ const userslist = [
 
 const DashboardRoutes = () => {
   const [count, setCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [leadList, setLeadList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
+  const [searchedList, setSearchedList] = useState([]);
+  const [query, setQuery] = useState('');
 
   const { userStatus, userAction, setUserStatus, setUserAction } = useContext(LeadContext);
 
   const RequireAuth = ({ children }) => {
     const { isAuthenticated, token } = useContext(AuthContext);
-
-    // useEffect(() => {
-    //   const resetSessionTimer = () => {
-    //     const reset = async () => {
-    //       try {
-    //         await logout(
-    //           {
-    //             status: 'no',
-    //             logout_via: 'New Login',
-    //           },
-    //           {
-    //             headers: {
-    //               Authorization: token,
-    //             },
-    //           },
-    //         );
-
-    //         window.location.reload();
-    //       } catch (err) {
-    //         window.location.reload();
-    //         console.log(err);
-    //       }
-    //     };
-
-    //     // // Reset the session timer when the user is Active
-    //     const timer = setTimeout(reset, TIMEOUT);
-
-    //     return () => clearTimeout(timer);
-    //   };
-
-    //   // Attach an event listener to track user activity
-    //   window.addEventListener('touchmove', resetSessionTimer);
-
-    //   // Clean up the event listener when the component unmounts
-    //   return () => {
-    //     window.removeEventListener('touchmove', resetSessionTimer);
-    //   };
-    // }, []);
 
     // Check authentication once and render accordingly
 
@@ -183,6 +357,7 @@ const DashboardRoutes = () => {
   };
 
   const handleChange = (event, value) => {
+    setCurrentPage(value);
     // Assuming each page contains a fixed number of items, let's say 10 items per page
     const itemsPerPage = 10;
 
@@ -190,11 +365,61 @@ const DashboardRoutes = () => {
     const startCount = (value - 1) * itemsPerPage;
     const endCount = value * itemsPerPage - 1;
 
+    if (searchedList.length) {
+      setFilteredList(
+        searchedList.filter((lead, i) => {
+          return i >= startCount && i <= endCount;
+        }),
+      );
+    } else {
+      setFilteredList(
+        leadList.filter((lead, i) => {
+          return i >= startCount && i <= endCount;
+        }),
+      );
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setCurrentPage(1);
+
+    const searchedList = leadList.filter((lead) => {
+      return lead.employee_code.toLowerCase().includes(query) || lead.employee_code.includes(query);
+    });
+
+    setSearchedList(searchedList);
+
+    setCount(Math.ceil(searchedList.length / 10));
+
     setFilteredList(
-      leadList.filter((lead, i) => {
-        return i >= startCount && i <= endCount;
+      searchedList.filter((lead, i) => {
+        return i < 10;
       }),
     );
+  };
+
+  const handleResetSearch = () => {
+    setQuery('');
+    setCount(Math.ceil(leadList.length / 10));
+    setSearchedList([]);
+    setCurrentPage(1);
+    setFilteredList(
+      leadList.filter((lead, i) => {
+        return i < 10;
+      }),
+    );
+
+    // const itemsPerPage = 10;
+
+    // const startCount = (currentPage - 1) * itemsPerPage;
+    // const endCount = currentPage * itemsPerPage - 1;
+
+    // setFilteredList(
+    //   leadList.filter((lead, i) => {
+    //     return i >= startCount && i <= endCount;
+    //   }),
+    // );
   };
 
   useEffect(() => {
@@ -212,9 +437,6 @@ const DashboardRoutes = () => {
     );
   }, [leadList]);
 
-  console.log(userStatus);
-  console.log(userAction);
-
   useEffect(() => {
     if (userStatus) {
       console.log('call status change api');
@@ -229,6 +451,10 @@ const DashboardRoutes = () => {
     }
   }, [userAction]);
 
+  // console.log(userStatus);
+  // console.log(userAction);
+  console.log(currentPage);
+
   return (
     <>
       <Routes>
@@ -237,8 +463,18 @@ const DashboardRoutes = () => {
           element={
             leadList.length ? (
               <>
+                <Searchbox
+                  query={query}
+                  setQuery={setQuery}
+                  handleSubmit={handleSearch}
+                  handleReset={handleResetSearch}
+                />
                 <UserTable userslist={filteredList} />
-                <AdminPagination count={count} handlePageChangeCb={handleChange} />
+                <AdminPagination
+                  currentPage={currentPage}
+                  count={count}
+                  handlePageChangeCb={handleChange}
+                />
               </>
             ) : (
               <span>Loading</span>
