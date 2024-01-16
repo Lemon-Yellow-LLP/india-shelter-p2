@@ -16,7 +16,7 @@ axios.interceptors.response.use(
     // Handle error globally
 
     if (error.response.status == 403 || error.response.status == 401) {
-      window.location.reload();
+      window.location.replace('/login');
     }
 
     // Pass the error to the next handler
