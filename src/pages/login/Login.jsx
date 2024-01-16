@@ -2,13 +2,12 @@ import { useCallback, useContext, useState } from 'react';
 import TextInputWithSendOtp from '../../components/TextInput/TextInputWithSendOtp';
 import { AuthContext } from '../../context/AuthContextProvider';
 import { ToastMessage, Button } from '../../components';
-import { getAllLoanOfficers, getLoginOtp, logout, verifyLoginOtp } from '../../global';
+import { checkLoanOfficerExists, getLoginOtp, logout, verifyLoginOtp } from '../../global';
 import DynamicDrawer from '../../components/SwipeableDrawer/DynamicDrawer';
 import { Header } from '../../components';
 import { useNavigate } from 'react-router-dom';
 import OtpInputNoEdit from '../../components/OtpInput/OtpInputNoEdit';
 import ErrorTost from '../../components/ToastMessage/ErrorTost';
-import DatePicker2 from '../../components/DatePicker/DatePicker2';
 
 const DISALLOW_NUM = ['0', '1', '2', '3', '4', '5'];
 
@@ -80,22 +79,9 @@ export default function Login() {
       setHasSentOTPOnce(true);
       setShowOTPInput(true);
     } else {
-      const officers = await getAllLoanOfficers({
-        headers: {
-          Authorization: token,
-        },
-      });
-
-      const user_exists = officers.find((user) => {
-        return user.username === values.username;
-      });
-
-      if (!user_exists) {
-        setFieldError('username', 'User with this number does not exists');
-        return;
-      }
-
       try {
+        await checkLoanOfficerExists(values.username);
+
         const res = await getLoginOtp(values.username);
 
         if (res.error) {
@@ -114,6 +100,9 @@ export default function Login() {
         setToastMessage('OTP has been sent to the mobile number');
       } catch (error) {
         console.log(error);
+        if (!error.response.data.status) {
+          setFieldError('username', 'User with this number does not exists');
+        }
       }
     }
   };
