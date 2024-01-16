@@ -439,6 +439,11 @@ const ApplicantDetails = () => {
                       is_existing: false,
                     },
                   },
+                  {
+                    headers: {
+                      Authorization: token,
+                    },
+                  },
                 );
                 setFieldValue(
                   `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
@@ -482,6 +487,11 @@ const ApplicantDetails = () => {
                     is_existing: false,
                   },
                 },
+                {
+                  headers: {
+                    Authorization: token,
+                  },
+                },
               );
               setFieldValue(
                 `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
@@ -491,12 +501,21 @@ const ApplicantDetails = () => {
           })
           .catch((err) => {
             console.log('Existing customer api error', err);
-            editFieldsById(values?.applicants?.[activeIndex]?.applicant_details?.id, 'applicant', {
-              extra_params: {
-                ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
-                is_existing: false,
+            editFieldsById(
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
+              'applicant',
+              {
+                extra_params: {
+                  ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                  is_existing: false,
+                },
               },
-            });
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
             setFieldValue(
               `applicants[${activeIndex}].applicant_details.extra_params.is_existing`,
               false,

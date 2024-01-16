@@ -251,6 +251,11 @@ function ImageUpload({
       {
         document_meta: { ...document_meta, [type]: edited_applicant },
       },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
 
     const edited_type = new_edited_applicant.document_meta[type];
