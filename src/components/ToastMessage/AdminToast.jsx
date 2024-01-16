@@ -6,7 +6,7 @@ import AdminCloseIcon from '../../assets/icons/adminClose';
 const DEFAULT_TIMEOUT = 3000;
 
 // setup state in AdminContextProvider
-// state = "success", "info"
+// state = "success", "info", "error"
 const AdminToastMessage = ({ message, setMessage, state, timeout = DEFAULT_TIMEOUT }) => {
   const handleOnCloseClick = useCallback(
     (e) => {
@@ -28,7 +28,9 @@ const AdminToastMessage = ({ message, setMessage, state, timeout = DEFAULT_TIMEO
       {message && (
         <motion.div
           style={{
-            backgroundColor: `${state === 'success' ? '#147257' : '#373435'}`,
+            backgroundColor: `${
+              state === 'success' ? '#147257' : state === 'error' ? '#EF8D32' : '#373435'
+            }`,
             zIndex: 10000,
           }}
           className={`flex gap-4 items-center 
