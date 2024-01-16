@@ -97,6 +97,11 @@ async function getAllLoanOfficers(options) {
   return res.data;
 }
 
+async function checkLoanOfficerExists(number) {
+  const res = await axios.get(`${API_URL}/account/r/check-if-user-exists/${number}`);
+  return res.data;
+}
+
 //BRE SCREEN
 
 async function verifyPan(id, data, options) {
@@ -549,4 +554,5 @@ export {
   reUploadDoc,
   getUserById,
   editDoc,
+  checkLoanOfficerExists,
 };
