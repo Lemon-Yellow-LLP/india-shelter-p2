@@ -180,6 +180,11 @@ function PdfAndImageUpload({
       {
         document_meta: { ...document_meta, property_paper_photos: edited_applicant },
       },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
     );
 
     const active_uploads = new_edited_applicant.document_meta.property_paper_photos.filter(
@@ -236,6 +241,11 @@ function PdfAndImageUpload({
       'applicant',
       {
         document_meta: { ...document_meta, property_paper_photos: edited_applicant },
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
       },
     );
 

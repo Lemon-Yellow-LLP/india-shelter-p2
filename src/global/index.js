@@ -10,6 +10,20 @@ const bre_timeout = 90000;
 
 axiosRetry(axios, { retries: 0 });
 
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle error globally
+
+    if (error.response.status == 403 || error.response.status == 401) {
+      window.location.replace('/login');
+    }
+
+    // Pass the error to the next handler
+    return Promise.reject(error);
+  },
+);
+
 async function pingAPI() {
   const res = await axios.get(`${API_URL}`, {}, requestOptions);
   return res.data;
@@ -80,6 +94,11 @@ async function testLogout(options) {
 
 async function getAllLoanOfficers(options) {
   const res = await axios.get(`${API_URL}/account`, options);
+  return res.data;
+}
+
+async function checkLoanOfficerExists(number) {
+  const res = await axios.get(`${API_URL}/account/r/check-if-user-exists/${number}`);
   return res.data;
 }
 
@@ -535,4 +554,5 @@ export {
   reUploadDoc,
   getUserById,
   editDoc,
+  checkLoanOfficerExists,
 };
