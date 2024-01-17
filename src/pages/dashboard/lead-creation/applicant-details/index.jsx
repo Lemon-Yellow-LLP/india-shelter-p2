@@ -412,6 +412,7 @@ const ApplicantDetails = () => {
         await axios
           .post(
             `https://uatagile.indiashelter.in/api/applicant/existing-customer/${values?.applicants?.[activeIndex]?.applicant_details?.id}`,
+            {},
             {
               headers: {
                 Authorization: token,
