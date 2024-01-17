@@ -1,3 +1,6 @@
+import ConnectionLost from '../../assets/icons/connection-lost';
+import Header from '../Header';
+
 const Overlay = () => (
   <div
     style={{
@@ -6,16 +9,27 @@ const Overlay = () => (
       left: 0,
       width: '100%',
       height: '100%',
-      background: 'rgba(0, 0, 0, 0.8)',
+      background: 'white',
       display: 'flex',
       justifyContent: 'center',
-      alignItems: 'center',
       zIndex: 10000,
-      padding: '16px',
       textAlign: 'center',
     }}
   >
-    <p style={{ color: '#fff' }}>No internet connection. Please check your connection.</p>
+    <div>
+      <Header />
+      <p
+        style={{
+          color: '#fff',
+          padding: '16px',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <ConnectionLost />
+      </p>
+    </div>
   </div>
 );
 
