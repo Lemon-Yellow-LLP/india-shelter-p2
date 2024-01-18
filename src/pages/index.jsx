@@ -342,6 +342,18 @@ const filterOptions = [
 ];
 
 const DashboardRoutes = () => {
+  const RequireAuth = ({ children }) => {
+    const { isAuthenticated, token } = useContext(AuthContext);
+
+    // Check authentication once and render accordingly
+
+    if (isAuthenticated) {
+      return children;
+    } else {
+      return <Navigate to='/login' />;
+    }
+  };
+
   const { userStatus, userAction, setUserStatus, setUserAction } = useContext(LeadContext);
 
   const [count, setCount] = useState(0);
@@ -373,18 +385,6 @@ const DashboardRoutes = () => {
         return state;
     }
   }
-
-  const RequireAuth = ({ children }) => {
-    const { isAuthenticated, token } = useContext(AuthContext);
-
-    // Check authentication once and render accordingly
-
-    if (isAuthenticated) {
-      return children;
-    } else {
-      return <Navigate to='/login' />;
-    }
-  };
 
   const handleChange = (event, value) => {
     setCurrentPage(value);
@@ -433,16 +433,28 @@ const DashboardRoutes = () => {
 
   const handleResetSearch = () => {
     setQuery('');
-    // setCount(Math.ceil(leadList.length / 10));
-    // setSearchedList([]);
     dispatch({ type: 'All users', payload: 'All users' });
     setCurrentPage(1);
+    // setCount(Math.ceil(leadList.length / 10));
+    // setSearchedList([]);
+
     // setDisplayedList(
     //   leadList.filter((lead, i) => {
     //     return i < 10;
     //   }),
     // );
   };
+
+  const handleUsersChange = useCallback(
+    (value) => {
+      if (value === 'All users') {
+        dispatch({ type: value, payload: value });
+      } else {
+        dispatch({ type: value, payload: value });
+      }
+    },
+    [displayedList],
+  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -478,24 +490,11 @@ const DashboardRoutes = () => {
     setDisplayedList(filteredList.filter((_, i) => i < 10));
   }, [filteredList]);
 
+  // console.log(filteredList);
+  // console.log(displayedList);
   // console.log(userStatus);
   // console.log(userAction);
   // console.log(currentPage);
-
-  const handleUsersChange = useCallback(
-    (value) => {
-      if (value === 'All users') {
-        dispatch({ type: value, payload: value });
-      } else {
-        dispatch({ type: value, payload: value });
-      }
-    },
-    [displayedList],
-  );
-
-  // console.log(filteredList);
-  // console.log(displayedList);
-
   return (
     <>
       <Routes>
