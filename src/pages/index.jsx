@@ -8,6 +8,9 @@ import { AuthContext } from '../context/AuthContextProvider';
 import DashboardApplicant from './dashboard/DashboardApplicant';
 import { logout } from '../global';
 import PropTypes from 'prop-types';
+import SideBar from '../components/Sidebar';
+import AdminHeader from '../components/Header/AdminHeader';
+import CaseAssigning from './CaseAssignment';
 
 const TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
@@ -65,7 +68,19 @@ const DashboardRoutes = () => {
   return (
     <>
       <Routes>
-        <Route path='/login' element={<Login />}></Route>
+        <Route
+          path='/login'
+          element={
+            // <div className='flex'>
+            //   <SideBar />
+            //   <div className='flex flex-col grow'>
+            //     <AdminHeader title='Manage Users' />
+            //     <CaseAssigning />
+            //   </div>
+            // </div>
+            <Login />
+          }
+        ></Route>
         <Route
           path='/'
           element={
