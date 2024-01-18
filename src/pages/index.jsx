@@ -3,7 +3,7 @@ import Dashboard from './dashboard';
 import LeadCreationRoutes from './dashboard/lead-creation';
 import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
 import DashboardApplicant from './dashboard/DashboardApplicant';
 import { logout } from '../global';
@@ -12,6 +12,7 @@ import AdminPagination from '../components/AdminPagination';
 import UserTable from '../components/UserTable';
 import { LeadContext } from '../context/LeadContextProvider';
 import Searchbox from '../components/Searchbox.jsx';
+import { DropDown } from '../components/index.jsx';
 
 const TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
@@ -23,7 +24,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0914',
@@ -321,7 +322,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0947',
@@ -330,19 +331,48 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
 ];
 
+const filterOptions = [
+  { label: 'All users', value: 'All users' },
+  { label: 'Active users', value: 'Active' },
+  { label: 'Inactive users', value: 'InActive' },
+];
+
 const DashboardRoutes = () => {
+  const { userStatus, userAction, setUserStatus, setUserAction } = useContext(LeadContext);
+
   const [count, setCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [leadList, setLeadList] = useState([]);
-  const [filteredList, setFilteredList] = useState([]);
-  const [searchedList, setSearchedList] = useState([]);
+  const [displayedList, setDisplayedList] = useState([]);
   const [query, setQuery] = useState('');
 
-  const { userStatus, userAction, setUserStatus, setUserAction } = useContext(LeadContext);
+  const [filteredList, dispatch] = useReducer(UserReducer, []);
+
+  function UserReducer(state, action) {
+    switch (action.type) {
+      case 'All users': {
+        return leadList;
+      }
+      case 'Active': {
+        return leadList.filter((lead) => lead.status == action.payload);
+      }
+      case 'InActive': {
+        return leadList.filter((lead) => lead.status === action.payload);
+      }
+      case 'Search': {
+        return leadList.filter(
+          (lead) =>
+            lead.employee_code.toLowerCase().includes(query) || lead.employee_code.includes(query),
+        );
+      }
+      default:
+        return state;
+    }
+  }
 
   const RequireAuth = ({ children }) => {
     const { isAuthenticated, token } = useContext(AuthContext);
@@ -365,14 +395,14 @@ const DashboardRoutes = () => {
     const startCount = (value - 1) * itemsPerPage;
     const endCount = value * itemsPerPage - 1;
 
-    if (searchedList.length) {
-      setFilteredList(
-        searchedList.filter((lead, i) => {
+    if (filteredList.length) {
+      setDisplayedList(
+        filteredList.filter((lead, i) => {
           return i >= startCount && i <= endCount;
         }),
       );
     } else {
-      setFilteredList(
+      setDisplayedList(
         leadList.filter((lead, i) => {
           return i >= startCount && i <= endCount;
         }),
@@ -384,40 +414,32 @@ const DashboardRoutes = () => {
     e.preventDefault();
     setCurrentPage(1);
 
-    const searchedList = leadList.filter((lead) => {
-      return lead.employee_code.toLowerCase().includes(query) || lead.employee_code.includes(query);
-    });
+    dispatch({ type: 'Search', payload: 'Search' });
 
-    setSearchedList(searchedList);
+    // const searchedList = leadList.filter((lead) => {
+    //   return lead.employee_code.toLowerCase().includes(query) || lead.employee_code.includes(query);
+    // });
 
-    setCount(Math.ceil(searchedList.length / 10));
+    // setSearchedList(searchedList);
 
-    setFilteredList(
-      searchedList.filter((lead, i) => {
-        return i < 10;
-      }),
-    );
+    // setCount(Math.ceil(searchedList.length / 10));
+
+    // setDisplayedList(
+    //   searchedList.filter((lead, i) => {
+    //     return i < 10;
+    //   }),
+    // );
   };
 
   const handleResetSearch = () => {
     setQuery('');
-    setCount(Math.ceil(leadList.length / 10));
-    setSearchedList([]);
+    // setCount(Math.ceil(leadList.length / 10));
+    // setSearchedList([]);
+    dispatch({ type: 'All users', payload: 'All users' });
     setCurrentPage(1);
-    setFilteredList(
-      leadList.filter((lead, i) => {
-        return i < 10;
-      }),
-    );
-
-    // const itemsPerPage = 10;
-
-    // const startCount = (currentPage - 1) * itemsPerPage;
-    // const endCount = currentPage * itemsPerPage - 1;
-
-    // setFilteredList(
+    // setDisplayedList(
     //   leadList.filter((lead, i) => {
-    //     return i >= startCount && i <= endCount;
+    //     return i < 10;
     //   }),
     // );
   };
@@ -430,7 +452,7 @@ const DashboardRoutes = () => {
   }, []);
 
   useEffect(() => {
-    setFilteredList(
+    setDisplayedList(
       leadList.filter((lead, i) => {
         return i < 10;
       }),
@@ -451,9 +473,28 @@ const DashboardRoutes = () => {
     }
   }, [userAction]);
 
+  useEffect(() => {
+    setCount(Math.ceil(filteredList.length / 10));
+    setDisplayedList(filteredList.filter((_, i) => i < 10));
+  }, [filteredList]);
+
   // console.log(userStatus);
   // console.log(userAction);
-  console.log(currentPage);
+  // console.log(currentPage);
+
+  const handleUsersChange = useCallback(
+    (value) => {
+      if (value === 'All users') {
+        dispatch({ type: value, payload: value });
+      } else {
+        dispatch({ type: value, payload: value });
+      }
+    },
+    [displayedList],
+  );
+
+  // console.log(filteredList);
+  // console.log(displayedList);
 
   return (
     <>
@@ -469,7 +510,14 @@ const DashboardRoutes = () => {
                   handleSubmit={handleSearch}
                   handleReset={handleResetSearch}
                 />
-                <UserTable userslist={filteredList} />
+                <DropDown
+                  label='USERS'
+                  options={filterOptions}
+                  onChange={handleUsersChange}
+                  defaultSelected={filterOptions[0].value}
+                  inputClasses='mt-2'
+                />
+                <UserTable userslist={displayedList} />
                 <AdminPagination
                   currentPage={currentPage}
                   count={count}
