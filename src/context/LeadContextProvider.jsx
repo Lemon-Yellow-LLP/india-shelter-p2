@@ -78,7 +78,6 @@ const LeadContextProvider = ({ children }) => {
         if (key === 'lead' || key === 'lnt_mobile_number') {
           continue;
         }
-        console.log('key', key);
         let newDataKeyprogress = getProgress(newData[key]);
         progressMap[key] = newDataKeyprogress ? newDataKeyprogress : 0;
       }
