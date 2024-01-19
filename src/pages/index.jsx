@@ -69,7 +69,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0919',
@@ -78,7 +78,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0920',
@@ -87,7 +87,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0921',
@@ -96,7 +96,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0922',
@@ -114,7 +114,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0924',
@@ -123,7 +123,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0925',
@@ -141,7 +141,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0927',
@@ -159,7 +159,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0929',
@@ -177,7 +177,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0931',
@@ -204,7 +204,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0934',
@@ -232,7 +232,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0937',
@@ -241,7 +241,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0938',
@@ -295,7 +295,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0944',
@@ -304,7 +304,7 @@ const userslist = [
     role: 'Branch Officer',
     mobile_number: '9238329132',
     created_on: '09/11/2023',
-    status: 'Active',
+    status: 'InActive',
   },
   {
     employee_code: 'ISFC0945',
@@ -364,6 +364,8 @@ const DashboardRoutes = () => {
 
   const [filteredList, dispatch] = useReducer(UserReducer, []);
 
+  const [emptyState, setEmptyState] = useState(false);
+
   function UserReducer(state, action) {
     switch (action.type) {
       case 'All users': {
@@ -376,10 +378,16 @@ const DashboardRoutes = () => {
         return leadList.filter((lead) => lead.status === action.payload);
       }
       case 'Search': {
-        return leadList.filter(
+        const searchedList = leadList.filter(
           (lead) =>
             lead.employee_code.toLowerCase().includes(query) || lead.employee_code.includes(query),
         );
+
+        if (searchedList.length) {
+          return searchedList;
+        } else {
+          return [];
+        }
       }
       default:
         return state;
@@ -412,6 +420,7 @@ const DashboardRoutes = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    setEmptyState(false);
     setCurrentPage(1);
 
     dispatch({ type: 'Search', payload: 'Search' });
@@ -435,6 +444,7 @@ const DashboardRoutes = () => {
     setQuery('');
     dispatch({ type: 'All users', payload: 'All users' });
     setCurrentPage(1);
+    setEmptyState(false);
     // setCount(Math.ceil(leadList.length / 10));
     // setSearchedList([]);
 
@@ -471,27 +481,35 @@ const DashboardRoutes = () => {
     );
   }, [leadList]);
 
-  useEffect(() => {
-    if (userStatus) {
-      console.log('call status change api');
-      setUserStatus('');
-    }
-  }, [userStatus]);
+  // Need to use while api integration
+  // useEffect(() => {
+  //   if (userStatus) {
+  //     console.log('call status change api');
+  //     setUserStatus('');
+  //   }
+  // }, [userStatus]);
 
-  useEffect(() => {
-    if (userAction) {
-      console.log('call action change api');
-      setUserAction('');
-    }
-  }, [userAction]);
+  // useEffect(() => {
+  //   if (userAction) {
+  //     console.log('call action change api');
+  //     setUserAction('');
+  //   }
+  // }, [userAction]);
 
   useEffect(() => {
     setCount(Math.ceil(filteredList.length / 10));
     setDisplayedList(filteredList.filter((_, i) => i < 10));
+    setCurrentPage(1);
   }, [filteredList]);
 
+  useEffect(() => {
+    if (!displayedList.length) {
+      setEmptyState(!emptyState);
+    }
+  }, [displayedList]);
+
   // console.log(filteredList);
-  // console.log(displayedList);
+  console.log(displayedList);
   // console.log(userStatus);
   // console.log(userAction);
   // console.log(currentPage);
@@ -509,19 +527,23 @@ const DashboardRoutes = () => {
                   handleSubmit={handleSearch}
                   handleReset={handleResetSearch}
                 />
-                <DropDown
-                  label='USERS'
-                  options={filterOptions}
-                  onChange={handleUsersChange}
-                  defaultSelected={filterOptions[0].value}
-                  inputClasses='mt-2'
-                />
-                <UserTable userslist={displayedList} />
-                <AdminPagination
-                  currentPage={currentPage}
-                  count={count}
-                  handlePageChangeCb={handleChange}
-                />
+                {!emptyState && (
+                  <>
+                    <DropDown
+                      label='USERS'
+                      options={filterOptions}
+                      onChange={handleUsersChange}
+                      defaultSelected={filterOptions[0].value}
+                      inputClasses='mt-2'
+                    />
+                    <UserTable userslist={displayedList} />
+                    <AdminPagination
+                      currentPage={currentPage}
+                      count={count}
+                      handlePageChangeCb={handleChange}
+                    />
+                  </>
+                )}
               </>
             ) : (
               <span>Loading</span>
