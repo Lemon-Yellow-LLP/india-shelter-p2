@@ -8,50 +8,50 @@ const ConnectionLost = () => {
       xmlns='http://www.w3.org/2000/svg'
     >
       <path
-        fill-rule='evenodd'
-        clip-rule='evenodd'
+        fillRule='evenodd'
+        clipRule='evenodd'
         d='M66.0491 58.0027C57.0341 57.5305 54 119 54 119H76.7169C76.7169 119 74.7833 58.4605 66.0491 58.0027Z'
         fill='#E8E8E8'
       />
       <path
-        fill-rule='evenodd'
-        clip-rule='evenodd'
+        fillRule='evenodd'
+        clipRule='evenodd'
         d='M73.2204 76.0016C67.8177 75.7206 66 112.3 66 112.3H79.6125C79.6125 112.3 78.4542 76.2726 73.2204 76.0016Z'
         fill='#D1D1D1'
       />
       <path
-        fill-rule='evenodd'
-        clip-rule='evenodd'
+        fillRule='evenodd'
+        clipRule='evenodd'
         d='M228.084 103.076C222.036 102.759 220 144.001 220 144.001H235.242C235.242 144.001 233.944 103.383 228.084 103.076Z'
         fill='#F1F1F1'
       />
       <path
-        fill-rule='evenodd'
-        clip-rule='evenodd'
+        fillRule='evenodd'
+        clipRule='evenodd'
         d='M242.548 89.0023C233.676 89.5898 238.153 141.542 238.153 141.542L250.113 143.336C250.113 143.336 248.714 88.591 242.548 89.0023Z'
         fill='#D1D1D1'
       />
       <path
-        fill-rule='evenodd'
-        clip-rule='evenodd'
+        fillRule='evenodd'
+        clipRule='evenodd'
         d='M236.381 98.7206C230.332 98.4038 228.297 139.646 228.297 139.646H243.538C243.538 139.646 242.241 99.0261 236.381 98.7206Z'
         fill='#DFDFDF'
       />
       <path
-        fill-rule='evenodd'
-        clip-rule='evenodd'
+        fillRule='evenodd'
+        clipRule='evenodd'
         d='M278.98 147.813C248.984 144.647 248.173 133.341 224.663 130.628C185.098 126.062 181.696 138.768 147.647 137.412C126.881 136.584 100.37 117.994 82.768 110.5C40.1198 92.3398 11 103.25 11 103.25V252H315V143.948C315 143.948 296.49 149.662 278.98 147.813Z'
         fill='url(#paint0_linear_4751_45802)'
       />
       <path
-        fill-rule='evenodd'
-        clip-rule='evenodd'
+        fillRule='evenodd'
+        clipRule='evenodd'
         d='M278.98 147.813C248.984 144.647 248.173 133.341 224.663 130.628C185.098 126.062 181.696 138.768 147.647 137.412C126.881 136.584 100.37 117.994 82.768 110.5C40.1198 92.3398 11 103.25 11 103.25V252H315V143.948C315 143.948 296.49 149.662 278.98 147.813Z'
         fill='url(#paint1_linear_4751_45802)'
       />
       <path
-        fill-rule='evenodd'
-        clip-rule='evenodd'
+        fillRule='evenodd'
+        clipRule='evenodd'
         d='M278.98 147.813C248.984 144.647 248.173 133.341 224.663 130.628C185.098 126.062 181.696 138.768 147.647 137.412C126.881 136.584 100.37 117.994 82.768 110.5C40.1198 92.3398 11 103.25 11 103.25V252H315V143.948C315 143.948 296.49 149.662 278.98 147.813Z'
         fill='url(#paint2_linear_4751_45802)'
       />
