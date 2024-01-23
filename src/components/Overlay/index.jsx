@@ -26,8 +26,8 @@ const Overlay = () => {
     >
       <div>
         <Header />
+        <input ref={inputRef} type='text' className='opacity-0' />
         <p
-          ref={inputRef}
           style={{
             color: '#fff',
             padding: '16px',
