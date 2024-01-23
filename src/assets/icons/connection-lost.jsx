@@ -160,8 +160,8 @@ const ConnectionLost = () => {
           y2='252'
           gradientUnits='userSpaceOnUse'
         >
-          <stop stop-color='#E0E0E0' />
-          <stop offset='1' stop-color='#E6E6E6' stop-opacity='0' />
+          <stop stopColor='#E0E0E0' />
+          <stop offset='1' stopColor='#E6E6E6' stopOpacity='0' />
         </linearGradient>
         <linearGradient
           id='paint1_linear_4751_45802'
@@ -171,8 +171,8 @@ const ConnectionLost = () => {
           y2='186.682'
           gradientUnits='userSpaceOnUse'
         >
-          <stop offset='0.03125' stop-color='#FAFAFA' />
-          <stop offset='0.427083' stop-color='#FAFAFA' stop-opacity='0' />
+          <stop offset='0.03125' stopColor='#FAFAFA' />
+          <stop offset='0.427083' stopColor='#FAFAFA' stopOpacity='0' />
         </linearGradient>
         <linearGradient
           id='paint2_linear_4751_45802'
@@ -182,8 +182,8 @@ const ConnectionLost = () => {
           y2='186.682'
           gradientUnits='userSpaceOnUse'
         >
-          <stop offset='0.666667' stop-color='#FAFAFA' stop-opacity='0' />
-          <stop offset='0.958333' stop-color='#FAFAFA' />
+          <stop offset='0.666667' stopColor='#FAFAFA' stopOpacity='0' />
+          <stop offset='0.958333' stopColor='#FAFAFA' />
         </linearGradient>
       </defs>
     </svg>
