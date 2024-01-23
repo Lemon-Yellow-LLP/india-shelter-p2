@@ -6,6 +6,7 @@ import UserManagement from '../../assets/icons/userManagement';
 import indiaShelterLogo from '../../assets/logo.svg';
 import DropDown from '../DropDown';
 import SideBarLogout from '../../assets/icons/sideBarLogout';
+import { Link } from 'react-router-dom';
 
 const userOptions = [
   {
@@ -25,18 +26,22 @@ const userTabs = [
       {
         icon: (isActive) => <UserManagement isActive={isActive} />,
         label: 'User management',
+        link: '/admin/user-management',
       },
       {
         icon: (isActive) => <MasterManagement isActive={isActive} />,
         label: 'Master management',
+        link: '/admin/master-management',
       },
       {
         icon: (isActive) => <StepsConfiguration isActive={isActive} />,
         label: 'Steps configuration',
+        link: '/admin/step-configuration',
       },
       {
         icon: (isActive) => <CaseAssignment isActive={isActive} />,
         label: 'Case assignment',
+        link: '/admin/case-assignment',
       },
     ],
   },
@@ -57,10 +62,10 @@ const userTabs = [
 
 export default function SideBar() {
   const [user, setUser] = useState('loan officer');
-  const [activeTab, setActiveTab] = useState(null);
+  const [activeTab, setActiveTab] = useState('User management');
 
   return (
-    <nav className='h-screen flex flex-col w-[252px] shrink-0 border-r border-lighter-grey'>
+    <nav className='h-screen flex flex-col w-full shrink-0 border-r border-lighter-grey'>
       <div className='px-6 py-4'>
         <img src={indiaShelterLogo} alt='India Shelter' style={{ height: '36px' }} />
         <p className='mt-2 text-primary-red text-sm'>iTrust & Agile admin</p>
@@ -88,15 +93,17 @@ export default function SideBar() {
           .tabs.map((tab) => {
             const isActive = activeTab === tab.label;
             return (
-              <button
-                key={tab.label}
-                className='flex py-[14px] mb-1 items-center w-full'
-                onClick={() => setActiveTab(tab.label)}
-              >
-                <div className={`w-1 rounded-sm ${isActive && 'bg-primary-red'} h-6 mr-6`}></div>
-                {tab.icon(isActive)}
-                <p className={`${isActive && 'text-primary-red '} ml-2 text-sm`}>{tab.label}</p>
-              </button>
+              <Link to={tab.link}>
+                <button
+                  key={tab.label}
+                  className='flex py-[14px] mb-1 items-center w-full'
+                  onClick={() => setActiveTab(tab.label)}
+                >
+                  <div className={`w-1 rounded-sm ${isActive && 'bg-primary-red'} h-6 mr-6`}></div>
+                  {tab.icon(isActive)}
+                  <p className={`${isActive && 'text-primary-red '} ml-2 text-sm`}>{tab.label}</p>
+                </button>
+              </Link>
             );
           })}
       </div>

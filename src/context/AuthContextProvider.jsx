@@ -30,6 +30,8 @@ const AuthContextProvider = ({ children }) => {
   const [phoneNumberList, setPhoneNumberList] = useState({});
   const [otpFailCount, setOtpFailCount] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
+  // move adminToastMessage to AdminContextProvider
+  const [adminToastMessage, setAdminToastMessage] = useState('User has been added successfully');
   const [errorToastMessage, setErrorToastMessage] = useState(null);
   const [isQaulifierActivated, setIsQaulifierActivated] = useState(null);
   const [sfdcCount, setSfdcCount] = useState(0);
@@ -90,6 +92,8 @@ const AuthContextProvider = ({ children }) => {
         loAllDetails,
         sfdcCount,
         setSfdcCount,
+        adminToastMessage,
+        setAdminToastMessage,
       }}
     >
       {children}
