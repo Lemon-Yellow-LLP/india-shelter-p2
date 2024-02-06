@@ -1078,7 +1078,8 @@ export default function Preview() {
                   )) &&
                 values?.lead?.extra_params?.progress_without_eligibility !== 100) ||
               (activeStep === coApplicantIndexes.length &&
-                !values?.lt_charges?.find((e) => e.status === 'Completed'))
+                !values?.lt_charges?.find((e) => e.status === 'Completed')) ||
+              !values?.applicants?.[primaryIndex]?.banking_details?.length
             }
             inputClasses='w-1/2 h-[46px]'
             onClick={nextStep}
