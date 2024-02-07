@@ -21,6 +21,7 @@ const AdminRoutes = () => {
         />
 
         <Routes>
+          <Route index element={<UserManagement />}></Route>
           <Route path='/user-management' element={<UserManagement />}></Route>
           <Route path='/master-management' element={<MasterManagement />}></Route>
           <Route path='/step-configuration' element={<StepConfiguration />}></Route>
