@@ -5,8 +5,11 @@ import StepConfiguration from './step-configuration';
 import MasterManagement from './master-management';
 import SideBar from '../../components/Sidebar';
 import AdminHeader from '../../components/Header/AdminHeader';
+import { useState } from 'react';
+import AdminForm from '../../components/AdminForm';
 
 const AdminRoutes = () => {
+  const [isFormOpen, setIsFormOpen] = useState(false);
   return (
     <div className='flex'>
       <div className='max-w-[252px] w-full'>
@@ -17,9 +20,30 @@ const AdminRoutes = () => {
           title='Manage users'
           showSearch={true}
           showButton={true}
-          buttonText='Add User'
+          buttonText={
+            <>
+              <svg
+                width='12'
+                height='12'
+                viewBox='0 0 12 12'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+                className='mr-2'
+              >
+                <path
+                  d='M6 1V11M11 6L1 6'
+                  stroke='#FEFEFE'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+              Add User
+            </>
+          }
+          handleButtonClick={() => setIsFormOpen(true)}
         />
-
+        <AdminForm isFormOpen={isFormOpen} setIsFormOpen={setIsFormOpen} />
         <Routes>
           <Route index element={<UserManagement />}></Route>
           <Route path='/user-management' element={<UserManagement />}></Route>
