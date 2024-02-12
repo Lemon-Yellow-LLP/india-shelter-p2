@@ -4,7 +4,6 @@ import UserManagement from './user-management';
 import StepConfiguration from './step-configuration';
 import MasterManagement from './master-management';
 import SideBar from '../../components/Sidebar';
-import AdminHeader from '../../components/Header/AdminHeader';
 
 const AdminRoutes = () => {
   return (
@@ -13,13 +12,6 @@ const AdminRoutes = () => {
         <SideBar />
       </div>
       <div className='w-full'>
-        <AdminHeader
-          title='Manage users'
-          showSearch={true}
-          showButton={true}
-          buttonText='Add User'
-        />
-
         <Routes>
           <Route index element={<UserManagement />}></Route>
           <Route path='/user-management' element={<UserManagement />}></Route>

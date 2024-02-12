@@ -6,6 +6,7 @@ import Searchbox from '../../../components/Searchbox.jsx';
 import { DropDown } from '../../../components/index.jsx';
 import NoUsersOnSearchIcon from '../../../assets/icons/NoUsersOnSearch.jsx';
 import FormPopUp from '../../../components/FormPopUp/index.jsx';
+import AdminHeader from '../../../components/Header/AdminHeader.jsx';
 
 const userslist = [
   {
@@ -493,10 +494,12 @@ const UserManagement = () => {
   // console.log(userAction);
   // console.log(currentPage);
 
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
 
   return (
     <>
+      <AdminHeader title='Manage users' showSearch={true} showButton={true} buttonText='Add User' />
+
       <FormPopUp showpopup={show} setShowPopUp={setShow} title='Terms and Conditions'>
         hi
       </FormPopUp>
