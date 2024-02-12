@@ -5,6 +5,7 @@ import { LeadContext } from '../../../context/LeadContextProvider.jsx';
 import Searchbox from '../../../components/Searchbox.jsx';
 import { DropDown } from '../../../components/index.jsx';
 import NoUsersOnSearchIcon from '../../../assets/icons/NoUsersOnSearch.jsx';
+import FormPopUp from '../../../components/FormPopUp/index.jsx';
 
 const userslist = [
   {
@@ -492,8 +493,13 @@ const UserManagement = () => {
   // console.log(userAction);
   // console.log(currentPage);
 
+  const [show, setShow] = useState(true);
+
   return (
     <>
+      <FormPopUp showpopup={show} setShowPopUp={setShow} title='Terms and Conditions'>
+        hi
+      </FormPopUp>
       {leadList.length ? (
         <>
           <Searchbox
