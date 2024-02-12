@@ -6,10 +6,8 @@ import MasterManagement from './master-management';
 import SideBar from '../../components/Sidebar';
 import AdminHeader from '../../components/Header/AdminHeader';
 import { useState } from 'react';
-import AdminForm from '../../components/AdminForm';
 
 const AdminRoutes = () => {
-  const [isFormOpen, setIsFormOpen] = useState(false);
   return (
     <div className='flex'>
       <div className='max-w-[252px] w-full'>
@@ -41,9 +39,8 @@ const AdminRoutes = () => {
               Add User
             </>
           }
-          handleButtonClick={() => setIsFormOpen(true)}
+          handleButtonClick={() => alert('form open')}
         />
-        <AdminForm isFormOpen={isFormOpen} setIsFormOpen={setIsFormOpen} />
         <Routes>
           <Route index element={<UserManagement />}></Route>
           <Route path='/user-management' element={<UserManagement />}></Route>

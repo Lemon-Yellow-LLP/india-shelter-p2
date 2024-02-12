@@ -340,6 +340,7 @@ const UserManagement = () => {
   const [leadList, setLeadList] = useState([]);
   const [displayedList, setDisplayedList] = useState([]);
   const [query, setQuery] = useState('');
+  const [show, setShow] = useState(false);
 
   const [filteredList, dispatch] = useReducer(UserReducer, []);
 
@@ -493,11 +494,14 @@ const UserManagement = () => {
   // console.log(userAction);
   // console.log(currentPage);
 
-  const [show, setShow] = useState(true);
-
   return (
     <>
-      <FormPopUp showpopup={show} setShowPopUp={setShow} title='Terms and Conditions'>
+      <FormPopUp
+        showpopup={show}
+        setShowPopUp={setShow}
+        title='Add user'
+        subTitle='Created on: Today'
+      >
         hi
       </FormPopUp>
       {leadList.length ? (
