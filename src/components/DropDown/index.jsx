@@ -1,7 +1,7 @@
 /* eslint-disable react/display-name */
 import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { IconArrowDown, IconTick } from '../../assets/icons';
+import { IconDownArrow, IconTick } from '../../assets/icons';
 
 const DropDown = memo(
   ({
@@ -21,6 +21,7 @@ const DropDown = memo(
     disableOption,
     disabledError,
     labelClassName,
+    styles,
     ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -82,9 +83,12 @@ const DropDown = memo(
           {...props}
           onBlur={onBlur}
           onMouseLeave={onBlur} // For Iphone
-          className={`${getThemes()} w-full flex justify-between gap-1 py-3 px-4 rounded-lg border-x border-y mt-1 bg-white disabled:bg-disabled-grey`}
+          className={`${getThemes()} ${
+            styles ? styles : 'py-3 px-4 rounded-lg'
+          } w-full flex justify-between gap-1 border-x border-y mt-1 bg-white disabled:bg-disabled-grey`}
         >
-          {selectedOption ? selectedOption.label : placeholder || props.value} <IconArrowDown />
+          {selectedOption ? selectedOption.label : placeholder || props.value}{' '}
+          <IconDownArrow width={styles ? 16 : 24} height={styles ? 16 : 24} />
         </button>
         {showDropDown && (
           <div
@@ -94,7 +98,9 @@ const DropDown = memo(
             className='rounded-lg bg-white shadow-secondary p-2 mt-2 absolute top-100 w-full overflow-y-auto z-20 border border-stroke'
           >
             {options.map((option, index) => {
-              let optionClasses = `py-3 px-4 flex justify-between w-full overflow-y-auto transition-colors duration-300 ease-out opacity-100
+              let optionClasses = `${
+                styles ? 'text-sm py-2.5 px-3' : 'text-base py-3 px-4'
+              }  flex justify-between w-full overflow-y-auto transition-colors duration-300 ease-out opacity-100
                   ${index ? 'border-t border-stroke' : 'border-none'}
                 `;
 
@@ -113,7 +119,7 @@ const DropDown = memo(
                   >
                     <div className={option.disabled && 'opacity-20'}>{option.label}</div>
                     {showIcon && selectedOption?.value === option.value ? (
-                      <IconTick />
+                      <IconTick width={styles ? 16 : 24} height={styles ? 16 : 24} />
                     ) : (
                       <div></div>
                     )}

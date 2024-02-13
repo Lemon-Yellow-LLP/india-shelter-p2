@@ -1,19 +1,35 @@
-import { useState } from 'react';
 import Button from '../Button';
 import Searchbox from '../Searchbox.jsx';
 import PropTypes from 'prop-types';
 
-export default function AdminHeader({ title, showSearch, showButton, buttonText }) {
-  const [query, setQuery] = useState('');
-
+export default function AdminHeader({
+  title,
+  query,
+  setQuery,
+  handleSearch,
+  handleResetSearch,
+  showSearch,
+  showButton,
+  buttonText,
+  prompt,
+}) {
   return (
     <div className='p-6 border-b border-lighter-grey flex justify-between items-center'>
       <h2>{title}</h2>
       <div className='flex gap-4 items-center'>
-        {showSearch && <Searchbox query={query} setQuery={setQuery} />}
+        {showSearch && (
+          <Searchbox
+            query={query}
+            setQuery={setQuery}
+            handleSubmit={handleSearch}
+            handleReset={handleResetSearch}
+            inputClasses='w-[328px]'
+            prompt={prompt}
+          />
+        )}
         {showButton && (
-          <Button inputClasses='md:py-2.5 px-5 md:w-auto md:text-base' primary>
-            {buttonText}
+          <Button inputClasses='h-12 md:py-2.5 px-5 md:w-auto md:!text-base' primary>
+            + &nbsp;{buttonText}
           </Button>
         )}
       </div>
