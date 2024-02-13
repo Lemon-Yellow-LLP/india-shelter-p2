@@ -503,14 +503,24 @@ const UserManagement = () => {
   const handleFirstNameChange = useCallback(
     (e) => {
       let first_name = e.target.value;
-      setFieldValue(e.target.name, first_name.charAt(0).toUpperCase() + first_name.slice(1));
+      first_name = first_name.trimStart().replace(/\s\s+/g, ' ');
+      // emp code should take either of alphabets or digits (max char limit 10)
+      const pattern = /^[a-zA-Z]*$/;
+      if (pattern.exec(first_name)) {
+        setFieldValue(e.target.name, first_name.charAt(0).toUpperCase() + first_name.slice(1));
+      }
     },
     [setFieldValue, values?.first_name],
   );
 
   const handleTextChange = useCallback(
     (e) => {
-      setFieldValue(e.target.name, e.target.value);
+      let value = e.target.value;
+      value = value.trimStart().replace(/\s\s+/g, ' ');
+      const pattern = /^[a-zA-Z]*$/;
+      if (pattern.exec(value)) {
+        setFieldValue(e.target.name, value);
+      }
     },
     [setFieldValue],
   );
@@ -627,59 +637,7 @@ const UserManagement = () => {
               value={values?.first_name}
               error={errors?.first_name}
               touched={touched?.first_name}
-              onBlur={async (e) => {
-                handleBlur(e);
-                coApplicantDrawerUpdate(values?.applicants);
-                const name = e.currentTarget.name.split('.')[2];
-                if (
-                  !errors?.applicants[activeIndex]?.applicant_details?.[name] &&
-                  values?.applicants?.[activeIndex]?.applicant_details?.[name]
-                ) {
-                  updateFieldsApplicant(
-                    name,
-                    values.applicants[activeIndex]?.applicant_details?.[name],
-                  );
-                  if (requiredFieldsStatus[name] !== undefined && !requiredFieldsStatus[name]) {
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-                  }
-
-                  if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-                    const res = await editFieldsById(
-                      values?.applicants[activeIndex]?.personal_details?.id,
-                      'personal',
-                      {
-                        first_name:
-                          values?.applicants?.[activeIndex]?.applicant_details?.first_name,
-                      },
-                      {
-                        headers: {
-                          Authorization: token,
-                        },
-                      },
-                    );
-                  }
-                } else {
-                  if (requiredFieldsStatus[name] !== undefined) {
-                    setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
-                  }
-                  updateFieldsApplicant(name, '');
-
-                  if (values?.applicants?.[activeIndex]?.personal_details?.id) {
-                    const res = await editFieldsById(
-                      values?.applicants[activeIndex]?.personal_details?.id,
-                      'personal',
-                      {
-                        first_name: '',
-                      },
-                      {
-                        headers: {
-                          Authorization: token,
-                        },
-                      },
-                    );
-                  }
-                }
-              }}
+              onBlur={handleBlur}
               onChange={handleFirstNameChange}
               inputClasses='capitalize'
               divClasses='flex-1'
