@@ -10,6 +10,7 @@ import AdminHeader from '../../../components/Header/AdminHeader.jsx';
 import { AuthContext } from '../../../context/AuthContextProvider.jsx';
 import AdminFormImageUpload from '../../../components/ImageUpload/AdminFormImageUpload.jsx';
 import { uploadDoc } from '../../../global/index.js';
+import AdminActionControl from '../../../components/AdminActionControl/index.jsx';
 
 const userslist = [
   {
@@ -346,6 +347,7 @@ const UserManagement = () => {
   const [displayedList, setDisplayedList] = useState([]);
   const [query, setQuery] = useState('');
   const [show, setShow] = useState(false);
+  const [showActionControlPopup, setShowActionControlPopup] = useState(false);
   const [uploadPhotoLoader, setUploadPhotoLoader] = useState(false);
   const [uploadPhotoError, setUploadPhotoError] = useState('');
   const [profilePhoto, setProfilePhoto] = useState([]);
@@ -590,7 +592,15 @@ const UserManagement = () => {
         }
         handleButtonClick={() => setShow(true)}
       />
-
+      {/* edit/ delete/ active/ inactive action popup */}
+      <AdminActionControl
+        title='Edit user'
+        actionDescription='Would you like to save the changes?'
+        showpopup={showActionControlPopup}
+        setShowPopUp={setShowActionControlPopup}
+        actionMsg='Yes, save'
+        handleActionClick={() => alert('set action func')}
+      />
       <FormPopUp
         showpopup={show}
         setShowPopUp={setShow}
