@@ -2,11 +2,14 @@ import { useCallback, useContext, useEffect, useReducer, useRef, useState } from
 import AdminPagination from '../../../components/AdminPagination/index.jsx';
 import UserTable from '../../../components/UserTable';
 import { LeadContext } from '../../../context/LeadContextProvider.jsx';
-import Searchbox from '../../../components/Searchbox.jsx';
 import { DropDown } from '../../../components/index.jsx';
 import NoUsersOnSearchIcon from '../../../assets/icons/NoUsersOnSearch.jsx';
 import FormPopUp from '../../../components/FormPopUp/index.jsx';
 import AdminHeader from '../../../components/Header/AdminHeader.jsx';
+import moment from 'moment';
+import { parseISO } from 'date-fns';
+import AdminDateRangePicker from '../../../components/AdminDateRangePicker/index.jsx';
+import NoUsersAddedIcon from '../../../assets/icons/no-users-added.jsx';
 
 const userslist = [
   {
@@ -333,18 +336,33 @@ const filterOptions = [
   { label: 'Inactive users', value: 'InActive' },
 ];
 
+const filterDateOptions = [
+  { label: 'Last 30 days', value: 'Last 30 days' },
+  { label: 'Today', value: 'Today' },
+  { label: 'Yesterday', value: 'Yesterday' },
+  { label: 'Last 7 days', value: 'Last 7 days' },
+  { label: 'Range', value: 'Range' },
+];
+
 const UserManagement = () => {
   const { userStatus, userAction, setUserStatus, setUserAction } = useContext(LeadContext);
 
   const [count, setCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [query, setQuery] = useState('');
+  const [emptyState, setEmptyState] = useState(false);
+
   const [leadList, setLeadList] = useState([]);
   const [displayedList, setDisplayedList] = useState([]);
-  const [query, setQuery] = useState('');
-
   const [filteredList, dispatch] = useReducer(UserReducer, []);
 
-  const [emptyState, setEmptyState] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [show, setShow] = useState(false);
+  const [selectionRange, setSelectionRange] = useState({
+    startDate: parseISO(moment().subtract(30, 'days').format()),
+    endDate: parseISO(moment().format()),
+    key: 'selection',
+  });
 
   function UserReducer(state, action) {
     switch (action.type) {
@@ -400,6 +418,7 @@ const UserManagement = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+
     setEmptyState(false);
     setCurrentPage(1);
 
@@ -437,10 +456,43 @@ const UserManagement = () => {
 
   const handleUsersChange = useCallback(
     (value) => {
-      if (value === 'All users') {
-        dispatch({ type: value, payload: value });
-      } else {
-        dispatch({ type: value, payload: value });
+      dispatch({ type: value, payload: value });
+      // if (value === 'All users') {
+      //   dispatch({ type: value, payload: value });
+      // } else {
+      //   dispatch({ type: value, payload: value });
+      // }
+    },
+    [displayedList],
+  );
+
+  const handleDateChange = useCallback(
+    (value) => {
+      switch (value) {
+        case 'Last 30 days': {
+          // setLeadList();
+          break;
+        }
+        case 'Today': {
+          // setLeadList();
+          break;
+        }
+        case 'Yesterday': {
+          console.log(value);
+          break;
+          // setLeadList();
+        }
+        case 'Last 7 days': {
+          // setLeadList();
+          break;
+        }
+        case 'Range': {
+          setOpen(true);
+          // setLeadList();
+          break;
+        }
+        default:
+          return value;
       }
     },
     [displayedList],
@@ -493,40 +545,73 @@ const UserManagement = () => {
   // console.log(userStatus);
   // console.log(userAction);
   // console.log(currentPage);
-
-  const [show, setShow] = useState(false);
+  // console.log(selectionRange);
 
   return (
     <>
-      <AdminHeader title='Manage users' showSearch={true} showButton={true} buttonText='Add User' />
+      <AdminHeader
+        title='Manage users'
+        query={query}
+        setQuery={setQuery}
+        handleSearch={handleSearch}
+        handleResetSearch={handleResetSearch}
+        showSearch={true}
+        showButton={true}
+        buttonText='Add User'
+        prompt='Search for emp code, name, branch, mob number'
+      />
 
       <FormPopUp showpopup={show} setShowPopUp={setShow} title='Terms and Conditions'>
         hi
       </FormPopUp>
+
+      {open ? (
+        <div className='fixed inset-0 w-full bg-black bg-opacity-50' style={{ zIndex: 99 }}>
+          <AdminDateRangePicker
+            selectionRange={selectionRange}
+            setSelectionRange={setSelectionRange}
+            open={open}
+            setOpen={setOpen}
+          />
+        </div>
+      ) : null}
+
       {leadList.length ? (
         <>
-          <Searchbox
-            query={query}
-            setQuery={setQuery}
-            handleSubmit={handleSearch}
-            handleReset={handleResetSearch}
-          />
           {!emptyState ? (
-            <>
-              <DropDown
-                label='USERS'
-                options={filterOptions}
-                onChange={handleUsersChange}
-                defaultSelected={filterOptions[0].value}
-                inputClasses='mt-2'
-              />
+            <div className='px-6 py-4 bg-medium-grey grow overflow-y-auto overflow-x-hidden'>
+              <div className='flex justify-between w-full mb-4'>
+                <DropDown
+                  label='USERS'
+                  options={filterOptions}
+                  onChange={handleUsersChange}
+                  defaultSelected={filterOptions[0].value}
+                  inputClasses='w-[170px] h-14'
+                  labelClassName='text-xs font-medium !text-dark-grey'
+                  styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
+                />
+
+                <DropDown
+                  label='DATE'
+                  options={filterDateOptions}
+                  onChange={handleDateChange}
+                  defaultSelected={filterDateOptions[0].value}
+                  inputClasses='w-[170px] h-14'
+                  labelClassName='text-xs font-medium !text-dark-grey'
+                  styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
+                  optionsMaxHeight='220'
+                />
+              </div>
+
               <UserTable userslist={displayedList} />
+
               <AdminPagination
-                currentPage={currentPage}
                 count={count}
+                currentPage={currentPage}
                 handlePageChangeCb={handleChange}
+                inputClasses=' flex justify-end mt-3'
               />
-            </>
+            </div>
           ) : (
             <div className='w-full h-screen flex justify-center items-center bg-[#FAFAFA]'>
               <NoUsersOnSearchIcon />
@@ -534,7 +619,9 @@ const UserManagement = () => {
           )}
         </>
       ) : (
-        'loading'
+        <div className='w-full h-screen flex justify-center items-center bg-[#FAFAFA]'>
+          <NoUsersAddedIcon />
+        </div>
       )}
     </>
   );

@@ -3,19 +3,23 @@ import { IconTick } from '../../assets/icons';
 import OptionsIcon from '../../assets/icons/admin-options';
 import { LeadContext } from '../../context/LeadContextProvider';
 
-const UserRow = ({ user }) => {
+const UserRow = ({ user, i }) => {
   return (
-    <tr>
-      <td className='text-primary-black font-normal text-sm p-4'>{user.employee_code}</td>
-      <td className='text-primary-black font-normal text-sm p-4'>{user.employee_name}</td>
-      <td className='text-primary-black font-normal text-sm p-4'>{user.branch}</td>
-      <td className='text-primary-black font-normal text-sm p-4'>{user.role}</td>
-      <td className='text-primary-black font-normal text-sm p-4'>{user.mobile_number}</td>
-      <td className='text-primary-black font-normal text-sm p-4'>{user.created_on}</td>
-      <td className='text-primary-black font-normal text-sm p-4'>
+    <tr
+      className={`${
+        i % 2 !== 0 ? 'bg-transparent' : 'bg-white'
+      } text-primary-black font-normal text-sm`}
+    >
+      <td className='px-4 py-[11px]'>{user.employee_code}</td>
+      <td className='px-4 py-[11px]'>{user.employee_name}</td>
+      <td className='px-4 py-[11px]'>{user.branch}</td>
+      <td className='px-4 py-[11px]'>{user.role}</td>
+      <td className='px-4 py-[11px]'>{user.mobile_number}</td>
+      <td className='px-4 py-[11px]'>{user.created_on}</td>
+      <td className='px-4 py-[11px]'>
         <AdminStatus user={user} />
       </td>
-      <td className='flex justify-center text-primary-black font-normal text-sm p-4'>
+      <td className='flex justify-start px-4 py-[11px]'>
         <AdminAction user={user} />
       </td>
     </tr>
@@ -115,7 +119,11 @@ const AdminStatus = ({ user }) => {
                 className={optionClasses}
               >
                 <div className={option.disabled && 'opacity-20'}>{option.label}</div>
-                {selectedOption === option.value ? <IconTick /> : <div></div>}
+                {selectedOption === option.value ? (
+                  <IconTick width={16} height={16} />
+                ) : (
+                  <div></div>
+                )}
               </button>
             );
           })}
@@ -132,7 +140,7 @@ const AdminAction = ({ user }) => {
   ];
 
   const [popUpOpen, setPopUpOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(options[0]);
+  const [selectedOption, setSelectedOption] = useState();
 
   const { setUserAction } = useContext(LeadContext);
 
@@ -171,7 +179,11 @@ const AdminAction = ({ user }) => {
                 className={optionClasses}
               >
                 <div className={option.disabled && 'opacity-20'}>{option.label}</div>
-                {selectedOption?.value === option.value ? <IconTick /> : <div></div>}
+                {selectedOption?.value === option.value ? (
+                  <IconTick width={16} height={16} />
+                ) : (
+                  <div></div>
+                )}
               </button>
             );
           })}

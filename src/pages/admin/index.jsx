@@ -7,11 +7,11 @@ import SideBar from '../../components/Sidebar';
 
 const AdminRoutes = () => {
   return (
-    <div className='flex'>
+    <div className='flex h-screen'>
       <div className='max-w-[252px] w-full'>
         <SideBar />
       </div>
-      <div className='w-full'>
+      <div className='flex flex-col w-full'>
         <Routes>
           <Route index element={<UserManagement />}></Route>
           <Route path='/user-management' element={<UserManagement />}></Route>
