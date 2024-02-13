@@ -13,10 +13,10 @@ const userOptions = [
     label: 'Loan Officer',
     value: 'loan officer',
   },
-  {
-    label: 'Admin',
-    value: 'admin',
-  },
+  // {
+  //   label: 'Admin',
+  //   value: 'admin',
+  // },
 ];
 
 const userTabs = [
@@ -28,21 +28,21 @@ const userTabs = [
         label: 'User management',
         link: '/admin/user-management',
       },
-      {
-        icon: (isActive) => <MasterManagement isActive={isActive} />,
-        label: 'Master management',
-        link: '/admin/master-management',
-      },
-      {
-        icon: (isActive) => <StepsConfiguration isActive={isActive} />,
-        label: 'Steps configuration',
-        link: '/admin/step-configuration',
-      },
-      {
-        icon: (isActive) => <CaseAssignment isActive={isActive} />,
-        label: 'Case assignment',
-        link: '/admin/case-assignment',
-      },
+      // {
+      //   icon: (isActive) => <MasterManagement isActive={isActive} />,
+      //   label: 'Master management',
+      //   link: '/admin/master-management',
+      // },
+      // {
+      //   icon: (isActive) => <StepsConfiguration isActive={isActive} />,
+      //   label: 'Steps configuration',
+      //   link: '/admin/step-configuration',
+      // },
+      // {
+      //   icon: (isActive) => <CaseAssignment isActive={isActive} />,
+      //   label: 'Case assignment',
+      //   link: '/admin/case-assignment',
+      // },
     ],
   },
   {
@@ -73,7 +73,7 @@ export default function SideBar() {
       <div className='px-6'>
         <div className='h-px bg-lighter-grey'></div>
       </div>
-      <div className='px-6 pt-6 pb-4'>
+      <div className='px-6 pt-6 pb-2'>
         <DropDown
           label='CHOOSE USER'
           name='dashboardUser'
@@ -84,9 +84,7 @@ export default function SideBar() {
           disabledError
         />
       </div>
-      <div className='px-6'>
-        <div className='h-px bg-lighter-grey'></div>
-      </div>
+
       <div className='py-4 grow text-light-grey'>
         {userTabs
           .find((userTab) => userTab.key === user)
@@ -101,7 +99,7 @@ export default function SideBar() {
                 >
                   <div className={`w-1 rounded-sm ${isActive && 'bg-primary-red'} h-6 mr-6`}></div>
                   {tab.icon(isActive)}
-                  <p className={`${isActive && 'text-primary-red '} ml-2 text-sm`}>{tab.label}</p>
+                  <p className={`${isActive && 'text-primary-red'} ml-2 text-sm`}>{tab.label}</p>
                 </button>
               </Link>
             );

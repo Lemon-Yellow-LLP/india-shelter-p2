@@ -5,9 +5,9 @@ const red = '#E33439';
 const grey = '#96989A';
 const selected_red = '#F2D4D5';
 
-const AdminPagination = ({ count, currentPage, handlePageChangeCb }) => {
+const AdminPagination = ({ count, currentPage, handlePageChangeCb, inputClasses }) => {
   return (
-    <div>
+    <div className={inputClasses}>
       <Stack spacing={2}>
         <Pagination
           page={currentPage}
