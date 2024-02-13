@@ -23,6 +23,7 @@ import IconSingle from './single.jsx';
 import IconSalarid from './salarid.jsx';
 import IconSelfEmployed from './self-employed.jsx';
 import IconLanguage from './Language.jsx';
+import IconDownArrow from './down-arrow.jsx';
 
 import ApplicantDetailsIcon from './ApplicantDetailsIcon';
 import AddressDetailsIcon from './AddressDetailsIcon';
@@ -100,4 +101,5 @@ export {
   IconSelfEmployed,
   TostErrorIcon,
   IconLanguage,
+  IconDownArrow,
 };
