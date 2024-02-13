@@ -577,6 +577,52 @@ const UserManagement = () => {
     [setFieldValue],
   );
 
+  const handleMobileNumberChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      const phoneNumber = value.trimStart().replace(/\s\s+/g, ' ');
+      const pattern = /[^\d]/g;
+      if (pattern.test(phoneNumber)) {
+        e.preventDefault();
+        return;
+      }
+
+      if (phoneNumber < 0) {
+        e.preventDefault();
+        return;
+      }
+
+      if (phoneNumber.length > 10) {
+        return;
+      }
+
+      if (
+        phoneNumber.charAt(0) === '0' ||
+        phoneNumber.charAt(0) === '1' ||
+        phoneNumber.charAt(0) === '2' ||
+        phoneNumber.charAt(0) === '3' ||
+        phoneNumber.charAt(0) === '4' ||
+        phoneNumber.charAt(0) === '5'
+      ) {
+        e.preventDefault();
+        return;
+      }
+
+      setFieldValue(`mobile_number`, phoneNumber);
+    },
+    [values?.mobile_number],
+  );
+
+  const handleRoleChange = useCallback((value) => setFieldValue('role', value), [values?.role]);
+  const handleBranchChange = useCallback(
+    (value) => setFieldValue('branch', value),
+    [values?.branch],
+  );
+  const handleDepartmentChange = useCallback(
+    (value) => setFieldValue('department', value),
+    [values?.department],
+  );
+
   useEffect(() => {
     setTimeout(() => {
       setLeadList(userslist);
@@ -703,9 +749,10 @@ const UserManagement = () => {
             <TextInput
               label='Mobile number'
               required
+              type='tel'
               name='mobile_number'
               value={values?.mobile_number}
-              onChange={handleTextChange}
+              onChange={handleMobileNumberChange}
               error={errors?.mobile_number}
               touched={touched?.mobile_number}
               onBlur={handleBlur}
@@ -725,10 +772,11 @@ const UserManagement = () => {
                   value: 'admin',
                 },
               ]}
-              onChange={handleTextChange}
+              onChange={handleRoleChange}
               touched={touched && touched?.role}
               error={errors && errors?.role}
               onBlur={handleBlur}
+              defaultSelected={values?.role}
               inputClasses='flex-1'
             />
           </div>
@@ -747,10 +795,11 @@ const UserManagement = () => {
                   value: 'admin',
                 },
               ]}
-              onChange={handleTextChange}
+              onChange={handleBranchChange}
               touched={touched && touched?.branch}
               error={errors && errors?.branch}
               onBlur={handleBlur}
+              defaultSelected={values?.branch}
               inputClasses='flex-1'
             />
             <DropDown
@@ -767,10 +816,11 @@ const UserManagement = () => {
                   value: 'admin',
                 },
               ]}
-              onChange={handleTextChange}
+              onChange={handleDepartmentChange}
               touched={touched && touched?.department}
               error={errors && errors?.department}
               onBlur={handleBlur}
+              defaultSelected={values?.department}
               inputClasses='flex-1'
             />
           </div>
