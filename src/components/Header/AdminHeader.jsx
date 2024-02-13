@@ -12,6 +12,7 @@ export default function AdminHeader({
   showButton,
   buttonText,
   prompt,
+  handleButtonClick,
 }) {
   return (
     <div className='p-6 border-b border-lighter-grey flex justify-between items-center'>
@@ -28,7 +29,11 @@ export default function AdminHeader({
           />
         )}
         {showButton && (
-          <Button inputClasses='h-12 md:py-2.5 px-5 md:w-auto md:!text-base' primary>
+          <Button
+            inputClasses='h-12 md:!py-2.5 px-5 md:w-auto md:!text-base'
+            primary
+            onClick={handleButtonClick}
+          >
             + &nbsp;{buttonText}
           </Button>
         )}
@@ -42,4 +47,5 @@ AdminHeader.propTypes = {
   showSearch: PropTypes.bool,
   showButton: PropTypes.bool,
   buttonText: PropTypes.string,
+  handleButtonClick: PropTypes.func,
 };

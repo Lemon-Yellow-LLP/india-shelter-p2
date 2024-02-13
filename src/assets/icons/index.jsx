@@ -51,7 +51,8 @@ import CashCreditIcon from './cashCreditIcon';
 import OverDraftIcon from './overDraftIcon';
 
 import TostErrorIcon from './TostErrorIcon';
-
+import IconThumb from './IconThumb.jsx';
+import IconAdminFormClose from './IconAdminFormClose.jsx';
 export {
   OverDraftIcon,
   CashCreditIcon,
@@ -101,5 +102,7 @@ export {
   IconSelfEmployed,
   TostErrorIcon,
   IconLanguage,
+  IconThumb,
+  IconAdminFormClose,
   IconDownArrow,
 };
