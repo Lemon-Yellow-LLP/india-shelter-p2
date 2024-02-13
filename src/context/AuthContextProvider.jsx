@@ -17,6 +17,9 @@ export const defaultValues = {
   alternate_number: '',
   comments: '',
   extra_params: '',
+  branch: '',
+  department: '',
+  profile_image_meta: null,
   is_mobile_verified: false,
 };
 

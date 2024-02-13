@@ -17,6 +17,7 @@ const TextInput = memo(
       error,
       touched,
       Icon,
+      divClasses,
       inputClasses,
       displayError = true,
       message,
@@ -29,7 +30,7 @@ const TextInput = memo(
     const inputRef = useRef();
 
     return (
-      <div className='flex flex-col gap-1'>
+      <div className={`flex flex-col gap-1 ${divClasses}`}>
         <label
           htmlFor={name}
           className={`'flex gap-0.5 items-center' ${labelDisabled ? 'opacity-60' : 'opacity-100'}`}
@@ -105,6 +106,7 @@ TextInput.propTypes = {
   touched: PropTypes.bool,
   Icon: PropTypes.elementType,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  divClasses: PropTypes.string,
   inputClasses: PropTypes.string,
   displayError: PropTypes.bool,
   disabled: PropTypes.bool,
