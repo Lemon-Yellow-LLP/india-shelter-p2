@@ -1809,9 +1809,8 @@ export default function AddressDetails() {
 
         <SwipeableDrawerComponent />
       </div>
-
       {openExistingPopup ? (
-        <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>
+        <DynamicDrawer open={true} setOpen={setOpenExistingPopup} height='80vh'>
           <div className='flex flex-col items-center h-full'>
             <span className='w-full font-semibold text-[14px] leading-[21px]'>
               This is an existing customer.

@@ -13,7 +13,32 @@ import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import { addApi, editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
-import { IconThumb } from '../../../../assets/icons';
+import { IconClose, IconThumb } from '../../../../assets/icons';
+import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
+import Radio from '../../../../components/Radio';
+import ConsentBox from '../../../../components/ConsentBox';
+import { Button } from '../../../../components';
+import EkycOtpInput from '../../../../components/OtpInput/EkycOtpInput';
+
+// Add ekyc methods
+const ekycMethods = [
+  {
+    label: 'OTP',
+    value: 'otp',
+  },
+  {
+    label: 'Biometrics',
+    value: 'biometrics',
+  },
+  {
+    label: 'IRIS',
+    value: 'iris',
+  },
+  {
+    label: 'Face Authentication',
+    value: 'faceAuthentication',
+  },
+];
 
 function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields }) {
   const {
@@ -41,6 +66,13 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
 
   const [date, setDate] = useState(null);
+  const [openEkycPopup, setOpenEkycPopup] = useState(false);
+  // otp will be default selected for ekyc
+  const [selectedEkycMethod, setSelectedEkycMethod] = useState('otp');
+  const [isConsentChecked, setIsConsentChecked] = useState(false);
+  const [isVerify, setIsVerify] = useState(false);
+  const [performVerification, setPerformVerification] = useState(false);
+  const [hasSentEkycOTPOnce, setHasSentEkycOTPOnce] = useState(true);
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
@@ -436,7 +468,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   useEffect(() => {
     mobileNumberUpdate();
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
-
   return (
     <>
       <DropDown
@@ -541,8 +572,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       {values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
         !errors?.applicants?.[activeIndex]?.personal_details?.id_number && (
           <button
-            className='text-primary-red font-semibold flex justify-end'
-            onClick={() => alert('hello')}
+            className='text-primary-red font-semibold flex justify-end ml-auto'
+            onClick={() => setOpenEkycPopup(true)}
           >
             <IconThumb />
             Verify Aadhar e-KYC
@@ -709,11 +740,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
       />
       {/* // if address proof is Aadhar and no errors in address proof no */}
-      {values?.applicants[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR' &&
+      {!values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+        values?.applicants[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR' &&
         !errors?.applicants?.[activeIndex]?.personal_details?.address_proof_number && (
           <button
-            className='text-primary-red font-semibold flex justify-end'
-            onClick={() => alert('hello')}
+            className='text-primary-red font-semibold flex justify-end ml-auto'
+            onClick={() => setOpenEkycPopup(true)}
           >
             <IconThumb />
             Verify Aadhar e-KYC
@@ -1084,6 +1116,110 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           hasSentOTPOnce={hasSentOTPOnce}
         />
       )}
+      <DynamicDrawer open={openEkycPopup} setOpen={setOpenEkycPopup} drawerChildrenClasses='!p-0'>
+        {performVerification ? (
+          <>
+            <div className='px-4 py-2 flex gap-2 justify-start w-full border-b border-lighter-grey'>
+              <button onClick={() => setPerformVerification(false)}>
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M18.0001 12.125H6.0293'
+                    stroke='#373435'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                  <path
+                    d='M6 12.125L9.91844 16.25'
+                    stroke='#373435'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                  <path
+                    d='M6 12.125L9.91844 8'
+                    stroke='#373435'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              </button>
+              <p className='font-semibold'>Verify OTP</p>
+            </div>
+            <div className='w-full p-4'>
+              <p className='text-sm text-dark-grey mb-3'>
+                OTP successfully sent to ******1234 and ra******@gmail.com
+              </p>
+              <EkycOtpInput
+                label='Enter OTP'
+                required
+                // verified={values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified}
+                // setOTPVerified={() => console.log('hii')}
+                // verifiedOnce={verifiedOnce}
+                // setVerifiedOnce={setVerifiedOnce}
+                // onSendOTPClick={sendMobileOtp}
+                defaultResendTime={30}
+                // disableSendOTP={
+                //   !values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified
+                // }
+                // verifyOTPCB={verifyOTP}
+                hasSentOTPOnce={hasSentEkycOTPOnce}
+              />
+              <Button
+                primary
+                disabled={!isConsentChecked}
+                onClick={() => alert('hi')}
+                inputClasses='mt-6'
+              >
+                Verify OTP
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div className='w-full h-[550px] flex flex-col'>
+            <div className='flex justify-between px-4 py-2 border-b border-lighter-grey'>
+              <p className='font-semibold'>Select verification method</p>
+              <button onClick={() => setOpenEkycPopup(false)}>
+                <IconClose />
+              </button>
+            </div>
+            <div className='px-4 pt-4 overflow-y-scroll'>
+              <div className='flex flex-col gap-2'>
+                {ekycMethods.map((method) => {
+                  return (
+                    <Radio
+                      key={method.label}
+                      label={method.label}
+                      value={method.value}
+                      current={selectedEkycMethod}
+                      onChange={() => setSelectedEkycMethod(method.value)}
+                    />
+                  );
+                })}
+              </div>
+              <hr className='my-4 bg-lighter-grey h-px w-full' />
+              <ConsentBox isChecked={isConsentChecked} setIsChecked={setIsConsentChecked} />
+            </div>
+            <div className='py-6 px-4 bg-[#FEFEFE]'>
+              <Button
+                primary
+                disabled={!isConsentChecked}
+                onClick={() => setPerformVerification(true)}
+                inputClasses='!py-3'
+              >
+                {selectedEkycMethod === 'otp' ? 'Verify' : 'Scan'}
+              </Button>
+            </div>
+          </div>
+        )}
+      </DynamicDrawer>
     </>
   );
 }

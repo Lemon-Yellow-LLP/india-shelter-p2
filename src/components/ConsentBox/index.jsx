@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Checkbox from '../Checkbox';
 import Audio from '../Audio/index';
 import LanguageDropDown from '../DropDown/LanguageDropDown';
+import PropTypes from 'prop-types';
 
 const consentInMultipleLanguage = [
   {
@@ -24,9 +25,8 @@ const consentInMultipleLanguage = [
   },
 ];
 
-const ConsentBox = () => {
+const ConsentBox = ({ isChecked, setIsChecked }) => {
   const [seeMore, setSeeMore] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
   const [language, setLanguage] = useState('english');
   const [consent, setConsent] = useState(
     consentInMultipleLanguage.find((info) => info.language === language),
@@ -53,7 +53,7 @@ const ConsentBox = () => {
   ];
 
   return (
-    <div className='p-4'>
+    <div>
       <div className='mb-3 flex justify-between items-center'>
         <p className='font-medium'>Consent</p>
         <LanguageDropDown
@@ -68,7 +68,7 @@ const ConsentBox = () => {
             isLarge
             name='consent'
             checked={isChecked}
-            onChange={() => setIsChecked(!isChecked)}
+            onTouchEnd={() => setIsChecked(!isChecked)}
           />
           <div className='ml-2'>
             <p className={`${!seeMore ? 'line-clamp-2' : ''}  text-dark-grey text-xs`}>
@@ -93,3 +93,8 @@ const ConsentBox = () => {
 };
 
 export default ConsentBox;
+
+ConsentBox.propTypes = {
+  isChecked: PropTypes.bool,
+  setIsChecked: PropTypes.bool,
+};

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 const Radio = ({ label, value, current, onChange }) => {
   return (
-    <div className='flex gap-3 justify-center items-center'>
+    <div className='flex gap-3 items-center'>
       <div
         type='radio'
         className={`${
