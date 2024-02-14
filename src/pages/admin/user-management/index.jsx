@@ -1,8 +1,7 @@
 import { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import AdminPagination from '../../../components/AdminPagination/index.jsx';
 import UserTable from '../../../components/UserTable';
-import { LeadContext } from '../../../context/LeadContextProvider.jsx';
-import { DropDown, TextInput } from '../../../components/index.jsx';
+import { Button, DropDown, TextInput } from '../../../components/index.jsx';
 import NoUsersOnSearchIcon from '../../../assets/icons/NoUsersOnSearch.jsx';
 import FormPopUp from '../../../components/FormPopUp/index.jsx';
 import AdminHeader from '../../../components/Header/AdminHeader.jsx';
@@ -349,8 +348,18 @@ const filterDateOptions = [
 ];
 
 const UserManagement = () => {
-  const { userStatus, userAction, setUserStatus, setUserAction } = useContext(LeadContext);
-  const { values, errors, touched, setFieldValue, handleBlur, token } = useContext(AuthContext);
+  const {
+    values,
+    errors,
+    touched,
+    setFieldValue,
+    handleBlur,
+    token,
+    userStatus,
+    userAction,
+    setUserStatus,
+    setUserAction,
+  } = useContext(AuthContext);
 
   const [count, setCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -592,21 +601,6 @@ const UserManagement = () => {
     );
   }, [leadList]);
 
-  // Need to use while api integration
-  // useEffect(() => {
-  //   if (userStatus) {
-  //     console.log('call status change api');
-  //     setUserStatus('');
-  //   }
-  // }, [userStatus]);
-
-  // useEffect(() => {
-  //   if (userAction) {
-  //     console.log('call action change api');
-  //     setUserAction('');
-  //   }
-  // }, [userAction]);
-
   useEffect(() => {
     setCount(Math.ceil(filteredList.length / 10));
     setDisplayedList(filteredList.filter((_, i) => i < 10));
@@ -625,6 +619,35 @@ const UserManagement = () => {
   // console.log(userAction);
   // console.log(currentPage);
   // console.log(selectionRange);
+
+  // Need to use while api integration
+  useEffect(() => {
+    if (userStatus) {
+      setShowActionControlPopup(true);
+    }
+  }, [userStatus]);
+
+  useEffect(() => {
+    if (userAction && userAction.value === 'Edit') {
+      setShow(true);
+    } else if (userAction) {
+      setShowActionControlPopup(true);
+    }
+  }, [userAction]);
+
+  const handleEditStatus = () => {
+    console.log('call status change api, as status change confirmed', userStatus);
+    setUserStatus('');
+  };
+
+  const handleEditData = () => {
+    if (userAction.value === 'Edit') {
+      console.log('edit user confirmed as edit user confirmed', userAction);
+    } else {
+      console.log('delete user confirmed, as delete user confirmed', userAction);
+    }
+    setUserAction('');
+  };
 
   return (
     <>
@@ -647,7 +670,7 @@ const UserManagement = () => {
         showpopup={showActionControlPopup}
         setShowPopUp={setShowActionControlPopup}
         actionMsg='Yes, save'
-        handleActionClick={() => alert('set action func')}
+        handleActionClick={userStatus.value ? handleEditStatus : handleEditData}
       />
       <FormPopUp
         showpopup={show}

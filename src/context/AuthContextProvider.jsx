@@ -39,6 +39,10 @@ const AuthContextProvider = ({ children }) => {
   const [isQaulifierActivated, setIsQaulifierActivated] = useState(null);
   const [sfdcCount, setSfdcCount] = useState(0);
 
+  //p3 states
+  const [userStatus, setUserStatus] = useState('');
+  const [userAction, setUserAction] = useState('');
+
   useEffect(() => {
     if (sfdcCount > 1) {
       setToastMessage(null);
@@ -97,6 +101,10 @@ const AuthContextProvider = ({ children }) => {
         setSfdcCount,
         adminToastMessage,
         setAdminToastMessage,
+        userStatus,
+        setUserStatus,
+        userAction,
+        setUserAction,
       }}
     >
       {children}

@@ -1,7 +1,7 @@
 import { useCallback, useContext, useState } from 'react';
 import { IconTick } from '../../assets/icons';
 import OptionsIcon from '../../assets/icons/admin-options';
-import { LeadContext } from '../../context/LeadContextProvider';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 const UserRow = ({ user, i }) => {
   return (
@@ -37,7 +37,7 @@ const AdminStatus = ({ user }) => {
   const [popUpOpen, setPopUpOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(user.status);
 
-  const { setUserStatus } = useContext(LeadContext);
+  const { setUserStatus } = useContext(AuthContext);
 
   const handleSelect = useCallback(
     (option) => {
@@ -142,7 +142,7 @@ const AdminAction = ({ user }) => {
   const [popUpOpen, setPopUpOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState();
 
-  const { setUserAction } = useContext(LeadContext);
+  const { setUserAction } = useContext(AuthContext);
 
   const handleSelect = useCallback(
     (option) => {
