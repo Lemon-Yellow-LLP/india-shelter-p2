@@ -187,8 +187,8 @@ export const coApplicantPagesRoute = [
 
 export const filterOptions = [
   { label: 'All users', value: 'All users' },
-  { label: 'Active users', value: 'Active' },
-  { label: 'Inactive users', value: 'InActive' },
+  { label: 'Active users', value: 'active' },
+  { label: 'Inactive users', value: 'inActive' },
 ];
 
 export const filterDateOptions = [
