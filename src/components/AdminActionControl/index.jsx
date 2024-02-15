@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 import Button from '../Button';
 
 const AdminActionControl = ({
+  title,
+  subtitle,
+  actionMsg,
   showpopup,
   setShowPopUp,
-  actionDescription,
-  title,
-  actionMsg,
   handleActionClick,
+  handleResetAction,
 }) => {
   if (showpopup)
     return createPortal(
@@ -32,17 +33,25 @@ const AdminActionControl = ({
             <div className='grow'>
               <h3 className='text-lg text-center text-primary-black font-semibold'>{title}</h3>
             </div>
-            <button onClick={() => setShowPopUp(false)}>
+            <button
+              onClick={() => {
+                handleResetAction();
+                setShowPopUp(false);
+              }}
+            >
               <IconAdminFormClose />
             </button>
           </div>
           {/* bottom div with action control ctas */}
           <div className='pt-4 pb-6 px-10 border-t border-lighter-grey flex flex-col'>
-            <p className='text-center mb-8'>{actionDescription}</p>
+            <p className='text-center mb-8'>{subtitle}</p>
             <div className='flex gap-4'>
               <Button
                 inputClasses='!text-base font-medium !w-[175px] !py-2.5'
-                onClick={() => setShowPopUp(false)}
+                onClick={() => {
+                  handleResetAction();
+                  setShowPopUp(false);
+                }}
               >
                 Cancel
               </Button>

@@ -3,7 +3,16 @@ import { IconAdminFormClose, IconClose } from '../../assets/icons';
 import PropTypes from 'prop-types';
 import Button from '../Button';
 
-const FormPopUp = ({ showpopup, setShowPopUp, children, title, subTitle, handleActionClick }) => {
+const FormPopUp = ({
+  title,
+  subTitle,
+  children,
+  showpopup,
+  setShowPopUp,
+  actionMsg,
+  handleActionClick,
+  handleResetAction,
+}) => {
   if (showpopup)
     return createPortal(
       <div
@@ -26,7 +35,13 @@ const FormPopUp = ({ showpopup, setShowPopUp, children, title, subTitle, handleA
               <h3 className='text-lg text-primary-black font-medium'>{title}</h3>
               <p className='text-xs text-dark-grey mt-1'>{subTitle}</p>
             </div>
-            <button className='p-1 ml-auto' onClick={() => setShowPopUp(false)}>
+            <button
+              className='p-1 ml-auto'
+              onClick={() => {
+                handleResetAction();
+                setShowPopUp(false);
+              }}
+            >
               <IconAdminFormClose />
             </button>
           </div>
@@ -36,7 +51,10 @@ const FormPopUp = ({ showpopup, setShowPopUp, children, title, subTitle, handleA
           <div className='p-6 border-t border-lighter-grey flex gap-4 justify-end'>
             <Button
               inputClasses='!text-base font-medium !w-[145px] !py-2.5'
-              onClick={() => setShowPopUp(false)}
+              onClick={() => {
+                handleResetAction();
+                setShowPopUp(false);
+              }}
             >
               Cancel
             </Button>
@@ -45,7 +63,7 @@ const FormPopUp = ({ showpopup, setShowPopUp, children, title, subTitle, handleA
               inputClasses='!text-base font-medium !w-[145px] !py-2.5'
               onClick={handleActionClick}
             >
-              Confirm
+              {actionMsg}
             </Button>
           </div>
         </div>
