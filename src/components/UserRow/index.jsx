@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { IconTick } from '../../assets/icons';
 import OptionsIcon from '../../assets/icons/admin-options';
 import { AuthContext } from '../../context/AuthContextProvider';
@@ -33,8 +33,8 @@ export default UserRow;
 
 const AdminStatus = ({ user }) => {
   const options = [
-    { label: 'Active', value: 'Active' },
-    { label: 'Inactive', value: 'Inactive' },
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inActive' },
   ];
 
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -44,24 +44,27 @@ const AdminStatus = ({ user }) => {
 
   const handleSelect = useCallback(
     (option) => {
-      setSelectedOption(option.value);
       setPopUpOpen(false);
-      setUserStatus({ id: user.employee_code, value: option.value });
+      setUserStatus({ id: user.id, value: option.value });
     },
     [user],
   );
+
+  useEffect(() => {
+    setSelectedOption(user.status);
+  }, [user]);
 
   return (
     <div className='relative'>
       <button
         onClick={() => setPopUpOpen(!popUpOpen)}
         className={`flex items-center w-24 px-3 py-1.5 justify-between ${
-          selectedOption === 'Active'
+          selectedOption === 'active'
             ? 'bg-light-green  border-secondary-green'
             : 'bg-[#FFF1E3] border-[#EF8D32]'
         }  border-x border-y rounded-[20px]`}
       >
-        {selectedOption === 'Active' ? (
+        {selectedOption === 'active' ? (
           <>
             <span className='text-secondary-green text-xs font-medium'>Active</span>
             <svg
@@ -145,13 +148,26 @@ const AdminAction = ({ user }) => {
   const [popUpOpen, setPopUpOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState();
 
-  const { setUserAction } = useContext(AuthContext);
+  const { setUserAction, setValues } = useContext(AuthContext);
 
   const handleSelect = useCallback(
     (option) => {
       setSelectedOption(option);
       setPopUpOpen(false);
-      setUserAction({ id: user.employee_code, value: option.value });
+      setUserAction({ id: user.id, value: option.value });
+      const userMeta = {
+        employee_code: user.employee_code,
+        username: user.username,
+        role: user.role,
+        first_name: user.first_name,
+        middle_name: user.middle_name,
+        last_name: user.last_name,
+        mobile_number: user.mobile_number,
+        branch: user.branch,
+        department: user.department,
+        loimage: user.loimage,
+      };
+      setValues(userMeta);
     },
     [user],
   );

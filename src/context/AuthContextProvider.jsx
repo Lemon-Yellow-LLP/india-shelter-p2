@@ -42,10 +42,10 @@ const AuthContextProvider = ({ children }) => {
   const [sfdcCount, setSfdcCount] = useState(0);
 
   //p3 states
-  const [userStatus, setUserStatus] = useState('');
-  const [userAction, setUserAction] = useState('');
+  const [userStatus, setUserStatus] = useState(null);
+  const [userAction, setUserAction] = useState(null);
   const [show, setShow] = useState(false);
-  const [useradd, setUseradd] = useState();
+  const [useradd, setUseradd] = useState(null);
 
   useEffect(() => {
     if (sfdcCount > 1) {
@@ -57,11 +57,15 @@ const AuthContextProvider = ({ children }) => {
     initialValues: { ...defaultValues },
     validationSchema: signInSchema,
     onSubmit: (values) => {
-      console.log(userAction);
-      // const user = addUser(values);
-      // const editedUser = editUser(values, userAction.id);
-      // setUseradd(editedUser);
-      // setShow(false);
+      if (userAction) {
+        const editedUser = editUser(userAction.id, values);
+        setUseradd(editedUser);
+        setShow(false);
+      } else {
+        const user = addUser(values);
+        setUseradd(user);
+        setShow(false);
+      }
     },
   });
 

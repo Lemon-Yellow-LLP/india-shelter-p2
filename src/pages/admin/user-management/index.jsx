@@ -10,13 +10,15 @@ import { parseISO } from 'date-fns';
 import AdminDateRangePicker from '../../../components/AdminDateRangePicker/index.jsx';
 import { AuthContext } from '../../../context/AuthContextProvider.jsx';
 import AdminFormImageUpload from '../../../components/ImageUpload/AdminFormImageUpload.jsx';
-import { getUsersList, uploadDoc } from '../../../global/index.js';
+import { editUser, getUsersList, uploadDoc } from '../../../global/index.js';
 import AdminActionControl from '../../../components/AdminActionControl/index.jsx';
 import { filterOptions, filterDateOptions } from '../../../utils/index.js';
 
 const UserManagement = () => {
   const {
     values,
+    initialValues,
+    setValues,
     errors,
     touched,
     setFieldValue,
@@ -30,6 +32,7 @@ const UserManagement = () => {
     show,
     setShow,
     useradd,
+    setUseradd,
   } = useContext(AuthContext);
 
   const [count, setCount] = useState(0);
@@ -91,10 +94,10 @@ const UserManagement = () => {
       case 'All users': {
         return leadList;
       }
-      case 'Active': {
+      case 'active': {
         return leadList.filter((lead) => lead.status == action.payload);
       }
-      case 'InActive': {
+      case 'inActive': {
         return leadList.filter((lead) => lead.status === action.payload);
       }
       case 'Search': {
@@ -370,8 +373,8 @@ const UserManagement = () => {
   useEffect(() => {
     const getUsers = async () => {
       const payload = {
-        start_date: selectionRange.startDate,
-        end_date: selectionRange.endDate,
+        start_date: parseISO(moment().subtract(30, 'days').format()),
+        end_date: parseISO(moment().format()),
         page: 1,
         page_size: 10000000,
       };
@@ -386,6 +389,7 @@ const UserManagement = () => {
 
   //display users
   useEffect(() => {
+    dispatch({ type: 'All users', payload: 'All users' });
     setDisplayedList(
       leadList.filter((lead, i) => {
         return i < 10;
@@ -407,41 +411,42 @@ const UserManagement = () => {
     }
   }, [displayedList]);
 
-  //add user
-  const handleAddData = () => {
-    handleSubmit();
-    setUserAction('');
-  };
-
-  //call edit user if status is changed
+  //open confirmation pop up on basis of status change
   useEffect(() => {
     if (userStatus) {
       setShowActionControlPopup(true);
     }
   }, [userStatus]);
 
-  const handleEditStatus = () => {
-    setShow(false);
-    setUserStatus('');
-  };
-
-  //call edit user if user edited or deleted
+  //open form popup if action is edit or else open confirmation pop up if action is delete
   useEffect(() => {
-    if (userAction && userAction.value === 'Edit') {
+    if (userAction && userAction?.value === 'Edit') {
       setShow(true);
-    } else if (userAction) {
+    } else if (userAction && userAction?.value === 'Delete') {
       setShowActionControlPopup(true);
     }
   }, [userAction]);
 
-  const handleEditData = () => {
-    if (userAction.value === 'Edit') {
-      handleSubmit();
+  //call api's on basis of user action confirmation
+  const handleDataChange = () => {
+    if (userStatus) {
+      editUser(userStatus.id, { status: userStatus.value })
+        .then((editedUser) => setUseradd(editedUser))
+        .catch((err) => console.log(err));
+
+      setUserStatus(null);
+      setShowActionControlPopup(false);
     } else {
-      setShow(false);
+      console.log('call delete user api');
+      setUserAction(null);
+      setShowActionControlPopup(false);
     }
-    setUserAction('');
   };
+
+  // console.log(leadList);
+  // console.log(resetDate);
+  // console.log(resetFilter);
+  // console.log(errors);
 
   return (
     <>
@@ -460,20 +465,30 @@ const UserManagement = () => {
 
       {/* edit/ delete/ active/ inactive action popup */}
       <AdminActionControl
-        title='Edit user'
-        actionDescription='Would you like to save the changes?'
+        title={userStatus ? 'Edit user' : 'Delete user'}
+        subtitle={
+          userStatus
+            ? ' Would you like to save the changes?'
+            : 'Would you like to delete this user?'
+        }
+        actionMsg={userStatus ? 'Yes, save' : 'Yes, delete'}
         showpopup={showActionControlPopup}
         setShowPopUp={setShowActionControlPopup}
-        actionMsg='Yes, save'
-        handleActionClick={userStatus.value ? handleEditStatus : handleEditData}
+        handleActionClick={handleDataChange}
+        handleResetAction={() => (userStatus ? setUserStatus(null) : setUserAction(null))}
       />
 
       <FormPopUp
+        title={userAction ? 'Edit user' : 'Add user'}
+        subTitle='Created on: Today'
+        actionMsg={userAction ? 'Save' : 'Confirm'}
         showpopup={show}
         setShowPopUp={setShow}
-        title={userAction.value ? 'Edit user' : 'Add user'}
-        subTitle='Created on: Today'
-        handleActionClick={userAction.value ? handleEditData : handleAddData}
+        handleActionClick={handleSubmit}
+        handleResetAction={() => {
+          setValues(initialValues);
+          setUserAction(null);
+        }}
       >
         <div className='p-6 overflow-y-scroll overflow-x-hidden flex flex-col gap-y-4'>
           <div className='flex gap-6'>
@@ -486,6 +501,7 @@ const UserManagement = () => {
               error={errors?.employee_code}
               touched={touched?.employee_code}
               onBlur={handleBlur}
+              disabled={!!userAction}
               divClasses='flex-1'
             />
             <TextInput
@@ -539,11 +555,11 @@ const UserManagement = () => {
               options={[
                 {
                   label: 'Loan Officer',
-                  value: 'loan_officer',
+                  value: 'Loan Officer',
                 },
                 {
                   label: 'Admin',
-                  value: 'admin',
+                  value: 'Admin',
                 },
               ]}
               onChange={handleRoleChange}
@@ -552,6 +568,7 @@ const UserManagement = () => {
               onBlur={handleBlur}
               defaultSelected={values?.role}
               inputClasses='flex-1'
+              disabled={!!userAction}
             />
           </div>
           <div className='flex gap-6'>
@@ -562,11 +579,11 @@ const UserManagement = () => {
               options={[
                 {
                   label: 'Loan Officer',
-                  value: 'loan_officer',
+                  value: 'Loan Officer',
                 },
                 {
                   label: 'Admin',
-                  value: 'admin',
+                  value: 'Admin',
                 },
               ]}
               onChange={handleBranchChange}
@@ -583,11 +600,11 @@ const UserManagement = () => {
               options={[
                 {
                   label: 'Loan Officer',
-                  value: 'loan_officer',
+                  value: 'loan Officer',
                 },
                 {
                   label: 'Admin',
-                  value: 'admin',
+                  value: 'Admin',
                 },
               ]}
               onChange={handleDepartmentChange}
@@ -636,53 +653,51 @@ const UserManagement = () => {
         </div>
       ) : null}
 
-      {/* {leadList.length ? ( */}
       <>
-        {!emptyState ? (
-          <div className='px-6 py-4 bg-medium-grey grow overflow-y-auto overflow-x-hidden'>
-            <div className='flex justify-between w-full mb-4'>
-              <DropDown
-                label='USERS'
-                options={filterOptions}
-                onChange={handleUsersChange}
-                defaultSelected={filterOptions[0].value}
-                inputClasses='w-[170px] h-14'
-                labelClassName='text-xs font-medium !text-dark-grey'
-                styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
-              />
+        <div
+          className={`px-6 py-4 bg-medium-grey grow overflow-y-auto overflow-x-hidden ${
+            emptyState && 'hidden'
+          }`}
+        >
+          <div className='flex justify-between w-full mb-4'>
+            <DropDown
+              label='USERS'
+              options={filterOptions}
+              onChange={handleUsersChange}
+              defaultSelected={filterOptions[0].value}
+              inputClasses='w-[170px] h-14'
+              labelClassName='text-xs font-medium !text-dark-grey'
+              styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
+            />
 
-              <DropDown
-                label='DATE'
-                options={filterDateOptions}
-                onChange={handleDateChange}
-                defaultSelected={filterDateOptions[0].value}
-                inputClasses='w-[170px] h-14'
-                labelClassName='text-xs font-medium !text-dark-grey'
-                styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
-                optionsMaxHeight='220'
-              />
-            </div>
-
-            <UserTable userslist={displayedList} />
-
-            <AdminPagination
-              count={count}
-              currentPage={currentPage}
-              handlePageChangeCb={handleChange}
-              inputClasses=' flex justify-end mt-3'
+            <DropDown
+              label='DATE'
+              options={filterDateOptions}
+              onChange={handleDateChange}
+              defaultSelected={filterDateOptions[0].value}
+              inputClasses='w-[170px] h-14'
+              labelClassName='text-xs font-medium !text-dark-grey'
+              styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
+              optionsMaxHeight='220'
             />
           </div>
-        ) : (
-          <div className='w-full h-screen flex justify-center items-center bg-[#FAFAFA]'>
+
+          <UserTable userslist={displayedList} />
+
+          <AdminPagination
+            count={count}
+            currentPage={currentPage}
+            handlePageChangeCb={handleChange}
+            inputClasses=' flex justify-end mt-3'
+          />
+        </div>
+
+        {emptyState ? (
+          <div className='w-full h-screen flex justify-center items-center bg-[#FAFAFA] grow overflow-y-auto overflow-x-hidden'>
             <NoUsersOnSearchIcon />
           </div>
-        )}
+        ) : null}
       </>
-      {/* ) : ( */}
-      {/* <div className='w-full h-screen flex justify-center items-center bg-[#FAFAFA]'>
-          <NoUsersAddedIcon />
-        </div> */}
-      {/* )} */}
     </>
   );
 };
