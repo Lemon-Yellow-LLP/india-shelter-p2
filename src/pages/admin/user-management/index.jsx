@@ -8,344 +8,11 @@ import AdminHeader from '../../../components/Header/AdminHeader.jsx';
 import moment from 'moment';
 import { parseISO } from 'date-fns';
 import AdminDateRangePicker from '../../../components/AdminDateRangePicker/index.jsx';
-import NoUsersAddedIcon from '../../../assets/icons/no-users-added.jsx';
 import { AuthContext } from '../../../context/AuthContextProvider.jsx';
 import AdminFormImageUpload from '../../../components/ImageUpload/AdminFormImageUpload.jsx';
-import { uploadDoc } from '../../../global/index.js';
+import { getUsersList, uploadDoc } from '../../../global/index.js';
 import AdminActionControl from '../../../components/AdminActionControl/index.jsx';
-
-const userslist = [
-  {
-    employee_code: 'ISFC0913',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0914',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0915',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0916',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0917',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0918',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0919',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0920',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0921',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0922',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0923',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0924',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0925',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0926',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0927',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0928',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0929',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0930',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0931',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0932',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0933',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0934',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0935',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-
-  {
-    employee_code: 'ISFC0936',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0937',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0938',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0939',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0940',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0941',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0942',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0943',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0944',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0945',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'Active',
-  },
-  {
-    employee_code: 'ISFC0946',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-  {
-    employee_code: 'ISFC0947',
-    employee_name: 'Suresh Ramji',
-    branch: 'Gurugram',
-    role: 'Branch Officer',
-    mobile_number: '9238329132',
-    created_on: '09/11/2023',
-    status: 'InActive',
-  },
-];
-
-const filterOptions = [
-  { label: 'All users', value: 'All users' },
-  { label: 'Active users', value: 'Active' },
-  { label: 'Inactive users', value: 'InActive' },
-];
-
-const filterDateOptions = [
-  { label: 'Last 30 days', value: 'Last 30 days' },
-  { label: 'Today', value: 'Today' },
-  { label: 'Yesterday', value: 'Yesterday' },
-  { label: 'Last 7 days', value: 'Last 7 days' },
-  { label: 'Range', value: 'Range' },
-];
+import { filterOptions, filterDateOptions } from '../../../utils/index.js';
 
 const UserManagement = () => {
   const {
@@ -359,6 +26,10 @@ const UserManagement = () => {
     userAction,
     setUserStatus,
     setUserAction,
+    handleSubmit,
+    show,
+    setShow,
+    useradd,
   } = useContext(AuthContext);
 
   const [count, setCount] = useState(0);
@@ -377,7 +48,8 @@ const UserManagement = () => {
   const [filteredList, dispatch] = useReducer(UserReducer, []);
 
   const [open, setOpen] = useState(false);
-  const [show, setShow] = useState(false);
+  const [range, setRange] = useState(false);
+
   const [selectionRange, setSelectionRange] = useState({
     startDate: parseISO(moment().subtract(30, 'days').format()),
     endDate: parseISO(moment().format()),
@@ -442,6 +114,7 @@ const UserManagement = () => {
     }
   }
 
+  //pagination filter
   const handleChange = (event, value) => {
     setCurrentPage(value);
     // Assuming each page contains a fixed number of items, let's say 10 items per page
@@ -466,6 +139,7 @@ const UserManagement = () => {
     }
   };
 
+  //search filter
   const handleSearch = (e) => {
     e.preventDefault();
 
@@ -473,72 +147,108 @@ const UserManagement = () => {
     setCurrentPage(1);
 
     dispatch({ type: 'Search', payload: 'Search' });
-
-    // const searchedList = leadList.filter((lead) => {
-    //   return lead.employee_code.toLowerCase().includes(query) || lead.employee_code.includes(query);
-    // });
-
-    // setSearchedList(searchedList);
-
-    // setCount(Math.ceil(searchedList.length / 10));
-
-    // setDisplayedList(
-    //   searchedList.filter((lead, i) => {
-    //     return i < 10;
-    //   }),
-    // );
   };
 
+  //reset search filter
   const handleResetSearch = () => {
     setQuery('');
     dispatch({ type: 'All users', payload: 'All users' });
     setCurrentPage(1);
     setEmptyState(false);
-    // setCount(Math.ceil(leadList.length / 10));
-    // setSearchedList([]);
-
-    // setDisplayedList(
-    //   leadList.filter((lead, i) => {
-    //     return i < 10;
-    //   }),
-    // );
   };
 
+  //active Inactive filter
   const handleUsersChange = useCallback(
     (value) => {
       dispatch({ type: value, payload: value });
-      // if (value === 'All users') {
-      //   dispatch({ type: value, payload: value });
-      // } else {
-      //   dispatch({ type: value, payload: value });
-      // }
     },
     [displayedList],
   );
 
+  //date filter
   const handleDateChange = useCallback(
     (value) => {
       switch (value) {
         case 'Last 30 days': {
-          // setLeadList();
+          const payload = {
+            start_date: parseISO(moment().subtract(30, 'days').format()),
+            end_date: parseISO(moment().format()),
+            page: 1,
+            page_size: 10000000,
+          };
+
+          getUsersList(payload)
+            .then((users) => {
+              setLeadList(users.data);
+              setCount(Math.ceil(users.data.length / 10));
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+
           break;
         }
         case 'Today': {
-          // setLeadList();
+          const payload = {
+            start_date: parseISO(moment().format()),
+            end_date: parseISO(moment().format()),
+            page: 1,
+            page_size: 10000000,
+          };
+
+          getUsersList(payload)
+            .then((users) => {
+              setLeadList(users.data);
+              setCount(Math.ceil(users.data.length / 10));
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+
           break;
         }
         case 'Yesterday': {
-          console.log(value);
+          const payload = {
+            start_date: parseISO(moment().subtract(1, 'days').format()),
+            end_date: parseISO(moment().subtract(1, 'days').format()),
+            page: 1,
+            page_size: 10000000,
+          };
+
+          getUsersList(payload)
+            .then((users) => {
+              setLeadList(users.data);
+              setCount(Math.ceil(users.data.length / 10));
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+
           break;
           // setLeadList();
         }
         case 'Last 7 days': {
-          // setLeadList();
+          const payload = {
+            start_date: parseISO(moment().subtract(7, 'days').format()),
+            end_date: parseISO(moment().format()),
+            page: 1,
+            page_size: 10000000,
+          };
+
+          getUsersList(payload)
+            .then((users) => {
+              setLeadList(users.data);
+              setCount(Math.ceil(users.data.length / 10));
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+
           break;
         }
         case 'Range': {
           setOpen(true);
-          // setLeadList();
+          setRange(true);
           break;
         }
         default:
@@ -548,6 +258,27 @@ const UserManagement = () => {
     [displayedList],
   );
 
+  useEffect(() => {
+    if (range) {
+      const payload = {
+        start_date: selectionRange.startDate,
+        end_date: moment(selectionRange.endDate).add(1, 'day'),
+        page: 1,
+        page_size: 10000000,
+      };
+
+      getUsersList(payload)
+        .then((users) => {
+          setLeadList(users.data);
+          setCount(Math.ceil(users.data.length / 10));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [selectionRange]);
+
+  //form handlers
   const handleEmpCodeChange = useCallback(
     (e) => {
       let value = e.target.value;
@@ -618,27 +349,42 @@ const UserManagement = () => {
       }
 
       setFieldValue(`mobile_number`, phoneNumber);
+      setFieldValue(`username`, phoneNumber);
     },
     [values?.mobile_number],
   );
 
   const handleRoleChange = useCallback((value) => setFieldValue('role', value), [values?.role]);
+
   const handleBranchChange = useCallback(
     (value) => setFieldValue('branch', value),
     [values?.branch],
   );
+
   const handleDepartmentChange = useCallback(
     (value) => setFieldValue('department', value),
     [values?.department],
   );
 
+  //fetch users
   useEffect(() => {
-    setTimeout(() => {
-      setLeadList(userslist);
-      setCount(Math.ceil(userslist.length / 10));
-    }, 2000);
-  }, []);
+    const getUsers = async () => {
+      const payload = {
+        start_date: selectionRange.startDate,
+        end_date: selectionRange.endDate,
+        page: 1,
+        page_size: 10000000,
+      };
 
+      const users = await getUsersList(payload);
+
+      setLeadList(users.data);
+      setCount(Math.ceil(users.data.length / 10));
+    };
+    getUsers();
+  }, [useradd]);
+
+  //display users
   useEffect(() => {
     setDisplayedList(
       leadList.filter((lead, i) => {
@@ -647,32 +393,39 @@ const UserManagement = () => {
     );
   }, [leadList]);
 
+  //set filtered users
   useEffect(() => {
     setCount(Math.ceil(filteredList.length / 10));
     setDisplayedList(filteredList.filter((_, i) => i < 10));
     setCurrentPage(1);
   }, [filteredList]);
 
+  //set empty state if no leads found in search
   useEffect(() => {
-    if (!displayedList.length) {
+    if (!displayedList.length && query) {
       setEmptyState(!emptyState);
     }
   }, [displayedList]);
 
-  // console.log(filteredList);
-  // console.log(displayedList);
-  // console.log(userStatus);
-  // console.log(userAction);
-  // console.log(currentPage);
-  // console.log(selectionRange);
+  //add user
+  const handleAddData = () => {
+    handleSubmit();
+    setUserAction('');
+  };
 
-  // Need to use while api integration
+  //call edit user if status is changed
   useEffect(() => {
     if (userStatus) {
       setShowActionControlPopup(true);
     }
   }, [userStatus]);
 
+  const handleEditStatus = () => {
+    setShow(false);
+    setUserStatus('');
+  };
+
+  //call edit user if user edited or deleted
   useEffect(() => {
     if (userAction && userAction.value === 'Edit') {
       setShow(true);
@@ -681,16 +434,11 @@ const UserManagement = () => {
     }
   }, [userAction]);
 
-  const handleEditStatus = () => {
-    console.log('call status change api, as status change confirmed', userStatus);
-    setUserStatus('');
-  };
-
   const handleEditData = () => {
     if (userAction.value === 'Edit') {
-      console.log('edit user confirmed as edit user confirmed', userAction);
+      handleSubmit();
     } else {
-      console.log('delete user confirmed, as delete user confirmed', userAction);
+      setShow(false);
     }
     setUserAction('');
   };
@@ -709,6 +457,7 @@ const UserManagement = () => {
         prompt='Search for emp code, name, branch, mob number'
         handleButtonClick={() => setShow(true)}
       />
+
       {/* edit/ delete/ active/ inactive action popup */}
       <AdminActionControl
         title='Edit user'
@@ -718,11 +467,13 @@ const UserManagement = () => {
         actionMsg='Yes, save'
         handleActionClick={userStatus.value ? handleEditStatus : handleEditData}
       />
+
       <FormPopUp
         showpopup={show}
         setShowPopUp={setShow}
-        title='Add user'
+        title={userAction.value ? 'Edit user' : 'Add user'}
         subTitle='Created on: Today'
+        handleActionClick={userAction.value ? handleEditData : handleAddData}
       >
         <div className='p-6 overflow-y-scroll overflow-x-hidden flex flex-col gap-y-4'>
           <div className='flex gap-6'>
@@ -885,53 +636,53 @@ const UserManagement = () => {
         </div>
       ) : null}
 
-      {leadList.length ? (
-        <>
-          {!emptyState ? (
-            <div className='px-6 py-4 bg-medium-grey grow overflow-y-auto overflow-x-hidden'>
-              <div className='flex justify-between w-full mb-4'>
-                <DropDown
-                  label='USERS'
-                  options={filterOptions}
-                  onChange={handleUsersChange}
-                  defaultSelected={filterOptions[0].value}
-                  inputClasses='w-[170px] h-14'
-                  labelClassName='text-xs font-medium !text-dark-grey'
-                  styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
-                />
+      {/* {leadList.length ? ( */}
+      <>
+        {!emptyState ? (
+          <div className='px-6 py-4 bg-medium-grey grow overflow-y-auto overflow-x-hidden'>
+            <div className='flex justify-between w-full mb-4'>
+              <DropDown
+                label='USERS'
+                options={filterOptions}
+                onChange={handleUsersChange}
+                defaultSelected={filterOptions[0].value}
+                inputClasses='w-[170px] h-14'
+                labelClassName='text-xs font-medium !text-dark-grey'
+                styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
+              />
 
-                <DropDown
-                  label='DATE'
-                  options={filterDateOptions}
-                  onChange={handleDateChange}
-                  defaultSelected={filterDateOptions[0].value}
-                  inputClasses='w-[170px] h-14'
-                  labelClassName='text-xs font-medium !text-dark-grey'
-                  styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
-                  optionsMaxHeight='220'
-                />
-              </div>
-
-              <UserTable userslist={displayedList} />
-
-              <AdminPagination
-                count={count}
-                currentPage={currentPage}
-                handlePageChangeCb={handleChange}
-                inputClasses=' flex justify-end mt-3'
+              <DropDown
+                label='DATE'
+                options={filterDateOptions}
+                onChange={handleDateChange}
+                defaultSelected={filterDateOptions[0].value}
+                inputClasses='w-[170px] h-14'
+                labelClassName='text-xs font-medium !text-dark-grey'
+                styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
+                optionsMaxHeight='220'
               />
             </div>
-          ) : (
-            <div className='w-full h-screen flex justify-center items-center bg-[#FAFAFA]'>
-              <NoUsersOnSearchIcon />
-            </div>
-          )}
-        </>
-      ) : (
-        <div className='w-full h-screen flex justify-center items-center bg-[#FAFAFA]'>
+
+            <UserTable userslist={displayedList} />
+
+            <AdminPagination
+              count={count}
+              currentPage={currentPage}
+              handlePageChangeCb={handleChange}
+              inputClasses=' flex justify-end mt-3'
+            />
+          </div>
+        ) : (
+          <div className='w-full h-screen flex justify-center items-center bg-[#FAFAFA]'>
+            <NoUsersOnSearchIcon />
+          </div>
+        )}
+      </>
+      {/* ) : ( */}
+      {/* <div className='w-full h-screen flex justify-center items-center bg-[#FAFAFA]'>
           <NoUsersAddedIcon />
-        </div>
-      )}
+        </div> */}
+      {/* )} */}
     </>
   );
 };

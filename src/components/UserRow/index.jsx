@@ -2,6 +2,7 @@ import { useCallback, useContext, useState } from 'react';
 import { IconTick } from '../../assets/icons';
 import OptionsIcon from '../../assets/icons/admin-options';
 import { AuthContext } from '../../context/AuthContextProvider';
+import moment from 'moment';
 
 const UserRow = ({ user, i }) => {
   return (
@@ -11,11 +12,13 @@ const UserRow = ({ user, i }) => {
       } text-primary-black font-normal text-sm`}
     >
       <td className='px-4 py-[11px]'>{user.employee_code}</td>
-      <td className='px-4 py-[11px]'>{user.employee_name}</td>
+      <td className='px-4 py-[11px]'>
+        {String(user.first_name + ' ' + user.middle_name + ' ' + user.last_name)}
+      </td>
       <td className='px-4 py-[11px]'>{user.branch}</td>
       <td className='px-4 py-[11px]'>{user.role}</td>
       <td className='px-4 py-[11px]'>{user.mobile_number}</td>
-      <td className='px-4 py-[11px]'>{user.created_on}</td>
+      <td className='px-4 py-[11px]'>{moment(user.updated_at).format('do MMMM YYYY')}</td>
       <td className='px-4 py-[11px]'>
         <AdminStatus user={user} />
       </td>

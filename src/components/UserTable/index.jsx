@@ -6,7 +6,7 @@ const TableHeaderList = [
   'BRANCH',
   'ROLE',
   'MOBILE NUMBER',
-  'CREATED ON',
+  'LAST MODIFIED',
   'STATUS',
   'ACTION',
 ];
@@ -29,7 +29,7 @@ const UserTable = ({ userslist }) => {
         </thead>
         <tbody>
           {userslist.map((user, i) => (
-            <UserRow user={user} key={user.employee_code} i={i} />
+            <UserRow user={user} key={user.id} i={i} />
           ))}
         </tbody>
       </table>

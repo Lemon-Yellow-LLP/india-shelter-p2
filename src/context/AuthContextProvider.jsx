@@ -3,24 +3,26 @@ import { useFormik } from 'formik';
 import { signInSchema } from '../schemas/index';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import { addUser, editUser } from '../global';
 
 export const defaultValues = {
   employee_code: '',
-  username: import.meta.env.VITE_DEV === 'true' ? '9876543210' : '',
-  password: '',
+  username: '',
+  // password: '',
   role: '',
   first_name: '',
   middle_name: '',
   last_name: '',
-  address: '',
+  // address: '',
   mobile_number: '',
-  alternate_number: '',
-  comments: '',
-  extra_params: '',
+  // alternate_number: '',
+  // comments: '',
+  // extra_params: '',
   branch: '',
   department: '',
-  profile_image_meta: null,
-  is_mobile_verified: false,
+  // is_active: true,
+  loimage: '',
+  // is_mobile_verified: false,
 };
 
 export const AuthContext = createContext(defaultValues);
@@ -42,6 +44,8 @@ const AuthContextProvider = ({ children }) => {
   //p3 states
   const [userStatus, setUserStatus] = useState('');
   const [userAction, setUserAction] = useState('');
+  const [show, setShow] = useState(false);
+  const [useradd, setUseradd] = useState();
 
   useEffect(() => {
     if (sfdcCount > 1) {
@@ -52,6 +56,13 @@ const AuthContextProvider = ({ children }) => {
   const formik = useFormik({
     initialValues: { ...defaultValues },
     validationSchema: signInSchema,
+    onSubmit: (values) => {
+      console.log(userAction);
+      // const user = addUser(values);
+      // const editedUser = editUser(values, userAction.id);
+      // setUseradd(editedUser);
+      // setShow(false);
+    },
   });
 
   const getLoAllDetails = async () => {
@@ -105,6 +116,10 @@ const AuthContextProvider = ({ children }) => {
         setUserStatus,
         userAction,
         setUserAction,
+        show,
+        setShow,
+        useradd,
+        setUseradd,
       }}
     >
       {children}

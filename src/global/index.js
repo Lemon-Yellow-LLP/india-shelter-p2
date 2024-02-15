@@ -513,6 +513,34 @@ export async function getDashboardLeadList(
   }
 }
 
+//admin
+async function getUsersList(values, options) {
+  try {
+    const { data } = await axios.post(`${API_URL}/admin/get-user-list`, values, options);
+    return data;
+  } catch (error) {
+    return error;
+  }
+}
+
+async function addUser(values, options) {
+  try {
+    const { data } = await axios.post(`${API_URL}/admin/add-user/`, values, options);
+    return data;
+  } catch (error) {
+    return error;
+  }
+}
+
+async function editUser(id, values, options) {
+  try {
+    const { data } = await axios.post(`${API_URL}/admin/edit-user/${id}`, values, options);
+    return data;
+  } catch (error) {
+    return error;
+  }
+}
+
 export {
   API_URL,
   pingAPI,
@@ -555,4 +583,7 @@ export {
   getUserById,
   editDoc,
   checkLoanOfficerExists,
+  getUsersList,
+  addUser,
+  editUser,
 };

@@ -3,7 +3,7 @@ import { IconAdminFormClose, IconClose } from '../../assets/icons';
 import PropTypes from 'prop-types';
 import Button from '../Button';
 
-const FormPopUp = ({ showpopup, setShowPopUp, children, title, subTitle }) => {
+const FormPopUp = ({ showpopup, setShowPopUp, children, title, subTitle, handleActionClick }) => {
   if (showpopup)
     return createPortal(
       <div
@@ -40,7 +40,11 @@ const FormPopUp = ({ showpopup, setShowPopUp, children, title, subTitle }) => {
             >
               Cancel
             </Button>
-            <Button primary inputClasses='!text-base font-medium !w-[145px] !py-2.5'>
+            <Button
+              primary
+              inputClasses='!text-base font-medium !w-[145px] !py-2.5'
+              onClick={handleActionClick}
+            >
               Confirm
             </Button>
           </div>
