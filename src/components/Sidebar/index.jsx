@@ -91,7 +91,7 @@ export default function SideBar() {
           .tabs.map((tab) => {
             const isActive = activeTab === tab.label;
             return (
-              <Link to={tab.link}>
+              <Link to={tab.link} key={tab.label}>
                 <button
                   key={tab.label}
                   className='flex py-[14px] mb-1 items-center w-full'
