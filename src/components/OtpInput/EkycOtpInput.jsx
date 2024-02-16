@@ -6,55 +6,52 @@ const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified
 const EkycOtpInput = ({
   label,
   required,
-  verified,
-  setOTPVerified,
   onSendOTPClick,
   disableSendOTP,
-  verifyOTPCB,
   defaultResendTime,
   hasSentOTPOnce,
-  verifiedOnce,
-  setVerifiedOnce,
+  setIsVerifyOtp,
 }) => {
   const [otp, setOtp] = useState('');
-  const [activeOtpIndex, setActiveOtpIndex] = useState(null);
   const [inputDisabled, setInputDisabled] = useState(true);
-  const [timer, setTimer] = useState(hasSentOTPOnce);
+  const [timer, setTimer] = useState(true);
   const [resendTime, setResendTime] = useState(defaultResendTime || 10);
   const inputRef = useRef(null);
 
+  // sorted
   const handleOnChange = useCallback(
     async (e) => {
       const { value } = e.target;
-      setOtp(value);
-      if (value.length >= 6) {
-        setInputDisabled(true);
-        let res = await verifyOTPCB(value);
-        setInputDisabled(res);
-        setTimer(false);
+      if (value.length <= 6) {
+        setOtp(value);
+        setIsVerifyOtp(false);
+      }
+      if (value.length === 6) {
+        setIsVerifyOtp(true);
       }
     },
-    [otp, verifyOTPCB],
+    [otp],
   );
 
   const handleOnOTPSend = useCallback(() => {
+    console.log('onotpsend disabling the otp field');
+    setIsVerifyOtp(false);
     setInputDisabled(false);
     onSendOTPClick();
     setTimer(true);
-    setVerifiedOnce(false);
   }, [onSendOTPClick]);
 
   useEffect(() => {
     if (!hasSentOTPOnce) return;
-    setActiveOtpIndex(0);
+    // console.log('useeffect disabling the otp field');
     setInputDisabled(false);
     setTimer(true);
   }, [hasSentOTPOnce]);
 
+  // sorted
   useEffect(() => {
     let interval = null;
     if (timer) {
-      // setOTPVerified(false);
       let time = defaultResendTime || 10;
       interval = setInterval(() => {
         time -= 1;
@@ -72,22 +69,17 @@ const EkycOtpInput = ({
     return () => {
       clearInterval(interval);
     };
-  }, [verified, timer, setOTPVerified, defaultResendTime]);
+  }, [timer, defaultResendTime]);
 
-  useEffect(() => {
-    inputRef.current?.focus({ preventScroll: true });
-  }, [activeOtpIndex]);
-
+  // sorted
   const inputClasses = useMemo(() => {
-    if (!hasSentOTPOnce) return 'border-stroke bg-white';
-    if (hasSentOTPOnce && !verified && !verifiedOnce)
-      return 'border-secondary-blue shadow-secondary-blue shadow-primary';
-    if (!verified && verifiedOnce) return 'border-primary-red shadow-primary shadow-primary-red';
-    if (verified) return 'border-dark-grey';
-  }, [verified, hasSentOTPOnce, verifiedOnce]);
+    if (otp.length === 0 || otp.length === 6) return 'border-stroke bg-white';
+    return 'border-secondary-blue shadow-secondary-blue shadow-primary';
+  }, [otp]);
 
   return (
     <div className='otp-container'>
+      {/* sorted */}
       <h3 className='flex gap-0.5 text-primary-black'>
         {label}
         {required && <span className='text-primary-red text-sm'>*</span>}
@@ -118,13 +110,19 @@ const EkycOtpInput = ({
           onPaste={(e) => {
             e.preventDefault();
             const text = (e.originalEvent || e).clipboardData.getData('text/plain');
-            setOtp(text);
-            if (text.length >= 6) {
-              verifyOTPCB(text);
+            // check copied value is digits or not
+            if (/^\d+$/.test(text)) {
+              if (text.length >= 6) {
+                setOtp(text.substring(0, 6));
+                setIsVerifyOtp(true);
+                return;
+              }
+              setOtp(text);
             }
           }}
         />
       </div>
+      {/* sorted */}
       <div className='mt-3 flex justify-between items-center'>
         <div className='flex gap-0.5'>
           {timer && (
@@ -132,6 +130,7 @@ const EkycOtpInput = ({
           )}
         </div>
       </div>
+      {/* sorted */}
       <div className='w-full flex justify-end'>
         {!timer ? (
           <button
@@ -156,15 +155,13 @@ const EkycOtpInput = ({
 EkycOtpInput.propTypes = {
   label: PropTypes.string.isRequired,
   required: PropTypes.bool,
-  verified: PropTypes.any,
-  setOTPVerified: PropTypes.func,
   onSendOTPClick: PropTypes.func,
   disableSendOTP: PropTypes.bool,
-  verifyOTPCB: PropTypes.func,
   defaultResendTime: PropTypes.number,
-  hasSentOTPOnce: PropTypes.any,
-  verifiedOnce: PropTypes.any,
-  setVerifiedOnce: PropTypes.any,
+  hasSentOTPOnce: PropTypes.bool,
+  setIsVerifyOtp: PropTypes.func,
 };
 
 export default EkycOtpInput;
+
+// inputRef.current?.focus({ preventScroll: true });
