@@ -551,6 +551,25 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             Verify Aadhar e-KYC
           </button>
         )}
+      {/* when ekyc is verified show kyc successful msg
+      <div className='gap-1 flex'>
+        <svg
+          width='18'
+          height='18'
+          viewBox='0 0 18 18'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <path
+            d='M15 4.5L6.75 12.75L3 9'
+            stroke='#147257'
+            strokeWidth='1.5'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          />
+        </svg>
+        <p className='text-xs text-secondary-green'>e-KYC completed successfully</p>
+      </div> */}
       <div className='flex items-center gap-2'>
         <Checkbox
           checked={
@@ -723,6 +742,25 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             Verify Aadhar e-KYC
           </button>
         )}
+      {/* when ekyc is verified show kyc successful msg
+      <div className='gap-1 flex'>
+        <svg
+          width='18'
+          height='18'
+          viewBox='0 0 18 18'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <path
+            d='M15 4.5L6.75 12.75L3 9'
+            stroke='#147257'
+            strokeWidth='1.5'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          />
+        </svg>
+        <p className='text-xs text-secondary-green'>e-KYC completed successfully</p>
+      </div> */}
       <TextInput
         label='First Name'
         placeholder='Eg: Sanjay'

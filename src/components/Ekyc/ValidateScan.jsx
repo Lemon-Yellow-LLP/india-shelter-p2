@@ -1,50 +1,116 @@
 import Button from '../Button';
 import Scanner from '../Scanner';
 import PropTypes from 'prop-types';
-import { Fingerprint_failure, Fingerprint_success, Scanning_fingerprint } from './ScanAnimations';
-import { useEffect, useState } from 'react';
+import {
+  Fingerprint_scanning,
+  Fingerprint_success,
+  Fingerprint_failure,
+  Iris_scanning,
+  Iris_success,
+  Iris_failure,
+  FaceAuth_scanning,
+  FaceAuth_success,
+  FaceAuth_failure,
+} from './ScanAnimations';
+import { useContext, useEffect, useState } from 'react';
+import axios from 'axios';
+import { LeadContext } from '../../context/LeadContextProvider';
+import { AuthContext } from '../../context/AuthContextProvider';
+
+let obj = [
+  {
+    title: 'Biometrics Scan',
+    scanLoadingMsg: 'Place your THUMB/FINGER on scanner',
+    scanSuccessMsg: 'Successfully captured information, validating Aadhar details',
+    scanFailureMsg: 'Unable to capture information, place your THUMB/FINGER on scanner',
+    scanLoadingAnimation: Fingerprint_scanning,
+    scanSuccessAnimation: Fingerprint_success,
+    scanFailureAnimation: Fingerprint_failure,
+  },
+  {
+    title: 'IRIS scan',
+    scanLoadingMsg: 'Place your EYE in front of machine',
+    scanSuccessMsg: 'Successfully captured information, validating Aadhar details',
+    scanFailureMsg: 'Unable to capture information, Place your EYE in front of machine',
+    scanLoadingAnimation: Iris_scanning,
+    scanSuccessAnimation: Iris_success,
+    scanFailureAnimation: Iris_failure,
+  },
+  {
+    title: 'Face Authentication',
+    scanLoadingMsg: 'Place your Face in front of Machine',
+    scanSuccessMsg: 'Successfully captured information, validating Aadhar details',
+    scanFailureMsg: 'Unable to capture information, Place your Face in front of Machine',
+    scanLoadingAnimation: FaceAuth_scanning,
+    scanSuccessAnimation: FaceAuth_success,
+    scanFailureAnimation: FaceAuth_failure,
+  },
+];
 
 // type = "biometric", "iris", "faceAuth"
-export default function ValidateScan({ type, setPerformVerification }) {
+export default function ValidateScan({
+  type,
+  setPerformVerification,
+  setScanningState,
+  setOpenEkycPopup,
+}) {
+  const { setToastMessage } = useContext(LeadContext);
+  const { setErrorToastMessage } = useContext(AuthContext);
+  // storing current selected scan meta data
   const [validateScanObj, setValidateScanObj] = useState({});
+
+  // capture biometric
   const [isCaptureSuccessful, setIsCaptureSuccessful] = useState(false);
-  const [scannerAnimation, setScannerAnimation] = useState(null);
-  const [scannerMsg, setScannerMsg] = useState('');
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsCaptureSuccessful(true);
-    }, 3000);
-  }, []);
-
-  useEffect(() => {
-    setScannerAnimation(validateScanObj.scanSuccessAnimation);
-    setScannerMsg(validateScanObj.scanSuccessMsg);
-  }, [isCaptureSuccessful]);
+  const [isCaptureFailure, setIsCaptureFailure] = useState(false);
 
   useEffect(() => {
     if (type === 'biometrics') {
-      let obj = {
-        title: 'Biometrics Scan',
-        scanLoadingMsg: 'Place your THUMB/FINGER on scanner',
-        scanFailureMsg: 'Successfully captured information, validating Aadhar details',
-        scanSuccessMsg: 'Unable to capture information, place your THUMB/FINGER on scanner',
-        scanLoadingAnimation: Scanning_fingerprint,
-        scanSuccessAnimation: Fingerprint_success,
-        scanFailureAnimation: Fingerprint_failure,
-      };
-      setValidateScanObj(obj);
-      console.log('setting validatescanobj');
-      setScannerAnimation(obj.scanLoadingAnimation);
-      setScannerMsg(obj.scanLoadingMsg);
+      setValidateScanObj(obj[0]);
+    } else if (type === 'iris') {
+      setValidateScanObj(obj[1]);
+    } else {
+      setValidateScanObj(obj[2]);
     }
   }, [type]);
-  console.log(type);
+
+  const captureScan = async () => {
+    console.log('capturing scan', Math.random());
+    const { data } = await axios.get(
+      `https://reqres.in/api/users/${Math.floor(Math.random() * 10)}?delay=4`,
+    );
+    if (data) {
+      if (Math.floor(Math.random() * 10) % 2) {
+        // capture successful
+        setIsCaptureSuccessful(true);
+      } else {
+        // capture unsuccessful
+        setIsCaptureFailure(true);
+      }
+    }
+  };
+  useEffect(() => {
+    captureScan();
+  }, []);
+
+  const validateCapturedScan = () => {
+    console.log('validating captured scan with aadhar');
+    setTimeout(() => {
+      if (Math.floor(Math.random() * 10) % 2) {
+        setToastMessage('Information fetched Successfully');
+      } else {
+        setErrorToastMessage('Technical error');
+      }
+      setOpenEkycPopup(false);
+      setPerformVerification(false);
+    }, 3000);
+  };
   return (
     <>
       <div className='px-4 py-2 flex gap-2 justify-start w-full border-b border-lighter-grey'>
         <button
           onClick={() => {
+            // setting scanning state to default loading state(searching for device)
+            setScanningState('loading');
             setPerformVerification(false);
           }}
         >
@@ -81,15 +147,59 @@ export default function ValidateScan({ type, setPerformVerification }) {
         <p className='font-semibold'>{validateScanObj.title}</p>
       </div>
       <div className='w-full px-4 pt-4 pb-6'>
-        <Scanner animationFile={scannerAnimation} message={scannerMsg} />
-        <Button
-          primary
-          disabled={!isCaptureSuccessful}
-          onClick={() => console.log('validating captured biometrics')}
-          inputClasses='!py-3 mt-6'
-        >
-          Validate
-        </Button>
+        {isCaptureFailure ? (
+          <>
+            {/* if Capture fails show "Try again" or "Try another method" */}
+            <Scanner
+              animationFile={validateScanObj.scanFailureAnimation}
+              message={validateScanObj.scanFailureMsg}
+            />
+            <Button
+              primary
+              onClick={() => {
+                setIsCaptureFailure(false);
+                captureScan();
+              }}
+              inputClasses='!py-3 mt-6'
+            >
+              Try again
+            </Button>
+            <Button
+              onClick={() => {
+                // setting scanning state to default loading state(searching for device)
+                setScanningState('loading');
+                setPerformVerification(false);
+              }}
+              inputClasses='!py-3 mt-3'
+            >
+              Try another method
+            </Button>
+          </>
+        ) : (
+          <>
+            {/* validating if capture successful */}
+            <Scanner
+              animationFile={
+                isCaptureSuccessful
+                  ? validateScanObj.scanSuccessAnimation
+                  : validateScanObj.scanLoadingAnimation
+              }
+              message={
+                isCaptureSuccessful
+                  ? validateScanObj.scanSuccessMsg
+                  : validateScanObj.scanLoadingMsg
+              }
+            />
+            <Button
+              primary
+              disabled={!isCaptureSuccessful}
+              onClick={validateCapturedScan}
+              inputClasses='!py-3 mt-6'
+            >
+              Validate
+            </Button>
+          </>
+        )}
       </div>
     </>
   );

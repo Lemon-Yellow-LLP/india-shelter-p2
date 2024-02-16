@@ -16,12 +16,12 @@ export default function Popup({
   state,
 }) {
   // on success autoHide popup after certain duration
-  if (state === 'success') {
+  if (state === 'success' && open) {
     setTimeout(() => {
       handleSuccess();
     }, 1000);
   }
-  console.log(state, ' from popup');
+
   let popupStateClasses =
     state === 'error'
       ? 'bg-lighter-red border border-primary-red'
@@ -31,6 +31,7 @@ export default function Popup({
   let popupTextColor =
     state === 'error' || state === 'success' ? 'text-primary-black' : 'text-neutral-white';
   let crossSvgColor = state === 'error' || state === 'success' ? '#373435' : '#FEFEFE';
+
   return open ? (
     <div
       style={{ bottom: `${bottom || 145}px` }}

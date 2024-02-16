@@ -6,11 +6,12 @@ import ManualMode from './ManualMode';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { addApi, editFieldsById } from '../../../../global';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
-import { Button } from '../../../../components';
+import { Button, ToastMessage } from '../../../../components';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import ErrorTost from '../../../../components/ToastMessage/ErrorTost';
 
 const PersonalDetails = () => {
   const {
@@ -21,9 +22,11 @@ const PersonalDetails = () => {
     setFieldValue,
     activeIndex,
     setCurrentStepIndex,
+    toastMessage,
+    setToastMessage,
   } = useContext(LeadContext);
 
-  const { token } = useContext(AuthContext);
+  const { token, errorToastMessage, setErrorToastMessage } = useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.applicants?.[activeIndex]?.personal_details?.extra_params?.required_fields_status,
@@ -252,6 +255,9 @@ const PersonalDetails = () => {
 
   return (
     <>
+      <ToastMessage message={toastMessage} setMessage={setToastMessage} />
+      <ErrorTost message={errorToastMessage} setMessage={setErrorToastMessage} />
+
       <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
           <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />

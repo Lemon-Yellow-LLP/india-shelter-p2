@@ -31,7 +31,7 @@ export default function DynamicDrawer({
       <SwipeableDrawer
         anchor='bottom'
         open={open}
-        onClose={toggleDrawer}
+        // onClose={toggleDrawer}
         // onOpen={() => console.log('open')}
         swipeAreaWidth={drawerBleeding}
         allowSwipeInChildren={false}

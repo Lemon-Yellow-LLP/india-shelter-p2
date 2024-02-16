@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import Button from '../Button';
 import { IconClose } from '../../assets/icons';
 import Radio from '../Radio';
@@ -7,6 +7,8 @@ import Popup from '../Popup';
 import PropTypes from 'prop-types';
 import EkycOtpInput from '../OtpInput/EkycOtpInput';
 import ValidateScan from './ValidateScan';
+import { LeadContext } from '../../context/LeadContextProvider';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 // Add ekyc methods
 const ekycMethods = [
@@ -29,6 +31,8 @@ const ekycMethods = [
 ];
 
 export default function EkycDrawer({ setOpenEkycPopup }) {
+  const { setToastMessage } = useContext(LeadContext);
+  const { setErrorToastMessage } = useContext(AuthContext);
   // otp will be default selected for ekyc
   const [selectedEkycMethod, setSelectedEkycMethod] = useState('otp');
   const [performVerification, setPerformVerification] = useState(false);
@@ -39,6 +43,10 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
   // loading, error, success (default would be loading state)
   const [scanningState, setScanningState] = useState('loading');
 
+  const consentRef = useRef();
+  const updateConsentRef = (consent) => {
+    consentRef.current = consent;
+  };
   const sendMobileOtp = () => {
     console.log('sending otp on mobile no. linked to aadhar');
   };
@@ -48,12 +56,30 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
     setPerformVerification(true);
   };
 
+  const handleVerifyAadharOtp = () => {
+    console.log('verifing aadhar otp');
+    setTimeout(() => {
+      if (Math.floor(Math.random() * 10) % 2) {
+        setToastMessage('Information fetched Successfully');
+      } else {
+        setErrorToastMessage('Technical error');
+      }
+      setOpenEkycPopup(false);
+    }, 3000);
+  };
+
   const handleScan = () => {
     console.log('searching for device');
     setDeviceScanPopup(true);
-    setTimeout(() => setScanningState('success'), 3000);
+    setTimeout(() => {
+      if (Math.floor(Math.random() * 10) % 2) {
+        setScanningState('success');
+      } else {
+        setScanningState('error');
+      }
+    }, 3000);
   };
-  console.log(scanningState);
+  console.log(consentRef.current);
   return performVerification ? (
     selectedEkycMethod === 'otp' ? (
       <>
@@ -97,6 +123,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
           <p className='font-semibold'>Verify OTP</p>
         </div>
         <div className='w-full px-4 pt-4 pb-6'>
+          {/* Aadhar will provide the masked email and masked mobile no. */}
           <p className='text-sm text-dark-grey mb-3'>
             OTP successfully sent to ******1234 and ra******@gmail.com
           </p>
@@ -110,7 +137,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
           <Button
             primary
             disabled={!isVerifyOtp}
-            onClick={() => console.log('verifing otp')}
+            onClick={handleVerifyAadharOtp}
             inputClasses='mt-6 !py-3'
           >
             Verify OTP
@@ -119,7 +146,12 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
       </>
     ) : (
       // handling biometrics, iris, faceAuth scan
-      <ValidateScan type={selectedEkycMethod} setPerformVerification={setPerformVerification} />
+      <ValidateScan
+        type={selectedEkycMethod}
+        setPerformVerification={setPerformVerification}
+        setScanningState={setScanningState}
+        setOpenEkycPopup={setOpenEkycPopup}
+      />
     )
   ) : (
     <div className='relative'>
@@ -145,7 +177,11 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
             })}
           </div>
           <hr className='my-4 bg-lighter-grey h-px w-full' />
-          <ConsentBox isChecked={isConsentChecked} setIsChecked={setIsConsentChecked} />
+          <ConsentBox
+            isChecked={isConsentChecked}
+            setIsChecked={setIsConsentChecked}
+            updateConsentRef={updateConsentRef}
+          />
         </div>
         <div className={`py-6 px-4 bg-[#FEFEFE] ${deviceScanPopup && 'opacity-0'}`}>
           <Button
