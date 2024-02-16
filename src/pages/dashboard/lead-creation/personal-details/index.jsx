@@ -266,56 +266,11 @@ const PersonalDetails = () => {
           />
         )}
         <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
-          <div className='flex flex-col gap-2'>
-            <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
-              How would you like to proceed <span className='text-primary-red text-xs'>*</span>
-            </label>
-            <div className={`flex gap-4 w-full`}>
-              {personalDetailsModeOption.map((option) => {
-                return (
-                  <CardRadio
-                    key={option.value}
-                    label={option.label}
-                    name={`applicants[${activeIndex}].personal_details.how_would_you_like_to_proceed`}
-                    value={option.value}
-                    current={
-                      values?.applicants?.[activeIndex]?.personal_details
-                        ?.how_would_you_like_to_proceed
-                    }
-                    onChange={handleRadioChange}
-                    containerClasses='flex-1'
-                    disabled={
-                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
-                    }
-                  >
-                    {option.icon}
-                  </CardRadio>
-                );
-              })}
-            </div>
-            {errors?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
-            touched?.applicants &&
-            touched?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed ? (
-              <span
-                className='text-xs text-primary-red'
-                dangerouslySetInnerHTML={{
-                  __html:
-                    errors?.applicants[activeIndex]?.personal_details
-                      ?.how_would_you_like_to_proceed,
-                }}
-              />
-            ) : (
-              ''
-            )}
-          </div>
-          {values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed ===
-            'Manual' && (
-            <ManualMode
-              requiredFieldsStatus={requiredFieldsStatus}
-              setRequiredFieldsStatus={setRequiredFieldsStatus}
-              updateFields={updateFields}
-            />
-          )}
+          <ManualMode
+            requiredFieldsStatus={requiredFieldsStatus}
+            setRequiredFieldsStatus={setRequiredFieldsStatus}
+            updateFields={updateFields}
+          />
         </div>
 
         <PreviousNextButtons

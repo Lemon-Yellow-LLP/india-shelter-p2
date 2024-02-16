@@ -49,6 +49,8 @@ import CashCreditIcon from './cashCreditIcon';
 import OverDraftIcon from './overDraftIcon';
 
 import TostErrorIcon from './TostErrorIcon';
+import CameraIcon from './cameraIcon.jsx';
+import TickGreen from './tickGreen.jsx';
 
 export {
   OverDraftIcon,
@@ -98,4 +100,6 @@ export {
   IconSalarid,
   IconSelfEmployed,
   TostErrorIcon,
+  CameraIcon,
+  TickGreen,
 };
