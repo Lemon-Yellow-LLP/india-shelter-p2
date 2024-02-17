@@ -51,6 +51,7 @@ import OverDraftIcon from './overDraftIcon';
 import TostErrorIcon from './TostErrorIcon';
 import CameraIcon from './cameraIcon.jsx';
 import TickGreen from './tickGreen.jsx';
+import VerifyOCRIcon from './verifyOCRIcon.jsx';
 
 export {
   OverDraftIcon,
@@ -102,4 +103,5 @@ export {
   TostErrorIcon,
   CameraIcon,
   TickGreen,
+  VerifyOCRIcon,
 };

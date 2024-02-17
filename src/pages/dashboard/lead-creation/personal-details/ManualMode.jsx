@@ -15,7 +15,7 @@ import { AuthContext } from '../../../../context/AuthContextProvider';
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import OCRDropdown from '../../../../components/DropDown/ocrDropdown';
 
-function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields }) {
+function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields, setLoading }) {
   const {
     values,
     errors,
@@ -42,8 +42,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const [date, setDate] = useState(null);
 
-  const [enableOCRIdType, setEnableOCRIdType] = useState(true);
+  const [enableOCRIdType, setEnableOCRIdType] = useState(false);
   const [enableOCRAddressProof, setEnableOCRAddressProof] = useState(false);
+
+  const [enableVerifyOCRIdType, setEnableVerifyOCRIdType] = useState(false);
+  const [enableVerifyOCRAddressProof, setEnableVerifyOCRAddressProof] = useState(false);
 
   const [idTypeOCRCount, setIdTypeOCRCount] = useState(0);
   const [addressProofOCRCount, setAddressProofOCRCount] = useState(0);
@@ -54,7 +57,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [disableFields, setDisableFields] = useState(false);
 
   const [idTypeOCRText, setIdTypeOCRText] = useState('Capture front image');
-  const [idTypeClickedPhotoText, setIdTypeClickedPhotoText] = useState('Front captured');
+  const [idTypeClickedPhotoText, setIdTypeClickedPhotoText] = useState('');
+
+  const [idTypeOCRImages, setIdTypeOCRImages] = useState([]);
 
   useEffect(() => {
     console.log('idTypeOcr', enableOCRIdType, 'addressProofOcr', enableOCRAddressProof);
@@ -484,8 +489,25 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     mobileNumberUpdate();
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
-  const captureImages = () => {
-    console.log('first');
+  const captureImages = (e) => {
+    if (idTypeOCRImages.length === 0) {
+      setIdTypeOCRText('Capture back image');
+      setIdTypeClickedPhotoText('Front captured');
+    } else {
+      setIdTypeOCRText('Verify with OCR');
+      setIdTypeClickedPhotoText('Front & back captured');
+      setEnableVerifyOCRIdType(true);
+    }
+    setIdTypeOCRImages((prev) => [...prev, e.target.files[0]]);
+  };
+
+  const verifyOCRIdType = (e) => {
+    setLoading(true);
+    setTimeout(() => {
+      setEnableOCRIdType(false);
+      setIdTypeOCRStatus(true);
+      setLoading(false);
+    }, 2000);
   };
 
   return (
@@ -517,6 +539,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         captureImages={captureImages}
         ocrButtonText={idTypeOCRText}
         clickedPhotoText={idTypeClickedPhotoText}
+        enableVerify={enableVerifyOCRIdType}
+        verifiedStatus={idTypeOCRStatus}
+        onVerifyClick={verifyOCRIdType}
       />
 
       <TextInput

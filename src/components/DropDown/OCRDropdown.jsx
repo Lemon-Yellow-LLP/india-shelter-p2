@@ -1,7 +1,7 @@
 /* eslint-disable react/display-name */
 import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { CameraIcon, IconArrowDown, IconTick, TickGreen } from '../../assets/icons';
+import { CameraIcon, IconArrowDown, IconTick, TickGreen, VerifyOCRIcon } from '../../assets/icons';
 
 const OCRDropdown = memo(
   ({
@@ -25,6 +25,9 @@ const OCRDropdown = memo(
     captureImages,
     ocrButtonText,
     clickedPhotoText,
+    enableVerify,
+    verifiedStatus,
+    onVerifyClick,
     ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -128,9 +131,17 @@ const OCRDropdown = memo(
           </div>
         )}
         <div className='mt-1 min-h-[16px]'>
-          {enableOCR ? (
+          {verifiedStatus ? (
             <div className='flex justify-between items-center'>
               <div className='flex flex-2 gap-[4px]'>
+                <TickGreen />
+                <span className='text-[12px] text-secondary-green'>OCR completed successfully</span>
+              </div>
+            </div>
+          ) : null}
+          {enableOCR ? (
+            <div className='flex justify-between items-center'>
+              <div className='flex flex-1 gap-[4px] min-w-[50%]'>
                 {clickedPhotoText ? (
                   <>
                     <TickGreen />
@@ -138,25 +149,29 @@ const OCRDropdown = memo(
                   </>
                 ) : null}
               </div>
-              {/* <button onClick={captureImages} className='flex gap-[4px] items-center'>
-                <CameraIcon />
-                <span className='font-[600] text-[16px] text-primary-red'>{ocrButtonText}</span>
-              </button> */}
-              <label className={`flex cursor-pointer items-center`}>
-                <input
-                  type='file'
-                  onChange={captureImages}
-                  className='opacity-0 w-[12px]'
-                  multiple={true}
-                  name='files[]'
-                  capture='user'
-                  accept='image/*'
-                />
-                <div className='flex gap-[4px] items-center'>
-                  <CameraIcon />
+
+              {enableVerify ? (
+                <button className='flex gap-[2px] items-center' onClick={onVerifyClick}>
+                  <VerifyOCRIcon />
                   <span className='font-[600] text-[16px] text-primary-red'>{ocrButtonText}</span>
-                </div>
-              </label>
+                </button>
+              ) : (
+                <label className={`flex cursor-pointer items-center`}>
+                  <input
+                    type='file'
+                    onChange={captureImages}
+                    className='opacity-0 w-[0px] h-[0px]'
+                    multiple={true}
+                    name='files'
+                    capture='user'
+                    accept='image/*'
+                  />
+                  <div className='flex gap-[4px] items-center'>
+                    <CameraIcon />
+                    <span className='font-[600] text-[16px] text-primary-red'>{ocrButtonText}</span>
+                  </div>
+                </label>
+              )}
             </div>
           ) : null}
           {!disabledError ? (
@@ -189,6 +204,9 @@ OCRDropdown.propTypes = {
   captureImages: PropTypes.func,
   ocrButtonText: PropTypes.string,
   clickedPhotoText: PropTypes.string,
+  enableVerify: PropTypes.bool,
+  verifiedStatus: PropTypes.bool,
+  onVerifyClick: PropTypes.func,
 };
 
 export default OCRDropdown;
