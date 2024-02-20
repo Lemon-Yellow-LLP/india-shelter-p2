@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import CaseAssignment from '../../assets/icons/caseAssignment';
 import MasterManagement from '../../assets/icons/masterManagement';
 import StepsConfiguration from '../../assets/icons/stepsConfiguration';
@@ -7,21 +7,22 @@ import indiaShelterLogo from '../../assets/logo.svg';
 import DropDown from '../DropDown';
 import SideBarLogout from '../../assets/icons/sideBarLogout';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContextProvider';
 
 const userOptions = [
   {
     label: 'Loan Officer',
-    value: 'loan officer',
+    value: 'Loan Officer',
   },
   // {
   //   label: 'Admin',
-  //   value: 'admin',
+  //   value: 'Admin',
   // },
 ];
 
 const userTabs = [
   {
-    key: 'loan officer',
+    key: 'Loan Officer',
     tabs: [
       {
         icon: (isActive) => <UserManagement isActive={isActive} />,
@@ -46,7 +47,7 @@ const userTabs = [
     ],
   },
   {
-    key: 'admin',
+    key: 'Admin',
     tabs: [
       {
         icon: (isActive) => <UserManagement isActive={isActive} />,
@@ -61,8 +62,30 @@ const userTabs = [
 ];
 
 export default function SideBar() {
-  const [user, setUser] = useState('loan officer');
+  const [user, setUser] = useState('Loan Officer');
   const [activeTab, setActiveTab] = useState('User management');
+  const { token } = useContext(AuthContext);
+
+  const handleLogout = async () => {
+    try {
+      await logout(
+        {
+          status: 'no',
+          logout_via: 'New Login',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+
+      window.location.replace('/');
+    } catch (err) {
+      window.location.replace('/');
+      console.log(err);
+    }
+  };
 
   return (
     <nav className='h-screen flex flex-col w-full shrink-0 border-r border-lighter-grey'>
@@ -110,7 +133,9 @@ export default function SideBar() {
       </div>
       <div className='mx-7 my-[30px] mr-auto flex items-center cursor-pointer'>
         <SideBarLogout />
-        <p className='ml-2 text-light-grey text-sm'>Log out</p>
+        <p className='ml-2 text-light-grey text-sm' onClick={handleLogout}>
+          Log out
+        </p>
       </div>
     </nav>
   );
