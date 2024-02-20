@@ -16,8 +16,22 @@ const DashboardRoutes = () => {
     const { isAuthenticated, token } = useContext(AuthContext);
 
     // Check authentication once and render accordingly
+    console.log('lo', isAuthenticated);
 
     if (isAuthenticated) {
+      return children;
+    } else {
+      return <Navigate to='/login' />;
+    }
+  };
+
+  const AdminRequireAuth = ({ children }) => {
+    const { isAdminAuthenticated, token } = useContext(AuthContext);
+
+    // Check authentication once and render accordingly
+    console.log('admin', isAdminAuthenticated);
+
+    if (isAdminAuthenticated) {
       return children;
     } else {
       return <Navigate to='/login' />;
@@ -28,7 +42,14 @@ const DashboardRoutes = () => {
     <>
       <Routes>
         <Route path='/login' element={<Login />}></Route>
-        <Route path='/admin/*' element={<AdminRoutes />} />
+        <Route
+          path='/admin/*'
+          element={
+            <AdminRequireAuth>
+              <AdminRoutes />
+            </AdminRequireAuth>
+          }
+        />
         <Route
           path='/'
           element={
