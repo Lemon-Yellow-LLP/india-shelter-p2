@@ -1,6 +1,8 @@
-const Header = ({ children }) => {
+const Header = ({ children, inputClasses }) => {
   return (
-    <div className='px-4 py-4 bg-neutral-white w-full border-b border-[#ECECEC] flex'>
+    <div
+      className={`px-4 py-4 bg-neutral-white w-full border-b border-[#ECECEC] flex ${inputClasses}`}
+    >
       <svg
         width='156'
         height='32'
