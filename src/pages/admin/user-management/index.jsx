@@ -10,9 +10,18 @@ import { parseISO } from 'date-fns';
 import AdminDateRangePicker from '../../../components/AdminDateRangePicker/index.jsx';
 import { AuthContext } from '../../../context/AuthContextProvider.jsx';
 import AdminFormImageUpload from '../../../components/ImageUpload/AdminFormImageUpload.jsx';
-import { editUser, getUsersList, uploadDoc } from '../../../global/index.js';
+import {
+  deleteUser,
+  editUser,
+  getUserBranches,
+  getUserDepartments,
+  getUserRoles,
+  getUsersList,
+  uploadDoc,
+} from '../../../global/index.js';
 import AdminActionControl from '../../../components/AdminActionControl/index.jsx';
 import { filterOptions, filterDateOptions } from '../../../utils/index.js';
+import AdminToastMessage from '../../../components/ToastMessage/AdminToast.jsx';
 
 const UserManagement = () => {
   const {
@@ -20,6 +29,7 @@ const UserManagement = () => {
     initialValues,
     setValues,
     errors,
+    setErrors,
     touched,
     setFieldValue,
     handleBlur,
@@ -33,6 +43,11 @@ const UserManagement = () => {
     setShow,
     useradd,
     setUseradd,
+    userToastMessage,
+    setUserToastMessage,
+    toastType,
+    setToastType,
+    loData,
   } = useContext(AuthContext);
 
   const [count, setCount] = useState(0);
@@ -45,8 +60,6 @@ const UserManagement = () => {
   const [showActionControlPopup, setShowActionControlPopup] = useState(false);
   const [uploadPhotoLoader, setUploadPhotoLoader] = useState(false);
   const [uploadPhotoError, setUploadPhotoError] = useState('');
-  const [profilePhoto, setProfilePhoto] = useState([]);
-  const [profileUpload, setProfileUpload] = useState(null);
 
   const [filteredList, dispatch] = useReducer(UserReducer, []);
 
@@ -59,35 +72,11 @@ const UserManagement = () => {
     key: 'selection',
   });
 
-  useEffect(() => {
-    async function uploadProfilePhoto() {
-      console.log('running upload photo func');
-      const data = new FormData();
-      const filename = profilePhoto[0].name;
-      data.append('employee_code', values?.employee_code);
-      data.append('document_type', 'profile_photo');
-      data.append('document_name', filename);
-      data.append('file', profilePhoto[0]);
-
-      let fileSize = data.get('file');
-
-      if (fileSize.size <= 5000000) {
-        const res = await uploadDoc(data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: token,
-          },
-        });
-
-        if (res) {
-          setUploadPhotoLoader(false);
-          setProfileUpload(res.document);
-          console.log('setting profile upload', res.document);
-        }
-      }
-    }
-    profilePhoto.length > 0 && uploadProfilePhoto();
-  }, [profilePhoto]);
+  const [userDropDownData, setUserDropDownData] = useState({
+    roles: [],
+    branches: [],
+    departments: [],
+  });
 
   function UserReducer(state, action) {
     switch (action.type) {
@@ -98,12 +87,20 @@ const UserManagement = () => {
         return leadList.filter((lead) => lead.status == action.payload);
       }
       case 'inActive': {
-        return leadList.filter((lead) => lead.status === action.payload);
+        return leadList.filter(
+          (lead) => lead.status === action.payload || lead.status !== 'active',
+        );
       }
       case 'Search': {
         const searchedList = leadList.filter(
           (lead) =>
-            lead.employee_code.toLowerCase().includes(query) || lead.employee_code.includes(query),
+            lead.employee_code?.toLowerCase().includes(query) ||
+            lead.employee_code?.includes(query) ||
+            lead.branch?.toLowerCase().includes(query) ||
+            lead.branch?.includes(query) ||
+            lead.role?.toLowerCase().includes(query) ||
+            lead.role?.includes(query) ||
+            lead.mobile_number?.includes(query),
         );
 
         if (searchedList.length) {
@@ -180,13 +177,17 @@ const UserManagement = () => {
             page_size: 10000000,
           };
 
-          getUsersList(payload)
+          getUsersList(payload, {
+            headers: {
+              Authorization: token,
+            },
+          })
             .then((users) => {
               setLeadList(users.data);
               setCount(Math.ceil(users.data.length / 10));
             })
             .catch((error) => {
-              console.log(error);
+              console.log('GET_USERLIST_ERROR', error);
             });
 
           break;
@@ -199,13 +200,17 @@ const UserManagement = () => {
             page_size: 10000000,
           };
 
-          getUsersList(payload)
+          getUsersList(payload, {
+            headers: {
+              Authorization: token,
+            },
+          })
             .then((users) => {
               setLeadList(users.data);
               setCount(Math.ceil(users.data.length / 10));
             })
             .catch((error) => {
-              console.log(error);
+              console.log('GET_USERLIST_ERROR', error);
             });
 
           break;
@@ -218,13 +223,17 @@ const UserManagement = () => {
             page_size: 10000000,
           };
 
-          getUsersList(payload)
+          getUsersList(payload, {
+            headers: {
+              Authorization: token,
+            },
+          })
             .then((users) => {
               setLeadList(users.data);
               setCount(Math.ceil(users.data.length / 10));
             })
             .catch((error) => {
-              console.log(error);
+              console.log('GET_USERLIST_ERROR', error);
             });
 
           break;
@@ -238,13 +247,17 @@ const UserManagement = () => {
             page_size: 10000000,
           };
 
-          getUsersList(payload)
+          getUsersList(payload, {
+            headers: {
+              Authorization: token,
+            },
+          })
             .then((users) => {
               setLeadList(users.data);
               setCount(Math.ceil(users.data.length / 10));
             })
             .catch((error) => {
-              console.log(error);
+              console.log('GET_USERLIST_ERROR', error);
             });
 
           break;
@@ -270,13 +283,17 @@ const UserManagement = () => {
         page_size: 10000000,
       };
 
-      getUsersList(payload)
+      getUsersList(payload, {
+        headers: {
+          Authorization: token,
+        },
+      })
         .then((users) => {
           setLeadList(users.data);
           setCount(Math.ceil(users.data.length / 10));
         })
         .catch((error) => {
-          console.log(error);
+          console.log('GET_USERLIST_ERROR', error);
         });
     }
   }, [selectionRange]);
@@ -373,25 +390,71 @@ const UserManagement = () => {
   useEffect(() => {
     const getUsers = async () => {
       const payload = {
-        start_date: parseISO(moment().subtract(30, 'days').format()),
-        end_date: parseISO(moment().format()),
+        start_date: selectionRange.startDate,
+        end_date: moment(selectionRange.endDate).add(1, 'day'),
         page: 1,
         page_size: 10000000,
       };
 
-      const users = await getUsersList(payload);
-
-      setLeadList(users.data);
-      setCount(Math.ceil(users.data.length / 10));
+      try {
+        const users = await getUsersList(payload, {
+          headers: {
+            Authorization: token,
+          },
+        });
+        setLeadList(users.data);
+        setCount(Math.ceil(users.data.length / 10));
+      } catch (error) {
+        console.log('GET_USERLIST_ERROR', error);
+      }
     };
     getUsers();
   }, [useradd]);
+
+  //fetch roles, branches, departments
+  useEffect(() => {
+    Promise.all([
+      getUserRoles({
+        headers: {
+          Authorization: token,
+        },
+      }),
+      getUserBranches({
+        headers: {
+          Authorization: token,
+        },
+      }),
+      getUserDepartments({
+        headers: {
+          Authorization: token,
+        },
+      }),
+    ])
+      .then((data) => {
+        const roles = data[0].map((obj) => {
+          if (loData?.user.role !== obj.value) return { label: obj.role, value: obj.role };
+        });
+        const branches = data[1].map((obj) => {
+          return { label: obj.branch, value: obj.branch };
+        });
+        const departments = data[2].map((obj) => {
+          return { label: obj.department, value: obj.department };
+        });
+
+        setUserDropDownData({
+          roles: roles,
+          branches: branches,
+          departments: departments,
+        });
+      })
+      .catch((error) => console.log('GET_DROPDOWN_DATA_ERR', error));
+  }, []);
 
   //display users
   useEffect(() => {
     dispatch({ type: 'All users', payload: 'All users' });
     setDisplayedList(
-      leadList.filter((lead, i) => {
+      leadList.filter((_, i) => {
         return i < 10;
       }),
     );
@@ -430,14 +493,45 @@ const UserManagement = () => {
   //call api's on basis of user action confirmation
   const handleDataChange = () => {
     if (userStatus) {
-      editUser(userStatus.id, { status: userStatus.value })
-        .then((editedUser) => setUseradd(editedUser))
-        .catch((err) => console.log(err));
+      editUser(
+        userStatus.id,
+        { status: userStatus.value },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      )
+        .then((editedUser) => {
+          setToastType('success');
+          setUserToastMessage('Changes saved successfully!');
+          setUseradd(editedUser);
+        })
+        .catch((error) => {
+          console.log('EDIT_USER_ERROR', error);
+          setToastType('error');
+          setUserToastMessage(`Changes couldn't be saved!`);
+        });
 
       setUserStatus(null);
       setShowActionControlPopup(false);
     } else {
-      console.log('call delete user api');
+      deleteUser(userAction.id, {
+        headers: {
+          Authorization: token,
+        },
+      })
+        .then((data) => {
+          setToastType('success');
+          setUserToastMessage('Changes saved successfully!');
+          setUseradd(data);
+        })
+        .catch((error) => {
+          console.log('DELETE_USER_ERROR', error);
+          setToastType('error');
+          setUserToastMessage(`Changes couldn't be saved!`);
+        });
+
       setUserAction(null);
       setShowActionControlPopup(false);
     }
@@ -446,10 +540,21 @@ const UserManagement = () => {
   // console.log(leadList);
   // console.log(resetDate);
   // console.log(resetFilter);
+  // console.log(userDropDownData);
+  // console.log(toastType);
+  // console.log(values);
   // console.log(errors);
+  // console.log(token);
+  console.log(loData);
 
   return (
     <>
+      <AdminToastMessage
+        message={userToastMessage}
+        setMessage={setUserToastMessage}
+        state={toastType}
+      />
+
       <AdminHeader
         title='Manage users'
         query={query}
@@ -487,6 +592,7 @@ const UserManagement = () => {
         handleActionClick={handleSubmit}
         handleResetAction={() => {
           setValues(initialValues);
+          setErrors(null);
           setUserAction(null);
         }}
       >
@@ -552,16 +658,7 @@ const UserManagement = () => {
               label='Role'
               name='role'
               required
-              options={[
-                {
-                  label: 'Loan Officer',
-                  value: 'Loan Officer',
-                },
-                {
-                  label: 'Admin',
-                  value: 'Admin',
-                },
-              ]}
+              options={userDropDownData.roles}
               onChange={handleRoleChange}
               touched={touched && touched?.role}
               error={errors && errors?.role}
@@ -576,16 +673,7 @@ const UserManagement = () => {
               label='Branch'
               name='branch'
               required
-              options={[
-                {
-                  label: 'Loan Officer',
-                  value: 'Loan Officer',
-                },
-                {
-                  label: 'Admin',
-                  value: 'Admin',
-                },
-              ]}
+              options={userDropDownData.branches}
               onChange={handleBranchChange}
               touched={touched && touched?.branch}
               error={errors && errors?.branch}
@@ -597,16 +685,7 @@ const UserManagement = () => {
               label='Department'
               name='department'
               required
-              options={[
-                {
-                  label: 'Loan Officer',
-                  value: 'loan Officer',
-                },
-                {
-                  label: 'Admin',
-                  value: 'Admin',
-                },
-              ]}
+              options={userDropDownData.departments}
               onChange={handleDepartmentChange}
               touched={touched && touched?.department}
               error={errors && errors?.department}
@@ -617,26 +696,16 @@ const UserManagement = () => {
           </div>
           <div>
             <AdminFormImageUpload
-              files={profilePhoto}
-              setFile={setProfilePhoto}
-              upload={profileUpload}
-              setUploads={setProfileUpload}
-              // setEdit={setEditProperty}
+              upload={values.loimage}
               label='Upload photo'
               required
               hint='Support: JPG, PNG'
-              // setSingleFile={setPropertyPhotosFile}
-              // errorMessage={
-              //   preview === location.pathname &&
-              //   values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-              //     ?.upload_required_fields_status?.property_image == false
-              //     ? 'This field is mandatory'
-              //     : ''
-              // }
+              errorMessage={errors && errors?.loimage ? 'This field is mandatory' : ''}
               message={uploadPhotoError}
               setMessage={setUploadPhotoError}
               loader={uploadPhotoLoader}
               setLoader={setUploadPhotoLoader}
+              edit={!!userAction}
             />
           </div>
         </div>
@@ -665,6 +734,7 @@ const UserManagement = () => {
               options={filterOptions}
               onChange={handleUsersChange}
               defaultSelected={filterOptions[0].value}
+              resetDefaultSelected={!query ? query : null}
               inputClasses='w-[170px] h-14'
               labelClassName='text-xs font-medium !text-dark-grey'
               styles='h-8 items-center text-xs px-3 py-2 rounded-[4px]'
