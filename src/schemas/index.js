@@ -17,6 +17,7 @@ export const signInSchema = Yup.object({
   role: Yup.string().required('This field is mandatory'),
   branch: Yup.string().required('This field is mandatory'),
   department: Yup.string().required('This field is mandatory'),
+  loimage: Yup.string().required('This field is mandatory'),
   username: Yup.string()
     .required('This field is mandatory')
     .min(10, 'Enter a valid phone number')
