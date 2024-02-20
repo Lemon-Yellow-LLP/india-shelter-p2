@@ -8,7 +8,7 @@ const CardRadio = memo(({ label, current, children, value, onChange, name, disab
   const getThemes = () => {
     if (disabled) {
       if (current === value) {
-        return 'bg-disabled-grey border-stroke stroke-black';
+        return 'bg-disabled-grey border-stroke stroke-black border-black';
       }
       // return 'opacity-60';
     }
@@ -28,7 +28,7 @@ const CardRadio = memo(({ label, current, children, value, onChange, name, disab
       <div
         className={`w-full border rounded-lg py-4 flex items-center justify-center cursor-pointer 
         ${getThemes()}
-transition-all duration-300 ease-out`}
+transition-all duration-300 ease-out ${disabled ? '!bg-disabled-grey' : null}`}
         tabIndex={0}
         role='radio'
         aria-checked={current === value}

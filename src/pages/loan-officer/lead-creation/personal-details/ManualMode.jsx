@@ -16,8 +16,9 @@ import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import { IconThumb } from '../../../../assets/icons';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import EkycDrawer from '../../../../components/Ekyc/EkycDrawer';
+import OCRDropdown from '../../../../components/DropDown/ocrDropdown';
 
-function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields }) {
+function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields, setLoading }) {
   const {
     values,
     errors,
@@ -45,6 +46,46 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [date, setDate] = useState(null);
 
   const [openEkycPopup, setOpenEkycPopup] = useState(false);
+  const [enableOCRIdType, setEnableOCRIdType] = useState(false);
+  const [enableOCRAddressProof, setEnableOCRAddressProof] = useState(false);
+
+  const [enableVerifyOCRIdType, setEnableVerifyOCRIdType] = useState(false);
+  const [enableVerifyOCRAddressProof, setEnableVerifyOCRAddressProof] = useState(false);
+
+  const [idTypeOCRCount, setIdTypeOCRCount] = useState(0);
+  const [addressProofOCRCount, setAddressProofOCRCount] = useState(0);
+
+  const [idTypeOCRStatus, setIdTypeOCRStatus] = useState(false);
+  const [addressProofOCRStatus, setAddressProofOCRStatus] = useState(false);
+
+  const [disableFields, setDisableFields] = useState(false);
+
+  const [idTypeOCRText, setIdTypeOCRText] = useState('Capture front image');
+  const [idTypeClickedPhotoText, setIdTypeClickedPhotoText] = useState('');
+
+  const [idTypeOCRImages, setIdTypeOCRImages] = useState([]);
+
+  useEffect(() => {
+    console.log('idTypeOcr', enableOCRIdType, 'addressProofOcr', enableOCRAddressProof);
+  }, [enableOCRIdType, enableOCRAddressProof]);
+
+  useEffect(() => {
+    if (
+      !(idTypeOCRStatus && addressProofOCRStatus) &&
+      (idTypeOCRCount !== 3 || addressProofOCRCount !== 3)
+    ) {
+      setDisableFields(true);
+    } else {
+      setDisableFields(false);
+    }
+  }, [
+    idTypeOCRStatus,
+    addressProofOCRStatus,
+    idTypeOCRCount,
+    addressProofOCRCount,
+    enableOCRIdType,
+    enableOCRAddressProof,
+  ]);
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
@@ -133,6 +174,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: false }));
         }
       }
+
+      if (e === 'PAN' || e === 'Driving license' || e === 'Voter ID') {
+        setEnableOCRIdType(true);
+      } else {
+        setEnableOCRIdType(false);
+      }
     },
     [requiredFieldsStatus],
   );
@@ -148,6 +195,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         selected_address_proof: true,
         address_proof_number: false,
       }));
+      if (e === 'Driving license' || e === 'Voter ID') {
+        setEnableOCRAddressProof(true);
+      } else {
+        setEnableOCRAddressProof(false);
+      }
     },
     [requiredFieldsStatus],
   );
@@ -440,9 +492,31 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   useEffect(() => {
     mobileNumberUpdate();
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
+
+  const captureImages = (e) => {
+    if (idTypeOCRImages.length === 0) {
+      setIdTypeOCRText('Capture back image');
+      setIdTypeClickedPhotoText('Front captured');
+    } else {
+      setIdTypeOCRText('Verify with OCR');
+      setIdTypeClickedPhotoText('Front & back captured');
+      setEnableVerifyOCRIdType(true);
+    }
+    setIdTypeOCRImages((prev) => [...prev, e.target.files[0]]);
+  };
+
+  const verifyOCRIdType = (e) => {
+    setLoading(true);
+    setTimeout(() => {
+      setEnableOCRIdType(false);
+      setIdTypeOCRStatus(true);
+      setLoading(false);
+    }, 2000);
+  };
+
   return (
     <>
-      <DropDown
+      <OCRDropdown
         label='Select ID type'
         name={`applicants[${activeIndex}].personal_details.id_type`}
         required
@@ -465,6 +539,13 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        enableOCR={enableOCRIdType}
+        captureImages={captureImages}
+        ocrButtonText={idTypeOCRText}
+        clickedPhotoText={idTypeClickedPhotoText}
+        enableVerify={enableVerifyOCRIdType}
+        verifiedStatus={idTypeOCRStatus}
+        onVerifyClick={verifyOCRIdType}
       />
 
       <TextInput
@@ -484,9 +565,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
-          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          disableFields
         }
-        labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
+        // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[2];
@@ -628,7 +710,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             );
           }}
           disabled={
-            !values?.applicants?.[activeIndex]?.personal_details?.id_type
+            disableFields || !values?.applicants?.[activeIndex]?.personal_details?.id_type
               ? true
               : values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN'
               ? true
@@ -651,7 +733,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         </span>
       </div>
 
-      <DropDown
+      <OCRDropdown
         label='Select address proof'
         name={`applicants[${activeIndex}].personal_details.selected_address_proof`}
         required
@@ -695,9 +777,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
-          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          disableFields
         }
-        labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
+        // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[2];
@@ -813,7 +896,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               current={values?.applicants?.[activeIndex]?.personal_details?.gender}
               onChange={handleRadioChange}
               disabled={
-                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                disableFields
               }
             >
               {option.icon}
@@ -910,7 +994,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             updateFields(name, '');
           }
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          disableFields
+        }
       />
 
       <TextInput
@@ -940,7 +1027,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             updateFields(name, '');
           }
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          disableFields
+        }
       />
 
       <div className='flex flex-col gap-2'>
@@ -957,7 +1047,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               current={values?.applicants?.[activeIndex]?.personal_details?.marital_status}
               onChange={handleRadioChange}
               disabled={
-                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                disableFields
               }
             >
               {option.icon}
@@ -1007,7 +1098,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               updateFields(name, '');
             }
           }}
-          disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+          disabled={
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+            disableFields
+          }
         />
       ) : null}
 
@@ -1028,7 +1122,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          disableFields
+        }
       />
 
       <DropDown
@@ -1049,7 +1146,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          disableFields
+        }
       />
 
       <DropDown
@@ -1069,7 +1169,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          disableFields
+        }
       />
 
       <TextInputWithSendOtp
@@ -1090,7 +1193,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           disableEmailInput ||
           emailVerified ||
-          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          disableFields
         }
         message={
           emailVerified
