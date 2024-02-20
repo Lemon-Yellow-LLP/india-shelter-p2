@@ -9,6 +9,7 @@ import EkycOtpInput from '../OtpInput/EkycOtpInput';
 import ValidateScan from './ValidateScan';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
+import { generateEkycOtp } from '../../global';
 
 // Add ekyc methods
 const ekycMethods = [
@@ -42,6 +43,8 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
   const [hasSentEkycOTPOnce, setHasSentEkycOTPOnce] = useState(true);
   // loading, error, success (default would be loading state)
   const [scanningState, setScanningState] = useState('loading');
+  const [maskedMobile, setMaskedMobile] = useState('');
+  const [maskedEmail, setMaskedEmail] = useState('');
 
   const consentRef = useRef();
   const updateConsentRef = (consent) => {
@@ -50,10 +53,20 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
   const sendMobileOtp = () => {
     console.log('sending otp on mobile no. linked to aadhar');
   };
-
-  const handleVerify = () => {
-    console.log('sending otp on mobile no. linked to aadhar');
-    setPerformVerification(true);
+  const handleVerify = async () => {
+    try {
+      console.log('sending otp on mobile no. linked to aadhar');
+      const data = await generateEkycOtp({
+        aadhaar_number: 'dummyAadharNo',
+        consent: consentRef.current,
+        send_sms: true,
+        send_email: true,
+      });
+      setMaskedMobile(data.maskedMobile);
+      setMaskedEmail(data.maskedEmail);
+      console.log(data);
+      setPerformVerification(true);
+    } catch (error) {}
   };
 
   const handleVerifyAadharOtp = () => {
@@ -79,7 +92,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
       }
     }, 3000);
   };
-  console.log(consentRef.current);
+
   return performVerification ? (
     selectedEkycMethod === 'otp' ? (
       <>
@@ -125,7 +138,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
         <div className='w-full px-4 pt-4 pb-6'>
           {/* Aadhar will provide the masked email and masked mobile no. */}
           <p className='text-sm text-dark-grey mb-3'>
-            OTP successfully sent to ******1234 and ra******@gmail.com
+            OTP successfully sent to {maskedMobile} and {maskedEmail}
           </p>
           <EkycOtpInput
             label='Enter OTP'
@@ -133,6 +146,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
             onSendOTPClick={sendMobileOtp}
             setIsVerifyOtp={setIsVerifyOtp}
             hasSentOTPOnce={hasSentEkycOTPOnce}
+            defaultResendTime={30}
           />
           <Button
             primary

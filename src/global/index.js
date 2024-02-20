@@ -513,6 +513,11 @@ export async function getDashboardLeadList(
   }
 }
 
+async function generateEkycOtp(data) {
+  const res = await axios.post(`${API_URL}/ekyc/generate-otp/`, data);
+  return res.data;
+}
+
 export {
   API_URL,
   pingAPI,
@@ -555,4 +560,5 @@ export {
   getUserById,
   editDoc,
   checkLoanOfficerExists,
+  generateEkycOtp,
 };
