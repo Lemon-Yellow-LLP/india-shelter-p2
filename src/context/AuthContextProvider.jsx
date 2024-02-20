@@ -30,6 +30,7 @@ export const AuthContext = createContext(defaultValues);
 const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [loData, setLoData] = useState(null);
   const [loAllDetails, setLoAllDetails] = useState(null);
   const [phoneNumberList, setPhoneNumberList] = useState({});
@@ -46,6 +47,8 @@ const AuthContextProvider = ({ children }) => {
   const [userAction, setUserAction] = useState(null);
   const [show, setShow] = useState(false);
   const [useradd, setUseradd] = useState(null);
+  const [userToastMessage, setUserToastMessage] = useState();
+  const [toastType, setToastType] = useState();
 
   useEffect(() => {
     if (sfdcCount > 1) {
@@ -58,13 +61,54 @@ const AuthContextProvider = ({ children }) => {
     validationSchema: signInSchema,
     onSubmit: (values) => {
       if (userAction) {
-        const editedUser = editUser(userAction.id, values);
-        setUseradd(editedUser);
-        setShow(false);
+        editUser(userAction.id, values, {
+          headers: {
+            Authorization: token,
+          },
+        })
+          .then((editedUser) => {
+            setToastType('success');
+            setUserToastMessage('Changes saved successfully!');
+            setUseradd(editedUser);
+            setShow(false);
+            formik.setValues(formik.initialValues);
+            setUserAction(null);
+          })
+          .catch((error) => {
+            console.log('EDIT_USER_ERROR', error);
+            setToastType('error');
+            setUserToastMessage(`Changes couldn't be saved!`);
+            setShow(false);
+            formik.setValues(formik.initialValues);
+            setUserAction(null);
+          });
       } else {
-        const user = addUser(values);
-        setUseradd(user);
-        setShow(false);
+        addUser(values, {
+          headers: {
+            Authorization: token,
+          },
+        })
+          .then((user) => {
+            setToastType('success');
+            setUserToastMessage('User added successfully!');
+            setUseradd(user);
+            setShow(false);
+            formik.setValues(formik.initialValues);
+          })
+          .catch((error) => {
+            console.log('ADD_USER_ERROR', error);
+            if (error.response.status == 400) {
+              formik.setFieldError(
+                'employee_code',
+                'User with this employee code or username already exists',
+              );
+              return;
+            }
+            setToastType('error');
+            setUserToastMessage(`User couldn't be added!`);
+            setShow(false);
+            formik.setValues(formik.initialValues);
+          });
       }
     },
   });
@@ -124,6 +168,12 @@ const AuthContextProvider = ({ children }) => {
         setShow,
         useradd,
         setUseradd,
+        userToastMessage,
+        setUserToastMessage,
+        toastType,
+        setToastType,
+        isAdminAuthenticated,
+        setIsAdminAuthenticated,
       }}
     >
       {children}
