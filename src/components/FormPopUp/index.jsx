@@ -78,7 +78,7 @@ export default FormPopUp;
 FormPopUp.propTypes = {
   showpopup: PropTypes.bool,
   setShowPopUp: PropTypes.func,
-  children: PropTypes.elementType,
+  // children: PropTypes.elementType,
   title: PropTypes.string,
   subTitle: PropTypes.string,
 };
