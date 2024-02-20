@@ -1,20 +1,13 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect, useContext, useRef } from 'react';
-import DesktopPopUp from '../UploadDocsModal';
+import { useEffect, useContext, useRef } from 'react';
 import loading from '../../assets/icons/loading.svg';
-import { editDoc, editFieldsById, getApplicantById } from '../../global';
-import { LeadContext } from '../../context/LeadContextProvider';
+import { editUser, uploadDoc } from '../../global';
 import { AuthContext } from '../../context/AuthContextProvider';
 import imageCompression from 'browser-image-compression';
-import generateImageWithTextWatermark from '../../utils/GenerateImageWithTextWatermark';
 
 const AdminFormImageUpload = ({
-  // eslint-disable-next-line react/prop-types
-  files,
-  setFile,
   setSingleFile,
   upload,
-  setUploads,
   setEdit,
   label,
   hint,
@@ -23,21 +16,20 @@ const AdminFormImageUpload = ({
   setMessage,
   loader,
   setLoader,
+  edit,
   ...props
 }) => {
-  const { token, loAllDetails } = useContext(AuthContext);
-  const { values, activeIndex } = useContext(LeadContext);
-
-  const [show, setShow] = useState(false);
-  const [previewFile, setPreviewFile] = useState(null);
+  const { token, loAllDetails, setFieldValue } = useContext(AuthContext);
 
   const replacePhotoInputRef = useRef();
+
   const handleFile = async (e) => {
     setMessage('');
     setLoader(true);
-    console.log(e.target.files[0]);
+
     const success = async () => {
       let file = e.target.files;
+
       if (file.length !== 0) {
         const fileType = file[0]['type'];
 
@@ -54,7 +46,24 @@ const AdminFormImageUpload = ({
           const compressedImageFile = new File([compressedFile], filename, {
             type: compressedFile.type,
           });
-          setFile([compressedImageFile]);
+
+          const data = new FormData();
+          data.append('document_type', 'user_profile_photo');
+          data.append('document_name', filename);
+          data.append('file', compressedImageFile);
+
+          const res = await uploadDoc(data, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: token,
+            },
+          });
+
+          setLoader(false);
+
+          if (res.document) {
+            setFieldValue('loimage', res.document.document_fetch_url);
+          }
         } else {
           setLoader(false);
           setMessage('File format not supported');
@@ -69,7 +78,7 @@ const AdminFormImageUpload = ({
   useEffect(() => {
     upload && setLoader(false);
   }, [upload]);
-  console.log(upload, 'upload inside of adminImageUpload');
+
   return (
     <div className='w-full'>
       <label className='flex gap-0.5 items-center text-primary-black font-medium'>
@@ -86,12 +95,14 @@ const AdminFormImageUpload = ({
         />
       )}
 
-      {!files?.length && !loader ? (
+      {!upload && !loader ? (
         <div>
           <div className='bg-white flex items-center justify-center w-full'>
             <label
               className={`flex cursor-pointer flex-col w-full border ${
-                message || errorMessage ? 'border-primary-red' : 'border-stroke'
+                message || errorMessage
+                  ? 'border-primary-red shadow-primary shadow-primary-red'
+                  : 'border-stroke'
               } rounded-md relative`}
             >
               <div className='flex flex-col items-center py-5'>
@@ -155,11 +166,11 @@ const AdminFormImageUpload = ({
           <div className='flex justify-between overflow-auto p-4 border border-[#D9D9D9] rounded-lg'>
             <div className='flex gap-5 items-center'>
               <img
-                src={upload.document_fetch_url}
+                src={upload}
                 alt='Gigs'
                 className='object-cover object-center h-[64px] w-[64px] rounded-lg'
               />
-              <p>{upload.document_name}</p>
+              <p>profile_photo</p>
             </div>
             <div className='flex items-center relative'>
               <button
@@ -205,7 +216,7 @@ const AdminFormImageUpload = ({
                 ref={replacePhotoInputRef}
                 onChange={handleFile}
                 className='opacity-0 absolute w-0'
-                name='files'
+                name='file'
                 capture='user'
                 accept='image/png, image/jpeg'
               />
