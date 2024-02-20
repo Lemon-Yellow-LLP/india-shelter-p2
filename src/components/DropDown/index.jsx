@@ -22,6 +22,7 @@ const DropDown = memo(
     disabledError,
     labelClassName,
     styles,
+    resetDefaultSelected,
     ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -32,7 +33,7 @@ const DropDown = memo(
     useEffect(() => {
       const option = options.find((option) => option.value === defaultSelected);
       setSelectedOption(option);
-    }, [defaultSelected, options]);
+    }, [defaultSelected, options, resetDefaultSelected]);
 
     const containerRef = useRef(null);
 
