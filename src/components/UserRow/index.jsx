@@ -18,11 +18,11 @@ const UserRow = ({ user, i }) => {
       <td className='px-4 py-[11px]'>{user.branch}</td>
       <td className='px-4 py-[11px]'>{user.role}</td>
       <td className='px-4 py-[11px]'>{user.mobile_number}</td>
-      <td className='px-4 py-[11px]'>{moment(user.updated_at).format('do MMMM YYYY')}</td>
+      <td className='px-4 py-[11px]'>{moment(user.updated_at).format('DD/MM/YY')}</td>
       <td className='px-4 py-[11px]'>
         <AdminStatus user={user} />
       </td>
-      <td className='flex justify-start px-4 py-[11px]'>
+      <td className='flex justify-center px-4 py-[11px]'>
         <AdminAction user={user} />
       </td>
     </tr>
