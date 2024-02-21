@@ -1,7 +1,14 @@
 /* eslint-disable react/display-name */
 import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { CameraIcon, IconArrowDown, IconTick, TickGreen, VerifyOCRIcon } from '../../assets/icons';
+import {
+  CameraIcon,
+  IconArrowDown,
+  IconThumb,
+  IconTick,
+  TickGreen,
+  VerifyOCRIcon,
+} from '../../assets/icons';
 
 const OCRDropdown = memo(
   ({
@@ -28,6 +35,7 @@ const OCRDropdown = memo(
     enableVerify,
     verifiedStatus,
     onVerifyClick,
+    setOpenEkycPopup,
     ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -139,6 +147,16 @@ const OCRDropdown = memo(
               </div>
             </div>
           ) : null}
+          {/* if Aadhar then show verify ekyc  */}
+          {selectedOption?.value === 'AADHAR' && (
+            <button
+              className='text-primary-red font-semibold flex justify-end ml-auto'
+              onClick={() => setOpenEkycPopup(true)}
+            >
+              <IconThumb />
+              Verify Aadhar e-KYC
+            </button>
+          )}
           {enableOCR ? (
             <div className='flex justify-between items-center'>
               <div className='flex flex-1 gap-[4px] min-w-[50%]'>
@@ -207,6 +225,7 @@ OCRDropdown.propTypes = {
   enableVerify: PropTypes.bool,
   verifiedStatus: PropTypes.bool,
   onVerifyClick: PropTypes.func,
+  setOpenEkycPopup: PropTypes.func,
 };
 
 export default OCRDropdown;

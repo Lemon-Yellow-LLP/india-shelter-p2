@@ -9,7 +9,8 @@ import EkycOtpInput from '../OtpInput/EkycOtpInput';
 import ValidateScan from './ValidateScan';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
-import { generateEkycOtp } from '../../global';
+import { generateEkycOtp, validateEkycOtp } from '../../global';
+import TextInput from '../TextInput';
 
 // Add ekyc methods
 const ekycMethods = [
@@ -31,9 +32,17 @@ const ekycMethods = [
   },
 ];
 
+// generate aadhaar otp returns otpTxnId which is required in validate otp
+let otpTxnId;
 export default function EkycDrawer({ setOpenEkycPopup }) {
   const { setToastMessage } = useContext(LeadContext);
-  const { setErrorToastMessage } = useContext(AuthContext);
+  const { setErrorToastMessage, token } = useContext(AuthContext);
+
+  const [isAadharInputDrawer, setIsAadharInputDrawer] = useState(true);
+  const [aadhaarNo, setAadhaarNo] = useState('');
+  const [aadhaarNoError, setAadhaarNoError] = useState('');
+
+  const [isSelectEkycMethodDrawer, setIsSelectEkycMethodDrawer] = useState(false);
   // otp will be default selected for ekyc
   const [selectedEkycMethod, setSelectedEkycMethod] = useState('otp');
   const [performVerification, setPerformVerification] = useState(false);
@@ -45,40 +54,91 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
   const [scanningState, setScanningState] = useState('loading');
   const [maskedMobile, setMaskedMobile] = useState('');
   const [maskedEmail, setMaskedEmail] = useState('');
+  const [otp, setOtp] = useState('');
 
   const consentRef = useRef();
   const updateConsentRef = (consent) => {
     consentRef.current = consent;
   };
-  const sendMobileOtp = () => {
-    console.log('sending otp on mobile no. linked to aadhar');
+
+  const sendMobileOtp = async () => {
+    try {
+      console.log('sending otp on mobile no. linked to aadhar');
+      const data = await generateEkycOtp(
+        {
+          aadhaar_number: aadhaarNo,
+          consent: consentRef.current,
+          send_sms: true,
+          send_email: true,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  // send otp on Mobile no and email
   const handleVerify = async () => {
     try {
       console.log('sending otp on mobile no. linked to aadhar');
-      const data = await generateEkycOtp({
-        aadhaar_number: 'dummyAadharNo',
-        consent: consentRef.current,
-        send_sms: true,
-        send_email: true,
-      });
-      setMaskedMobile(data.maskedMobile);
-      setMaskedEmail(data.maskedEmail);
+      const data = await generateEkycOtp(
+        {
+          aadhaar_number: aadhaarNo,
+          consent: consentRef.current,
+          send_sms: true,
+          send_email: true,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      otpTxnId = data.OtpTxnId;
+      setMaskedMobile(data?.maskedMobile);
+      setMaskedEmail(data?.maskedEmail);
       console.log(data);
       setPerformVerification(true);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      setErrorToastMessage(error.response.data.error);
+      setOpenEkycPopup(false);
+      setIsAadharInputDrawer(true);
+      setAadhaarNo('');
+      setIsConsentChecked(false);
+    }
   };
 
-  const handleVerifyAadharOtp = () => {
-    console.log('verifing aadhar otp');
-    setTimeout(() => {
-      if (Math.floor(Math.random() * 10) % 2) {
-        setToastMessage('Information fetched Successfully');
-      } else {
-        setErrorToastMessage('Technical error');
-      }
+  const handleVerifyAadharOtp = async () => {
+    try {
+      console.log('verifing aadhar otp');
+      const res = await validateEkycOtp(
+        {
+          aadhaar_number: aadhaarNo,
+          consent: consentRef.current,
+          otp_txn_id: otpTxnId,
+          otp_value: otp,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      console.log(res);
+      setToastMessage('Information fetched Successfully');
       setOpenEkycPopup(false);
-    }, 3000);
+      setPerformVerification(false);
+      setIsAadharInputDrawer(true);
+    } catch (error) {
+      setErrorToastMessage('Technical error');
+    }
   };
 
   const handleScan = () => {
@@ -93,7 +153,58 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
     }, 3000);
   };
 
-  return performVerification ? (
+  const handleAadhaarNoChange = (e) => {
+    const value = e.target.value;
+    const aadhaarPattern = /^\d{12}$/;
+    if (value[0] == '0' || value[0] == '1') return;
+    setAadhaarNo(value);
+    if (aadhaarPattern.test(value)) {
+      setAadhaarNoError('');
+    } else {
+      setAadhaarNoError('Enter valid 12 digit Aadhaar no.');
+    }
+  };
+
+  return isAadharInputDrawer ? (
+    <div className='w-full px-4 py-6 flex flex-col gap-3'>
+      <div className='flex justify-between items-center'>
+        <p className='font-semibold'>Enter Aadhaar No</p>
+        <button onClick={() => setOpenEkycPopup(false)}>
+          <IconClose />
+        </button>
+      </div>
+      <TextInput
+        placeholder='Enter Aadhaar number'
+        type='number'
+        name='aadhaarNo'
+        value={aadhaarNo}
+        onChange={handleAadhaarNoChange}
+        error={aadhaarNoError}
+        touched={true}
+        onKeyDown={(e) => {
+          if (
+            e.key === 'ArrowUp' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'ArrowLeft' ||
+            e.key === 'ArrowRight' ||
+            e.key === ' ' ||
+            e.keyCode === 32 ||
+            (e.keyCode >= 65 && e.keyCode <= 90)
+          ) {
+            e.preventDefault();
+          }
+        }}
+      />
+      <Button
+        primary
+        inputClasses='!py-3'
+        disabled={aadhaarNoError || !aadhaarNo}
+        onClick={() => setIsAadharInputDrawer(false)}
+      >
+        Next
+      </Button>
+    </div>
+  ) : performVerification ? (
     selectedEkycMethod === 'otp' ? (
       <>
         <div className='px-4 py-2 flex gap-2 justify-start w-full border-b border-lighter-grey'>
@@ -101,6 +212,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
             onClick={() => {
               setPerformVerification(false);
               setIsVerifyOtp(false);
+              setOtp('');
             }}
           >
             <svg
@@ -147,6 +259,8 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
             setIsVerifyOtp={setIsVerifyOtp}
             hasSentOTPOnce={hasSentEkycOTPOnce}
             defaultResendTime={30}
+            otp={otp}
+            setOtp={setOtp}
           />
           <Button
             primary
@@ -172,7 +286,14 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
       <div className='w-full h-[550px] flex flex-col'>
         <div className='flex justify-between px-4 py-2 border-b border-lighter-grey'>
           <p className='font-semibold'>Select verification method</p>
-          <button onClick={() => setOpenEkycPopup(false)}>
+          <button
+            onClick={() => {
+              setOpenEkycPopup(false);
+              setAadhaarNo('');
+              setIsAadharInputDrawer(true);
+              setIsConsentChecked(false);
+            }}
+          >
             <IconClose />
           </button>
         </div>
@@ -227,7 +348,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
             ? 'Device not found'
             : 'Device found successfully'
         }
-        description={scanningState === 'error' && 'Please try again or try another method'}
+        description={scanningState === 'error' ? 'Please try again or try another method' : ''}
         state={scanningState}
         bottom={4}
         handleClose={() => {

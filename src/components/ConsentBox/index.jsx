@@ -99,6 +99,6 @@ export default ConsentBox;
 
 ConsentBox.propTypes = {
   isChecked: PropTypes.bool,
-  setIsChecked: PropTypes.bool,
+  setIsChecked: PropTypes.func,
   updateConsentRef: PropTypes.func,
 };

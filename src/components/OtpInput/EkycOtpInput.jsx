@@ -11,8 +11,9 @@ const EkycOtpInput = ({
   defaultResendTime,
   hasSentOTPOnce,
   setIsVerifyOtp,
+  otp,
+  setOtp,
 }) => {
-  const [otp, setOtp] = useState('');
   const [inputDisabled, setInputDisabled] = useState(true);
   const [timer, setTimer] = useState(true);
   const [resendTime, setResendTime] = useState(defaultResendTime || 10);

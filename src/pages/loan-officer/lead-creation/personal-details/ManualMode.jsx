@@ -46,6 +46,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [date, setDate] = useState(null);
 
   const [openEkycPopup, setOpenEkycPopup] = useState(false);
+  const [ekycStatus, setEkycStatus] = useState(false);
   const [enableOCRIdType, setEnableOCRIdType] = useState(false);
   const [enableOCRAddressProof, setEnableOCRAddressProof] = useState(false);
 
@@ -546,6 +547,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         enableVerify={enableVerifyOCRIdType}
         verifiedStatus={idTypeOCRStatus}
         onVerifyClick={verifyOCRIdType}
+        setOpenEkycPopup={setOpenEkycPopup}
       />
 
       <TextInput
@@ -622,17 +624,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }}
       />
-      {/* // if Id type is Aadhar and no errors in id no */}
-      {values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
-        !errors?.applicants?.[activeIndex]?.personal_details?.id_number && (
-          <button
-            className='text-primary-red font-semibold flex justify-end ml-auto'
-            onClick={() => setOpenEkycPopup(true)}
-          >
-            <IconThumb />
-            Verify Aadhar e-KYC
-          </button>
-        )}
       {/* when ekyc is verified show kyc successful msg
       <div className='gap-1 flex'>
         <svg
@@ -756,6 +747,14 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
+        enableOCR={enableOCRAddressProof}
+        captureImages={captureImages}
+        ocrButtonText={idTypeOCRText}
+        clickedPhotoText={idTypeClickedPhotoText}
+        enableVerify={enableVerifyOCRAddressProof}
+        verifiedStatus={addressProofOCRStatus}
+        onVerifyClick={verifyOCRIdType}
+        setOpenEkycPopup={setOpenEkycPopup}
       />
 
       <TextInput
@@ -813,18 +812,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }}
       />
-      {/* // if address proof is Aadhar and no errors in address proof no */}
-      {!values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
-        values?.applicants[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR' &&
-        !errors?.applicants?.[activeIndex]?.personal_details?.address_proof_number && (
-          <button
-            className='text-primary-red font-semibold flex justify-end ml-auto'
-            onClick={() => setOpenEkycPopup(true)}
-          >
-            <IconThumb />
-            Verify Aadhar e-KYC
-          </button>
-        )}
       {/* when ekyc is verified show kyc successful msg
       <div className='gap-1 flex'>
         <svg

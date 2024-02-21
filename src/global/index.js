@@ -513,8 +513,13 @@ export async function getDashboardLeadList(
   }
 }
 
-async function generateEkycOtp(data) {
-  const res = await axios.post(`${API_URL}/ekyc/generate-otp/`, data);
+async function generateEkycOtp(data, options) {
+  const res = await axios.post(`${API_URL}/ekyc/generate-otp/`, data, options);
+  return res.data;
+}
+
+async function validateEkycOtp(data, options) {
+  const res = await axios.post(`${API_URL}/ekyc/validate-otp/`, data, options);
   return res.data;
 }
 
@@ -561,4 +566,5 @@ export {
   editDoc,
   checkLoanOfficerExists,
   generateEkycOtp,
+  validateEkycOtp,
 };

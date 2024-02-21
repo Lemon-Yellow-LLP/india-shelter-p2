@@ -19,7 +19,7 @@ const Radio = ({ label, value, current, onChange }) => {
   );
 };
 
-Radio.PropTypes = {
+Radio.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string.isRequired,
   current: PropTypes.string,
