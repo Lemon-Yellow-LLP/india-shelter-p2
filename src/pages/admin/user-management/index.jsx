@@ -194,7 +194,7 @@ const UserManagement = () => {
         }
         case 'Today': {
           const payload = {
-            start_date: parseISO(moment().format()),
+            start_date: parseISO(moment().subtract(1, 'days').format()),
             end_date: parseISO(moment().format()),
             page: 1,
             page_size: 10000000,
@@ -217,7 +217,7 @@ const UserManagement = () => {
         }
         case 'Yesterday': {
           const payload = {
-            start_date: parseISO(moment().subtract(1, 'days').format()),
+            start_date: parseISO(moment().subtract(2, 'days').format()),
             end_date: parseISO(moment().subtract(1, 'days').format()),
             page: 1,
             page_size: 10000000,
