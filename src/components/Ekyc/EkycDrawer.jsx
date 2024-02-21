@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import Button from '../Button';
 import { IconClose } from '../../assets/icons';
 import Radio from '../Radio';
@@ -42,7 +42,6 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
   const [aadhaarNo, setAadhaarNo] = useState('');
   const [aadhaarNoError, setAadhaarNoError] = useState('');
 
-  const [isSelectEkycMethodDrawer, setIsSelectEkycMethodDrawer] = useState(false);
   // otp will be default selected for ekyc
   const [selectedEkycMethod, setSelectedEkycMethod] = useState('otp');
   const [performVerification, setPerformVerification] = useState(false);
@@ -61,6 +60,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
     consentRef.current = consent;
   };
 
+  // resend otp on mobile and email
   const sendMobileOtp = async () => {
     try {
       console.log('sending otp on mobile no. linked to aadhar');
@@ -83,7 +83,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
     }
   };
 
-  // send otp on Mobile no and email
+  // send otp on Mobile and email
   const handleVerify = async () => {
     try {
       console.log('sending otp on mobile no. linked to aadhar');
@@ -115,6 +115,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
     }
   };
 
+  // handle otp and aadhaar verification
   const handleVerifyAadharOtp = async () => {
     try {
       console.log('verifing aadhar otp');
@@ -153,6 +154,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
     }, 3000);
   };
 
+  // aadhaar no validation
   const handleAadhaarNoChange = (e) => {
     const value = e.target.value;
     const aadhaarPattern = /^\d{12}$/;
