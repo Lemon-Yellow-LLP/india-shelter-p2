@@ -13,6 +13,7 @@ import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import { addApi, editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
+import { IconThumb } from '../../../../assets/icons';
 
 function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields }) {
   const {
@@ -536,7 +537,17 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }}
       />
-
+      {/* // if Id type is Aadhar and no errors in id no */}
+      {values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
+        !errors?.applicants?.[activeIndex]?.personal_details?.id_number && (
+          <button
+            className='text-primary-red font-semibold flex justify-end'
+            onClick={() => alert('hello')}
+          >
+            <IconThumb />
+            Verify Aadhar e-KYC
+          </button>
+        )}
       <div className='flex items-center gap-2'>
         <Checkbox
           checked={
@@ -697,7 +708,17 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }}
       />
-
+      {/* // if address proof is Aadhar and no errors in address proof no */}
+      {values?.applicants[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR' &&
+        !errors?.applicants?.[activeIndex]?.personal_details?.address_proof_number && (
+          <button
+            className='text-primary-red font-semibold flex justify-end'
+            onClick={() => alert('hello')}
+          >
+            <IconThumb />
+            Verify Aadhar e-KYC
+          </button>
+        )}
       <TextInput
         label='First Name'
         placeholder='Eg: Sanjay'

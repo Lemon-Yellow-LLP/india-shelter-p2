@@ -32,6 +32,7 @@ const PropertyDetails = () => {
     updateProgressApplicantSteps,
     activeIndex,
     setCurrentStepIndex,
+    showMap,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
@@ -225,7 +226,7 @@ const PropertyDetails = () => {
         description='Complete Qualifier to Unlock.'
       />
       <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
-        <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
+        {!showMap ? <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} /> : null}
         <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[160px] flex-1'>
           <label
             htmlFor='property-identification'
@@ -296,7 +297,8 @@ const PropertyDetails = () => {
               : null;
           }}
         />
-        <SwipeableDrawerComponent />
+
+        {!showMap ? <SwipeableDrawerComponent /> : null}
       </div>
     </>
   );

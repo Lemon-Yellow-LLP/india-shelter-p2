@@ -1,6 +1,23 @@
 import * as Yup from 'yup';
 
 export const signInSchema = Yup.object({
+  employee_code: Yup.string()
+    .trim()
+    .required('This field is mandatory')
+    .max(10, 'Emp code can be max 10 characters long'),
+  first_name: Yup.string()
+    .trim()
+    .required('This field is mandatory')
+    .min(2, 'Name must be atleast 2 characters long')
+    .max(50, 'Name can be max 50 characters long')
+    .matches(/^[A-Za-z][A-Za-z\s]*$/, 'Invalid characters in Name'),
+  mobile_number: Yup.string()
+    .matches(/^(?!.*(\d)\1{4})(?!.*(\d{5}).*\2)\d{10}$/, 'Enter a valid 10-digit mobile number')
+    .required('Mobile number is required'),
+  role: Yup.string().required('This field is mandatory'),
+  branch: Yup.string().required('This field is mandatory'),
+  department: Yup.string().required('This field is mandatory'),
+  loimage: Yup.string().required('This field is mandatory'),
   username: Yup.string()
     .required('This field is mandatory')
     .min(10, 'Enter a valid phone number')

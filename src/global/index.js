@@ -513,6 +513,66 @@ export async function getDashboardLeadList(
   }
 }
 
+//admin
+async function getUsersList(values, options) {
+  try {
+    const { data } = await axios.post(`${API_URL}/admin/get-user-list`, values, options);
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+async function addUser(values, options) {
+  const { data } = await axios.post(`${API_URL}/admin/add-user/`, values, options);
+  return data;
+}
+
+async function editUser(id, values, options) {
+  try {
+    const { data } = await axios.post(`${API_URL}/admin/edit-user/${id}`, values, options);
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+async function deleteUser(id, options) {
+  try {
+    const { data } = await axios.delete(`${API_URL}/account/delete/${id}`, options);
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+async function getUserRoles(options) {
+  try {
+    const { data } = await axios.get(`${API_URL}/admin/get-user-roles`, options);
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+async function getUserBranches(options) {
+  try {
+    const { data } = await axios.get(`${API_URL}/admin/get-user-branches`, options);
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+async function getUserDepartments(options) {
+  try {
+    const { data } = await axios.get(`${API_URL}/admin/get-user-departments`, options);
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
 export {
   API_URL,
   pingAPI,
@@ -555,4 +615,11 @@ export {
   getUserById,
   editDoc,
   checkLoanOfficerExists,
+  getUsersList,
+  addUser,
+  editUser,
+  deleteUser,
+  getUserRoles,
+  getUserBranches,
+  getUserDepartments,
 };

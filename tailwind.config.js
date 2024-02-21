@@ -19,6 +19,7 @@ export default {
         'medium-grey': '#FAFAFA',
         'disabled-grey': '#EFEFEF',
         'lighter-grey': '#D9D9D9',
+        'lighter-red': '#FDECE8',
         stroke: '#D9D9D9',
       },
     },

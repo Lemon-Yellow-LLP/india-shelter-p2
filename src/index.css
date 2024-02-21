@@ -383,6 +383,12 @@ body {
   }
 }
 
+@media (max-width: 767px) {
+  .loginstyles {
+    height: calc(100vh - 290px);
+  }
+}
+
 @media (min-width: 728px) {
   .btn-bg {
     z-index: 10;
@@ -416,4 +422,12 @@ body {
 
 .MuiStack-root {
   padding-top: 0 !important;
+}
+
+.custom-table tr:first-child th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.custom-table tr:first-child th:last-child {
+  border-top-right-radius: 8px;
 }

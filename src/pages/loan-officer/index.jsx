@@ -153,6 +153,7 @@ export default function Dashboard() {
             handleSubmit={handleSearch}
             handleReset={handleResetSearch}
             disabled={loading}
+            prompt='Search for name, ID, mobile number'
           />
         </div>
       </div>

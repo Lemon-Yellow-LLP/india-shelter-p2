@@ -30,6 +30,7 @@ const LeadContextProvider = ({ children }) => {
   const [pincodeErr, setPincodeErr] = useState({});
   const [propertyValueEstimateError, setPropertyValueEstimateError] = useState('');
   const [salesforceID, setSalesforceID] = useState(null);
+  const [showMap, setShowMap] = useState(false);
 
   const { token } = useContext(AuthContext);
 
@@ -73,7 +74,6 @@ const LeadContextProvider = ({ children }) => {
         if (key === 'lead' || key === 'lnt_mobile_number') {
           continue;
         }
-        console.log('key', key);
         let newDataKeyprogress = getProgress(newData[key]);
         progressMap[key] = newDataKeyprogress ? newDataKeyprogress : 0;
       }
@@ -425,6 +425,8 @@ const LeadContextProvider = ({ children }) => {
         salesforceID,
         setSalesforceID,
         coApplicantDrawerUpdate,
+        showMap,
+        setShowMap,
       }}
     >
       {children}

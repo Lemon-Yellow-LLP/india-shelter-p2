@@ -2,7 +2,13 @@ import { useCallback, useContext, useState } from 'react';
 import TextInputWithSendOtp from '../../components/TextInput/TextInputWithSendOtp';
 import { AuthContext } from '../../context/AuthContextProvider';
 import { ToastMessage, Button } from '../../components';
-import { checkLoanOfficerExists, getLoginOtp, logout, verifyLoginOtp } from '../../global';
+import {
+  checkLoanOfficerExists,
+  getLoginOtp,
+  getUserById,
+  logout,
+  verifyLoginOtp,
+} from '../../global';
 import DynamicDrawer from '../../components/SwipeableDrawer/DynamicDrawer';
 import { Header } from '../../components';
 import { useNavigate } from 'react-router-dom';
@@ -19,12 +25,16 @@ export default function Login() {
     handleBlur,
     setFieldValue,
     setFieldError,
+    isAuthenticated,
     setIsAuthenticated,
+    isAdminAuthenticated,
+    setIsAdminAuthenticated,
     setOtpFailCount,
     token,
     setToken,
     toastMessage,
     setToastMessage,
+    loData,
     setLoData,
     setPhoneNumberList,
     errorToastMessage,
@@ -186,8 +196,14 @@ export default function Login() {
           setMobileVerified(true);
           setFieldError('username', undefined);
           setShowOTPInput(false);
-          setIsAuthenticated(true);
           setLoData(res);
+
+          if (res.user.role === 'Loan Officer') {
+            setIsAuthenticated(true);
+            return true;
+          }
+
+          setIsAdminAuthenticated(true);
           return true;
         }
 
@@ -247,8 +263,13 @@ export default function Login() {
 
       if (!res) return;
 
-      setIsAuthenticated(true);
-      navigate('/');
+      if (res.user.role === 'Loan Officer') {
+        setIsAuthenticated(true);
+        navigate('/');
+      } else {
+        setIsAdminAuthenticated(true);
+        navigate('/admin');
+      }
     } catch (err) {
       console.log(err);
     }
@@ -260,18 +281,16 @@ export default function Login() {
 
       <ErrorTost message={errorToastMessage} setMessage={setErrorToastMessage} />
 
-      <div className='bg-[#CCE2BE] overflow-hidden h-[100vh] relative'>
-        <Header />
+      <Header inputClasses='hidden md:flex' />
+
+      <div className='bg-[#CCE2BE] overflow-hidden h-[100vh] relative md:flex'>
+        <Header inputClasses='md:hidden' />
+
         <div>
           <img src='./IS-Login-Logo.png' alt='login-logo' />
         </div>
 
-        <div
-          style={{
-            height: 'calc(100vh - 290px)',
-          }}
-          className='absolute bottom-0 w-full flex flex-col gap-5 px-4 pb-4 pt-3 rounded-t-2xl bg-white overflow-auto no-scrollbar'
-        >
+        <div className='loginstyles absolute md:relative bottom-0 w-full flex flex-col gap-5 px-4 pb-4 pt-3 rounded-t-2xl md:rounded-[0px] bg-white overflow-auto no-scrollbar'>
           <div>
             <h2 className='text-primary-black font-semibold'>Welcome!</h2>
             <p className='text-dark-grey font-normal'>Login to continue</p>
@@ -347,8 +366,8 @@ export default function Login() {
           <Button
             disabled={!mobileVerified}
             primary
-            inputClasses={`h-[48px] ${mobileVerified ? 'font-semibold' : 'font-normal'}`}
-            link='/'
+            inputClasses={`h-[48px] md:!w-full ${mobileVerified ? 'font-semibold' : 'font-normal'}`}
+            link={isAuthenticated ? '/' : '/admin'}
           >
             Login
           </Button>
