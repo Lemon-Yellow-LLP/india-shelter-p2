@@ -27,11 +27,11 @@ const DropDown = memo(
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
     const [selectedOption, setSelectedOption] = useState(() =>
-      options?.find((option) => defaultSelected === option.value),
+      options?.find((option) => defaultSelected === option?.value),
     );
 
     useEffect(() => {
-      const option = options.find((option) => option.value === defaultSelected);
+      const option = options.find((option) => option?.value === defaultSelected);
       setSelectedOption(option);
     }, [defaultSelected, options, resetDefaultSelected]);
 
@@ -41,7 +41,7 @@ const DropDown = memo(
       (option) => {
         setSelectedOption(option);
         setShowDropDown(false);
-        onChange && onChange(option.value);
+        onChange && onChange(option?.value);
       },
       [onChange],
     );
@@ -105,20 +105,20 @@ const DropDown = memo(
                   ${index ? 'border-t border-stroke' : 'border-none'}
                 `;
 
-              if (option.value === selectedOption?.value)
+              if (option?.value === selectedOption?.value)
                 optionClasses = `${optionClasses} text-primary-red`;
-              else if (option.disabled) {
+              else if (option?.disabled) {
                 optionClasses = `${optionClasses} pointer-events-none`;
               }
 
               return (
-                disableOption !== option.value && (
+                disableOption !== option?.value && (
                   <button
-                    key={option.value}
+                    key={option?.value}
                     onClick={() => handleSelect(option)}
                     className={optionClasses}
                   >
-                    <div className={option.disabled && 'opacity-20'}>{option.label}</div>
+                    <div className={option?.disabled && 'opacity-20'}>{option?.label}</div>
                     {showIcon && selectedOption?.value === option.value ? (
                       <IconTick width={styles ? 16 : 24} height={styles ? 16 : 24} />
                     ) : (

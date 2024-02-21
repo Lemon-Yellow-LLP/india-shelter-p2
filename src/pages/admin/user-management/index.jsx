@@ -432,7 +432,7 @@ const UserManagement = () => {
     ])
       .then((data) => {
         const roles = data[0].map((obj) => {
-          if (loData?.user.role !== obj.value) return { label: obj.role, value: obj.role };
+          if (loData?.user.role !== obj.role) return { label: obj.role, value: obj.role };
         });
         const branches = data[1].map((obj) => {
           return { label: obj.branch, value: obj.branch };
@@ -545,7 +545,8 @@ const UserManagement = () => {
   // console.log(values);
   // console.log(errors);
   // console.log(token);
-  console.log(loData);
+  // console.log(userDropDownData.roles);
+  // console.log(loData);
 
   return (
     <>
