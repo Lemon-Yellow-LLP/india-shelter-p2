@@ -525,11 +525,13 @@ const UserManagement = () => {
           setToastType('success');
           setUserToastMessage('Changes saved successfully!');
           setUseradd(data);
+          setValues(initialValues);
         })
         .catch((error) => {
           console.log('DELETE_USER_ERROR', error);
           setToastType('error');
           setUserToastMessage(`Changes couldn't be saved!`);
+          setValues(initialValues);
         });
 
       setUserAction(null);
@@ -565,7 +567,7 @@ const UserManagement = () => {
         showSearch={true}
         showButton={true}
         buttonText='Add User'
-        prompt='Search for emp code, name, branch, mob number'
+        prompt='Search for emp code, role, branch, mob number'
         handleButtonClick={() => setShow(true)}
       />
 
