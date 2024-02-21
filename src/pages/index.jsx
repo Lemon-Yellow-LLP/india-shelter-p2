@@ -1,13 +1,13 @@
 import { Route, Routes } from 'react-router-dom';
-import Dashboard from './dashboard';
-import LeadCreationRoutes from './dashboard/lead-creation';
+import Dashboard from './loan-officer';
+import LeadCreationRoutes from './loan-officer/lead-creation';
 import Login from './login/Login';
 import { Navigate } from 'react-router-dom';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContextProvider';
-import DashboardApplicant from './dashboard/DashboardApplicant';
-import { logout } from '../global';
+import DashboardApplicant from './loan-officer/DashboardApplicant';
 import PropTypes from 'prop-types';
+import AdminRoutes from './admin/index.jsx';
 
 const TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
@@ -15,47 +15,23 @@ const DashboardRoutes = () => {
   const RequireAuth = ({ children }) => {
     const { isAuthenticated, token } = useContext(AuthContext);
 
-    // useEffect(() => {
-    //   const resetSessionTimer = () => {
-    //     const reset = async () => {
-    //       try {
-    //         await logout(
-    //           {
-    //             status: 'no',
-    //             logout_via: 'New Login',
-    //           },
-    //           {
-    //             headers: {
-    //               Authorization: token,
-    //             },
-    //           },
-    //         );
-
-    //         window.location.reload();
-    //       } catch (err) {
-    //         window.location.reload();
-    //         console.log(err);
-    //       }
-    //     };
-
-    //     // // Reset the session timer when the user is active
-    //     const timer = setTimeout(reset, TIMEOUT);
-
-    //     return () => clearTimeout(timer);
-    //   };
-
-    //   // Attach an event listener to track user activity
-    //   window.addEventListener('touchmove', resetSessionTimer);
-
-    //   // Clean up the event listener when the component unmounts
-    //   return () => {
-    //     window.removeEventListener('touchmove', resetSessionTimer);
-    //   };
-    // }, []);
-
     // Check authentication once and render accordingly
+    console.log('lo', isAuthenticated);
 
     if (isAuthenticated) {
+      return children;
+    } else {
+      return <Navigate to='/login' />;
+    }
+  };
+
+  const AdminRequireAuth = ({ children }) => {
+    const { isAdminAuthenticated, token } = useContext(AuthContext);
+
+    // Check authentication once and render accordingly
+    console.log('admin', isAdminAuthenticated);
+
+    if (isAdminAuthenticated) {
       return children;
     } else {
       return <Navigate to='/login' />;
@@ -66,6 +42,14 @@ const DashboardRoutes = () => {
     <>
       <Routes>
         <Route path='/login' element={<Login />}></Route>
+        <Route
+          path='/admin/*'
+          element={
+            <AdminRequireAuth>
+              <AdminRoutes />
+            </AdminRequireAuth>
+          }
+        />
         <Route
           path='/'
           element={

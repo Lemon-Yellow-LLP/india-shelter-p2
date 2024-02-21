@@ -5,8 +5,8 @@ const Checkbox = forwardRef(function Checkbox({ name, checked, setChecked, ...pr
   return (
     <label htmlFor={name} className='relative block'>
       <svg
-        width='16'
-        height='16'
+        width={props.isLarge ? '32' : '16'}
+        height={props.isLarge ? '32' : '16'}
         viewBox='0 0 16 16'
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
@@ -22,14 +22,14 @@ const Checkbox = forwardRef(function Checkbox({ name, checked, setChecked, ...pr
                 ? 'stroke-black fill-transparent'
                 : 'stroke-[#808080] fill-transparent'
             } transition-colors ease-out duration-300`}
-            strokeWidth='1.5'
+            strokeWidth={props.isLarge ? '1' : '1.5'}
           />
           <path
             d='M12 5L6.5 10.5L4 8'
             className={`stroke-neutral-white ${
               checked ? 'opacity-100' : 'opacity-0'
             } transition-opacity ease-out duration-300`}
-            strokeWidth='1.5'
+            strokeWidth={props.isLarge ? '1' : '1.5'}
             strokeLinecap='round'
             strokeLinejoin='round'
           />
@@ -59,6 +59,7 @@ Checkbox.propTypes = {
   name: PropTypes.string.isRequired,
   checked: PropTypes.bool,
   onChange: PropTypes.func,
+  isLarge: PropTypes.bool,
 };
 
 export default Checkbox;

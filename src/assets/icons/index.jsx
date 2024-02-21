@@ -22,6 +22,8 @@ import IconMarried from './married.jsx';
 import IconSingle from './single.jsx';
 import IconSalarid from './salarid.jsx';
 import IconSelfEmployed from './self-employed.jsx';
+import IconLanguage from './Language.jsx';
+import IconDownArrow from './down-arrow.jsx';
 
 import ApplicantDetailsIcon from './ApplicantDetailsIcon';
 import AddressDetailsIcon from './AddressDetailsIcon';
@@ -49,7 +51,8 @@ import CashCreditIcon from './cashCreditIcon';
 import OverDraftIcon from './overDraftIcon';
 
 import TostErrorIcon from './TostErrorIcon';
-
+import IconThumb from './IconThumb.jsx';
+import IconAdminFormClose from './IconAdminFormClose.jsx';
 export {
   OverDraftIcon,
   CashCreditIcon,
@@ -98,4 +101,8 @@ export {
   IconSalarid,
   IconSelfEmployed,
   TostErrorIcon,
+  IconLanguage,
+  IconThumb,
+  IconAdminFormClose,
+  IconDownArrow,
 };

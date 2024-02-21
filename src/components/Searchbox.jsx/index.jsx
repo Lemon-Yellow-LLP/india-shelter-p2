@@ -2,13 +2,21 @@ import React, { useState } from 'react';
 import SearchIcon from '../../assets/icons/search';
 import CloseIcon2 from '../../assets/icons/close2';
 
-export default function Searchbox({ query, setQuery, handleSubmit, handleReset, disabled }) {
+export default function Searchbox({
+  query,
+  setQuery,
+  handleSubmit,
+  handleReset,
+  disabled,
+  inputClasses,
+  prompt,
+}) {
   return (
     <form
       name='searchbox'
       onSubmit={handleSubmit}
       onReset={handleReset}
-      className={`flex items-center p-2 h-11 gap-2 border-[#D9D9D9] bg-white shadow-search rounded-lg focus-within:outline outline-1 outline-offset-2`}
+      className={`${inputClasses} flex items-center p-2 h-11 gap-2 border-[#D9D9D9] bg-white shadow-search rounded-lg focus-within:outline outline-1 outline-offset-2`}
     >
       <div className=''>
         <SearchIcon />
@@ -29,7 +37,7 @@ export default function Searchbox({ query, setQuery, handleSubmit, handleReset, 
         }}
         className={`w-full truncate ${disabled ? 'opacity-40' : 'opacity-100'}`}
         type='text'
-        placeholder='Search for name, ID, mobile number'
+        placeholder={prompt}
         disabled={disabled}
       />
       {query ? (

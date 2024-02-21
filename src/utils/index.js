@@ -184,3 +184,17 @@ export const coApplicantPagesRoute = [
   '/lead/banking-details',
   '/lead/upload-documents',
 ];
+
+export const filterOptions = [
+  { label: 'All users', value: 'All users' },
+  { label: 'Active users', value: 'active' },
+  { label: 'Inactive users', value: 'inActive' },
+];
+
+export const filterDateOptions = [
+  { label: 'Last 30 days', value: 'Last 30 days' },
+  { label: 'Today', value: 'Today' },
+  { label: 'Yesterday', value: 'Yesterday' },
+  { label: 'Last 7 days', value: 'Last 7 days' },
+  { label: 'Range', value: 'Range' },
+];

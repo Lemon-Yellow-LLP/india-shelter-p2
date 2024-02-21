@@ -27,15 +27,15 @@ const IdentificationDoneFields = ({
     setPincodeErr,
     propertyValueEstimateError,
     setPropertyValueEstimateError,
+    showMap,
+    setShowMap,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
 
-  const [showMap, setShowMap] = useState(false);
-
-  // const onMapButtonClick = useCallback(() => {
-  //   setShowMap((prev) => !prev);
-  // }, []);
+  const onMapButtonClick = useCallback(() => {
+    setShowMap((prev) => !prev);
+  }, []);
 
   const handleTextInputChange = (e) => {
     const value = e.currentTarget.value;
@@ -400,7 +400,7 @@ const IdentificationDoneFields = ({
         }}
       />
 
-      {/* <MapInput
+      <MapInput
         name='property_details.project_society_colony'
         label='Project/Society/Colony name'
         required
@@ -425,7 +425,7 @@ const IdentificationDoneFields = ({
         maxLength={90}
         onBlur={handleBlur}
         onMapButtonClick={onMapButtonClick}
-      /> */}
+      />
 
       <TextInput
         name='property_details.pincode'
@@ -529,6 +529,7 @@ const IdentificationDoneFields = ({
         onChange={handleChange}
         onBlur={handleBlur}
       />
+
       {showMap ? <Map setShowMap={setShowMap} /> : null}
     </>
   );
