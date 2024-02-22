@@ -56,7 +56,7 @@ const UserTable = ({ userslist }) => {
 
   return (
     <div className='custom-table'>
-      //Table height h-[570px]
+      {/* Table height h-[570px] */}
       {!userslist.length ? (
         <div className='flex justify-center items-center h-full'>
           <NoUsersOnSearchIcon />
