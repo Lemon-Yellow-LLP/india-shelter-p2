@@ -263,7 +263,7 @@ export default function Login() {
 
       if (!res) return;
 
-      if (res.user.role === 'Loan Officer') {
+      if (loData.user.role === 'Loan Officer') {
         setIsAuthenticated(true);
         navigate('/');
       } else {

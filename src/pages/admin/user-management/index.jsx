@@ -41,6 +41,8 @@ const UserManagement = () => {
     handleSubmit,
     show,
     setShow,
+    showActionControlPopup,
+    setShowActionControlPopup,
     useradd,
     setUseradd,
     userToastMessage,
@@ -57,7 +59,6 @@ const UserManagement = () => {
 
   const [leadList, setLeadList] = useState([]);
   const [displayedList, setDisplayedList] = useState([]);
-  const [showActionControlPopup, setShowActionControlPopup] = useState(false);
   const [uploadPhotoLoader, setUploadPhotoLoader] = useState(false);
   const [uploadPhotoError, setUploadPhotoError] = useState('');
 
@@ -67,8 +68,8 @@ const UserManagement = () => {
   const [range, setRange] = useState(false);
 
   const [selectionRange, setSelectionRange] = useState({
-    startDate: parseISO(moment().subtract(30, 'days').format()),
-    endDate: parseISO(moment().format()),
+    startDate: parseISO(moment().subtract(30, 'days').format('YYYY-MM-DD')),
+    endDate: parseISO(moment().format('YYYY-MM-DD')),
     key: 'selection',
   });
 
@@ -171,8 +172,8 @@ const UserManagement = () => {
       switch (value) {
         case 'Last 30 days': {
           const payload = {
-            start_date: parseISO(moment().subtract(30, 'days').format()),
-            end_date: parseISO(moment().format()),
+            start_date: moment().subtract(30, 'days').format('YYYY-MM-DD'),
+            end_date: moment().format('YYYY-MM-DD'),
             page: 1,
             page_size: 10000000,
           };
@@ -194,8 +195,8 @@ const UserManagement = () => {
         }
         case 'Today': {
           const payload = {
-            start_date: parseISO(moment().format()),
-            end_date: parseISO(moment().format()),
+            start_date: moment().format('YYYY-MM-DD'),
+            end_date: moment().add(1, 'days').format('YYYY-MM-DD'),
             page: 1,
             page_size: 10000000,
           };
@@ -217,10 +218,11 @@ const UserManagement = () => {
         }
         case 'Yesterday': {
           const payload = {
-            start_date: parseISO(moment().subtract(1, 'days').format()),
-            end_date: parseISO(moment().subtract(1, 'days').format()),
+            start_date: moment().subtract(1, 'days').format('YYYY-MM-DD'),
+            end_date: moment().format('YYYY-MM-DD'),
             page: 1,
             page_size: 10000000,
+            yesterday: true,
           };
 
           getUsersList(payload, {
@@ -241,8 +243,8 @@ const UserManagement = () => {
         }
         case 'Last 7 days': {
           const payload = {
-            start_date: parseISO(moment().subtract(7, 'days').format()),
-            end_date: parseISO(moment().format()),
+            start_date: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+            end_date: moment().format('YYYY-MM-DD'),
             page: 1,
             page_size: 10000000,
           };
@@ -277,8 +279,8 @@ const UserManagement = () => {
   useEffect(() => {
     if (range) {
       const payload = {
-        start_date: selectionRange.startDate,
-        end_date: moment(selectionRange.endDate).add(1, 'day'),
+        start_date: moment(selectionRange.startDate).format('YYYY-MM-DD'),
+        end_date: moment(selectionRange.endDate).add(1, 'day').format('YYYY-MM-DD'),
         page: 1,
         page_size: 10000000,
       };
@@ -331,7 +333,7 @@ const UserManagement = () => {
       value = value.trimStart().replace(/\s\s+/g, ' ');
       const pattern = /^[a-zA-Z]*$/;
       if (pattern.exec(value)) {
-        setFieldValue(e.target.name, value);
+        setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
     },
     [setFieldValue],
@@ -493,9 +495,11 @@ const UserManagement = () => {
   //call api's on basis of user action confirmation
   const handleDataChange = () => {
     if (userStatus) {
+      const isactive = userStatus.value === 'active' ? true : false;
+
       editUser(
         userStatus.id,
-        { status: userStatus.value },
+        { status: userStatus.value, is_active: isactive },
         {
           headers: {
             Authorization: token,
@@ -515,6 +519,8 @@ const UserManagement = () => {
 
       setUserStatus(null);
       setShowActionControlPopup(false);
+    } else if (userAction.value === 'Edit') {
+      handleSubmit();
     } else {
       deleteUser(userAction.id, {
         headers: {
@@ -525,11 +531,13 @@ const UserManagement = () => {
           setToastType('success');
           setUserToastMessage('Changes saved successfully!');
           setUseradd(data);
+          setValues(initialValues);
         })
         .catch((error) => {
           console.log('DELETE_USER_ERROR', error);
           setToastType('error');
           setUserToastMessage(`Changes couldn't be saved!`);
+          setValues(initialValues);
         });
 
       setUserAction(null);
@@ -565,23 +573,51 @@ const UserManagement = () => {
         showSearch={true}
         showButton={true}
         buttonText='Add User'
-        prompt='Search for emp code, name, branch, mob number'
+        prompt='Search for emp code, role, branch, mob number'
         handleButtonClick={() => setShow(true)}
       />
 
       {/* edit/ delete/ active/ inactive action popup */}
       <AdminActionControl
-        title={userStatus ? 'Edit user' : 'Delete user'}
+        title={
+          userStatus
+            ? userStatus?.value === 'active'
+              ? 'Activate user'
+              : 'Inactivate user'
+            : userAction?.value === 'Edit'
+            ? 'Edit user'
+            : 'Delete user'
+        }
         subtitle={
           userStatus
-            ? ' Would you like to save the changes?'
+            ? userStatus?.value === 'active'
+              ? 'Would you like to activate this user?'
+              : 'Would you like to inactivate this user?'
+            : userAction?.value === 'Edit'
+            ? 'Would you like to save the changes?'
             : 'Would you like to delete this user?'
         }
-        actionMsg={userStatus ? 'Yes, save' : 'Yes, delete'}
+        actionMsg={
+          userStatus
+            ? userStatus?.value === 'active'
+              ? 'yes, activate'
+              : 'yes, inactivate'
+            : userAction?.value === 'Edit'
+            ? 'Yes, save'
+            : 'Yes, delete'
+        }
         showpopup={showActionControlPopup}
         setShowPopUp={setShowActionControlPopup}
         handleActionClick={handleDataChange}
-        handleResetAction={() => (userStatus ? setUserStatus(null) : setUserAction(null))}
+        handleResetAction={
+          userStatus
+            ? () => setUserStatus(null)
+            : () => {
+                setUserAction(null);
+                setErrors(null);
+                setValues(initialValues);
+              }
+        }
       />
 
       <FormPopUp
@@ -590,7 +626,14 @@ const UserManagement = () => {
         actionMsg={userAction ? 'Save' : 'Confirm'}
         showpopup={show}
         setShowPopUp={setShow}
-        handleActionClick={handleSubmit}
+        handleActionClick={
+          userAction
+            ? () => {
+                setShowActionControlPopup(true);
+                setShow(false);
+              }
+            : handleSubmit
+        }
         handleResetAction={() => {
           setValues(initialValues);
           setErrors(null);
@@ -630,6 +673,9 @@ const UserManagement = () => {
               name='middle_name'
               value={values?.middle_name}
               onChange={handleTextChange}
+              error={errors?.middle_name}
+              touched={touched?.middle_name}
+              onBlur={handleBlur}
               inputClasses='capitalize'
               divClasses='flex-1'
             />
@@ -638,6 +684,9 @@ const UserManagement = () => {
               name='last_name'
               value={values?.last_name}
               onChange={handleTextChange}
+              error={errors?.last_name}
+              touched={touched?.last_name}
+              onBlur={handleBlur}
               inputClasses='capitalize'
               divClasses='flex-1'
             />

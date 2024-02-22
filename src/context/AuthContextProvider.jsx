@@ -46,6 +46,7 @@ const AuthContextProvider = ({ children }) => {
   const [userStatus, setUserStatus] = useState(null);
   const [userAction, setUserAction] = useState(null);
   const [show, setShow] = useState(false);
+  const [showActionControlPopup, setShowActionControlPopup] = useState(false);
   const [useradd, setUseradd] = useState(null);
   const [userToastMessage, setUserToastMessage] = useState();
   const [toastType, setToastType] = useState();
@@ -71,6 +72,7 @@ const AuthContextProvider = ({ children }) => {
             setUserToastMessage('Changes saved successfully!');
             setUseradd(editedUser);
             setShow(false);
+            setShowActionControlPopup(false);
             formik.setValues(formik.initialValues);
             setUserAction(null);
           })
@@ -78,6 +80,7 @@ const AuthContextProvider = ({ children }) => {
             console.log('EDIT_USER_ERROR', error);
             setToastType('error');
             setUserToastMessage(`Changes couldn't be saved!`);
+            setShowActionControlPopup(false);
             setShow(false);
             formik.setValues(formik.initialValues);
             setUserAction(null);
@@ -98,10 +101,7 @@ const AuthContextProvider = ({ children }) => {
           .catch((error) => {
             console.log('ADD_USER_ERROR', error);
             if (error.response.status == 400) {
-              formik.setFieldError(
-                'employee_code',
-                'User with this employee code or username already exists',
-              );
+              formik.setFieldError('employee_code', 'This is an existing user');
               return;
             }
             setToastType('error');
@@ -174,6 +174,8 @@ const AuthContextProvider = ({ children }) => {
         setToastType,
         isAdminAuthenticated,
         setIsAdminAuthenticated,
+        showActionControlPopup,
+        setShowActionControlPopup,
       }}
     >
       {children}

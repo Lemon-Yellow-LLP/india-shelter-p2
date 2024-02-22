@@ -8,6 +8,7 @@ import DropDown from '../DropDown';
 import SideBarLogout from '../../assets/icons/sideBarLogout';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContextProvider';
+import { logout } from '../../global';
 
 const userOptions = [
   {
