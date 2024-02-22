@@ -333,7 +333,7 @@ const UserManagement = () => {
       value = value.trimStart().replace(/\s\s+/g, ' ');
       const pattern = /^[a-zA-Z]*$/;
       if (pattern.exec(value)) {
-        setFieldValue(e.target.name, value);
+        setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
     },
     [setFieldValue],
@@ -673,6 +673,9 @@ const UserManagement = () => {
               name='middle_name'
               value={values?.middle_name}
               onChange={handleTextChange}
+              error={errors?.middle_name}
+              touched={touched?.middle_name}
+              onBlur={handleBlur}
               inputClasses='capitalize'
               divClasses='flex-1'
             />
@@ -681,6 +684,9 @@ const UserManagement = () => {
               name='last_name'
               value={values?.last_name}
               onChange={handleTextChange}
+              error={errors?.last_name}
+              touched={touched?.last_name}
+              onBlur={handleBlur}
               inputClasses='capitalize'
               divClasses='flex-1'
             />

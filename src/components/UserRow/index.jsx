@@ -4,7 +4,16 @@ import OptionsIcon from '../../assets/icons/admin-options';
 import { AuthContext } from '../../context/AuthContextProvider';
 import moment from 'moment';
 
-const UserRow = ({ user, i }) => {
+const UserRow = ({
+  user,
+  i,
+  isAdminStatusPopupOpen,
+  handleAdminStatusPopupId,
+  setAdminStatusPopupId,
+  isAdminActionPopupId,
+  handleAdminActionPopupId,
+  setAdminActionPopupId,
+}) => {
   return (
     <tr
       className={`${
@@ -20,10 +29,22 @@ const UserRow = ({ user, i }) => {
       <td className='px-4 py-[11px]'>{user.mobile_number}</td>
       <td className='px-4 py-[11px]'>{moment(user.updated_at).format('DD/MM/YY')}</td>
       <td className='px-4 py-[11px]'>
-        <AdminStatus user={user} />
+        <AdminStatus
+          user={user}
+          isOpen={isAdminStatusPopupOpen}
+          index={i}
+          handleAdminStatusPopupId={handleAdminStatusPopupId}
+          setAdminStatusPopupId={setAdminStatusPopupId}
+        />
       </td>
       <td className='flex justify-center px-4 py-[11px]'>
-        <AdminAction user={user} />
+        <AdminAction
+          user={user}
+          isOpen={isAdminActionPopupId}
+          index={i}
+          handleAdminActionPopupId={handleAdminActionPopupId}
+          setAdminActionPopupId={setAdminActionPopupId}
+        />
       </td>
     </tr>
   );
@@ -31,20 +52,18 @@ const UserRow = ({ user, i }) => {
 
 export default UserRow;
 
-const AdminStatus = ({ user }) => {
+const AdminStatus = ({ user, isOpen, index, handleAdminStatusPopupId, setAdminStatusPopupId }) => {
   const options = [
     { label: 'Active', value: 'active' },
     { label: 'Inactive', value: 'inActive' },
   ];
 
-  const [popUpOpen, setPopUpOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(user.status);
 
   const { setUserStatus } = useContext(AuthContext);
 
   const handleSelect = useCallback(
     (option) => {
-      setPopUpOpen(false);
       setUserStatus({ id: user.id, value: option.value });
     },
     [user],
@@ -57,7 +76,8 @@ const AdminStatus = ({ user }) => {
   return (
     <div className='relative'>
       <button
-        onClick={() => setPopUpOpen(!popUpOpen)}
+        data-ispopup='popup'
+        onClick={() => handleAdminStatusPopupId(index)}
         className={`flex items-center w-24 px-3 py-1.5 justify-between ${
           selectedOption === 'active'
             ? 'bg-light-green  border-secondary-green'
@@ -105,31 +125,24 @@ const AdminStatus = ({ user }) => {
         )}
       </button>
 
-      {popUpOpen && (
+      {isOpen && (
         <div className='w-32 rounded-lg bg-white shadow-secondary mt-2 absolute top-100 overflow-y-auto z-20 border border-stroke'>
           {options.map((option, index) => {
             let optionClasses = `py-3 px-4 flex justify-between w-full overflow-y-auto transition-colors duration-300 ease-out opacity-100
               ${index ? 'border-t border-stroke' : 'border-none'}
             `;
 
-            if (option.value === selectedOption)
-              optionClasses = `${optionClasses} text-primary-red`;
-            else if (option.disabled) {
-              optionClasses = `${optionClasses} pointer-events-none`;
-            }
-
             return (
               <button
+                data-ispopup='popup'
                 key={option.value}
-                onClick={() => handleSelect(option)}
+                onClick={() => {
+                  setAdminStatusPopupId(null);
+                  handleSelect(option);
+                }}
                 className={optionClasses}
               >
                 <div className={option.disabled && 'opacity-20'}>{option.label}</div>
-                {selectedOption === option.value ? (
-                  <IconTick width={16} height={16} />
-                ) : (
-                  <div></div>
-                )}
               </button>
             );
           })}
@@ -139,13 +152,12 @@ const AdminStatus = ({ user }) => {
   );
 };
 
-const AdminAction = ({ user }) => {
+const AdminAction = ({ user, isOpen, index, handleAdminActionPopupId, setAdminActionPopupId }) => {
   const options = [
     { label: 'Edit', value: 'Edit' },
     { label: 'Delete', value: 'Delete' },
   ];
 
-  const [popUpOpen, setPopUpOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState();
 
   const { setUserAction, setValues } = useContext(AuthContext);
@@ -153,7 +165,6 @@ const AdminAction = ({ user }) => {
   const handleSelect = useCallback(
     (option) => {
       setSelectedOption(option);
-      setPopUpOpen(false);
       setUserAction({ id: user.id, value: option.value });
       const userMeta = {
         employee_code: user.employee_code,
@@ -174,35 +185,27 @@ const AdminAction = ({ user }) => {
 
   return (
     <div className='relative'>
-      <button onClick={() => setPopUpOpen(!popUpOpen)}>
+      <button data-ispopup='popup' onClick={() => handleAdminActionPopupId(index)}>
         <OptionsIcon />
       </button>
-
-      {popUpOpen && (
+      {isOpen && (
         <div className='w-32 rounded-lg bg-white shadow-secondary mt-2 absolute top-100 left-[-110px] overflow-y-auto z-20 border border-stroke'>
           {options.map((option, index) => {
             let optionClasses = `py-3 px-4 flex justify-between w-full overflow-y-auto transition-colors duration-300 ease-out opacity-100
               ${index ? 'border-t border-stroke' : 'border-none'}
             `;
 
-            if (option.value === selectedOption?.value)
-              optionClasses = `${optionClasses} text-primary-red`;
-            else if (option.disabled) {
-              optionClasses = `${optionClasses} pointer-events-none`;
-            }
-
             return (
               <button
+                data-ispopup='popup'
                 key={option.value}
-                onClick={() => handleSelect(option)}
+                onClick={() => {
+                  setAdminActionPopupId(null);
+                  handleSelect(option);
+                }}
                 className={optionClasses}
               >
                 <div className={option.disabled && 'opacity-20'}>{option.label}</div>
-                {selectedOption?.value === option.value ? (
-                  <IconTick width={16} height={16} />
-                ) : (
-                  <div></div>
-                )}
               </button>
             );
           })}

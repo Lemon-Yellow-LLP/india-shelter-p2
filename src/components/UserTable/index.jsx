@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import NoUsersOnSearchIcon from '../../assets/icons/NoUsersOnSearch';
 import UserRow from '../UserRow';
 
@@ -13,6 +14,48 @@ const TableHeaderList = [
 ];
 
 const UserTable = ({ userslist }) => {
+  const [adminStatusPopupId, setAdminStatusPopupId] = useState(null);
+  const [adminActionPopupId, setAdminActionPopupId] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      let target = event.target.getAttribute('data-ispopup') === 'popup';
+      let closestTarget = event.target.closest('button[data-ispopup="popup"]');
+      if (!target && !closestTarget) {
+        console.log('clicked outside');
+        setAdminStatusPopupId(null);
+        setAdminActionPopupId(null);
+        return;
+      }
+    };
+
+    if (adminActionPopupId !== null || adminStatusPopupId !== null) {
+      document.body.addEventListener('click', handleClickOutside, true);
+    } else {
+      console.log('removing event listener');
+      document.body.removeEventListener('click', handleClickOutside, true);
+    }
+    return () => document.body.removeEventListener('click', handleClickOutside, true);
+  }, [adminActionPopupId, adminStatusPopupId]);
+
+  const handleAdminStatusPopupId = (index) => {
+    setAdminActionPopupId(null);
+    if (adminStatusPopupId === index) {
+      setAdminStatusPopupId(null);
+    } else {
+      setAdminStatusPopupId(index);
+    }
+  };
+
+  const handleAdminActionPopupId = (index) => {
+    setAdminStatusPopupId(null);
+    if (adminActionPopupId === index) {
+      setAdminActionPopupId(null);
+    } else {
+      setAdminActionPopupId(index);
+    }
+  };
+
   return (
     <div className='custom-table h-[570px]'>
       {!userslist.length ? (
@@ -36,7 +79,17 @@ const UserTable = ({ userslist }) => {
 
           <tbody>
             {userslist.map((user, i) => (
-              <UserRow user={user} key={user.id} i={i} />
+              <UserRow
+                user={user}
+                key={user.id}
+                i={i}
+                isAdminStatusPopupOpen={adminStatusPopupId === i}
+                handleAdminStatusPopupId={handleAdminStatusPopupId}
+                setAdminStatusPopupId={setAdminStatusPopupId}
+                isAdminActionPopupId={adminActionPopupId === i}
+                handleAdminActionPopupId={handleAdminActionPopupId}
+                setAdminActionPopupId={setAdminActionPopupId}
+              />
             ))}
           </tbody>
         </table>

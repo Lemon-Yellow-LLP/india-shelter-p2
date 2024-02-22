@@ -29,6 +29,14 @@ const DropDown = memo(
     const [selectedOption, setSelectedOption] = useState(() =>
       options?.find((option) => defaultSelected === option?.value),
     );
+    const [innerWidth, setInnerWidth] = useState(window.innerWidth);
+    useEffect(() => {
+      function handleWindowResize() {
+        setInnerWidth(window.innerWidth);
+      }
+      window.addEventListener('resize', handleWindowResize);
+      return () => window.removeEventListener('resize', handleWindowResize);
+    }, []);
 
     useEffect(() => {
       const option = options.find((option) => option?.value === defaultSelected);
@@ -83,13 +91,13 @@ const DropDown = memo(
           }}
           {...props}
           onBlur={onBlur}
-          onMouseLeave={onBlur} // For Iphone
+          onMouseLeave={innerWidth < '1024' ? onBlur : null} // For Iphone (if opens on desktop don't run onMouseLeave)
           className={`${getThemes()} ${
             styles ? styles : 'py-3 px-4 rounded-lg'
           } w-full flex justify-between gap-1 border-x border-y mt-1 bg-white disabled:bg-disabled-grey`}
         >
           {selectedOption ? selectedOption.label : placeholder || props.value}{' '}
-          <IconDownArrow width={styles ? 16 : 24} height={styles ? 16 : 24} />
+          <IconDownArrow width={styles ? 16 : 24} height={styles ? 16 : 24} cssClasses='ml-auto' />
         </button>
         {showDropDown && (
           <div
