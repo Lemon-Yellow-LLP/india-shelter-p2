@@ -22,7 +22,6 @@ const UserTable = ({ userslist }) => {
       let target = event.target.getAttribute('data-ispopup') === 'popup';
       let closestTarget = event.target.closest('button[data-ispopup="popup"]');
       if (!target && !closestTarget) {
-        console.log('clicked outside');
         setAdminStatusPopupId(null);
         setAdminActionPopupId(null);
         return;
@@ -32,7 +31,6 @@ const UserTable = ({ userslist }) => {
     if (adminActionPopupId !== null || adminStatusPopupId !== null) {
       document.body.addEventListener('click', handleClickOutside, true);
     } else {
-      console.log('removing event listener');
       document.body.removeEventListener('click', handleClickOutside, true);
     }
     return () => document.body.removeEventListener('click', handleClickOutside, true);
@@ -57,7 +55,8 @@ const UserTable = ({ userslist }) => {
   };
 
   return (
-    <div className='custom-table h-[570px]'>
+    <div className='custom-table'>
+      //Table height h-[570px]
       {!userslist.length ? (
         <div className='flex justify-center items-center h-full'>
           <NoUsersOnSearchIcon />
