@@ -632,6 +632,9 @@ const UserManagement = () => {
               name='middle_name'
               value={values?.middle_name}
               onChange={handleTextChange}
+              error={errors?.middle_name}
+              touched={touched?.middle_name}
+              onBlur={handleBlur}
               inputClasses='capitalize'
               divClasses='flex-1'
             />
@@ -640,6 +643,9 @@ const UserManagement = () => {
               name='last_name'
               value={values?.last_name}
               onChange={handleTextChange}
+              error={errors?.last_name}
+              touched={touched?.last_name}
+              onBlur={handleBlur}
               inputClasses='capitalize'
               divClasses='flex-1'
             />
