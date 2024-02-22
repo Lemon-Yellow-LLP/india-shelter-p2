@@ -24,7 +24,7 @@ export default function AdminHeader({
             setQuery={setQuery}
             handleSubmit={handleSearch}
             handleReset={handleResetSearch}
-            inputClasses='w-[328px]'
+            inputClasses='w-[340px]'
             prompt={prompt}
           />
         )}
