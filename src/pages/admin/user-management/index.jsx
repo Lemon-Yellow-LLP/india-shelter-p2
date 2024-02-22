@@ -331,7 +331,7 @@ const UserManagement = () => {
       value = value.trimStart().replace(/\s\s+/g, ' ');
       const pattern = /^[a-zA-Z]*$/;
       if (pattern.exec(value)) {
-        setFieldValue(e.target.name, value);
+        setFieldValue(e.target.name, value.charAt(0).toUpperCase() + value.slice(1));
       }
     },
     [setFieldValue],
