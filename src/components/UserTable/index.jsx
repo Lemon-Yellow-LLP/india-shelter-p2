@@ -17,6 +17,27 @@ const UserTable = ({ userslist }) => {
   const [adminStatusPopupId, setAdminStatusPopupId] = useState(null);
   const [adminActionPopupId, setAdminActionPopupId] = useState(null);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      let target = event.target.getAttribute('data-ispopup') === 'popup';
+      let closestTarget = event.target.closest('button[data-ispopup="popup"]');
+      if (!target && !closestTarget) {
+        console.log('clicked outside');
+        setAdminStatusPopupId(null);
+        setAdminActionPopupId(null);
+        return;
+      }
+    };
+
+    if (adminActionPopupId !== null || adminStatusPopupId !== null) {
+      document.body.addEventListener('click', handleClickOutside, true);
+    } else {
+      console.log('removing event listener');
+      document.body.removeEventListener('click', handleClickOutside, true);
+    }
+    return () => document.body.removeEventListener('click', handleClickOutside, true);
+  }, [adminActionPopupId, adminStatusPopupId]);
+
   const handleAdminStatusPopupId = (index) => {
     setAdminActionPopupId(null);
     if (adminStatusPopupId === index) {

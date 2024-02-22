@@ -76,6 +76,7 @@ const AdminStatus = ({ user, isOpen, index, handleAdminStatusPopupId, setAdminSt
   return (
     <div className='relative'>
       <button
+        data-ispopup='popup'
         onClick={() => handleAdminStatusPopupId(index)}
         className={`flex items-center w-24 px-3 py-1.5 justify-between ${
           selectedOption === 'active'
@@ -133,6 +134,7 @@ const AdminStatus = ({ user, isOpen, index, handleAdminStatusPopupId, setAdminSt
 
             return (
               <button
+                data-ispopup='popup'
                 key={option.value}
                 onClick={() => {
                   setAdminStatusPopupId(null);
@@ -183,7 +185,7 @@ const AdminAction = ({ user, isOpen, index, handleAdminActionPopupId, setAdminAc
 
   return (
     <div className='relative'>
-      <button onClick={() => handleAdminActionPopupId(index)}>
+      <button data-ispopup='popup' onClick={() => handleAdminActionPopupId(index)}>
         <OptionsIcon />
       </button>
       {isOpen && (
@@ -195,6 +197,7 @@ const AdminAction = ({ user, isOpen, index, handleAdminActionPopupId, setAdminAc
 
             return (
               <button
+                data-ispopup='popup'
                 key={option.value}
                 onClick={() => {
                   setAdminActionPopupId(null);
