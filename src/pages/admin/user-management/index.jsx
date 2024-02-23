@@ -630,8 +630,10 @@ const UserManagement = () => {
         handleActionClick={
           userAction
             ? () => {
-                setShowActionControlPopup(true);
-                setShow(false);
+                if (!Object.keys(errors).length) {
+                  setShowActionControlPopup(true);
+                  setShow(false);
+                }
               }
             : handleSubmit
         }
