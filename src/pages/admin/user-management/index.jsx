@@ -64,12 +64,14 @@ const UserManagement = () => {
 
   const [filteredList, dispatch] = useReducer(UserReducer, []);
 
+  const [dateState, setDateState] = useState(filterDateOptions[0].value);
+
   const [open, setOpen] = useState(false);
   const [range, setRange] = useState(false);
 
   const [selectionRange, setSelectionRange] = useState({
     startDate: parseISO(moment().subtract(30, 'days').format('YYYY-MM-DD')),
-    endDate: parseISO(moment().format('YYYY-MM-DD')),
+    endDate: parseISO(moment().add(1, 'day').format('YYYY-MM-DD')),
     key: 'selection',
   });
 
@@ -93,16 +95,18 @@ const UserManagement = () => {
         );
       }
       case 'Search': {
-        const searchedList = leadList.filter(
-          (lead) =>
-            lead.employee_code?.toLowerCase().includes(query) ||
-            lead.employee_code?.includes(query) ||
-            lead.branch?.toLowerCase().includes(query) ||
-            lead.branch?.includes(query) ||
-            lead.role?.toLowerCase().includes(query) ||
-            lead.role?.includes(query) ||
-            lead.mobile_number?.includes(query),
-        );
+        const searchedList = leadList.filter((lead) => {
+          let value = query.trim();
+          return (
+            lead.employee_code?.toLowerCase().includes(value) ||
+            lead.employee_code?.includes(value) ||
+            lead.branch?.toLowerCase().includes(value) ||
+            lead.branch?.includes(value) ||
+            lead.role?.toLowerCase().includes(value) ||
+            lead.role?.includes(value) ||
+            lead.mobile_number?.includes(value)
+          );
+        });
 
         if (searchedList.length) {
           return searchedList;
@@ -169,11 +173,13 @@ const UserManagement = () => {
   //date filter
   const handleDateChange = useCallback(
     (value) => {
+      setDateState(value);
+
       switch (value) {
         case 'Last 30 days': {
           const payload = {
             start_date: moment().subtract(30, 'days').format('YYYY-MM-DD'),
-            end_date: moment().format('YYYY-MM-DD'),
+            end_date: moment().add(1, 'day').format('YYYY-MM-DD'),
             page: 1,
             page_size: 10000000,
           };
@@ -239,12 +245,11 @@ const UserManagement = () => {
             });
 
           break;
-          // setLeadList();
         }
         case 'Last 7 days': {
           const payload = {
             start_date: moment().subtract(7, 'days').format('YYYY-MM-DD'),
-            end_date: moment().format('YYYY-MM-DD'),
+            end_date: moment().add(1, 'day').format('YYYY-MM-DD'),
             page: 1,
             page_size: 10000000,
           };
@@ -391,23 +396,124 @@ const UserManagement = () => {
   //fetch users
   useEffect(() => {
     const getUsers = async () => {
-      const payload = {
-        start_date: selectionRange.startDate,
-        end_date: moment(selectionRange.endDate).add(1, 'day'),
-        page: 1,
-        page_size: 10000000,
-      };
+      switch (dateState) {
+        case 'Last 30 days': {
+          const payload = {
+            start_date: moment().subtract(30, 'days').format('YYYY-MM-DD'),
+            end_date: moment().add(1, 'day').format('YYYY-MM-DD'),
+            page: 1,
+            page_size: 10000000,
+          };
 
-      try {
-        const users = await getUsersList(payload, {
-          headers: {
-            Authorization: token,
-          },
-        });
-        setLeadList(users.data);
-        setCount(Math.ceil(users.data.length / 10));
-      } catch (error) {
-        console.log('GET_USERLIST_ERROR', error);
+          try {
+            const users = await getUsersList(payload, {
+              headers: {
+                Authorization: token,
+              },
+            });
+            setLeadList(users.data);
+            setCount(Math.ceil(users.data.length / 10));
+          } catch (error) {
+            console.log('GET_USERLIST_ERROR', error);
+          }
+
+          break;
+        }
+        case 'Today': {
+          const payload = {
+            start_date: moment().format('YYYY-MM-DD'),
+            end_date: moment().add(1, 'days').format('YYYY-MM-DD'),
+            page: 1,
+            page_size: 10000000,
+          };
+
+          getUsersList(payload, {
+            headers: {
+              Authorization: token,
+            },
+          })
+            .then((users) => {
+              setLeadList(users.data);
+              setCount(Math.ceil(users.data.length / 10));
+            })
+            .catch((error) => {
+              console.log('GET_USERLIST_ERROR', error);
+            });
+
+          break;
+        }
+        case 'Yesterday': {
+          const payload = {
+            start_date: moment().subtract(1, 'days').format('YYYY-MM-DD'),
+            end_date: moment().format('YYYY-MM-DD'),
+            page: 1,
+            page_size: 10000000,
+            yesterday: true,
+          };
+
+          getUsersList(payload, {
+            headers: {
+              Authorization: token,
+            },
+          })
+            .then((users) => {
+              setLeadList(users.data);
+              setCount(Math.ceil(users.data.length / 10));
+            })
+            .catch((error) => {
+              console.log('GET_USERLIST_ERROR', error);
+            });
+
+          break;
+        }
+        case 'Last 7 days': {
+          const payload = {
+            start_date: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+            end_date: moment().add(1, 'day').format('YYYY-MM-DD'),
+            page: 1,
+            page_size: 10000000,
+          };
+
+          getUsersList(payload, {
+            headers: {
+              Authorization: token,
+            },
+          })
+            .then((users) => {
+              setLeadList(users.data);
+              setCount(Math.ceil(users.data.length / 10));
+            })
+            .catch((error) => {
+              console.log('GET_USERLIST_ERROR', error);
+            });
+
+          break;
+        }
+        case 'Range': {
+          const payload = {
+            start_date: moment(selectionRange.startDate).format('YYYY-MM-DD'),
+            end_date: moment(selectionRange.endDate).add(1, 'day').format('YYYY-MM-DD'),
+            page: 1,
+            page_size: 10000000,
+          };
+
+          getUsersList(payload, {
+            headers: {
+              Authorization: token,
+            },
+          })
+            .then((users) => {
+              setLeadList(users.data);
+              setCount(Math.ceil(users.data.length / 10));
+            })
+            .catch((error) => {
+              console.log('GET_USERLIST_ERROR', error);
+            });
+
+          break;
+        }
+        default: {
+        }
       }
     };
     getUsers();
@@ -529,14 +635,14 @@ const UserManagement = () => {
       })
         .then((data) => {
           setToastType('success');
-          setUserToastMessage('Changes saved successfully!');
+          setUserToastMessage('User deleted successfully!');
           setUseradd(data);
           setValues(initialValues);
         })
         .catch((error) => {
           console.log('DELETE_USER_ERROR', error);
           setToastType('error');
-          setUserToastMessage(`Changes couldn't be saved!`);
+          setUserToastMessage(`User couldn't be deleted!`);
           setValues(initialValues);
         });
 
@@ -555,6 +661,9 @@ const UserManagement = () => {
   // console.log(token);
   // console.log(userDropDownData.roles);
   // console.log(loData);
+  // console.log('open', open);
+  // console.log('range', range);
+  // console.log('dropdown-state', dateState);
 
   return (
     <>
@@ -629,8 +738,10 @@ const UserManagement = () => {
         handleActionClick={
           userAction
             ? () => {
-                setShowActionControlPopup(true);
-                setShow(false);
+                if (!Object.keys(errors).length) {
+                  setShowActionControlPopup(true);
+                  setShow(false);
+                }
               }
             : handleSubmit
         }
