@@ -95,16 +95,18 @@ const UserManagement = () => {
         );
       }
       case 'Search': {
-        const searchedList = leadList.filter(
-          (lead) =>
-            lead.employee_code?.toLowerCase().includes(query) ||
-            lead.employee_code?.includes(query) ||
-            lead.branch?.toLowerCase().includes(query) ||
-            lead.branch?.includes(query) ||
-            lead.role?.toLowerCase().includes(query) ||
-            lead.role?.includes(query) ||
-            lead.mobile_number?.includes(query),
-        );
+        const searchedList = leadList.filter((lead) => {
+          let value = query.trim();
+          return (
+            lead.employee_code?.toLowerCase().includes(value) ||
+            lead.employee_code?.includes(value) ||
+            lead.branch?.toLowerCase().includes(value) ||
+            lead.branch?.includes(value) ||
+            lead.role?.toLowerCase().includes(value) ||
+            lead.role?.includes(value) ||
+            lead.mobile_number?.includes(value)
+          );
+        });
 
         if (searchedList.length) {
           return searchedList;
@@ -736,8 +738,10 @@ const UserManagement = () => {
         handleActionClick={
           userAction
             ? () => {
-                setShowActionControlPopup(true);
-                setShow(false);
+                if (!Object.keys(errors).length) {
+                  setShowActionControlPopup(true);
+                  setShow(false);
+                }
               }
             : handleSubmit
         }
