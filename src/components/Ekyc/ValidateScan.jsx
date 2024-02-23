@@ -53,6 +53,7 @@ export default function ValidateScan({
   setPerformVerification,
   setScanningState,
   setOpenEkycPopup,
+  ecsBioHelper,
 }) {
   const { setToastMessage } = useContext(LeadContext);
   const { setErrorToastMessage } = useContext(AuthContext);
@@ -64,7 +65,7 @@ export default function ValidateScan({
   const [isCaptureFailure, setIsCaptureFailure] = useState(false);
 
   useEffect(() => {
-    if (type === 'biometrics') {
+    if (type === 'FMR') {
       setValidateScanObj(obj[0]);
     } else if (type === 'iris') {
       setValidateScanObj(obj[1]);
@@ -75,22 +76,53 @@ export default function ValidateScan({
 
   const captureScan = async () => {
     console.log('capturing scan', Math.random());
-    const { data } = await axios.get(
-      `https://reqres.in/api/users/${Math.floor(Math.random() * 10)}?delay=4`,
-    );
-    if (data) {
-      if (Math.floor(Math.random() * 10) % 2) {
-        // capture successful
-        setIsCaptureSuccessful(true);
-      } else {
-        // capture unsuccessful
-        setIsCaptureFailure(true);
-      }
+
+    // setting it to 0 for FMR
+    var deviceSelectedIndex = 0;
+
+    await ecsBioHelper.enableLog();
+
+    if (type == 'FMR') {
+      const wadh = '18f4CEiXeXcfGXvgWA/blxD+w2pw7hfQPY45JMytkPw=';
+      const fType = 2;
+      const otpValue = null;
+      await ecsBioHelper.captureFMR(
+        deviceSelectedIndex,
+        'P',
+        'K',
+        1,
+        fType,
+        false,
+        otpValue,
+        wadh,
+        function (responseXml) {
+          console.log(responseXml, 'fingerprint data');
+          if (responseXml) {
+            setIsCaptureSuccessful(true);
+          }
+          // performKyc(aadhaarNumber, consent, responseXml, 'FMR', fType, otpValue != null);
+        },
+        function (errorMessage) {
+          console.log(errorMessage);
+        },
+      );
     }
+
+    // const { data } = await axios.get(
+    //   `https://reqres.in/api/users/${Math.floor(Math.random() * 10)}?delay=4`,
+    // );
+    // if (data) {
+    //   if (Math.floor(Math.random() * 10) % 2) {
+    //     // capture successful
+    //   } else {
+    //     // capture unsuccessful
+    //     setIsCaptureFailure(true);
+    //   }
+    // }
   };
-  useEffect(() => {
-    captureScan();
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => captureScan(), 1000);
+  // }, []);
 
   const validateCapturedScan = () => {
     console.log('validating captured scan with aadhar');
@@ -201,6 +233,15 @@ export default function ValidateScan({
           </>
         )}
       </div>
+      <Button
+        primary
+        onClick={() => {
+          captureScan();
+        }}
+        inputClasses='!py-3 mt-6'
+      >
+        Try again
+      </Button>
     </>
   );
 }

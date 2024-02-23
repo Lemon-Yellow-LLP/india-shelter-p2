@@ -20,7 +20,7 @@ const ekycMethods = [
   },
   {
     label: 'Biometrics',
-    value: 'biometrics',
+    value: 'FMR',
   },
   {
     label: 'IRIS',
@@ -35,6 +35,7 @@ const ekycMethods = [
 // generate aadhaar otp returns otpTxnId which is required in validate otp
 let otpTxnId;
 export default function EkycDrawer({ setOpenEkycPopup }) {
+  const ecsBioHelper = window.ecsBioHelper;
   const { setToastMessage } = useContext(LeadContext);
   const { setErrorToastMessage, token } = useContext(AuthContext);
 
@@ -55,6 +56,15 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
   const [maskedEmail, setMaskedEmail] = useState('');
   const [otp, setOtp] = useState('');
 
+  useEffect(() => {
+    if (
+      !ecsBioHelper.init(
+        '1637623c9eddfdc7306e6925442f0020c322366137d01e5078a9c87a7b4bcd18061b31bc0c6e',
+      )
+    ) {
+      console.log('ecsBioHelper not working');
+    }
+  }, []);
   const consentRef = useRef();
   const updateConsentRef = (consent) => {
     consentRef.current = consent;
@@ -142,16 +152,16 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
     }
   };
 
-  const handleScan = () => {
+  const handleScan = async () => {
     console.log('searching for device');
     setDeviceScanPopup(true);
-    setTimeout(() => {
-      if (Math.floor(Math.random() * 10) % 2) {
+    ecsBioHelper.detectDevices(function () {
+      if (ecsBioHelper.getDetectedDevices().length !== 0) {
         setScanningState('success');
       } else {
         setScanningState('error');
       }
-    }, 3000);
+    });
   };
 
   // aadhaar no validation
@@ -281,6 +291,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
         setPerformVerification={setPerformVerification}
         setScanningState={setScanningState}
         setOpenEkycPopup={setOpenEkycPopup}
+        ecsBioHelper={ecsBioHelper}
       />
     )
   ) : (
