@@ -635,14 +635,14 @@ const UserManagement = () => {
       })
         .then((data) => {
           setToastType('success');
-          setUserToastMessage('Changes saved successfully!');
+          setUserToastMessage('User deleted successfully!');
           setUseradd(data);
           setValues(initialValues);
         })
         .catch((error) => {
           console.log('DELETE_USER_ERROR', error);
           setToastType('error');
-          setUserToastMessage(`Changes couldn't be saved!`);
+          setUserToastMessage(`User couldn't be deleted!`);
           setValues(initialValues);
         });
 
