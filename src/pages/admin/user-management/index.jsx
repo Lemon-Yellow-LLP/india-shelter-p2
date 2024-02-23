@@ -69,7 +69,7 @@ const UserManagement = () => {
 
   const [selectionRange, setSelectionRange] = useState({
     startDate: parseISO(moment().subtract(30, 'days').format('YYYY-MM-DD')),
-    endDate: parseISO(moment().format('YYYY-MM-DD')),
+    endDate: parseISO(moment().add(1, 'day').format('YYYY-MM-DD')),
     key: 'selection',
   });
 
@@ -173,7 +173,7 @@ const UserManagement = () => {
         case 'Last 30 days': {
           const payload = {
             start_date: moment().subtract(30, 'days').format('YYYY-MM-DD'),
-            end_date: moment().format('YYYY-MM-DD'),
+            end_date: moment().add(1, 'day').format('YYYY-MM-DD'),
             page: 1,
             page_size: 10000000,
           };
@@ -239,12 +239,11 @@ const UserManagement = () => {
             });
 
           break;
-          // setLeadList();
         }
         case 'Last 7 days': {
           const payload = {
             start_date: moment().subtract(7, 'days').format('YYYY-MM-DD'),
-            end_date: moment().format('YYYY-MM-DD'),
+            end_date: moment().add(1, 'day').format('YYYY-MM-DD'),
             page: 1,
             page_size: 10000000,
           };
@@ -392,8 +391,8 @@ const UserManagement = () => {
   useEffect(() => {
     const getUsers = async () => {
       const payload = {
-        start_date: selectionRange.startDate,
-        end_date: moment(selectionRange.endDate).add(1, 'day'),
+        start_date: moment().subtract(30, 'days').format('YYYY-MM-DD'),
+        end_date: moment().add(1, 'day').format('YYYY-MM-DD'),
         page: 1,
         page_size: 10000000,
       };
