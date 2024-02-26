@@ -17,6 +17,7 @@ import { IconThumb } from '../../../../assets/icons';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import EkycDrawer from '../../../../components/Ekyc/EkycDrawer';
 import OCRDropdown from '../../../../components/DropDown/ocrDropdown';
+import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 
 function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields, setLoading }) {
   const {
@@ -1220,6 +1221,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
       <DynamicDrawer open={openEkycPopup} setOpen={setOpenEkycPopup} drawerChildrenClasses='!p-0'>
         <EkycDrawer setOpenEkycPopup={setOpenEkycPopup} />
+        {false && (
+          <div className='absolute w-full h-full bg-[#00000080] z-[8000]'>
+            <LoaderDynamicText text='Sending OTP' textColor='white' height='100vh' />
+          </div>
+        )}
       </DynamicDrawer>
     </>
   );

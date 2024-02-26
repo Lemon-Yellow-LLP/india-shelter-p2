@@ -11,26 +11,8 @@ import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
 import { generateEkycOtp, validateEkycOtp } from '../../global';
 import TextInput from '../TextInput';
-
-// Add ekyc methods
-const ekycMethods = [
-  {
-    label: 'OTP',
-    value: 'otp',
-  },
-  {
-    label: 'Biometrics',
-    value: 'FMR',
-  },
-  {
-    label: 'IRIS',
-    value: 'iris',
-  },
-  {
-    label: 'Face Authentication',
-    value: 'faceAuthentication',
-  },
-];
+import LoaderDynamicText from '../Loader/LoaderDynamicText';
+import { ekycMethods } from './EkycMeta';
 
 // generate aadhaar otp returns otpTxnId which is required in validate otp
 let otpTxnId;
@@ -42,6 +24,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
   const [isAadharInputDrawer, setIsAadharInputDrawer] = useState(true);
   const [aadhaarNo, setAadhaarNo] = useState('');
   const [aadhaarNoError, setAadhaarNoError] = useState('');
+  const [consent, setConsent] = useState('');
 
   // otp will be default selected for ekyc
   const [selectedEkycMethod, setSelectedEkycMethod] = useState('otp');
@@ -55,19 +38,21 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
   const [maskedMobile, setMaskedMobile] = useState('');
   const [maskedEmail, setMaskedEmail] = useState('');
   const [otp, setOtp] = useState('');
-
+  // disable fields when performing api connection
+  const [disableFields, setDisableFields] = useState(false);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (
       !ecsBioHelper.init(
-        '1637623c9eddfdc7306e6925442f0020c322366137d01e5078a9c87a7b4bcd18061b31bc0c6e',
+        '0929343689fd09b252906caca8612081858126cb315c367ff43462c320559b63b3f9ee1f2dfb',
       )
     ) {
       console.log('ecsBioHelper not working');
     }
   }, []);
   const consentRef = useRef();
-  const updateConsentRef = (consent) => {
-    consentRef.current = consent;
+  const updateConsent = (consent) => {
+    setConsent(consent);
   };
 
   // resend otp on mobile and email
@@ -97,10 +82,11 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
   const handleVerify = async () => {
     try {
       console.log('sending otp on mobile no. linked to aadhar');
+      setLoading(true);
       const data = await generateEkycOtp(
         {
           aadhaar_number: aadhaarNo,
-          consent: consentRef.current,
+          consent: consent,
           send_sms: true,
           send_email: true,
         },
@@ -110,6 +96,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
           },
         },
       );
+      setLoading(false);
       otpTxnId = data.OtpTxnId;
       setMaskedMobile(data?.maskedMobile);
       setMaskedEmail(data?.maskedEmail);
@@ -149,6 +136,9 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
       setIsAadharInputDrawer(true);
     } catch (error) {
       setErrorToastMessage('Technical error');
+      setOpenEkycPopup(false);
+      setPerformVerification(false);
+      setIsAadharInputDrawer(true);
     }
   };
 
@@ -176,17 +166,17 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
       setAadhaarNoError('Enter valid 12 digit Aadhaar no.');
     }
   };
-
+  console.log(consentRef.current);
   return isAadharInputDrawer ? (
     <div className='w-full px-4 py-6 flex flex-col gap-3'>
       <div className='flex justify-between items-center'>
-        <p className='font-semibold'>Enter Aadhaar No</p>
+        <p className='font-semibold'>Enter Aadhar No</p>
         <button onClick={() => setOpenEkycPopup(false)}>
           <IconClose />
         </button>
       </div>
       <TextInput
-        placeholder='Enter Aadhaar number'
+        placeholder='Enter Aadhar number'
         type='number'
         name='aadhaarNo'
         value={aadhaarNo}
@@ -292,85 +282,89 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
         setScanningState={setScanningState}
         setOpenEkycPopup={setOpenEkycPopup}
         ecsBioHelper={ecsBioHelper}
+        aadhaarNo={aadhaarNo}
+        consent={consent}
       />
     )
   ) : (
-    <div className='relative'>
-      <div className='w-full h-[550px] flex flex-col'>
-        <div className='flex justify-between px-4 py-2 border-b border-lighter-grey'>
-          <p className='font-semibold'>Select verification method</p>
-          <button
-            onClick={() => {
-              setOpenEkycPopup(false);
-              setAadhaarNo('');
-              setIsAadharInputDrawer(true);
-              setIsConsentChecked(false);
-            }}
-          >
-            <IconClose />
-          </button>
-        </div>
-        <div className='px-4 pt-4 overflow-y-scroll'>
-          <div className='flex flex-col gap-2'>
-            {ekycMethods.map((method) => {
-              return (
-                <Radio
-                  key={method.label}
-                  label={method.label}
-                  value={method.value}
-                  current={selectedEkycMethod}
-                  onChange={() => setSelectedEkycMethod(method.value)}
-                />
-              );
-            })}
+    <>
+      <div className='relative'>
+        <div className='w-full h-[550px] flex flex-col'>
+          <div className='flex justify-between px-4 py-2 border-b border-lighter-grey'>
+            <p className='font-semibold'>Select verification method</p>
+            <button
+              onClick={() => {
+                setOpenEkycPopup(false);
+                setAadhaarNo('');
+                setIsAadharInputDrawer(true);
+                setIsConsentChecked(false);
+              }}
+            >
+              <IconClose />
+            </button>
           </div>
-          <hr className='my-4 bg-lighter-grey h-px w-full' />
-          <ConsentBox
-            isChecked={isConsentChecked}
-            setIsChecked={setIsConsentChecked}
-            updateConsentRef={updateConsentRef}
-          />
+          <div className='px-4 pt-4 overflow-y-scroll'>
+            <div className='flex flex-col gap-2'>
+              {ekycMethods.map((method) => {
+                return (
+                  <Radio
+                    key={method.label}
+                    label={method.label}
+                    value={method.value}
+                    current={selectedEkycMethod}
+                    onChange={() => setSelectedEkycMethod(method.value)}
+                  />
+                );
+              })}
+            </div>
+            <hr className='my-4 bg-lighter-grey h-px w-full' />
+            <ConsentBox
+              isChecked={isConsentChecked}
+              setIsChecked={setIsConsentChecked}
+              updateConsentRef={updateConsent}
+            />
+          </div>
+          <div className={`py-6 px-4 bg-[#FEFEFE] ${deviceScanPopup && 'opacity-0'}`}>
+            <Button
+              primary
+              disabled={!isConsentChecked}
+              onClick={() => {
+                if (selectedEkycMethod === 'otp') {
+                  handleVerify();
+                  return;
+                }
+                handleScan();
+              }}
+              inputClasses='!py-3'
+            >
+              {selectedEkycMethod === 'otp' ? 'Verify' : 'Scan'}
+            </Button>
+          </div>
         </div>
-        <div className={`py-6 px-4 bg-[#FEFEFE] ${deviceScanPopup && 'opacity-0'}`}>
-          <Button
-            primary
-            disabled={!isConsentChecked}
-            onClick={() => {
-              if (selectedEkycMethod === 'otp') {
-                handleVerify();
-                return;
-              }
-              handleScan();
-            }}
-            inputClasses='!py-3'
-          >
-            {selectedEkycMethod === 'otp' ? 'Verify' : 'Scan'}
-          </Button>
-        </div>
+        <Popup
+          open={deviceScanPopup}
+          handleSuccess={() => {
+            setDeviceScanPopup(false);
+            setPerformVerification(true);
+          }}
+          title={
+            scanningState === 'loading'
+              ? 'Please wait while we are detecting your device'
+              : scanningState === 'error'
+              ? 'Device not found'
+              : 'Device found successfully'
+          }
+          description={scanningState === 'error' ? 'Please try again or try another method' : ''}
+          state={scanningState}
+          bottom={4}
+          handleClose={() => {
+            setDeviceScanPopup(false);
+            // setting default scanning state
+            setScanningState('loading');
+          }}
+        />
       </div>
-      <Popup
-        open={deviceScanPopup}
-        handleSuccess={() => {
-          setDeviceScanPopup(false);
-          setPerformVerification(true);
-        }}
-        title={
-          scanningState === 'loading'
-            ? 'Please wait while we are detecting your device'
-            : scanningState === 'error'
-            ? 'Device not found'
-            : 'Device found successfully'
-        }
-        description={scanningState === 'error' ? 'Please try again or try another method' : ''}
-        state={scanningState}
-        bottom={4}
-        handleClose={() => {
-          setDeviceScanPopup(false);
-          // setting default scanning state
-          setScanningState('loading');
-        }}
-      />
-    </div>
+    </>
   );
 }
 
