@@ -78,6 +78,15 @@ const AuthContextProvider = ({ children }) => {
           })
           .catch((error) => {
             console.log('EDIT_USER_ERROR', error);
+            if (
+              error.response.status == 400 &&
+              error.response.data.message === 'User with this username already exists.'
+            ) {
+              formik.setFieldError('mobile_number', 'This is an existing user');
+              setShowActionControlPopup(false);
+              setShow(true);
+              return;
+            }
             setToastType('error');
             setUserToastMessage(`Changes couldn't be saved!`);
             setShowActionControlPopup(false);
@@ -100,7 +109,13 @@ const AuthContextProvider = ({ children }) => {
           })
           .catch((error) => {
             console.log('ADD_USER_ERROR', error);
-            if (error.response.status == 400) {
+            if (
+              error.response.status == 400 &&
+              error.response.data.message === 'User with this username already exists.'
+            ) {
+              formik.setFieldError('mobile_number', 'This is an existing user');
+              return;
+            } else if (error.response.status == 400) {
               formik.setFieldError('employee_code', 'This is an existing user');
               return;
             }
