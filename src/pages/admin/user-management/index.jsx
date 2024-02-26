@@ -709,8 +709,8 @@ const UserManagement = () => {
         actionMsg={
           userStatus
             ? userStatus?.value === 'active'
-              ? 'yes, activate'
-              : 'yes, inactivate'
+              ? 'Yes, activate'
+              : 'Yes, inactivate'
             : userAction?.value === 'Edit'
             ? 'Yes, save'
             : 'Yes, delete'
