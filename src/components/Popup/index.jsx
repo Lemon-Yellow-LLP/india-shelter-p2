@@ -19,6 +19,7 @@ export default function Popup({
   if (state === 'success' && open) {
     setTimeout(() => {
       handleSuccess();
+      return;
     }, 1000);
   }
 

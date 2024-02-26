@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import Button from '../Button';
 import { IconClose } from '../../assets/icons';
 import Radio from '../Radio';
@@ -11,49 +11,72 @@ import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
 import { generateEkycOtp, validateEkycOtp } from '../../global';
 import TextInput from '../TextInput';
-import LoaderDynamicText from '../Loader/LoaderDynamicText';
-import { ekycMethods } from './EkycMeta';
+
+// Add ekyc methods
+export const ekycMethods = [
+  {
+    label: 'OTP',
+    value: 'otp',
+  },
+  {
+    label: 'Biometrics',
+    value: 'FMR',
+  },
+  {
+    label: 'IRIS',
+    value: 'iris',
+  },
+  {
+    label: 'Face Authentication',
+    value: 'faceAuthentication',
+  },
+];
 
 // generate aadhaar otp returns otpTxnId which is required in validate otp
 let otpTxnId;
-export default function EkycDrawer({ setOpenEkycPopup }) {
+
+export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   const ecsBioHelper = window.ecsBioHelper;
-  const { setToastMessage } = useContext(LeadContext);
+  const { setToastMessage, values } = useContext(LeadContext);
   const { setErrorToastMessage, token } = useContext(AuthContext);
 
+  // aadharInputDrawser states
   const [isAadharInputDrawer, setIsAadharInputDrawer] = useState(true);
   const [aadhaarNo, setAadhaarNo] = useState('');
   const [aadhaarNoError, setAadhaarNoError] = useState('');
-  const [consent, setConsent] = useState('');
 
+  // select kyc method screen states
   // otp will be default selected for ekyc
-  const [selectedEkycMethod, setSelectedEkycMethod] = useState('otp');
   const [performVerification, setPerformVerification] = useState(false);
-  const [isVerifyOtp, setIsVerifyOtp] = useState(false);
-  const [deviceScanPopup, setDeviceScanPopup] = useState(false);
+  const [selectedEkycMethod, setSelectedEkycMethod] = useState('otp');
   const [isConsentChecked, setIsConsentChecked] = useState(false);
-  const [hasSentEkycOTPOnce, setHasSentEkycOTPOnce] = useState(true);
+  const [consent, setConsent] = useState('');
+  const [deviceScanPopup, setDeviceScanPopup] = useState(false);
   // loading, error, success (default would be loading state)
   const [scanningState, setScanningState] = useState('loading');
+
+  // verify OTP screen states
   const [maskedMobile, setMaskedMobile] = useState('');
   const [maskedEmail, setMaskedEmail] = useState('');
   const [otp, setOtp] = useState('');
-  // disable fields when performing api connection
-  const [disableFields, setDisableFields] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isVerifyOtp, setIsVerifyOtp] = useState(false);
+
   useEffect(() => {
     if (
       !ecsBioHelper.init(
         '0929343689fd09b252906caca8612081858126cb315c367ff43462c320559b63b3f9ee1f2dfb',
       )
     ) {
-      console.log('ecsBioHelper not working');
+      console.log('ecsBioHelper terminate');
     }
   }, []);
-  const consentRef = useRef();
-  const updateConsent = (consent) => {
-    setConsent(consent);
-  };
+
+  const updateConsent = useCallback(
+    (consent) => {
+      setConsent(consent);
+    },
+    [consent],
+  );
 
   // resend otp on mobile and email
   const sendMobileOtp = async () => {
@@ -62,7 +85,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
       const data = await generateEkycOtp(
         {
           aadhaar_number: aadhaarNo,
-          consent: consentRef.current,
+          consent: consent,
           send_sms: true,
           send_email: true,
         },
@@ -96,11 +119,9 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
           },
         },
       );
-      setLoading(false);
       otpTxnId = data.OtpTxnId;
       setMaskedMobile(data?.maskedMobile);
       setMaskedEmail(data?.maskedEmail);
-      console.log(data);
       setPerformVerification(true);
     } catch (error) {
       console.log(error);
@@ -109,19 +130,22 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
       setIsAadharInputDrawer(true);
       setAadhaarNo('');
       setIsConsentChecked(false);
+    } finally {
+      setLoading(false);
     }
   };
 
   // handle otp and aadhaar verification
   const handleVerifyAadharOtp = async () => {
     try {
-      console.log('verifing aadhar otp');
+      setLoading(true);
       const res = await validateEkycOtp(
         {
           aadhaar_number: aadhaarNo,
-          consent: consentRef.current,
+          consent: consent,
           otp_txn_id: otpTxnId,
           otp_value: otp,
+          applicant_id: values?.lead?.id,
         },
         {
           headers: {
@@ -131,17 +155,17 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
       );
       console.log(res);
       setToastMessage('Information fetched Successfully');
-      setOpenEkycPopup(false);
-      setPerformVerification(false);
-      setIsAadharInputDrawer(true);
     } catch (error) {
       setErrorToastMessage('Technical error');
+    } finally {
+      setLoading(false);
       setOpenEkycPopup(false);
       setPerformVerification(false);
       setIsAadharInputDrawer(true);
     }
   };
 
+  // detecting biometric device
   const handleScan = async () => {
     console.log('searching for device');
     setDeviceScanPopup(true);
@@ -166,7 +190,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
       setAadhaarNoError('Enter valid 12 digit Aadhaar no.');
     }
   };
-  console.log(consentRef.current);
+
   return isAadharInputDrawer ? (
     <div className='w-full px-4 py-6 flex flex-col gap-3'>
       <div className='flex justify-between items-center'>
@@ -183,6 +207,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
         onChange={handleAadhaarNoChange}
         error={aadhaarNoError}
         touched={true}
+        min={0} // hanlde mousewheel down
         onKeyDown={(e) => {
           if (
             e.key === 'ArrowUp' ||
@@ -259,7 +284,6 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
             required
             onSendOTPClick={sendMobileOtp}
             setIsVerifyOtp={setIsVerifyOtp}
-            hasSentOTPOnce={hasSentEkycOTPOnce}
             defaultResendTime={30}
             otp={otp}
             setOtp={setOtp}
@@ -284,6 +308,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
         ecsBioHelper={ecsBioHelper}
         aadhaarNo={aadhaarNo}
         consent={consent}
+        setLoading={setLoading}
       />
     )
   ) : (
@@ -321,7 +346,7 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
             <ConsentBox
               isChecked={isConsentChecked}
               setIsChecked={setIsConsentChecked}
-              updateConsentRef={updateConsent}
+              updateConsent={updateConsent}
             />
           </div>
           <div className={`py-6 px-4 bg-[#FEFEFE] ${deviceScanPopup && 'opacity-0'}`}>
@@ -370,4 +395,5 @@ export default function EkycDrawer({ setOpenEkycPopup }) {
 
 EkycDrawer.propTypes = {
   setOpenEkycPopup: PropTypes.func,
+  setLoading: PropTypes.func,
 };

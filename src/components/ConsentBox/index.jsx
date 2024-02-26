@@ -27,7 +27,7 @@ const consentInMultipleLanguage = [
   },
 ];
 
-const ConsentBox = ({ isChecked, setIsChecked, updateConsentRef }) => {
+const ConsentBox = ({ isChecked, setIsChecked, updateConsent }) => {
   const [seeMore, setSeeMore] = useState(false);
   const [language, setLanguage] = useState('english');
   const [consent, setConsent] = useState(
@@ -36,7 +36,7 @@ const ConsentBox = ({ isChecked, setIsChecked, updateConsentRef }) => {
 
   useEffect(() => {
     const filteredConsent = consentInMultipleLanguage.find((info) => info.language === language);
-    updateConsentRef(filteredConsent.description);
+    updateConsent(filteredConsent.description);
     setConsent(filteredConsent);
   }, [language]);
 
@@ -100,5 +100,5 @@ export default ConsentBox;
 ConsentBox.propTypes = {
   isChecked: PropTypes.bool,
   setIsChecked: PropTypes.func,
-  updateConsentRef: PropTypes.func,
+  updateConsent: PropTypes.func,
 };

@@ -1,23 +1,25 @@
 import Button from '../Button';
 import Scanner from '../Scanner';
 import PropTypes from 'prop-types';
-import {
-  Fingerprint_scanning,
-  Fingerprint_success,
-  Fingerprint_failure,
-  Iris_scanning,
-  Iris_success,
-  Iris_failure,
-  FaceAuth_scanning,
-  FaceAuth_success,
-  FaceAuth_failure,
-} from './ScanAnimations';
+
+import Fingerprint_scanning from '../../assets/anim/Fingerprint_Scanning.json';
+import Fingerprint_success from '../../assets/anim/Fingerprint_Success.json';
+import Fingerprint_failure from '../../assets/anim/Fingerprint_Failure.json';
+
+import Iris_scanning from '../../assets/anim/Iris_Scanning.json';
+import Iris_success from '../../assets/anim/Iris_Success.json';
+import Iris_failure from '../../assets/anim/Iris_Failure.json';
+
+import FaceAuth_scanning from '../../assets/anim/FaceAuth_Scanning.json';
+import FaceAuth_success from '../../assets/anim/FaceAuth_Success.json';
+import FaceAuth_failure from '../../assets/anim/FaceAuth_Failure.json';
+
 import { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
 import { performBiometric } from '../../global';
 
+// biometric screen meta based on type
 let obj = [
   {
     title: 'Biometrics Scan',
@@ -48,7 +50,7 @@ let obj = [
   },
 ];
 
-// type = "biometric", "iris", "faceAuth"
+// type = "FMR", "iris", "faceAuth"
 export default function ValidateScan({
   type,
   setPerformVerification,
@@ -57,6 +59,7 @@ export default function ValidateScan({
   ecsBioHelper,
   aadhaarNo,
   consent,
+  setLoading,
 }) {
   const { setToastMessage, values } = useContext(LeadContext);
   const { setErrorToastMessage, token } = useContext(AuthContext);
@@ -82,7 +85,6 @@ export default function ValidateScan({
   // capture biometric
   const captureScan = async () => {
     setDisableFields(true);
-    console.log('capturing scan', Math.random());
 
     // setting it to 0 for FMR
     var deviceSelectedIndex = 0;
@@ -103,7 +105,6 @@ export default function ValidateScan({
         otpValue,
         wadh,
         function (responseXml) {
-          console.log(responseXml, 'fingerprint data');
           if (responseXml.includes('errCode="0"')) {
             setBiometricData(responseXml);
             SetIsCapturing(false);
@@ -117,7 +118,6 @@ export default function ValidateScan({
           // performKyc(aadhaarNumber, consent, responseXml, 'FMR', fType, otpValue != null);
         },
         function (errorMessage) {
-          console.log('timeout error');
           setDisableFields(false);
           setIsCaptureSuccessful(false);
           SetIsCapturing(false);
@@ -127,36 +127,38 @@ export default function ValidateScan({
     }
   };
 
-  console.log(disableFields);
+  // validate captured biometric
   const validateCapturedScan = async () => {
-    console.log('validating captured scan with aadhar');
-    const res = await performBiometric(
-      {
-        aadhaar_number: aadhaarNo, //<---- Enter aadhar number here
-        consent: consent,
-        pid_data: biometricData,
-        bio_type: 'FMR',
-        fmr_type: '2',
-        uses_otp: 'false',
-        applicant_id: values?.lead?.id,
-      },
-      {
-        headers: {
-          Authorization: token,
+    try {
+      setLoading(true);
+      const res = await performBiometric(
+        {
+          aadhaar_number: aadhaarNo, //<---- Enter aadhar number here
+          consent: consent,
+          pid_data: biometricData,
+          bio_type: 'FMR',
+          fmr_type: '2',
+          uses_otp: 'false',
+          applicant_id: values?.lead?.id,
         },
-      },
-    );
-    console.log(res);
-    // setTimeout(() => {
-    //   if (Math.floor(Math.random() * 10) % 2) {
-    //     setToastMessage('Information fetched Successfully');
-    //   } else {
-    //     setErrorToastMessage('Technical error');
-    //   }
-    //   setOpenEkycPopup(false);
-    //   setPerformVerification(false);
-    // }, 3000);
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      console.log(res);
+      setToastMessage('Information fetched Successfully');
+    } catch (error) {
+      setErrorToastMessage('Technical error');
+      console.log(error);
+    } finally {
+      setOpenEkycPopup(false);
+      setPerformVerification(false);
+      setLoading(false);
+    }
   };
+
   return (
     <>
       <div className='px-4 py-2 flex gap-2 justify-start w-full border-b border-lighter-grey'>
@@ -262,7 +264,12 @@ export default function ValidateScan({
 }
 
 ValidateScan.propTypes = {
-  title: PropTypes.string,
   type: PropTypes.string,
   setPerformVerification: PropTypes.func,
+  setScanningState: PropTypes.func,
+  setOpenEkycPopup: PropTypes.func,
+  ecsBioHelper: PropTypes.any,
+  aadhaarNo: PropTypes.string,
+  consent: PropTypes.string,
+  setLoading: PropTypes.func,
 };
