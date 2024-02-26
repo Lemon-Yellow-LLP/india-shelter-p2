@@ -27,7 +27,7 @@ const UserRow = ({
       <td className='px-4 py-[11px]'>{user.branch}</td>
       <td className='px-4 py-[11px]'>{user.role}</td>
       <td className='px-4 py-[11px]'>{user.mobile_number}</td>
-      <td className='px-4 py-[11px]'>{moment(user.updated_at).format('DD/MM/YY')}</td>
+      <td className='px-4 py-[11px]'>{moment(user.updated_at).format('DD/MM/YYYY')}</td>
       <td className='px-4 py-[11px]'>
         <AdminStatus
           user={user}
