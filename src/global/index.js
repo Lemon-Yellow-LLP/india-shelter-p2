@@ -573,6 +573,7 @@ async function getUserDepartments(options) {
   }
 }
 
+//EKYC
 async function generateEkycOtp(data, options) {
   const res = await axios.post(`${API_URL}/ekyc/generate-otp/`, data, options);
   return res.data;
@@ -585,6 +586,12 @@ async function validateEkycOtp(data, options) {
 
 async function performBiometric(data, options) {
   const res = await axios.post(`${API_URL}/ekyc/perform-ekyc-biometric/`, data, options);
+  return res.data;
+}
+
+//OCR
+async function performOcr(data, options) {
+  const res = await axios.post(`${API_URL}/ocr/r/`, data, options);
   return res.data;
 }
 
@@ -640,4 +647,5 @@ export {
   generateEkycOtp,
   validateEkycOtp,
   performBiometric,
+  performOcr,
 };
