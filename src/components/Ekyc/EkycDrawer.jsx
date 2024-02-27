@@ -61,6 +61,8 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   const [otp, setOtp] = useState('');
   const [isVerifyOtp, setIsVerifyOtp] = useState(false);
 
+  const [disableFields, setDisableFields] = useState(false);
+
   useEffect(() => {
     if (
       !ecsBioHelper.init(
@@ -175,6 +177,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   // detecting biometric device
   const handleScan = async () => {
     console.log('searching for device');
+    setDisableFields(true);
     setDeviceScanPopup(true);
     ecsBioHelper.detectDevices(function () {
       if (ecsBioHelper.getDetectedDevices().length !== 0) {
@@ -344,7 +347,8 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
                     label={method.label}
                     value={method.value}
                     current={selectedEkycMethod}
-                    onChange={() => setSelectedEkycMethod(method.value)}
+                    onChange={(value) => setSelectedEkycMethod(value)}
+                    disabled={disableFields}
                   />
                 );
               })}
@@ -354,6 +358,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
               isChecked={isConsentChecked}
               setIsChecked={setIsConsentChecked}
               updateConsent={updateConsent}
+              disabled={disableFields}
             />
           </div>
           <div className={`py-6 px-4 bg-[#FEFEFE] ${deviceScanPopup && 'opacity-0'}`}>
@@ -376,6 +381,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
         <Popup
           open={deviceScanPopup}
           handleSuccess={() => {
+            setDisableFields(false);
             setDeviceScanPopup(false);
             setPerformVerification(true);
           }}
@@ -390,6 +396,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
           state={scanningState}
           bottom={4}
           handleClose={() => {
+            setDisableFields(false);
             setDeviceScanPopup(false);
             // setting default scanning state
             setScanningState('loading');
