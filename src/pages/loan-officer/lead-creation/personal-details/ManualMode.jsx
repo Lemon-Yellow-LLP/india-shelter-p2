@@ -10,7 +10,13 @@ import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWith
 import { manualModeDropdownOptions } from './manualModeDropdownOptions';
 import OtpInput from '../../../../components/OtpInput/index';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
-import { addApi, editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
+import {
+  addApi,
+  editFieldsById,
+  getEmailOtp,
+  performOcr,
+  verifyEmailOtp,
+} from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import { IconThumb } from '../../../../assets/icons';
@@ -46,7 +52,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [date, setDate] = useState(null);
 
   const [openEkycPopup, setOpenEkycPopup] = useState(false);
-  const [ekycStatus, setEkycStatus] = useState(false);
+  const [enableEKYCIdtype, setEnableEKYIdtype] = useState(false);
+  const [enableEKYCAddressProof, setEnableEKYCAddressProof] = useState(false);
+
+  const [ekycIDStatus, setEkycIDStatus] = useState(false);
+  const [ekycAddressStatus, setEkycAddressStatus] = useState(false);
 
   const [enableOCRIdType, setEnableOCRIdType] = useState(false);
   const [enableOCRAddressProof, setEnableOCRAddressProof] = useState(false);
@@ -191,7 +201,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
       if (e === 'PAN' || e === 'Driving license' || e === 'Voter ID' || e === 'Passport') {
         setEnableOCRIdType(true);
-      } else {
+        setEnableEKYIdtype(false);
+      } else if (e === 'AADHAR') {
+        setEnableEKYIdtype(true);
         setEnableOCRIdType(false);
       }
     },
@@ -211,7 +223,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       }));
       if (e === 'Driving license' || e === 'Voter ID' || e === 'Passport') {
         setEnableOCRAddressProof(true);
-      } else {
+        setEnableEKYCAddressProof(false);
+      } else if (e === 'AADHAR') {
+        setEnableEKYCAddressProof(true);
         setEnableOCRAddressProof(false);
       }
     },
@@ -533,20 +547,24 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const verifyOCRIdType = (e) => {
     setLoading(true);
-    setTimeout(() => {
-      setEnableOCRIdType(false);
-      setIdTypeOCRStatus(true);
-      setLoading(false);
-    }, 2000);
+    performOcr()
+      .then((data) => {
+        setEnableOCRIdType(false);
+        setIdTypeOCRStatus(true);
+        setLoading(false);
+      })
+      .catch((err) => console.log('OCR_ERR', err));
   };
 
   const verifyOCRAddressType = (e) => {
     setLoading(true);
-    setTimeout(() => {
-      setEnableOCRAddressProof(false);
-      setAddressProofOCRStatus(true);
-      setLoading(false);
-    }, 2000);
+    performOcr()
+      .then((data) => {
+        setEnableOCRAddressProof(false);
+        setAddressProofOCRStatus(true);
+        setLoading(false);
+      })
+      .catch((err) => console.log('OCR_ERR', err));
   };
 
   return (
@@ -582,6 +600,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         verifiedStatus={idTypeOCRStatus}
         onVerifyClick={verifyOCRIdType}
         setOpenEkycPopup={setOpenEkycPopup}
+        verifiedEkycStatus={ekycIDStatus}
+        enableEKYC={enableEKYCIdtype}
       />
 
       <TextInput
@@ -658,25 +678,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }}
       />
-      {/* when ekyc is verified show kyc successful msg
-      <div className='gap-1 flex'>
-        <svg
-          width='18'
-          height='18'
-          viewBox='0 0 18 18'
-          fill='none'
-          xmlns='http://www.w3.org/2000/svg'
-        >
-          <path
-            d='M15 4.5L6.75 12.75L3 9'
-            stroke='#147257'
-            strokeWidth='1.5'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          />
-        </svg>
-        <p className='text-xs text-secondary-green'>e-KYC completed successfully</p>
-      </div> */}
+
       <div className='flex items-center gap-2'>
         <Checkbox
           checked={
@@ -789,6 +791,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         verifiedStatus={addressProofOCRStatus}
         onVerifyClick={verifyOCRAddressType}
         setOpenEkycPopup={setOpenEkycPopup}
+        verifiedEkycStatus={ekycAddressStatus}
+        enableEKYC={enableEKYCAddressProof}
       />
 
       <TextInput
