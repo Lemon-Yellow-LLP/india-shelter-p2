@@ -16,7 +16,7 @@ import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import { IconThumb } from '../../../../assets/icons';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import EkycDrawer from '../../../../components/Ekyc/EkycDrawer';
-import OCRDropdown from '../../../../components/DropDown/ocrDropdown';
+import OCRDropdown from '../../../../components/DropDown/OCRDropdown';
 
 function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields, setLoading }) {
   const {
@@ -62,9 +62,29 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [disableFields, setDisableFields] = useState(false);
 
   const [idTypeOCRText, setIdTypeOCRText] = useState('Capture front image');
+  const [addressTypeOCRText, setAddressTypeOCRText] = useState('Capture front image');
+
   const [idTypeClickedPhotoText, setIdTypeClickedPhotoText] = useState('');
+  const [addressTypeClickedPhotoText, setAddressTypeClickedPhotoText] = useState('');
 
   const [idTypeOCRImages, setIdTypeOCRImages] = useState([]);
+  const [addressTypeOCRImages, setAddressTypeOCRImages] = useState([]);
+
+  // enableOCR={enableOCRIdType}
+  // captureImages={captureImages}
+  // ocrButtonText={idTypeOCRText}
+  // clickedPhotoText={idTypeClickedPhotoText}
+  // enableVerify={enableVerifyOCRIdType}
+  // verifiedStatus={idTypeOCRStatus}
+  // onVerifyClick={verifyOCRIdType}
+  // setOpenEkycPopup={setOpenEkycPopup}
+  console.log('enableOCRIdType', enableOCRIdType);
+  console.log('enableVerifyOCRIdType', enableVerifyOCRIdType);
+  console.log('idTypeOCRText', idTypeOCRText);
+  console.log('idTypeClickedPhotoText', idTypeClickedPhotoText);
+  console.log('idTypeOCRStatus', idTypeOCRStatus);
+  console.log('idTypeOCRImages', idTypeOCRImages);
+  console.log('addressTypeOCRImages', addressTypeOCRImages);
 
   useEffect(() => {
     console.log('idTypeOcr', enableOCRIdType, 'addressProofOcr', enableOCRAddressProof);
@@ -176,7 +196,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
       }
 
-      if (e === 'PAN' || e === 'Driving license' || e === 'Voter ID') {
+      if (e === 'PAN' || e === 'Driving license' || e === 'Voter ID' || e === 'Passport') {
         setEnableOCRIdType(true);
       } else {
         setEnableOCRIdType(false);
@@ -196,7 +216,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         selected_address_proof: true,
         address_proof_number: false,
       }));
-      if (e === 'Driving license' || e === 'Voter ID') {
+      if (e === 'Driving license' || e === 'Voter ID' || e === 'Passport') {
         setEnableOCRAddressProof(true);
       } else {
         setEnableOCRAddressProof(false);
@@ -494,7 +514,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     mobileNumberUpdate();
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
-  const captureImages = (e) => {
+  const captureIDImages = (e) => {
     if (idTypeOCRImages.length === 0) {
       setIdTypeOCRText('Capture back image');
       setIdTypeClickedPhotoText('Front captured');
@@ -506,11 +526,32 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setIdTypeOCRImages((prev) => [...prev, e.target.files[0]]);
   };
 
+  const captureAddressImages = (e) => {
+    if (addressTypeOCRImages.length === 0) {
+      setAddressTypeOCRText('Capture back image');
+      setAddressTypeClickedPhotoText('Front captured');
+    } else {
+      setAddressTypeOCRText('Verify with OCR');
+      setAddressTypeClickedPhotoText('Front & back captured');
+      setEnableVerifyOCRAddressProof(true);
+    }
+    setAddressTypeOCRImages((prev) => [...prev, e.target.files[0]]);
+  };
+
   const verifyOCRIdType = (e) => {
     setLoading(true);
     setTimeout(() => {
       setEnableOCRIdType(false);
       setIdTypeOCRStatus(true);
+      setLoading(false);
+    }, 2000);
+  };
+
+  const verifyOCRAddressType = (e) => {
+    setLoading(true);
+    setTimeout(() => {
+      setEnableOCRAddressProof(false);
+      setAddressProofOCRStatus(true);
       setLoading(false);
     }, 2000);
   };
@@ -541,7 +582,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
         enableOCR={enableOCRIdType}
-        captureImages={captureImages}
+        captureImages={captureIDImages}
         ocrButtonText={idTypeOCRText}
         clickedPhotoText={idTypeClickedPhotoText}
         enableVerify={enableVerifyOCRIdType}
@@ -748,12 +789,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           handleBlur(e);
         }}
         enableOCR={enableOCRAddressProof}
-        captureImages={captureImages}
-        ocrButtonText={idTypeOCRText}
-        clickedPhotoText={idTypeClickedPhotoText}
+        captureImages={captureAddressImages}
+        ocrButtonText={addressTypeOCRText}
+        clickedPhotoText={addressTypeClickedPhotoText}
         enableVerify={enableVerifyOCRAddressProof}
         verifiedStatus={addressProofOCRStatus}
-        onVerifyClick={verifyOCRIdType}
+        onVerifyClick={verifyOCRAddressType}
         setOpenEkycPopup={setOpenEkycPopup}
       />
 

@@ -43,6 +43,8 @@ const OCRDropdown = memo(
       options?.find((option) => defaultSelected === option.value),
     );
 
+    console.log(enableVerify);
+
     useEffect(() => {
       const option = options.find((option) => option.value === defaultSelected);
       setSelectedOption(option);
@@ -159,7 +161,7 @@ const OCRDropdown = memo(
           )}
           {enableOCR ? (
             <div className='flex justify-between items-center'>
-              <div className='flex flex-1 gap-[4px] min-w-[50%]'>
+              <div className='flex flex-1 gap-[4px]'>
                 {clickedPhotoText ? (
                   <>
                     <TickGreen />
@@ -186,7 +188,9 @@ const OCRDropdown = memo(
                   />
                   <div className='flex gap-[4px] items-center'>
                     <CameraIcon />
-                    <span className='font-[600] text-[16px] text-primary-red'>{ocrButtonText}</span>
+                    <span className='font-semibold text-[16px] text-primary-red'>
+                      {ocrButtonText}
+                    </span>
                   </div>
                 </label>
               )}
