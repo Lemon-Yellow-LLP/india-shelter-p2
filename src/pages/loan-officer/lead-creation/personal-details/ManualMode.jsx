@@ -47,6 +47,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const [openEkycPopup, setOpenEkycPopup] = useState(false);
   const [ekycStatus, setEkycStatus] = useState(false);
+
   const [enableOCRIdType, setEnableOCRIdType] = useState(false);
   const [enableOCRAddressProof, setEnableOCRAddressProof] = useState(false);
 
@@ -70,21 +71,13 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [idTypeOCRImages, setIdTypeOCRImages] = useState([]);
   const [addressTypeOCRImages, setAddressTypeOCRImages] = useState([]);
 
-  // enableOCR={enableOCRIdType}
-  // captureImages={captureImages}
-  // ocrButtonText={idTypeOCRText}
-  // clickedPhotoText={idTypeClickedPhotoText}
-  // enableVerify={enableVerifyOCRIdType}
-  // verifiedStatus={idTypeOCRStatus}
-  // onVerifyClick={verifyOCRIdType}
-  // setOpenEkycPopup={setOpenEkycPopup}
-  console.log('enableOCRIdType', enableOCRIdType);
-  console.log('enableVerifyOCRIdType', enableVerifyOCRIdType);
-  console.log('idTypeOCRText', idTypeOCRText);
-  console.log('idTypeClickedPhotoText', idTypeClickedPhotoText);
-  console.log('idTypeOCRStatus', idTypeOCRStatus);
-  console.log('idTypeOCRImages', idTypeOCRImages);
-  console.log('addressTypeOCRImages', addressTypeOCRImages);
+  // console.log('enableOCRIdType', enableOCRIdType);
+  // console.log('enableVerifyOCRIdType', enableVerifyOCRIdType);
+  // console.log('idTypeOCRText', idTypeOCRText);
+  // console.log('idTypeClickedPhotoText', idTypeClickedPhotoText);
+  // console.log('idTypeOCRStatus', idTypeOCRStatus);
+  // console.log('idTypeOCRImages', idTypeOCRImages);
+  // console.log('addressTypeOCRImages', addressTypeOCRImages);
 
   useEffect(() => {
     console.log('idTypeOcr', enableOCRIdType, 'addressProofOcr', enableOCRAddressProof);
