@@ -547,24 +547,34 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const verifyOCRIdType = (e) => {
     setLoading(true);
-    performOcr()
-      .then((data) => {
-        setEnableOCRIdType(false);
-        setIdTypeOCRStatus(true);
-        setLoading(false);
-      })
-      .catch((err) => console.log('OCR_ERR', err));
+    setTimeout(() => {
+      setEnableOCRIdType(false);
+      setIdTypeOCRStatus(true);
+      setLoading(false);
+    }, 3000);
+    // performOcr()
+    //   .then((data) => {
+    //     setEnableOCRIdType(false);
+    //     setIdTypeOCRStatus(true);
+    //     setLoading(false);
+    //   })
+    //   .catch((err) => console.log('OCR_ERR', err));
   };
 
   const verifyOCRAddressType = (e) => {
     setLoading(true);
-    performOcr()
-      .then((data) => {
-        setEnableOCRAddressProof(false);
-        setAddressProofOCRStatus(true);
-        setLoading(false);
-      })
-      .catch((err) => console.log('OCR_ERR', err));
+    setTimeout(() => {
+      setEnableOCRIdType(false);
+      setIdTypeOCRStatus(true);
+      setLoading(false);
+    }, 3000);
+    // performOcr()
+    //   .then((data) => {
+    //     setEnableOCRAddressProof(false);
+    //     setAddressProofOCRStatus(true);
+    //     setLoading(false);
+    //   })
+    //   .catch((err) => console.log('OCR_ERR', err));
   };
 
   return (
