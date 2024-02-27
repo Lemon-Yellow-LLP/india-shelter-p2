@@ -149,7 +149,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
       const res = await validateEkycOtp(
         {
           aadhaar_number: aadhaarNo,
-          // consent: consent,
+          consent: consent,
           otp_txn_id: otpTxnId,
           otp_value: otp,
           applicant_id: values?.lead?.id,
