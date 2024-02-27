@@ -36,6 +36,8 @@ const OCRDropdown = memo(
     verifiedStatus,
     onVerifyClick,
     setOpenEkycPopup,
+    verifiedEkycStatus,
+    enableEKYC,
     ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -149,16 +151,17 @@ const OCRDropdown = memo(
               </div>
             </div>
           ) : null}
-          {/* if Aadhar then show verify ekyc  */}
-          {selectedOption?.value === 'AADHAR' && (
-            <button
-              className='text-primary-red font-semibold flex justify-end ml-auto'
-              onClick={() => setOpenEkycPopup(true)}
-            >
-              <IconThumb />
-              Verify Aadhar e-KYC
-            </button>
-          )}
+          {verifiedEkycStatus ? (
+            <div className='flex justify-between items-center'>
+              <div className='flex flex-2 gap-[4px]'>
+                <TickGreen />
+                <span className='text-[12px] text-secondary-green'>
+                  e-Kyc completed successfully
+                </span>
+              </div>
+            </div>
+          ) : null}
+
           {enableOCR ? (
             <div className='flex justify-between items-center'>
               <div className='flex flex-1 gap-[4px]'>
@@ -195,6 +198,16 @@ const OCRDropdown = memo(
                 </label>
               )}
             </div>
+          ) : null}
+
+          {enableEKYC ? (
+            <button
+              className='text-primary-red font-semibold flex justify-end ml-auto'
+              onClick={() => setOpenEkycPopup(true)}
+            >
+              <IconThumb />
+              Verify Aadhar e-KYC
+            </button>
           ) : null}
           {!disabledError ? (
             <span className='text-xs text-primary-red'>{error && touched ? error : null}</span>
