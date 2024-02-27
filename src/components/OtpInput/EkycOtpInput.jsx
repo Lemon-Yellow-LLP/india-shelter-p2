@@ -30,10 +30,10 @@ const EkycOtpInput = ({
     [otp],
   );
 
-  const handleOnOTPSend = useCallback(() => {
+  const handleOnOTPSend = useCallback(async () => {
     setOtp('');
     setIsVerifyOtp(false);
-    onSendOTPClick();
+    await onSendOTPClick();
     setTimer(true);
   }, [onSendOTPClick]);
 

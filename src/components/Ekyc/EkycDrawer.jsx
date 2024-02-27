@@ -38,7 +38,7 @@ let otpTxnId;
 export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   const ecsBioHelper = window.ecsBioHelper;
   const { setToastMessage, values } = useContext(LeadContext);
-  const { setErrorToastMessage, token } = useContext(AuthContext);
+  const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
 
   // aadharInputDrawser states
   const [isAadharInputDrawer, setIsAadharInputDrawer] = useState(true);
@@ -81,7 +81,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   // resend otp on mobile and email
   const sendMobileOtp = async () => {
     try {
-      console.log('sending otp on mobile no. linked to aadhar');
+      setLoading(true);
       const data = await generateEkycOtp(
         {
           aadhaar_number: aadhaarNo,
@@ -97,7 +97,12 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
       );
       console.log(data);
     } catch (error) {
-      console.log(error);
+      setOpenEkycPopup(false);
+      setPerformVerification(false);
+      setIsAadharInputDrawer(true);
+      setErrorToastMessage(error.response.data.error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -142,7 +147,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
       const res = await validateEkycOtp(
         {
           aadhaar_number: aadhaarNo,
-          consent: consent,
+          // consent: consent,
           otp_txn_id: otpTxnId,
           otp_value: otp,
           applicant_id: values?.lead?.id,
@@ -156,7 +161,9 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
       console.log(res);
       setToastMessage('Information fetched Successfully');
     } catch (error) {
-      setErrorToastMessage('Technical error');
+      console.log(error);
+      setErrorToastMessage(error.response.data.error);
+      setErrorToastSubMessage(error.response.data.details.errMsg);
     } finally {
       setLoading(false);
       setOpenEkycPopup(false);
@@ -284,7 +291,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
             required
             onSendOTPClick={sendMobileOtp}
             setIsVerifyOtp={setIsVerifyOtp}
-            defaultResendTime={30}
+            defaultResendTime={10}
             otp={otp}
             setOtp={setOtp}
           />

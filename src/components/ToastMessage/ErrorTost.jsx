@@ -5,11 +5,18 @@ import propTypes from 'prop-types';
 
 const DEFAULT_TIMEOUT = 3000;
 
-const ErrorTost = ({ message, setMessage, timeout = DEFAULT_TIMEOUT }) => {
+const ErrorTost = ({
+  message,
+  setMessage,
+  subMessage,
+  setSubMessage,
+  timeout = DEFAULT_TIMEOUT,
+}) => {
   const handleOnCloseClick = useCallback(
     (e) => {
       e.stopPropagation();
       setMessage(null);
+      setSubMessage(null);
     },
     [setMessage],
   );
@@ -18,6 +25,7 @@ const ErrorTost = ({ message, setMessage, timeout = DEFAULT_TIMEOUT }) => {
     if (!message) return;
     setTimeout(() => {
       setMessage(false);
+      setSubMessage(false);
     }, timeout);
   }, [message, timeout, setMessage]);
 
@@ -41,8 +49,16 @@ const ErrorTost = ({ message, setMessage, timeout = DEFAULT_TIMEOUT }) => {
           transition={{ ease: 'easeOut', duration: 0.52 }}
         >
           <TostErrorIcon />
-
-          <span className='flex-1 leading-5 text-sm font-medium text-neutral-white'>{message}</span>
+          <div className='flex flex-col grow'>
+            <span className='flex-1 leading-5 text-sm font-medium text-neutral-white'>
+              {message}
+            </span>
+            {subMessage && (
+              <span className='flex-1 leading-5 text-xs font-medium text-neutral-white'>
+                {subMessage}
+              </span>
+            )}
+          </div>
 
           <button type='button' onClick={handleOnCloseClick}>
             <IconClose color='#FEFEFE' />
@@ -58,5 +74,7 @@ export default ErrorTost;
 ErrorTost.propTypes = {
   message: propTypes.any,
   setMessage: propTypes.func,
+  subMessage: propTypes.any,
+  setSubMessage: propTypes.func,
   timeout: propTypes.number,
 };
