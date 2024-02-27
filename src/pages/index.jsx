@@ -18,12 +18,12 @@ const DashboardRoutes = () => {
     // Check authentication once and render accordingly
     console.log('lo', isAuthenticated);
 
-    // if (isAuthenticated) {
-    //   return children;
-    // } else {
-    //   return <Navigate to='/login' />;
-    // }
-    return children;
+    if (isAuthenticated) {
+      return children;
+    } else {
+      return <Navigate to='/login' />;
+    }
+    // return children;
   };
 
   const AdminRequireAuth = ({ children }) => {

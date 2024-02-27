@@ -15,9 +15,9 @@ axios.interceptors.response.use(
   (error) => {
     // Handle error globally
 
-    // if (error.response.status == 403 || error.response.status == 401) {
-    //   window.location.replace('/login');
-    // }
+    if (error.response.status == 403 || error.response.status == 401) {
+      window.location.replace('/login');
+    }
 
     // Pass the error to the next handler
     return Promise.reject(error);
@@ -583,6 +583,11 @@ async function validateEkycOtp(data, options) {
   return res.data;
 }
 
+async function performBiometric(data, options) {
+  const res = await axios.post(`${API_URL}/ekyc/perform-ekyc-biometric/`, data, options);
+  return res.data;
+}
+
 export {
   API_URL,
   pingAPI,
@@ -634,4 +639,5 @@ export {
   getUserDepartments,
   generateEkycOtp,
   validateEkycOtp,
+  performBiometric,
 };

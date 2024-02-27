@@ -7,19 +7,15 @@ const EkycOtpInput = ({
   label,
   required,
   onSendOTPClick,
-  disableSendOTP,
   defaultResendTime,
-  hasSentOTPOnce,
   setIsVerifyOtp,
   otp,
   setOtp,
 }) => {
-  const [inputDisabled, setInputDisabled] = useState(true);
   const [timer, setTimer] = useState(true);
   const [resendTime, setResendTime] = useState(defaultResendTime || 10);
   const inputRef = useRef(null);
 
-  // sorted
   const handleOnChange = useCallback(
     async (e) => {
       const { value } = e.target;
@@ -35,21 +31,12 @@ const EkycOtpInput = ({
   );
 
   const handleOnOTPSend = useCallback(() => {
-    console.log('onotpsend disabling the otp field');
+    setOtp('');
     setIsVerifyOtp(false);
-    setInputDisabled(false);
     onSendOTPClick();
     setTimer(true);
   }, [onSendOTPClick]);
 
-  useEffect(() => {
-    if (!hasSentOTPOnce) return;
-    // console.log('useeffect disabling the otp field');
-    setInputDisabled(false);
-    setTimer(true);
-  }, [hasSentOTPOnce]);
-
-  // sorted
   useEffect(() => {
     let interval = null;
     if (timer) {
@@ -80,7 +67,6 @@ const EkycOtpInput = ({
 
   return (
     <div className='otp-container'>
-      {/* sorted */}
       <h3 className='flex gap-0.5 text-primary-black'>
         {label}
         {required && <span className='text-primary-red text-sm'>*</span>}
@@ -89,7 +75,6 @@ const EkycOtpInput = ({
         <input
           type='number'
           autoComplete='one-time-code'
-          disabled={inputDisabled}
           ref={inputRef}
           className={`
               w-full h-12 border bg-transparent outline-none px-4 text-base font-normal text-primary-black transition spin-button-none rounded-lg hidearrow
@@ -123,7 +108,6 @@ const EkycOtpInput = ({
           }}
         />
       </div>
-      {/* sorted */}
       <div className='mt-3 flex justify-between items-center'>
         <div className='flex gap-0.5'>
           {timer && (
@@ -131,14 +115,12 @@ const EkycOtpInput = ({
           )}
         </div>
       </div>
-      {/* sorted */}
       <div className='w-full flex justify-end'>
         {!timer ? (
           <button
             type='button'
             className='text-primary-red cursor-pointer font-semibold'
             onClick={() => {
-              setOtp('');
               inputRef.current?.focus({ preventScroll: true });
               handleOnOTPSend();
             }}
@@ -157,12 +139,10 @@ EkycOtpInput.propTypes = {
   label: PropTypes.string.isRequired,
   required: PropTypes.bool,
   onSendOTPClick: PropTypes.func,
-  disableSendOTP: PropTypes.bool,
   defaultResendTime: PropTypes.number,
-  hasSentOTPOnce: PropTypes.bool,
   setIsVerifyOtp: PropTypes.func,
+  otp: PropTypes.string,
+  setOtp: PropTypes.func,
 };
 
 export default EkycOtpInput;
-
-// inputRef.current?.focus({ preventScroll: true });

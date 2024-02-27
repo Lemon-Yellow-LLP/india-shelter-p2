@@ -1253,7 +1253,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       )}
 
       <DynamicDrawer open={openEkycPopup} setOpen={setOpenEkycPopup} drawerChildrenClasses='!p-0'>
-        <EkycDrawer setOpenEkycPopup={setOpenEkycPopup} />
+        <EkycDrawer setOpenEkycPopup={setOpenEkycPopup} setLoading={setLoading} />
       </DynamicDrawer>
     </>
   );
