@@ -37,7 +37,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setFieldError,
   } = useContext(LeadContext);
 
-  const { token } = useContext(AuthContext);
+  const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
@@ -544,37 +544,81 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     }
     setAddressTypeOCRImages((prev) => [...prev, e.target.files[0]]);
   };
+  setLoading(false);
 
   const verifyOCRIdType = (e) => {
     setLoading(true);
-    setTimeout(() => {
-      setEnableOCRIdType(false);
-      setIdTypeOCRStatus(true);
-      setLoading(false);
-    }, 3000);
-    // performOcr()
-    //   .then((data) => {
-    //     setEnableOCRIdType(false);
-    //     setIdTypeOCRStatus(true);
-    //     setLoading(false);
-    //   })
-    //   .catch((err) => console.log('OCR_ERR', err));
+    // setTimeout(() => {
+    //   setEnableOCRIdType(false);
+    //   setIdTypeOCRStatus(true);
+    //   setLoading(false);
+    // }, 3000);
+
+    const image1 = idTypeOCRImages[0];
+    const image2 = idTypeOCRImages[1];
+    console.log(image1);
+    console.log(image2);
+    const data = new FormData();
+    data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
+    data.append('document_type', values?.applicants?.[activeIndex]?.applicant_details?.id_type);
+    data.append('field_name', 'id_type');
+    data.append('file', image1, image2);
+
+    performOcr(data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: token,
+      },
+    })
+      .then((data) => {
+        console.log('OCR_RES', data);
+        setToastMessage('Information fetched Successfully');
+        setEnableOCRIdType(false);
+        setIdTypeOCRStatus(true);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log('OCR_ERR', error);
+        setErrorToastMessage('Technical error');
+        setErrorToastSubMessage('Please recapture the images and verify the OCR');
+      });
   };
 
   const verifyOCRAddressType = (e) => {
     setLoading(true);
-    setTimeout(() => {
-      setEnableOCRIdType(false);
-      setIdTypeOCRStatus(true);
-      setLoading(false);
-    }, 3000);
-    // performOcr()
-    //   .then((data) => {
-    //     setEnableOCRAddressProof(false);
-    //     setAddressProofOCRStatus(true);
-    //     setLoading(false);
-    //   })
-    //   .catch((err) => console.log('OCR_ERR', err));
+    // setTimeout(() => {
+    //   setEnableOCRIdType(false);
+    //   setIdTypeOCRStatus(true);
+    //   setLoading(false);
+    // }, 3000);
+
+    const data = new FormData();
+    data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
+    data.append(
+      'document_type',
+      values?.applicants?.[activeIndex]?.applicant_details?.selected_address_proof,
+    );
+    data.append('field_name', 'selected_address_proof');
+    data.append('file', addressTypeOCRImages);
+
+    performOcr(data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: token,
+      },
+    })
+      .then((data) => {
+        console.log('OCR_RES', data);
+        setToastMessage('Information fetched Successfully');
+        setEnableOCRIdType(false);
+        setIdTypeOCRStatus(true);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log('OCR_ERR', error);
+        setErrorToastMessage('Technical error');
+        setErrorToastSubMessage('Please recapture the images and verify the OCR');
+      });
   };
 
   return (
