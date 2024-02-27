@@ -25,7 +25,13 @@ const PersonalDetails = () => {
     setToastMessage,
   } = useContext(LeadContext);
 
-  const { token, errorToastMessage, setErrorToastMessage } = useContext(AuthContext);
+  const {
+    token,
+    errorToastMessage,
+    setErrorToastMessage,
+    errorToastSubMessage,
+    setErrorToastSubMessage,
+  } = useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.applicants?.[activeIndex]?.personal_details?.extra_params?.required_fields_status,
@@ -257,7 +263,12 @@ const PersonalDetails = () => {
   return (
     <>
       <ToastMessage message={toastMessage} setMessage={setToastMessage} />
-      <ErrorTost message={errorToastMessage} setMessage={setErrorToastMessage} />
+      <ErrorTost
+        message={errorToastMessage}
+        setMessage={setErrorToastMessage}
+        subMessage={errorToastSubMessage}
+        setSubMessage={setErrorToastSubMessage}
+      />
 
       <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (

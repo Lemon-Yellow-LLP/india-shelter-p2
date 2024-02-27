@@ -38,7 +38,7 @@ let otpTxnId;
 export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   const ecsBioHelper = window.ecsBioHelper;
   const { setToastMessage, values } = useContext(LeadContext);
-  const { setErrorToastMessage, token } = useContext(AuthContext);
+  const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
 
   // aadharInputDrawser states
   const [isAadharInputDrawer, setIsAadharInputDrawer] = useState(true);
@@ -61,6 +61,8 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   const [otp, setOtp] = useState('');
   const [isVerifyOtp, setIsVerifyOtp] = useState(false);
 
+  const [disableFields, setDisableFields] = useState(false);
+
   useEffect(() => {
     if (
       !ecsBioHelper.init(
@@ -81,7 +83,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   // resend otp on mobile and email
   const sendMobileOtp = async () => {
     try {
-      console.log('sending otp on mobile no. linked to aadhar');
+      setLoading(true);
       const data = await generateEkycOtp(
         {
           aadhaar_number: aadhaarNo,
@@ -97,7 +99,12 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
       );
       console.log(data);
     } catch (error) {
-      console.log(error);
+      setOpenEkycPopup(false);
+      setPerformVerification(false);
+      setIsAadharInputDrawer(true);
+      setErrorToastMessage(error.response.data.error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -142,7 +149,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
       const res = await validateEkycOtp(
         {
           aadhaar_number: aadhaarNo,
-          consent: consent,
+          // consent: consent,
           otp_txn_id: otpTxnId,
           otp_value: otp,
           applicant_id: values?.lead?.id,
@@ -156,7 +163,9 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
       console.log(res);
       setToastMessage('Information fetched Successfully');
     } catch (error) {
-      setErrorToastMessage('Technical error');
+      console.log(error);
+      setErrorToastMessage(error.response.data.error);
+      setErrorToastSubMessage(error.response.data.details.errMsg);
     } finally {
       setLoading(false);
       setOpenEkycPopup(false);
@@ -168,6 +177,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   // detecting biometric device
   const handleScan = async () => {
     console.log('searching for device');
+    setDisableFields(true);
     setDeviceScanPopup(true);
     ecsBioHelper.detectDevices(function () {
       if (ecsBioHelper.getDetectedDevices().length !== 0) {
@@ -284,7 +294,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
             required
             onSendOTPClick={sendMobileOtp}
             setIsVerifyOtp={setIsVerifyOtp}
-            defaultResendTime={30}
+            defaultResendTime={10}
             otp={otp}
             setOtp={setOtp}
           />
@@ -337,7 +347,8 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
                     label={method.label}
                     value={method.value}
                     current={selectedEkycMethod}
-                    onChange={() => setSelectedEkycMethod(method.value)}
+                    onChange={(value) => setSelectedEkycMethod(value)}
+                    disabled={disableFields}
                   />
                 );
               })}
@@ -347,6 +358,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
               isChecked={isConsentChecked}
               setIsChecked={setIsConsentChecked}
               updateConsent={updateConsent}
+              disabled={disableFields}
             />
           </div>
           <div className={`py-6 px-4 bg-[#FEFEFE] ${deviceScanPopup && 'opacity-0'}`}>
@@ -369,6 +381,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
         <Popup
           open={deviceScanPopup}
           handleSuccess={() => {
+            setDisableFields(false);
             setDeviceScanPopup(false);
             setPerformVerification(true);
           }}
@@ -383,6 +396,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
           state={scanningState}
           bottom={4}
           handleClose={() => {
+            setDisableFields(false);
             setDeviceScanPopup(false);
             // setting default scanning state
             setScanningState('loading');

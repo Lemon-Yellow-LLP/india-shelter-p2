@@ -27,7 +27,7 @@ const consentInMultipleLanguage = [
   },
 ];
 
-const ConsentBox = ({ isChecked, setIsChecked, updateConsent }) => {
+const ConsentBox = ({ isChecked, setIsChecked, updateConsent, disabled }) => {
   const [seeMore, setSeeMore] = useState(false);
   const [language, setLanguage] = useState('english');
   const [consent, setConsent] = useState(
@@ -71,7 +71,7 @@ const ConsentBox = ({ isChecked, setIsChecked, updateConsent }) => {
             isLarge
             name='consent'
             checked={isChecked}
-            onTouchEnd={() => setIsChecked(!isChecked)}
+            onTouchEnd={() => !disabled && setIsChecked(!isChecked)}
           />
           <div className='ml-2'>
             <p className={`${!seeMore ? 'line-clamp-2' : ''}  text-dark-grey text-xs`}>
@@ -101,4 +101,5 @@ ConsentBox.propTypes = {
   isChecked: PropTypes.bool,
   setIsChecked: PropTypes.func,
   updateConsent: PropTypes.func,
+  disabled: PropTypes.bool,
 };

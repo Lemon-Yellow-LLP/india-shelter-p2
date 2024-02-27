@@ -62,7 +62,7 @@ export default function ValidateScan({
   setLoading,
 }) {
   const { setToastMessage, values } = useContext(LeadContext);
-  const { setErrorToastMessage, token } = useContext(AuthContext);
+  const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
   // storing current selected scan meta data
   const [validateScanObj, setValidateScanObj] = useState({});
   const [disableFields, setDisableFields] = useState(false);
@@ -150,7 +150,8 @@ export default function ValidateScan({
       console.log(res);
       setToastMessage('Information fetched Successfully');
     } catch (error) {
-      setErrorToastMessage('Technical error');
+      setErrorToastMessage(error.response.data.error);
+      setErrorToastSubMessage(error.response.data.details.errMsg);
       console.log(error);
     } finally {
       setOpenEkycPopup(false);
