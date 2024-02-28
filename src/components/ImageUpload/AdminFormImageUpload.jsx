@@ -12,6 +12,8 @@ const AdminFormImageUpload = ({
   label,
   hint,
   errorMessage,
+  onBlur,
+  touched,
   message,
   setMessage,
   loader,
@@ -100,7 +102,7 @@ const AdminFormImageUpload = ({
           <div className='bg-white flex items-center justify-center w-full'>
             <label
               className={`flex cursor-pointer flex-col w-full border ${
-                message || errorMessage
+                touched && (message || errorMessage)
                   ? 'border-primary-red shadow-primary shadow-primary-red'
                   : 'border-stroke'
               } rounded-md relative`}
@@ -145,13 +147,16 @@ const AdminFormImageUpload = ({
                 type='file'
                 onChange={handleFile}
                 className='opacity-0 absolute'
-                name='file'
+                name='loimage'
                 capture='user'
                 accept='image/png, image/jpeg'
+                onBlur={onBlur}
               />
             </label>
           </div>
-          <span className='mt-1 text-[12px] text-red-500'>{message || errorMessage}</span>
+          <span className='mt-1 text-[12px] text-red-500'>
+            {touched && (message || errorMessage)}
+          </span>
         </div>
       ) : null}
 
@@ -216,7 +221,7 @@ const AdminFormImageUpload = ({
                 ref={replacePhotoInputRef}
                 onChange={handleFile}
                 className='opacity-0 absolute w-0'
-                name='file'
+                name='loimage'
                 capture='user'
                 accept='image/png, image/jpeg'
               />
