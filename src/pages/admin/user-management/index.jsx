@@ -31,6 +31,7 @@ const UserManagement = () => {
     errors,
     setErrors,
     touched,
+    setTouched,
     setFieldValue,
     handleBlur,
     token,
@@ -709,8 +710,8 @@ const UserManagement = () => {
         actionMsg={
           userStatus
             ? userStatus?.value === 'active'
-              ? 'yes, activate'
-              : 'yes, inactivate'
+              ? 'Yes, activate'
+              : 'Yes, inactivate'
             : userAction?.value === 'Edit'
             ? 'Yes, save'
             : 'Yes, delete'
@@ -723,8 +724,14 @@ const UserManagement = () => {
             ? () => setUserStatus(null)
             : () => {
                 setUserAction(null);
-                setErrors(null);
                 setValues(initialValues);
+                setErrors(null);
+                // reset touched for all fields
+                const newTouched = {};
+                Object.keys(initialValues).forEach((key) => {
+                  if (!key === 'username') newTouched[key] = false;
+                });
+                setTouched(newTouched);
               }
         }
       />
@@ -747,7 +754,14 @@ const UserManagement = () => {
         }
         handleResetAction={() => {
           setValues(initialValues);
+          // reset all errors
           setErrors(null);
+          // reset touched for all fields
+          const newTouched = {};
+          Object.keys(initialValues).forEach((key) => {
+            if (!key === 'username') newTouched[key] = false;
+          });
+          setTouched(newTouched);
           setUserAction(null);
         }}
       >
