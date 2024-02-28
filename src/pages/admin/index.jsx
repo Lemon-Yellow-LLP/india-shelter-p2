@@ -8,7 +8,7 @@ import SideBar from '../../components/Sidebar';
 const AdminRoutes = () => {
   return (
     <div className='flex h-screen'>
-      <div className='max-w-[252px] w-full'>
+      <div className='w-[252px] shrink-0'>
         <SideBar />
       </div>
       <div className='flex flex-col w-full'>
