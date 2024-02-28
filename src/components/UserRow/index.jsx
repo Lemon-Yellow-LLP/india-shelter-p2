@@ -21,7 +21,7 @@ const UserRow = ({
       } text-primary-black font-normal text-sm`}
     >
       <td className='px-4 py-[11px]'>{user.employee_code}</td>
-      <td className='px-4 py-[11px]'>
+      <td className='px-4 py-[11px] truncate'>
         {String(user.first_name + ' ' + user.middle_name + ' ' + user.last_name)}
       </td>
       <td className='px-4 py-[11px]'>{user.branch}</td>

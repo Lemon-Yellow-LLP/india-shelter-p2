@@ -106,6 +106,12 @@ const AuthContextProvider = ({ children }) => {
             setUseradd(user);
             setShow(false);
             formik.setValues(formik.initialValues);
+            // reset touched for all fields
+            const newTouched = {};
+            Object.keys(formik.initialValues).forEach((key) => {
+              if (!key === 'username') newTouched[key] = false;
+            });
+            formik.setTouched(newTouched);
           })
           .catch((error) => {
             console.log('ADD_USER_ERROR', error);
@@ -123,6 +129,12 @@ const AuthContextProvider = ({ children }) => {
             setUserToastMessage(`User couldn't be added!`);
             setShow(false);
             formik.setValues(formik.initialValues);
+            // reset touched for all fields
+            const newTouched = {};
+            Object.keys(formik.initialValues).forEach((key) => {
+              if (!key === 'username') newTouched[key] = false;
+            });
+            formik.setTouched(newTouched);
           });
       }
     },
