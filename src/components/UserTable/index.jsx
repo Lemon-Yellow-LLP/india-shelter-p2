@@ -62,12 +62,16 @@ const UserTable = ({ userslist }) => {
           <NoUsersOnSearchIcon />
         </div>
       ) : (
-        <table className=' w-full'>
+        <table className='w-full table-fixed'>
           <thead>
             <tr>
               {TableHeaderList.map((heading, i) => (
                 <th
-                  className='text-dark-grey font-medium text-xs leading-5 p-4 bg-white text-left'
+                  className={`
+                  ${heading === 'EMPLOYEE NAME' && 'w-[230px]'} ${
+                    heading === 'ACTION' && 'w-[82px]'
+                  } 
+                  text-dark-grey font-medium text-xs leading-5 p-4 bg-white text-left`}
                   key={i}
                 >
                   {heading}

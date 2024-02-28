@@ -9,10 +9,10 @@ export const signInSchema = Yup.object({
     .trim()
     .required('This field is mandatory')
     .min(2, 'Name must be atleast 2 characters long')
-    .max(50, 'Name can be max 50 characters long')
+    .max(30, 'Name can be max 30 characters long')
     .matches(/^[A-Za-z][A-Za-z\s]*$/, 'Invalid characters in Name'),
-  middle_name: Yup.string().trim().max(50, 'Name can be max 50 characters long'),
-  last_name: Yup.string().trim().max(50, 'Name can be max 50 characters long'),
+  middle_name: Yup.string().trim().max(30, 'Name can be max 30 characters long'),
+  last_name: Yup.string().trim().max(30, 'Name can be max 30 characters long'),
   mobile_number: Yup.string()
     .matches(/^(?!.*(\d)\1{4})(?!.*(\d{5}).*\2)\d{10}$/, 'Enter a valid 10-digit mobile number')
     .required('Mobile number is required'),
