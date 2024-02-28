@@ -729,7 +729,7 @@ const UserManagement = () => {
                 // reset touched for all fields
                 const newTouched = {};
                 Object.keys(initialValues).forEach((key) => {
-                  if (!key === 'username') newTouched[key] = false;
+                  newTouched[key] = false;
                 });
                 setTouched(newTouched);
               }
@@ -759,7 +759,7 @@ const UserManagement = () => {
           // reset touched for all fields
           const newTouched = {};
           Object.keys(initialValues).forEach((key) => {
-            if (!key === 'username') newTouched[key] = false;
+            newTouched[key] = false;
           });
           setTouched(newTouched);
           setUserAction(null);
@@ -876,6 +876,8 @@ const UserManagement = () => {
               required
               hint='Support: JPG, PNG'
               errorMessage={errors && errors?.loimage ? 'This field is mandatory' : ''}
+              onBlur={handleBlur}
+              touched={touched && touched.loimage}
               message={uploadPhotoError}
               setMessage={setUploadPhotoError}
               loader={uploadPhotoLoader}
