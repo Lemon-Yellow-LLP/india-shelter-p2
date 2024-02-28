@@ -200,10 +200,26 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       }
 
       if (e === 'PAN' || e === 'Driving license' || e === 'Voter ID' || e === 'Passport') {
+        setEnableVerifyOCRIdType(false);
+        setIdTypeOCRStatus(false);
+        setIdTypeOCRImages([]);
+        setIdTypeClickedPhotoText('');
+        setIdTypeOCRText('Capture front image');
+        setEnableVerifyOCRIdType(false);
+
         setEnableOCRIdType(true);
+
         setEnableEKYIdtype(false);
       } else if (e === 'AADHAR') {
+        setEnableVerifyOCRIdType(false);
+        setIdTypeOCRStatus(false);
+        setIdTypeOCRImages([]);
+        setIdTypeClickedPhotoText('');
+        setIdTypeOCRText('Capture front image');
+        setEnableVerifyOCRIdType(false);
+
         setEnableEKYIdtype(true);
+
         setEnableOCRIdType(false);
       }
     },
@@ -222,10 +238,26 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         address_proof_number: false,
       }));
       if (e === 'Driving license' || e === 'Voter ID' || e === 'Passport') {
+        setEnableEKYCAddressProof(false);
+        setAddressProofOCRStatus(false);
+        setAddressTypeOCRImages([]);
+        setAddressTypeClickedPhotoText('');
+        setAddressTypeOCRText('Capture front image');
+        setEnableVerifyOCRAddressProof(false);
+
         setEnableOCRAddressProof(true);
+
         setEnableEKYCAddressProof(false);
       } else if (e === 'AADHAR') {
+        setEnableEKYCAddressProof(false);
+        setAddressProofOCRStatus(false);
+        setAddressTypeOCRImages([]);
+        setAddressTypeClickedPhotoText('');
+        setAddressTypeOCRText('Capture front image');
+        setEnableVerifyOCRAddressProof(false);
+
         setEnableEKYCAddressProof(true);
+
         setEnableOCRAddressProof(false);
       }
     },
@@ -522,9 +554,16 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
   const captureIDImages = (e) => {
-    if (idTypeOCRImages.length === 0) {
+    if (
+      idTypeOCRImages.length === 0 &&
+      values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID'
+    ) {
       setIdTypeOCRText('Capture back image');
       setIdTypeClickedPhotoText('Front captured');
+    } else if (values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID') {
+      setIdTypeOCRText('Verify with OCR');
+      setIdTypeClickedPhotoText('Front captured');
+      setEnableVerifyOCRIdType(true);
     } else {
       setIdTypeOCRText('Verify with OCR');
       setIdTypeClickedPhotoText('Front & back captured');
@@ -534,9 +573,18 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   };
 
   const captureAddressImages = (e) => {
-    if (addressTypeOCRImages.length === 0) {
+    if (
+      addressTypeOCRImages.length === 0 &&
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID'
+    ) {
       setAddressTypeOCRText('Capture back image');
       setAddressTypeClickedPhotoText('Front captured');
+    } else if (
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'Voter ID'
+    ) {
+      setAddressTypeOCRText('Verify with OCR');
+      setAddressTypeClickedPhotoText('Front captured');
+      setEnableVerifyOCRAddressProof(true);
     } else {
       setAddressTypeOCRText('Verify with OCR');
       setAddressTypeClickedPhotoText('Front & back captured');
@@ -544,81 +592,78 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     }
     setAddressTypeOCRImages((prev) => [...prev, e.target.files[0]]);
   };
-  setLoading(false);
 
   const verifyOCRIdType = (e) => {
     setLoading(true);
-    // setTimeout(() => {
-    //   setEnableOCRIdType(false);
-    //   setIdTypeOCRStatus(true);
-    //   setLoading(false);
-    // }, 3000);
+    setTimeout(() => {
+      setEnableOCRIdType(false);
+      setIdTypeOCRStatus(true);
+      setLoading(false);
+    }, 3000);
 
-    const image1 = idTypeOCRImages[0];
-    const image2 = idTypeOCRImages[1];
-    console.log(image1);
-    console.log(image2);
-    const data = new FormData();
-    data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
-    data.append('document_type', values?.applicants?.[activeIndex]?.applicant_details?.id_type);
-    data.append('field_name', 'id_type');
-    data.append('file', image1, image2);
+    // const data = new FormData();
+    // data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
+    // data.append('document_type', values.applicants[activeIndex]?.personal_details?.id_type);
+    // data.append('field_name', 'id_type');
+    // data.append('file', idTypeOCRImages[0]);
+    // data.append('file', idTypeOCRImages[1]);
 
-    performOcr(data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: token,
-      },
-    })
-      .then((data) => {
-        console.log('OCR_RES', data);
-        setToastMessage('Information fetched Successfully');
-        setEnableOCRIdType(false);
-        setIdTypeOCRStatus(true);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log('OCR_ERR', error);
-        setErrorToastMessage('Technical error');
-        setErrorToastSubMessage('Please recapture the images and verify the OCR');
-      });
+    // performOcr(data, {
+    //   headers: {
+    //     'Content-Type': 'multipart/form-data',
+    //     Authorization: token,
+    //   },
+    // })
+    //   .then((data) => {
+    //     console.log('OCR_RES', data);
+    //     setToastMessage('Information fetched Successfully');
+    //     setEnableOCRIdType(false);
+    //     setIdTypeOCRStatus(true);
+    //     setLoading(false);
+    //   })
+    //   .catch((error) => {
+    //     console.log('OCR_ERR', error);
+    //     setErrorToastMessage('Technical error');
+    //     setErrorToastSubMessage('Please recapture the images and verify the OCR');
+    //   });
   };
 
   const verifyOCRAddressType = (e) => {
     setLoading(true);
-    // setTimeout(() => {
-    //   setEnableOCRIdType(false);
-    //   setIdTypeOCRStatus(true);
-    //   setLoading(false);
-    // }, 3000);
+    setTimeout(() => {
+      setEnableOCRAddressProof(false);
+      setAddressProofOCRStatus(true);
+      setLoading(false);
+    }, 3000);
 
-    const data = new FormData();
-    data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
-    data.append(
-      'document_type',
-      values?.applicants?.[activeIndex]?.applicant_details?.selected_address_proof,
-    );
-    data.append('field_name', 'selected_address_proof');
-    data.append('file', addressTypeOCRImages);
+    // const data = new FormData();
+    // data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
+    // data.append(
+    //   'document_type',
+    //   values.applicants[activeIndex]?.personal_details?.selected_address_proof,
+    // );
+    // data.append('field_name', 'selected_address_proof');
+    // data.append('file', idTypeOCRImages[0]);
+    // data.append('file', idTypeOCRImages[1]);
 
-    performOcr(data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: token,
-      },
-    })
-      .then((data) => {
-        console.log('OCR_RES', data);
-        setToastMessage('Information fetched Successfully');
-        setEnableOCRIdType(false);
-        setIdTypeOCRStatus(true);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log('OCR_ERR', error);
-        setErrorToastMessage('Technical error');
-        setErrorToastSubMessage('Please recapture the images and verify the OCR');
-      });
+    // performOcr(data, {
+    //   headers: {
+    //     'Content-Type': 'multipart/form-data',
+    //     Authorization: token,
+    //   },
+    // })
+    //   .then((data) => {
+    //     console.log('OCR_RES', data);
+    //     setToastMessage('Information fetched Successfully');
+    //     setEnableOCRAddressProof(false);
+    //     setAddressProofOCRStatus(true);
+    //     setLoading(false);
+    //   })
+    //   .catch((error) => {
+    //     console.log('OCR_ERR', error);
+    //     setErrorToastMessage('Technical error');
+    //     setErrorToastSubMessage('Please recapture the images and verify the OCR');
+    //   });
   };
 
   return (
