@@ -13,6 +13,7 @@ import AdminFormImageUpload from '../../../components/ImageUpload/AdminFormImage
 import {
   deleteUser,
   editUser,
+  getAllDbUsers,
   getUserBranches,
   getUserDepartments,
   getUserRoles,
@@ -58,6 +59,7 @@ const UserManagement = () => {
   const [query, setQuery] = useState('');
   const [emptyState, setEmptyState] = useState(false);
 
+  const [allDbUsers, setAllDbUsers] = useState([]);
   const [leadList, setLeadList] = useState([]);
   const [displayedList, setDisplayedList] = useState([]);
   const [uploadPhotoLoader, setUploadPhotoLoader] = useState(false);
@@ -96,7 +98,7 @@ const UserManagement = () => {
         );
       }
       case 'Search': {
-        const searchedList = leadList.filter((lead) => {
+        const searchedList = allDbUsers.filter((lead) => {
           let value = query.trim();
           return (
             lead.employee_code?.toLowerCase().includes(value) ||
@@ -538,6 +540,11 @@ const UserManagement = () => {
           Authorization: token,
         },
       }),
+      getAllDbUsers({
+        headers: {
+          Authorization: token,
+        },
+      }),
     ])
       .then((data) => {
         const roles = data[0].map((obj) => {
@@ -549,6 +556,7 @@ const UserManagement = () => {
         const departments = data[2].map((obj) => {
           return { label: obj.department, value: obj.department };
         });
+        setAllDbUsers(data[3]);
 
         setUserDropDownData({
           roles: roles,
@@ -665,6 +673,7 @@ const UserManagement = () => {
   // console.log('open', open);
   // console.log('range', range);
   // console.log('dropdown-state', dateState);
+  // console.log(allDbUsers);
 
   return (
     <>
