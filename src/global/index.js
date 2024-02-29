@@ -92,7 +92,7 @@ async function testLogout(options) {
   return res.data;
 }
 
-async function getAllLoanOfficers(options) {
+async function getAllDbUsers(options) {
   const res = await axios.get(`${API_URL}/account`, options);
   return res.data;
 }
@@ -589,7 +589,7 @@ export {
   verifyLoginOtp,
   logout,
   testLogout,
-  getAllLoanOfficers,
+  getAllDbUsers,
   verifyPan,
   verifyDL,
   verifyVoterID,
