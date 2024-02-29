@@ -399,6 +399,14 @@ const UserManagement = () => {
   //fetch users
   useEffect(() => {
     const getUsers = async () => {
+      getAllDbUsers({
+        headers: {
+          Authorization: token,
+        },
+      })
+        .then((data) => setAllDbUsers(data))
+        .catch((error) => console.log('FETCH_ALL_USERS_ERR', error));
+
       switch (dateState) {
         case 'Last 30 days': {
           const payload = {
@@ -540,11 +548,6 @@ const UserManagement = () => {
           Authorization: token,
         },
       }),
-      getAllDbUsers({
-        headers: {
-          Authorization: token,
-        },
-      }),
     ])
       .then((data) => {
         const roles = data[0].map((obj) => {
@@ -556,7 +559,6 @@ const UserManagement = () => {
         const departments = data[2].map((obj) => {
           return { label: obj.department, value: obj.department };
         });
-        setAllDbUsers(data[3]);
 
         setUserDropDownData({
           roles: roles,
