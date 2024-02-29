@@ -13,6 +13,7 @@ import AdminFormImageUpload from '../../../components/ImageUpload/AdminFormImage
 import {
   deleteUser,
   editUser,
+  getAllDbUsers,
   getUserBranches,
   getUserDepartments,
   getUserRoles,
@@ -31,6 +32,7 @@ const UserManagement = () => {
     errors,
     setErrors,
     touched,
+    setTouched,
     setFieldValue,
     handleBlur,
     token,
@@ -57,6 +59,7 @@ const UserManagement = () => {
   const [query, setQuery] = useState('');
   const [emptyState, setEmptyState] = useState(false);
 
+  const [allDbUsers, setAllDbUsers] = useState([]);
   const [leadList, setLeadList] = useState([]);
   const [displayedList, setDisplayedList] = useState([]);
   const [uploadPhotoLoader, setUploadPhotoLoader] = useState(false);
@@ -95,7 +98,7 @@ const UserManagement = () => {
         );
       }
       case 'Search': {
-        const searchedList = leadList.filter((lead) => {
+        const searchedList = allDbUsers.filter((lead) => {
           let value = query.trim();
           return (
             lead.employee_code?.toLowerCase().includes(value) ||
@@ -396,6 +399,14 @@ const UserManagement = () => {
   //fetch users
   useEffect(() => {
     const getUsers = async () => {
+      getAllDbUsers({
+        headers: {
+          Authorization: token,
+        },
+      })
+        .then((data) => setAllDbUsers(data))
+        .catch((error) => console.log('FETCH_ALL_USERS_ERR', error));
+
       switch (dateState) {
         case 'Last 30 days': {
           const payload = {
@@ -664,6 +675,7 @@ const UserManagement = () => {
   // console.log('open', open);
   // console.log('range', range);
   // console.log('dropdown-state', dateState);
+  // console.log(allDbUsers);
 
   return (
     <>
@@ -709,8 +721,8 @@ const UserManagement = () => {
         actionMsg={
           userStatus
             ? userStatus?.value === 'active'
-              ? 'yes, activate'
-              : 'yes, inactivate'
+              ? 'Yes, activate'
+              : 'Yes, inactivate'
             : userAction?.value === 'Edit'
             ? 'Yes, save'
             : 'Yes, delete'
@@ -723,8 +735,14 @@ const UserManagement = () => {
             ? () => setUserStatus(null)
             : () => {
                 setUserAction(null);
-                setErrors(null);
                 setValues(initialValues);
+                setErrors(null);
+                // reset touched for all fields
+                const newTouched = {};
+                Object.keys(initialValues).forEach((key) => {
+                  newTouched[key] = false;
+                });
+                setTouched(newTouched);
               }
         }
       />
@@ -747,7 +765,14 @@ const UserManagement = () => {
         }
         handleResetAction={() => {
           setValues(initialValues);
+          // reset all errors
           setErrors(null);
+          // reset touched for all fields
+          const newTouched = {};
+          Object.keys(initialValues).forEach((key) => {
+            newTouched[key] = false;
+          });
+          setTouched(newTouched);
           setUserAction(null);
         }}
       >
@@ -862,6 +887,8 @@ const UserManagement = () => {
               required
               hint='Support: JPG, PNG'
               errorMessage={errors && errors?.loimage ? 'This field is mandatory' : ''}
+              onBlur={handleBlur}
+              touched={touched && touched.loimage}
               message={uploadPhotoError}
               setMessage={setUploadPhotoError}
               loader={uploadPhotoLoader}
