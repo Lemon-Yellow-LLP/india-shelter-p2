@@ -109,7 +109,7 @@ const AuthContextProvider = ({ children }) => {
             // reset touched for all fields
             const newTouched = {};
             Object.keys(formik.initialValues).forEach((key) => {
-              if (!key === 'username') newTouched[key] = false;
+              newTouched[key] = false;
             });
             formik.setTouched(newTouched);
           })
@@ -132,7 +132,7 @@ const AuthContextProvider = ({ children }) => {
             // reset touched for all fields
             const newTouched = {};
             Object.keys(formik.initialValues).forEach((key) => {
-              if (!key === 'username') newTouched[key] = false;
+              newTouched[key] = false;
             });
             formik.setTouched(newTouched);
           });
