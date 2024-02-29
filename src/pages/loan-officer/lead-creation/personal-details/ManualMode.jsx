@@ -35,6 +35,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setToastMessage,
     activeIndex,
     setFieldError,
+    disableFields,
+    setDisableFields,
   } = useContext(LeadContext);
 
   const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
@@ -69,8 +71,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const [idTypeOCRStatus, setIdTypeOCRStatus] = useState(false);
   const [addressProofOCRStatus, setAddressProofOCRStatus] = useState(false);
-
-  const [disableFields, setDisableFields] = useState(false);
 
   const [idTypeOCRText, setIdTypeOCRText] = useState('Capture front image');
   const [addressTypeOCRText, setAddressTypeOCRText] = useState('Capture front image');

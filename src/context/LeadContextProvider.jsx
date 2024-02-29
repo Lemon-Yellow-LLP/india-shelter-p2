@@ -32,6 +32,9 @@ const LeadContextProvider = ({ children }) => {
   const [salesforceID, setSalesforceID] = useState(null);
   const [showMap, setShowMap] = useState(false);
 
+  //p3 states
+  const [disableFields, setDisableFields] = useState(false);
+
   const { token } = useContext(AuthContext);
 
   const location = useLocation();
@@ -427,6 +430,8 @@ const LeadContextProvider = ({ children }) => {
         coApplicantDrawerUpdate,
         showMap,
         setShowMap,
+        disableFields,
+        setDisableFields,
       }}
     >
       {children}
