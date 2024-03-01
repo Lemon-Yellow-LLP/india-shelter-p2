@@ -35,8 +35,39 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setToastMessage,
     activeIndex,
     setFieldError,
-    disableFields,
-    setDisableFields,
+    idDisableFields,
+    setIdDisableFields,
+    addressDisableFields,
+    setAddressDisableFields,
+    enableOCRIdType,
+    setEnableOCRIdType,
+    enableOCRAddressProof,
+    setEnableOCRAddressProof,
+    enableVerifyOCRIdType,
+    setEnableVerifyOCRIdType,
+    enableVerifyOCRAddressProof,
+    setEnableVerifyOCRAddressProof,
+    idTypeOCRCount,
+    setIdTypeOCRCount,
+    addressProofOCRCount,
+    setAddressProofOCRCount,
+    idTypeOCRStatus,
+    setIdTypeOCRStatus,
+    addressProofOCRStatus,
+    setAddressProofOCRStatus,
+    idTypeOCRText,
+    setIdTypeOCRText,
+    addressTypeOCRText,
+    setAddressTypeOCRText,
+    idTypeClickedPhotoText,
+    setIdTypeClickedPhotoText,
+    addressTypeClickedPhotoText,
+    setAddressTypeClickedPhotoText,
+    idTypeOCRImages,
+    setIdTypeOCRImages,
+    addressTypeOCRImages,
+    setAddressTypeOCRImages,
+    setValues,
   } = useContext(LeadContext);
 
   const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
@@ -60,27 +91,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [ekycIDStatus, setEkycIDStatus] = useState(false);
   const [ekycAddressStatus, setEkycAddressStatus] = useState(false);
 
-  const [enableOCRIdType, setEnableOCRIdType] = useState(false);
-  const [enableOCRAddressProof, setEnableOCRAddressProof] = useState(false);
-
-  const [enableVerifyOCRIdType, setEnableVerifyOCRIdType] = useState(false);
-  const [enableVerifyOCRAddressProof, setEnableVerifyOCRAddressProof] = useState(false);
-
-  const [idTypeOCRCount, setIdTypeOCRCount] = useState(0);
-  const [addressProofOCRCount, setAddressProofOCRCount] = useState(0);
-
-  const [idTypeOCRStatus, setIdTypeOCRStatus] = useState(false);
-  const [addressProofOCRStatus, setAddressProofOCRStatus] = useState(false);
-
-  const [idTypeOCRText, setIdTypeOCRText] = useState('Capture front image');
-  const [addressTypeOCRText, setAddressTypeOCRText] = useState('Capture front image');
-
-  const [idTypeClickedPhotoText, setIdTypeClickedPhotoText] = useState('');
-  const [addressTypeClickedPhotoText, setAddressTypeClickedPhotoText] = useState('');
-
-  const [idTypeOCRImages, setIdTypeOCRImages] = useState([]);
-  const [addressTypeOCRImages, setAddressTypeOCRImages] = useState([]);
-
   // console.log('enableOCRIdType', enableOCRIdType);
   // console.log('enableVerifyOCRIdType', enableVerifyOCRIdType);
   // console.log('idTypeOCRText', idTypeOCRText);
@@ -88,19 +98,32 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   // console.log('idTypeOCRStatus', idTypeOCRStatus);
   // console.log('idTypeOCRImages', idTypeOCRImages);
   // console.log('addressTypeOCRImages', addressTypeOCRImages);
+  console.log(idTypeOCRCount, addressProofOCRCount);
 
   useEffect(() => {
     console.log('idTypeOcr', enableOCRIdType, 'addressProofOcr', enableOCRAddressProof);
   }, [enableOCRIdType, enableOCRAddressProof]);
 
   useEffect(() => {
-    if (
-      !(idTypeOCRStatus && addressProofOCRStatus) &&
-      (idTypeOCRCount !== 3 || addressProofOCRCount !== 3)
-    ) {
-      setDisableFields(true);
+    if (!idTypeOCRStatus && idTypeOCRCount !== 3) {
+      setIdDisableFields(true);
     } else {
-      setDisableFields(false);
+      setIdDisableFields(false);
+    }
+  }, [
+    idTypeOCRStatus,
+    addressProofOCRStatus,
+    idTypeOCRCount,
+    addressProofOCRCount,
+    enableOCRIdType,
+    enableOCRAddressProof,
+  ]);
+
+  useEffect(() => {
+    if (!addressProofOCRStatus && addressProofOCRCount !== 3) {
+      setAddressDisableFields(true);
+    } else {
+      setAddressDisableFields(false);
     }
   }, [
     idTypeOCRStatus,
@@ -595,75 +618,125 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const verifyOCRIdType = (e) => {
     setLoading(true);
-    setTimeout(() => {
-      setEnableOCRIdType(false);
-      setIdTypeOCRStatus(true);
-      setLoading(false);
-    }, 3000);
 
-    // const data = new FormData();
-    // data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
-    // data.append('document_type', values.applicants[activeIndex]?.personal_details?.id_type);
-    // data.append('field_name', 'id_type');
-    // data.append('file', idTypeOCRImages[0]);
-    // data.append('file', idTypeOCRImages[1]);
+    //success
+    // setTimeout(() => {
+    //   setEnableOCRIdType(false);
+    //   setIdTypeOCRStatus(true);
+    //   setLoading(false);
+    // }, 3000);
 
-    // performOcr(data, {
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data',
-    //     Authorization: token,
-    //   },
-    // })
-    //   .then((data) => {
-    //     console.log('OCR_RES', data);
-    //     setToastMessage('Information fetched Successfully');
-    //     setEnableOCRIdType(false);
-    //     setIdTypeOCRStatus(true);
-    //     setLoading(false);
-    //   })
-    //   .catch((error) => {
-    //     console.log('OCR_ERR', error);
-    //     setErrorToastMessage('Technical error');
-    //     setErrorToastSubMessage('Please recapture the images and verify the OCR');
-    //   });
+    //error
+    // setTimeout(() => {
+    //   setEnableVerifyOCRIdType(false);
+    //   setIdTypeOCRStatus(false);
+    //   setIdTypeOCRImages([]);
+    //   setIdTypeClickedPhotoText('');
+    //   setIdTypeOCRText('Capture front image');
+    //   setEnableVerifyOCRIdType(false);
+
+    //   setLoading(false);
+    // }, 1000);
+
+    setIdTypeOCRCount((prev) => prev + 1);
+
+    const data = new FormData();
+    data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
+    data.append('document_type', 'PASSPORT');
+    data.append('field_name', 'id_type');
+    data.append('file', idTypeOCRImages[0]);
+    if (values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID') {
+      data.append('file', idTypeOCRImages[1]);
+    }
+
+    performOcr(data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: token,
+      },
+    })
+      .then((data) => {
+        console.log('OCR_RES', data);
+        setToastMessage('Information fetched Successfully');
+        setEnableOCRIdType(false);
+        setIdTypeOCRStatus(true);
+      })
+      .catch((error) => {
+        console.log('OCR_ERR', error);
+        setErrorToastMessage('Technical error');
+        setErrorToastSubMessage('Please recapture the images and verify the OCR');
+
+        setEnableVerifyOCRIdType(false);
+        setIdTypeOCRStatus(false);
+        setIdTypeOCRImages([]);
+        setIdTypeClickedPhotoText('');
+        setIdTypeOCRText('Capture front image');
+        setEnableVerifyOCRIdType(false);
+      });
+
+    setLoading(false);
   };
 
+  // setLoading(false);
   const verifyOCRAddressType = (e) => {
     setLoading(true);
-    setTimeout(() => {
-      setEnableOCRAddressProof(false);
-      setAddressProofOCRStatus(true);
-      setLoading(false);
-    }, 3000);
 
-    // const data = new FormData();
-    // data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
-    // data.append(
-    //   'document_type',
-    //   values.applicants[activeIndex]?.personal_details?.selected_address_proof,
-    // );
-    // data.append('field_name', 'selected_address_proof');
-    // data.append('file', idTypeOCRImages[0]);
-    // data.append('file', idTypeOCRImages[1]);
+    // success;
+    // setTimeout(() => {
+    //   setEnableOCRAddressProof(false);
+    //   setAddressProofOCRStatus(true);
+    //   setLoading(false);
+    // }, 3000);
 
-    // performOcr(data, {
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data',
-    //     Authorization: token,
-    //   },
-    // })
-    //   .then((data) => {
-    //     console.log('OCR_RES', data);
-    //     setToastMessage('Information fetched Successfully');
-    //     setEnableOCRAddressProof(false);
-    //     setAddressProofOCRStatus(true);
-    //     setLoading(false);
-    //   })
-    //   .catch((error) => {
-    //     console.log('OCR_ERR', error);
-    //     setErrorToastMessage('Technical error');
-    //     setErrorToastSubMessage('Please recapture the images and verify the OCR');
-    //   });
+    //error
+    // setTimeout(() => {
+    //   setEnableVerifyOCRAddressProof(false);
+    //   setAddressProofOCRStatus(false);
+    //   setAddressTypeOCRImages([]);
+    //   setAddressTypeClickedPhotoText('');
+    //   setAddressTypeOCRText('Capture front image');
+    //   setEnableVerifyOCRAddressProof(false);
+
+    //   setLoading(false);
+    // }, 1000);
+
+    setAddressProofOCRCount((prev) => prev + 1);
+
+    const data = new FormData();
+    data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
+    data.append('document_type', 'DL');
+    data.append('field_name', 'selected_address_proof');
+    data.append('file', addressTypeOCRImages[0]);
+    if (values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID') {
+      data.append('file', addressTypeOCRImages[1]);
+    }
+
+    performOcr(data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: token,
+      },
+    })
+      .then((data) => {
+        console.log('OCR_RES', data);
+        setToastMessage('Information fetched Successfully');
+        setEnableOCRAddressProof(false);
+        setAddressProofOCRStatus(true);
+      })
+      .catch((error) => {
+        console.log('OCR_ERR', error);
+        setErrorToastMessage('Technical error');
+        setErrorToastSubMessage('Please recapture the images and verify the OCR');
+
+        setEnableVerifyOCRAddressProof(false);
+        setAddressProofOCRStatus(false);
+        setAddressTypeOCRImages([]);
+        setAddressTypeClickedPhotoText('');
+        setAddressTypeOCRText('Capture front image');
+        setEnableVerifyOCRAddressProof(false);
+      });
+
+    setLoading(false);
   };
 
   return (
@@ -690,7 +763,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             );
           }
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          idTypeOCRStatus
+        }
         enableOCR={enableOCRIdType}
         captureImages={captureIDImages}
         ocrButtonText={idTypeOCRText}
@@ -721,7 +797,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          disableFields
+          (!idTypeOCRStatus && idTypeOCRCount < 3)
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
@@ -836,7 +912,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             );
           }}
           disabled={
-            disableFields || !values?.applicants?.[activeIndex]?.personal_details?.id_type
+            idDisableFields || !values?.applicants?.[activeIndex]?.personal_details?.id_type
               ? true
               : values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN'
               ? true
@@ -876,7 +952,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
         disabled={
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
-          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          addressProofOCRStatus
         }
         disableOption={values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
@@ -914,7 +991,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           !values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          disableFields
+          (!addressProofOCRStatus && addressProofOCRCount < 3)
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
         onBlur={(e) => {
@@ -1021,7 +1098,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               onChange={handleRadioChange}
               disabled={
                 values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-                disableFields
+                idDisableFields
               }
             >
               {option.icon}
@@ -1120,7 +1197,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          disableFields
+          idDisableFields
         }
       />
 
@@ -1153,7 +1230,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          disableFields
+          idDisableFields
         }
       />
 
@@ -1172,7 +1249,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               onChange={handleRadioChange}
               disabled={
                 values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-                disableFields
+                idDisableFields
               }
             >
               {option.icon}
@@ -1224,7 +1301,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }}
           disabled={
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-            disableFields
+            idDisableFields
           }
         />
       ) : null}
@@ -1248,7 +1325,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          disableFields
+          idDisableFields
         }
       />
 
@@ -1272,7 +1349,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          disableFields
+          idDisableFields
         }
       />
 
@@ -1295,7 +1372,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          disableFields
+          idDisableFields
         }
       />
 
@@ -1318,7 +1395,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           disableEmailInput ||
           emailVerified ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          disableFields
+          idDisableFields
         }
         message={
           emailVerified
