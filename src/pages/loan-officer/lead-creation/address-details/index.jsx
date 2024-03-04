@@ -33,6 +33,7 @@ export default function AddressDetails() {
     pincodeErr,
     setPincodeErr,
     setFieldTouched,
+    addressDisableFields,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
@@ -743,7 +744,8 @@ export default function AddressDetails() {
                 }}
                 disabled={
                   inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                  addressDisableFields
                 }
                 onChange={(e) => {
                   let value = e.currentTarget.value;
@@ -856,7 +858,8 @@ export default function AddressDetails() {
                 }}
                 disabled={
                   inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                  addressDisableFields
                 }
                 onChange={(e) => {
                   let value = e.currentTarget.value;
@@ -959,7 +962,8 @@ export default function AddressDetails() {
                 }}
                 disabled={
                   inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                  addressDisableFields
                 }
                 onChange={(e) => {
                   let value = e.currentTarget.value;
@@ -1060,7 +1064,8 @@ export default function AddressDetails() {
                 }}
                 disabled={
                   inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                  addressDisableFields
                 }
                 onChange={(e) => {
                   let value = e.currentTarget.value;
@@ -1094,7 +1099,8 @@ export default function AddressDetails() {
                 touched={touched?.applicants?.[activeIndex]?.address_detail?.current_pincode}
                 disabled={
                   inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                  addressDisableFields
                 }
                 onBlur={(e) => {
                   handleBlur(e);

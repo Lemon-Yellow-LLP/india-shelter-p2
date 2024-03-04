@@ -60,18 +60,22 @@ export default function ValidateScan({
   aadhaarNo,
   consent,
   setLoading,
+  field_name,
 }) {
-  const { setToastMessage, values } = useContext(LeadContext);
+  const { setToastMessage, values, activeIndex } = useContext(LeadContext);
   const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
   // storing current selected scan meta data
   const [validateScanObj, setValidateScanObj] = useState({});
-  const [disableFields, setDisableFields] = useState(false);
+  const [disableCapture, setdisableCapture] = useState(false);
 
   // capture biometric
   const [isCapturing, SetIsCapturing] = useState(true);
   const [isCaptureSuccessful, setIsCaptureSuccessful] = useState(false);
   const [biometricData, setBiometricData] = useState(null);
 
+  useEffect(() => {
+    captureScan();
+  }, []);
   useEffect(() => {
     if (type === 'FMR') {
       setValidateScanObj(obj[0]);
@@ -84,7 +88,7 @@ export default function ValidateScan({
 
   // capture biometric
   const captureScan = async () => {
-    setDisableFields(true);
+    setdisableCapture(true);
 
     // setting it to 0 for FMR
     var deviceSelectedIndex = 0;
@@ -105,20 +109,21 @@ export default function ValidateScan({
         otpValue,
         wadh,
         function (responseXml) {
+          console.log(responseXml, ' data from mantra device');
           if (responseXml.includes('errCode="0"')) {
             setBiometricData(responseXml);
             SetIsCapturing(false);
-            setDisableFields(false);
+            setdisableCapture(false);
             setIsCaptureSuccessful(true);
           } else {
             SetIsCapturing(false);
-            setDisableFields(false);
+            setdisableCapture(false);
             setIsCaptureSuccessful(false);
           }
           // performKyc(aadhaarNumber, consent, responseXml, 'FMR', fType, otpValue != null);
         },
         function (errorMessage) {
-          setDisableFields(false);
+          setdisableCapture(false);
           setIsCaptureSuccessful(false);
           SetIsCapturing(false);
           console.log(errorMessage);
@@ -139,7 +144,8 @@ export default function ValidateScan({
           bio_type: 'FMR',
           fmr_type: '2',
           uses_otp: 'false',
-          applicant_id: values?.lead?.id,
+          applicant_id: values?.applicants[activeIndex]?.applicant_details?.id,
+          field_name,
         },
         {
           headers: {
@@ -211,8 +217,8 @@ export default function ValidateScan({
               message={validateScanObj.scanLoadingMsg}
             />
             <Button
-              primary
-              disabled={disableFields}
+              primaryapplicant_id
+              disabled={disableCapture}
               onClick={captureScan}
               inputClasses='!py-3 mt-6 w-full'
             >

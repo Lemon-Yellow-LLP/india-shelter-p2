@@ -33,8 +33,34 @@ const LeadContextProvider = ({ children }) => {
   const [showMap, setShowMap] = useState(false);
 
   //p3 states
-  const [disableFields, setDisableFields] = useState(false);
+  const [idDisableFields, setIdDisableFields] = useState(false);
+  const [addressDisableFields, setAddressDisableFields] = useState(false);
 
+  //ocr states
+  const [enableOCRIdType, setEnableOCRIdType] = useState(false);
+  const [enableOCRAddressProof, setEnableOCRAddressProof] = useState(false);
+
+  const [enableVerifyOCRIdType, setEnableVerifyOCRIdType] = useState(false);
+  const [enableVerifyOCRAddressProof, setEnableVerifyOCRAddressProof] = useState(false);
+
+  const [idTypeOCRCount, setIdTypeOCRCount] = useState(0);
+  const [addressProofOCRCount, setAddressProofOCRCount] = useState(0);
+
+  const [idTypeOCRStatus, setIdTypeOCRStatus] = useState(false);
+  const [addressProofOCRStatus, setAddressProofOCRStatus] = useState(false);
+
+  const [idTypeOCRText, setIdTypeOCRText] = useState('Capture front image');
+  const [addressTypeOCRText, setAddressTypeOCRText] = useState('Capture front image');
+
+  const [idTypeClickedPhotoText, setIdTypeClickedPhotoText] = useState('');
+  const [addressTypeClickedPhotoText, setAddressTypeClickedPhotoText] = useState('');
+
+  const [idTypeOCRImages, setIdTypeOCRImages] = useState([]);
+  const [addressTypeOCRImages, setAddressTypeOCRImages] = useState([]);
+
+  // ekyc fields
+  const [enableEKYCIdtype, setEnableEKYIdtype] = useState(false);
+  const [ekycIDStatus, setEkycIDStatus] = useState(false);
   const { token } = useContext(AuthContext);
 
   const location = useLocation();
@@ -373,10 +399,28 @@ const LeadContextProvider = ({ children }) => {
       );
 
       formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
+      setEkycIDStatus(false);
+      setEnableEKYIdtype(false);
+      setDisableFields(false);
     }
   }, [activeIndex, location.pathname]);
 
   useEffect(() => {
+    if (formik?.values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR') {
+      console.log(
+        formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified,
+        formik?.values?.applicants[activeIndex]?.personal_details?.first_name,
+        ' lead name status',
+      );
+      // enable ekyc for id type
+      if (!formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+        setEnableEKYIdtype(true);
+      } else {
+        setEnableEKYIdtype(false);
+        setEkycIDStatus(true);
+        setDisableFields(true);
+      }
+    }
     if (formik?.values?.applicants?.length !== coApplicants?.length) {
       coApplicantDrawerUpdate(formik?.values?.applicants);
     }
@@ -384,6 +428,17 @@ const LeadContextProvider = ({ children }) => {
 
   useEffect(() => {
     console.log('Lead Context Values', formik.values);
+    console.log(formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count);
+    if (!!formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count) {
+      let ocrData = formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count;
+
+      let ocrCount;
+      for (let i in ocrData) {
+        console.log(ocrData[i]);
+        ocrCount = ocrCount + Number(ocrData[i]);
+      }
+      console.log(ocrCount);
+    }
   }, [formik.values]);
 
   return (
@@ -430,8 +485,42 @@ const LeadContextProvider = ({ children }) => {
         coApplicantDrawerUpdate,
         showMap,
         setShowMap,
-        disableFields,
-        setDisableFields,
+        idDisableFields,
+        setIdDisableFields,
+        addressDisableFields,
+        setAddressDisableFields,
+        enableOCRIdType,
+        setEnableOCRIdType,
+        enableOCRAddressProof,
+        setEnableOCRAddressProof,
+        enableVerifyOCRIdType,
+        setEnableVerifyOCRIdType,
+        enableVerifyOCRAddressProof,
+        setEnableVerifyOCRAddressProof,
+        idTypeOCRCount,
+        setIdTypeOCRCount,
+        addressProofOCRCount,
+        setAddressProofOCRCount,
+        idTypeOCRStatus,
+        setIdTypeOCRStatus,
+        addressProofOCRStatus,
+        setAddressProofOCRStatus,
+        idTypeOCRText,
+        setIdTypeOCRText,
+        addressTypeOCRText,
+        setAddressTypeOCRText,
+        idTypeClickedPhotoText,
+        setIdTypeClickedPhotoText,
+        addressTypeClickedPhotoText,
+        setAddressTypeClickedPhotoText,
+        idTypeOCRImages,
+        setIdTypeOCRImages,
+        addressTypeOCRImages,
+        setAddressTypeOCRImages,
+        enableEKYCIdtype,
+        setEnableEKYIdtype,
+        ekycIDStatus,
+        setEkycIDStatus,
       }}
     >
       {children}
