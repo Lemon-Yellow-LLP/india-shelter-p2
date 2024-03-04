@@ -58,6 +58,9 @@ const LeadContextProvider = ({ children }) => {
   const [idTypeOCRImages, setIdTypeOCRImages] = useState([]);
   const [addressTypeOCRImages, setAddressTypeOCRImages] = useState([]);
 
+  // ekyc fields
+  const [enableEKYCIdtype, setEnableEKYIdtype] = useState(false);
+  const [ekycIDStatus, setEkycIDStatus] = useState(false);
   const { token } = useContext(AuthContext);
 
   const location = useLocation();
@@ -396,10 +399,28 @@ const LeadContextProvider = ({ children }) => {
       );
 
       formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
+      setEkycIDStatus(false);
+      setEnableEKYIdtype(false);
+      setDisableFields(false);
     }
   }, [activeIndex, location.pathname]);
 
   useEffect(() => {
+    if (formik?.values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR') {
+      console.log(
+        formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified,
+        formik?.values?.applicants[activeIndex]?.personal_details?.first_name,
+        ' lead name status',
+      );
+      // enable ekyc for id type
+      if (!formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+        setEnableEKYIdtype(true);
+      } else {
+        setEnableEKYIdtype(false);
+        setEkycIDStatus(true);
+        setDisableFields(true);
+      }
+    }
     if (formik?.values?.applicants?.length !== coApplicants?.length) {
       coApplicantDrawerUpdate(formik?.values?.applicants);
     }
@@ -496,6 +517,10 @@ const LeadContextProvider = ({ children }) => {
         setIdTypeOCRImages,
         addressTypeOCRImages,
         setAddressTypeOCRImages,
+        enableEKYCIdtype,
+        setEnableEKYIdtype,
+        ekycIDStatus,
+        setEkycIDStatus,
       }}
     >
       {children}

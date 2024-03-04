@@ -68,6 +68,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     addressTypeOCRImages,
     setAddressTypeOCRImages,
     setValues,
+    enableEKYCIdtype,
+    setEnableEKYIdtype,
+    ekycIDStatus,
+    setEkycIDStatus,
   } = useContext(LeadContext);
 
   const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
@@ -85,10 +89,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [date, setDate] = useState(null);
 
   const [openEkycPopup, setOpenEkycPopup] = useState(false);
-  const [enableEKYCIdtype, setEnableEKYIdtype] = useState(false);
+  const [field_name, setField_name] = useState(null);
+  // enable ekyc
   const [enableEKYCAddressProof, setEnableEKYCAddressProof] = useState(false);
-
-  const [ekycIDStatus, setEkycIDStatus] = useState(false);
+  // get ekyc status
   const [ekycAddressStatus, setEkycAddressStatus] = useState(false);
 
   // console.log('enableOCRIdType', enableOCRIdType);
@@ -103,6 +107,26 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   useEffect(() => {
     console.log('idTypeOcr', enableOCRIdType, 'addressProofOcr', enableOCRAddressProof);
   }, [enableOCRIdType, enableOCRAddressProof]);
+
+  // useEffect(() => {
+  //   if (
+  //     !(idTypeOCRStatus && addressProofOCRStatus) &&
+  //     (idTypeOCRCount !== 3 || addressProofOCRCount !== 3)
+  //   ) {
+  //     console.log('disable fields from manual mode');
+  //     setDisableFields(true);
+  //   } else {
+  //     console.log('unlock fields from manual mode');
+  //     setDisableFields(false);
+  //   }
+  // }, [
+  //   idTypeOCRStatus,
+  //   addressProofOCRStatus,
+  //   idTypeOCRCount,
+  //   addressProofOCRCount,
+  //   enableOCRIdType,
+  //   enableOCRAddressProof,
+  // ]);
 
   useEffect(() => {
     if (!idTypeOCRStatus && idTypeOCRCount !== 3) {
@@ -125,14 +149,13 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     } else {
       setAddressDisableFields(false);
     }
-  }, [
-    idTypeOCRStatus,
-    addressProofOCRStatus,
-    idTypeOCRCount,
-    addressProofOCRCount,
-    enableOCRIdType,
-    enableOCRAddressProof,
-  ]);
+  }, []);
+
+  useEffect(() => {
+    if (values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR') {
+      setEnableEKYCAddressProof(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
@@ -777,6 +800,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setOpenEkycPopup={setOpenEkycPopup}
         verifiedEkycStatus={ekycIDStatus}
         enableEKYC={enableEKYCIdtype}
+        setField_name={() => setField_name('id_type')}
       />
 
       <TextInput
@@ -797,7 +821,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          (!idTypeOCRStatus && idTypeOCRCount < 3)
+          (!idTypeOCRStatus && idTypeOCRCount < 3) ||
+          values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAAR'
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
@@ -969,6 +994,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setOpenEkycPopup={setOpenEkycPopup}
         verifiedEkycStatus={ekycAddressStatus}
         enableEKYC={enableEKYCAddressProof}
+        setField_name={() => setField_name('selected_address_proof')}
       />
 
       <TextInput
@@ -1433,7 +1459,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       )}
 
       <DynamicDrawer open={openEkycPopup} setOpen={setOpenEkycPopup} drawerChildrenClasses='!p-0'>
-        <EkycDrawer setOpenEkycPopup={setOpenEkycPopup} setLoading={setLoading} />
+        <EkycDrawer
+          setOpenEkycPopup={setOpenEkycPopup}
+          setLoading={setLoading}
+          field_name={field_name}
+        />
       </DynamicDrawer>
     </>
   );

@@ -38,14 +38,13 @@ const OCRDropdown = memo(
     setOpenEkycPopup,
     verifiedEkycStatus,
     enableEKYC,
+    setField_name,
     ...props
   }) => {
     const [showDropDown, setShowDropDown] = useState(false);
     const [selectedOption, setSelectedOption] = useState(() =>
       options?.find((option) => defaultSelected === option.value),
     );
-
-    console.log(enableVerify);
 
     useEffect(() => {
       const option = options.find((option) => option.value === defaultSelected);
@@ -203,7 +202,10 @@ const OCRDropdown = memo(
           {enableEKYC ? (
             <button
               className='text-primary-red font-semibold flex justify-end ml-auto'
-              onClick={() => setOpenEkycPopup(true)}
+              onClick={() => {
+                setOpenEkycPopup(true);
+                setField_name();
+              }}
             >
               <IconThumb />
               Verify Aadhar e-KYC
