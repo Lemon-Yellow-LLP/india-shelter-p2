@@ -966,7 +966,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          addressProofOCRStatus
+          addressProofOCRStatus ||
+          ekycAddressStatus
         }
         disableOption={values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
@@ -1005,6 +1006,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           !values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAAR' ||
           (!addressProofOCRStatus && addressProofOCRCount < 3)
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}

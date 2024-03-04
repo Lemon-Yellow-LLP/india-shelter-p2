@@ -6,18 +6,10 @@ import Fingerprint_scanning from '../../assets/anim/Fingerprint_Scanning.json';
 import Fingerprint_success from '../../assets/anim/Fingerprint_Success.json';
 import Fingerprint_failure from '../../assets/anim/Fingerprint_Failure.json';
 
-import Iris_scanning from '../../assets/anim/Iris_Scanning.json';
-import Iris_success from '../../assets/anim/Iris_Success.json';
-import Iris_failure from '../../assets/anim/Iris_Failure.json';
-
-import FaceAuth_scanning from '../../assets/anim/FaceAuth_Scanning.json';
-import FaceAuth_success from '../../assets/anim/FaceAuth_Success.json';
-import FaceAuth_failure from '../../assets/anim/FaceAuth_Failure.json';
-
 import { useContext, useEffect, useState } from 'react';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
-import { performBiometric } from '../../global';
+import { editFieldsById, getDashboardLeadById, performBiometric } from '../../global';
 
 // biometric screen meta based on type
 let obj = [
@@ -30,24 +22,6 @@ let obj = [
     scanSuccessAnimation: Fingerprint_success,
     scanFailureAnimation: Fingerprint_failure,
   },
-  {
-    title: 'IRIS scan',
-    scanLoadingMsg: 'Place your EYE in front of machine',
-    scanSuccessMsg: 'Successfully captured information, validating Aadhar details',
-    scanFailureMsg: 'Unable to capture information, Place your EYE in front of machine',
-    scanLoadingAnimation: Iris_scanning,
-    scanSuccessAnimation: Iris_success,
-    scanFailureAnimation: Iris_failure,
-  },
-  {
-    title: 'Face Authentication',
-    scanLoadingMsg: 'Place your Face in front of Machine',
-    scanSuccessMsg: 'Successfully captured information, validating Aadhar details',
-    scanFailureMsg: 'Unable to capture information, Place your Face in front of Machine',
-    scanLoadingAnimation: FaceAuth_scanning,
-    scanSuccessAnimation: FaceAuth_success,
-    scanFailureAnimation: FaceAuth_failure,
-  },
 ];
 
 // type = "FMR", "iris", "faceAuth"
@@ -58,11 +32,13 @@ export default function ValidateScan({
   setOpenEkycPopup,
   ecsBioHelper,
   aadhaarNo,
+  setAadhaarNo,
+  setIsAadharInputDrawer,
   consent,
   setLoading,
   field_name,
 }) {
-  const { setToastMessage, values, activeIndex } = useContext(LeadContext);
+  const { setToastMessage, values, activeIndex, setValues } = useContext(LeadContext);
   const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
   // storing current selected scan meta data
   const [validateScanObj, setValidateScanObj] = useState({});
@@ -74,15 +50,8 @@ export default function ValidateScan({
   const [biometricData, setBiometricData] = useState(null);
 
   useEffect(() => {
-    captureScan();
-  }, []);
-  useEffect(() => {
     if (type === 'FMR') {
       setValidateScanObj(obj[0]);
-    } else if (type === 'iris') {
-      setValidateScanObj(obj[1]);
-    } else {
-      setValidateScanObj(obj[2]);
     }
   }, [type]);
 
@@ -120,7 +89,6 @@ export default function ValidateScan({
             setdisableCapture(false);
             setIsCaptureSuccessful(false);
           }
-          // performKyc(aadhaarNumber, consent, responseXml, 'FMR', fType, otpValue != null);
         },
         function (errorMessage) {
           setdisableCapture(false);
@@ -136,6 +104,21 @@ export default function ValidateScan({
   const validateCapturedScan = async () => {
     try {
       setLoading(true);
+      await editFieldsById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+        'applicant',
+        {
+          extra_params: {
+            ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+            is_ekyc_performed: true,
+          },
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       const res = await performBiometric(
         {
           aadhaar_number: aadhaarNo, //<---- Enter aadhar number here
@@ -154,8 +137,46 @@ export default function ValidateScan({
         },
       );
       console.log(res);
+      setValues(res.lead);
       setToastMessage('Information fetched Successfully');
     } catch (error) {
+      const maskedPortion = aadhaarNo.slice(0, 8).replace(/\d/g, '*');
+      const maskedAadhar = maskedPortion + aadhaarNo.slice(8);
+      let data =
+        field_name === 'id_type'
+          ? {
+              id_number: maskedAadhar,
+              extra_params: {
+                ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                id_number: true,
+              },
+            }
+          : {
+              address_proof_number: maskedAadhar,
+              extra_params: {
+                ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                address_proof_number: true,
+              },
+            };
+      await editFieldsById(
+        values?.applicants?.[activeIndex]?.personal_details?.id,
+        'personal',
+        data,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      const res = await getDashboardLeadById(
+        values?.applicants[activeIndex]?.applicant_details?.lead_id,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      setValues(res);
       setErrorToastMessage(error.response.data.error);
       setErrorToastSubMessage(error.response.data.details.errMsg);
       console.log(error);
@@ -163,6 +184,9 @@ export default function ValidateScan({
       setOpenEkycPopup(false);
       setPerformVerification(false);
       setLoading(false);
+      setBiometricData(null);
+      setAadhaarNo('');
+      setIsAadharInputDrawer(true);
     }
   };
 
@@ -217,7 +241,7 @@ export default function ValidateScan({
               message={validateScanObj.scanLoadingMsg}
             />
             <Button
-              primaryapplicant_id
+              primary
               disabled={disableCapture}
               onClick={captureScan}
               inputClasses='!py-3 mt-6 w-full'
@@ -279,4 +303,7 @@ ValidateScan.propTypes = {
   aadhaarNo: PropTypes.string,
   consent: PropTypes.string,
   setLoading: PropTypes.func,
+  field_name: PropTypes.string,
+  setIsAadharInputDrawer: PropTypes.func,
+  setAadhaarNo: PropTypes.func,
 };

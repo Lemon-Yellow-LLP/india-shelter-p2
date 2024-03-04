@@ -27,14 +27,6 @@ export const ekycMethods = [
     label: 'Biometrics',
     value: 'FMR',
   },
-  {
-    label: 'IRIS',
-    value: 'iris',
-  },
-  {
-    label: 'Face Authentication',
-    value: 'faceAuthentication',
-  },
 ];
 
 // generate aadhaar otp returns otpTxnId which is required in validate otp
@@ -380,15 +372,17 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading, field_name })
         setOpenEkycPopup={setOpenEkycPopup}
         ecsBioHelper={ecsBioHelper}
         aadhaarNo={aadhaarNo}
+        setAadhaarNo={setAadhaarNo}
         consent={consent}
         setLoading={setLoading}
         field_name={field_name}
+        setIsAadharInputDrawer={setIsAadharInputDrawer}
       />
     )
   ) : (
     <>
       <div className='relative'>
-        <div className='w-full h-[550px] flex flex-col'>
+        <div className='w-full h-[494px] flex flex-col'>
           <div className='flex justify-between px-4 py-2 border-b border-lighter-grey'>
             <p className='font-semibold'>Select verification method</p>
             <button
