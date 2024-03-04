@@ -37,7 +37,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setFieldError,
     idDisableFields,
     setIdDisableFields,
-    addressDisableFields,
     setAddressDisableFields,
     enableOCRIdType,
     setEnableOCRIdType,
@@ -67,13 +66,17 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setIdTypeOCRImages,
     addressTypeOCRImages,
     setAddressTypeOCRImages,
-    setValues,
-    enableEKYCIdtype,
-    setEnableEKYIdtype,
+    enableEkycIdtype,
+    setEnableEkycIdtype,
     ekycIDStatus,
     setEkycIDStatus,
+    enableEKYCAddressProof,
+    setEnableEKYCAddressProof,
+    ekycAddressStatus,
+    setEkycAddressStatus,
   } = useContext(LeadContext);
-
+  console.log(idDisableFields, 'initial value of failed ekyc disable from manual mode');
+  console.log(ekycIDStatus, 'ekyc id status from manual mode');
   const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
@@ -90,10 +93,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   const [openEkycPopup, setOpenEkycPopup] = useState(false);
   const [field_name, setField_name] = useState(null);
-  // enable ekyc
-  const [enableEKYCAddressProof, setEnableEKYCAddressProof] = useState(false);
-  // get ekyc status
-  const [ekycAddressStatus, setEkycAddressStatus] = useState(false);
 
   // console.log('enableOCRIdType', enableOCRIdType);
   // console.log('enableVerifyOCRIdType', enableVerifyOCRIdType);
@@ -148,12 +147,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       setAddressDisableFields(true);
     } else {
       setAddressDisableFields(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR') {
-      setEnableEKYCAddressProof(true);
     }
   }, []);
 
@@ -255,7 +248,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
         setEnableOCRIdType(true);
 
-        setEnableEKYIdtype(false);
+        setEnableEkycIdtype(false);
       } else if (e === 'AADHAR') {
         setEnableVerifyOCRIdType(false);
         setIdTypeOCRStatus(false);
@@ -264,7 +257,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdTypeOCRText('Capture front image');
         setEnableVerifyOCRIdType(false);
 
-        setEnableEKYIdtype(true);
+        setEnableEkycIdtype(true);
 
         setEnableOCRIdType(false);
       }
@@ -290,10 +283,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setAddressTypeClickedPhotoText('');
         setAddressTypeOCRText('Capture front image');
         setEnableVerifyOCRAddressProof(false);
-
         setEnableOCRAddressProof(true);
-
-        setEnableEKYCAddressProof(false);
       } else if (e === 'AADHAR') {
         setEnableEKYCAddressProof(false);
         setAddressProofOCRStatus(false);
@@ -301,9 +291,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setAddressTypeClickedPhotoText('');
         setAddressTypeOCRText('Capture front image');
         setEnableVerifyOCRAddressProof(false);
-
-        setEnableEKYCAddressProof(true);
-
         setEnableOCRAddressProof(false);
       }
     },
@@ -788,7 +775,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          idTypeOCRStatus
+          idTypeOCRStatus ||
+          ekycIDStatus
         }
         enableOCR={enableOCRIdType}
         captureImages={captureIDImages}
@@ -799,7 +787,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onVerifyClick={verifyOCRIdType}
         setOpenEkycPopup={setOpenEkycPopup}
         verifiedEkycStatus={ekycIDStatus}
-        enableEKYC={enableEKYCIdtype}
+        enableEKYC={enableEkycIdtype}
         setField_name={() => setField_name('id_type')}
       />
 
@@ -937,7 +925,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             );
           }}
           disabled={
-            idDisableFields || !values?.applicants?.[activeIndex]?.personal_details?.id_type
+            !values?.applicants?.[activeIndex]?.personal_details?.id_type
               ? true
               : values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN'
               ? true
@@ -1052,25 +1040,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }}
       />
-      {/* when ekyc is verified show kyc successful msg
-      <div className='gap-1 flex'>
-        <svg
-          width='18'
-          height='18'
-          viewBox='0 0 18 18'
-          fill='none'
-          xmlns='http://www.w3.org/2000/svg'
-        >
-          <path
-            d='M15 4.5L6.75 12.75L3 9'
-            stroke='#147257'
-            strokeWidth='1.5'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          />
-        </svg>
-        <p className='text-xs text-secondary-green'>e-KYC completed successfully</p>
-      </div> */}
+
       <TextInput
         label='First Name'
         placeholder='Eg: Sanjay'
@@ -1082,7 +1052,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={
           touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.first_name
         }
-        disabled={true}
+        disabled={idDisableFields}
       />
       <TextInput
         label='Middle Name'
@@ -1094,7 +1064,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={
           touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.middle_name
         }
-        disabled={true}
+        disabled={idDisableFields}
       />
       <TextInput
         label='Last Name'
@@ -1106,7 +1076,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={
           touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.last_name
         }
-        disabled={true}
+        disabled={idDisableFields}
       />
 
       <div className='flex flex-col gap-2'>
@@ -1155,7 +1125,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={
           touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.date_of_birth
         }
-        disabled={true}
+        disabled={idDisableFields}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[2];
@@ -1223,7 +1193,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          idDisableFields
+          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
         }
       />
 
@@ -1256,7 +1226,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          idDisableFields
+          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
         }
       />
 
@@ -1275,7 +1245,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               onChange={handleRadioChange}
               disabled={
                 values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-                idDisableFields
+                !values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                  ?.is_ekyc_performed
               }
             >
               {option.icon}
@@ -1327,7 +1298,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }}
           disabled={
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-            idDisableFields
+            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
           }
         />
       ) : null}
@@ -1351,7 +1322,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          idDisableFields
+          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
         }
       />
 
@@ -1375,7 +1346,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          idDisableFields
+          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
         }
       />
 
@@ -1398,7 +1369,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          idDisableFields
+          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
         }
       />
 
@@ -1421,7 +1392,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           disableEmailInput ||
           emailVerified ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          idDisableFields
+          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
         }
         message={
           emailVerified

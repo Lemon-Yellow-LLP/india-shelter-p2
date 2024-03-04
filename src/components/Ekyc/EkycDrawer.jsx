@@ -9,7 +9,12 @@ import EkycOtpInput from '../OtpInput/EkycOtpInput';
 import ValidateScan from './ValidateScan';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
-import { generateEkycOtp, validateEkycOtp } from '../../global';
+import {
+  editFieldsById,
+  generateEkycOtp,
+  getDashboardLeadById,
+  validateEkycOtp,
+} from '../../global';
 import TextInput from '../TextInput';
 
 // Add ekyc methods
@@ -37,7 +42,7 @@ let otpTxnId;
 
 export default function EkycDrawer({ setOpenEkycPopup, setLoading, field_name }) {
   const ecsBioHelper = window.ecsBioHelper;
-  const { setToastMessage, values, setFieldValue, activeIndex } = useContext(LeadContext);
+  const { setToastMessage, values, setValues, activeIndex } = useContext(LeadContext);
   const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
 
   // aadharInputDrawser states
@@ -146,6 +151,21 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading, field_name })
   const handleVerifyAadharOtp = async () => {
     try {
       setLoading(true);
+      await editFieldsById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+        'applicant',
+        {
+          extra_params: {
+            ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+            is_ekyc_performed: true,
+          },
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       const res = await validateEkycOtp(
         {
           aadhaar_number: aadhaarNo,
@@ -161,10 +181,49 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading, field_name })
           },
         },
       );
+      setValues(res.lead);
       console.log(res);
       setToastMessage('Information fetched Successfully');
     } catch (error) {
       console.log(error);
+      const maskedPortion = aadhaarNo.slice(0, 8).replace(/\d/g, '*');
+      const maskedAadhar = maskedPortion + aadhaarNo.slice(8);
+      let data =
+        field_name === 'id_type'
+          ? {
+              id_number: maskedAadhar,
+              extra_params: {
+                ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                id_number: true,
+              },
+            }
+          : {
+              address_proof_number: maskedAadhar,
+              extra_params: {
+                ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                address_proof_number: true,
+              },
+            };
+      await editFieldsById(
+        values?.applicants?.[activeIndex]?.personal_details?.id,
+        'personal',
+        data,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      const res = await getDashboardLeadById(
+        values?.applicants[activeIndex]?.applicant_details?.lead_id,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      setValues(res);
+      console.log(res, 'from failed ekyc');
       setErrorToastMessage(error?.response?.data?.error);
       setErrorToastSubMessage(error?.response?.data?.details?.errMsg);
     } finally {
@@ -175,9 +234,6 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading, field_name })
       setAadhaarNo('');
       setIsConsentChecked(false);
       setOtp('');
-      // // remove before commiting
-      // setFieldValue(`applicants[${activeIndex}].applicant_details.is_ekyc_verified`, true);
-      // setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, '********1234');
     }
   };
 
@@ -418,4 +474,5 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading, field_name })
 EkycDrawer.propTypes = {
   setOpenEkycPopup: PropTypes.func,
   setLoading: PropTypes.func,
+  field_name: PropTypes.string,
 };

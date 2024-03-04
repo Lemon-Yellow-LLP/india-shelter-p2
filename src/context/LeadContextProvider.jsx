@@ -59,8 +59,11 @@ const LeadContextProvider = ({ children }) => {
   const [addressTypeOCRImages, setAddressTypeOCRImages] = useState([]);
 
   // ekyc fields
-  const [enableEKYCIdtype, setEnableEKYIdtype] = useState(false);
+  const [enableEkycIdtype, setEnableEkycIdtype] = useState(false);
   const [ekycIDStatus, setEkycIDStatus] = useState(false);
+  const [enableEKYCAddressProof, setEnableEKYCAddressProof] = useState(false);
+  const [ekycAddressStatus, setEkycAddressStatus] = useState(false);
+
   const { token } = useContext(AuthContext);
 
   const location = useLocation();
@@ -397,30 +400,82 @@ const LeadContextProvider = ({ children }) => {
       const updatedValues = newApplicants.applicants.filter(
         (e, index) => index === activeIndex || e.applicant_details.is_mobile_verified,
       );
-
-      formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
+      setEnableEkycIdtype(false);
       setEkycIDStatus(false);
-      setEnableEKYIdtype(false);
-      setDisableFields(false);
+      setIdDisableFields(false);
+      setEnableEKYCAddressProof(false);
+      setEkycAddressStatus(false);
+      setAddressDisableFields(false);
+      formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
     }
   }, [activeIndex, location.pathname]);
 
   useEffect(() => {
+    // did user left on id_type being aadhar
     if (formik?.values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR') {
-      console.log(
-        formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified,
-        formik?.values?.applicants[activeIndex]?.personal_details?.first_name,
-        ' lead name status',
-      );
-      // enable ekyc for id type
-      if (!formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
-        setEnableEKYIdtype(true);
+      // did user perfomed ekyc atleast once irrespective of success or fail
+      if (
+        formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
+      ) {
+        // successful Ekyc (default is_ekyc_verified=false)
+        if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+          console.log('successfull ekyc');
+          setEnableEkycIdtype(false);
+          setEkycIDStatus(true);
+          setIdDisableFields(true);
+          setAddressDisableFields(true);
+        } else {
+          // unsuccessful Ekyc
+          console.log('unsuccessful ekyc from leadContext');
+          setEnableEkycIdtype(true);
+          setEkycIDStatus(false);
+          setIdDisableFields(false);
+          setAddressDisableFields(false);
+        }
       } else {
-        setEnableEKYIdtype(false);
-        setEkycIDStatus(true);
-        setDisableFields(true);
+        // ekyc didn't perfomed
+        console.log('first time ekyc');
+        setEnableEkycIdtype(true);
+        setEkycIDStatus(false);
+        setIdDisableFields(true);
+        setAddressDisableFields(true);
       }
     }
+
+    // did user left on selected_address_proof being aadhar
+    if (
+      formik?.values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ===
+      'AADHAR'
+    ) {
+      // did user perfomed ekyc atleast once irrespective of success or fail
+      if (
+        formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
+      ) {
+        // successful Ekyc (default is_ekyc_verified=false)
+        if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+          console.log('successfull ekyc');
+          setEnableEKYCAddressProof(false);
+          setEkycAddressStatus(true);
+          setIdDisableFields(true);
+          setAddressDisableFields(true);
+        } else {
+          // unsuccessful Ekyc
+          console.log('unsuccessful ekyc from leadContext');
+          setEnableEKYCAddressProof(true);
+          setEkycAddressStatus(false);
+          setIdDisableFields(false);
+          setAddressDisableFields(false);
+        }
+      } else {
+        // ekyc didn't perfomed
+        console.log('first time ekyc');
+        setEnableEKYCAddressProof(true);
+        setEkycAddressStatus(false);
+        setIdDisableFields(true);
+        setAddressDisableFields(true);
+      }
+    }
+
     if (formik?.values?.applicants?.length !== coApplicants?.length) {
       coApplicantDrawerUpdate(formik?.values?.applicants);
     }
@@ -517,10 +572,14 @@ const LeadContextProvider = ({ children }) => {
         setIdTypeOCRImages,
         addressTypeOCRImages,
         setAddressTypeOCRImages,
-        enableEKYCIdtype,
-        setEnableEKYIdtype,
+        enableEkycIdtype,
+        setEnableEkycIdtype,
         ekycIDStatus,
         setEkycIDStatus,
+        enableEKYCAddressProof,
+        setEnableEKYCAddressProof,
+        ekycAddressStatus,
+        setEkycAddressStatus,
       }}
     >
       {children}
