@@ -113,7 +113,8 @@ export default function PrimaryApplicantTab() {
           index={primaryIndex}
           stepIndex={6}
           lock={
-            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.progress !== 100
+            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.progress !== 100 ||
+            !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.qualifier
           }
         />
         <DrawerStepBanking
@@ -134,7 +135,8 @@ export default function PrimaryApplicantTab() {
           index={primaryIndex}
           stepIndex={8}
           lock={
-            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.progress !== 100
+            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.progress !== 100 ||
+            !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.qualifier
           }
         />
         <UploadSteps
@@ -144,7 +146,8 @@ export default function PrimaryApplicantTab() {
           index={primaryIndex}
           stepIndex={9}
           lock={
-            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.progress !== 100
+            values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.progress !== 100 ||
+            !values?.applicants?.[primaryIndex]?.applicant_details?.extra_params?.qualifier
           }
         />
         <DrawerSteps

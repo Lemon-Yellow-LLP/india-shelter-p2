@@ -75,8 +75,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     ekycAddressStatus,
     setEkycAddressStatus,
   } = useContext(LeadContext);
-  console.log(idDisableFields, 'initial value of failed ekyc disable from manual mode');
-  console.log(ekycIDStatus, 'ekyc id status from manual mode');
   const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
@@ -1054,7 +1052,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={
           touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.first_name
         }
-        disabled={idDisableFields}
+        disabled={true}
       />
       <TextInput
         label='Middle Name'
@@ -1066,7 +1064,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={
           touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.middle_name
         }
-        disabled={idDisableFields}
+        disabled={true}
       />
       <TextInput
         label='Last Name'
@@ -1078,7 +1076,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={
           touched?.applicants && touched.applicants?.[activeIndex]?.applicant_details?.last_name
         }
-        disabled={idDisableFields}
+        disabled={true}
       />
 
       <div className='flex flex-col gap-2'>
@@ -1127,7 +1125,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         touched={
           touched?.applicants && touched.applicants?.[activeIndex]?.personal_details?.date_of_birth
         }
-        disabled={idDisableFields}
+        disabled={true}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[2];
