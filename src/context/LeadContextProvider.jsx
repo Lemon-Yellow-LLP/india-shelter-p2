@@ -146,14 +146,14 @@ const LeadContextProvider = ({ children }) => {
       progressMap.lt_charges = newData?.lt_charges?.find((e) => e.status === 'Completed') ? 100 : 0;
 
       progressMapTemp.lt_charges = structuredClone(progressMap.lt_charges);
-      console.log(progressMap);
+      // console.log(progressMap);
 
       const { totalKeys, valuesSum } = countKeysAndValues(progressMap);
       const resValues = countKeysAndValues(progressMapTemp);
 
       let finalProgress = parseInt(parseInt(valuesSum) / parseInt(totalKeys));
 
-      console.log(finalProgress);
+      // console.log(finalProgress);
 
       let tempFinalProgress = parseInt(
         parseInt(resValues.valuesSum) / parseInt(resValues.totalKeys),
@@ -395,29 +395,95 @@ const LeadContextProvider = ({ children }) => {
         (e, index) => index === activeIndex || e.applicant_details.is_mobile_verified,
       );
 
+      // setIdTypeOCRStatus(false);
+      setIdTypeOCRImages([]);
+      setIdTypeClickedPhotoText('');
+      setIdTypeOCRText('Capture front image');
+      setEnableVerifyOCRIdType(false);
+
+      // setAddressProofOCRStatus(false);
+      setAddressTypeOCRImages([]);
+      setAddressTypeClickedPhotoText('');
+      setAddressTypeOCRText('Capture front image');
+      setEnableVerifyOCRAddressProof(false);
+
       formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
     }
   }, [activeIndex, location.pathname]);
 
   useEffect(() => {
+    if (!!formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count) {
+      let ocrData = formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count;
+
+      let ocrCount = 0;
+      for (let i in ocrData) {
+        ocrCount = ocrCount + ocrData[i];
+      }
+      setIdTypeOCRCount(ocrCount);
+    } else {
+      setIdTypeOCRCount(0);
+    }
+
+    if (formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_status) {
+      setIdTypeOCRStatus(true);
+    } else {
+      setIdTypeOCRStatus(false);
+    }
+
+    if (
+      formik.values?.applicants[activeIndex]?.personal_details.id_type &&
+      formik.values?.applicants[activeIndex]?.personal_details.id_type !== 'AADHAR' &&
+      !formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_status
+    ) {
+      setEnableOCRIdType(true);
+    } else {
+      setEnableOCRIdType(false);
+    }
+
+    if (
+      !!formik.values?.applicants[activeIndex]?.applicant_details.selected_address_proof_ocr_count
+    ) {
+      let ocrData =
+        formik.values?.applicants[activeIndex]?.applicant_details.selected_address_proof_ocr_count;
+
+      let ocrCount = 0;
+      for (let i in ocrData) {
+        ocrCount = ocrCount + ocrData[i];
+      }
+      setAddressProofOCRCount(ocrCount);
+    } else {
+      setAddressProofOCRCount(0);
+    }
+
+    if (formik.values?.applicants[activeIndex]?.applicant_details.selected_address_ocr_status) {
+      setAddressProofOCRStatus(true);
+    } else {
+      if (
+        !formik.values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+      ) {
+        setAddressProofOCRStatus(false);
+      }
+    }
+
+    if (
+      formik.values?.applicants[activeIndex]?.personal_details.selected_address_proof &&
+      formik.values?.applicants[activeIndex]?.personal_details.selected_address_proof !==
+        'AADHAR' &&
+      !formik.values?.applicants[activeIndex]?.applicant_details.selected_address_ocr_status &&
+      !formik.values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+    ) {
+      setEnableOCRAddressProof(true);
+    } else {
+      setEnableOCRAddressProof(false);
+    }
+
     if (formik?.values?.applicants?.length !== coApplicants?.length) {
       coApplicantDrawerUpdate(formik?.values?.applicants);
     }
   }, [formik?.values?.applicants]);
 
   useEffect(() => {
-    console.log('Lead Context Values', formik.values);
-    console.log(formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count);
-    if (!!formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count) {
-      let ocrData = formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count;
-
-      let ocrCount;
-      for (let i in ocrData) {
-        console.log(ocrData[i]);
-        ocrCount = ocrCount + Number(ocrData[i]);
-      }
-      console.log(ocrCount);
-    }
+    // console.log('Lead Context Values', formik.values);
   }, [formik.values]);
 
   return (

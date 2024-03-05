@@ -45,8 +45,6 @@ const OCRDropdown = memo(
       options?.find((option) => defaultSelected === option.value),
     );
 
-    console.log(enableVerify);
-
     useEffect(() => {
       const option = options.find((option) => option.value === defaultSelected);
       setSelectedOption(option);

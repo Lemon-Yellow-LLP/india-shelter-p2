@@ -95,17 +95,17 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   // console.log('enableVerifyOCRIdType', enableVerifyOCRIdType);
   // console.log('idTypeOCRText', idTypeOCRText);
   // console.log('idTypeClickedPhotoText', idTypeClickedPhotoText);
-  // console.log('idTypeOCRStatus', idTypeOCRStatus);
+  console.log(idTypeOCRStatus, addressProofOCRStatus);
   // console.log('idTypeOCRImages', idTypeOCRImages);
   // console.log('addressTypeOCRImages', addressTypeOCRImages);
   console.log(idTypeOCRCount, addressProofOCRCount);
 
   useEffect(() => {
-    console.log('idTypeOcr', enableOCRIdType, 'addressProofOcr', enableOCRAddressProof);
+    // console.log('idTypeOcr', enableOCRIdType, 'addressProofOcr', enableOCRAddressProof);
   }, [enableOCRIdType, enableOCRAddressProof]);
 
   useEffect(() => {
-    if (!idTypeOCRStatus && idTypeOCRCount !== 3) {
+    if (!idTypeOCRStatus && idTypeOCRCount < 3) {
       setIdDisableFields(true);
     } else {
       setIdDisableFields(false);
@@ -120,7 +120,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   ]);
 
   useEffect(() => {
-    if (!addressProofOCRStatus && addressProofOCRCount !== 3) {
+    if (!addressProofOCRStatus && addressProofOCRCount < 3) {
       setAddressDisableFields(true);
     } else {
       setAddressDisableFields(false);
@@ -228,7 +228,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdTypeOCRImages([]);
         setIdTypeClickedPhotoText('');
         setIdTypeOCRText('Capture front image');
-        setEnableVerifyOCRIdType(false);
+        // setEnableVerifyOCRIdType(false);
 
         setEnableOCRIdType(true);
 
@@ -239,7 +239,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdTypeOCRImages([]);
         setIdTypeClickedPhotoText('');
         setIdTypeOCRText('Capture front image');
-        setEnableVerifyOCRIdType(false);
+        // setEnableVerifyOCRIdType(false);
 
         setEnableEKYIdtype(true);
 
@@ -270,7 +270,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
         setEnableOCRAddressProof(true);
 
-        setEnableEKYCAddressProof(false);
+        // setEnableEKYCAddressProof(false);
       } else if (e === 'AADHAR') {
         setEnableEKYCAddressProof(false);
         setAddressProofOCRStatus(false);
@@ -617,32 +617,26 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   };
 
   const verifyOCRIdType = (e) => {
+    setIdTypeOCRCount((prev) => prev + 1);
     setLoading(true);
 
-    //success
-    // setTimeout(() => {
-    //   setEnableOCRIdType(false);
-    //   setIdTypeOCRStatus(true);
-    //   setLoading(false);
-    // }, 3000);
+    let ocrDocumentType;
 
-    //error
-    // setTimeout(() => {
-    //   setEnableVerifyOCRIdType(false);
-    //   setIdTypeOCRStatus(false);
-    //   setIdTypeOCRImages([]);
-    //   setIdTypeClickedPhotoText('');
-    //   setIdTypeOCRText('Capture front image');
-    //   setEnableVerifyOCRIdType(false);
-
-    //   setLoading(false);
-    // }, 1000);
-
-    setIdTypeOCRCount((prev) => prev + 1);
+    if (values.applicants[activeIndex]?.personal_details?.id_type === 'Driving license') {
+      ocrDocumentType = 'DL';
+    } else if (values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID') {
+      ocrDocumentType = 'VOTER';
+    } else if (values.applicants[activeIndex]?.personal_details?.id_type === 'Passport') {
+      ocrDocumentType = 'PASSPORT';
+    } else if (values.applicants[activeIndex]?.personal_details?.id_type === 'PAN') {
+      ocrDocumentType = 'PAN';
+    } else {
+      ocrDocumentType = 'AADHAR';
+    }
 
     const data = new FormData();
     data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
-    data.append('document_type', 'PASSPORT');
+    data.append('document_type', ocrDocumentType);
     data.append('field_name', 'id_type');
     data.append('file', idTypeOCRImages[0]);
     if (values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID') {
@@ -656,10 +650,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       },
     })
       .then((data) => {
-        console.log('OCR_RES', data);
+        setValues(data.full_lead);
         setToastMessage('Information fetched Successfully');
         setEnableOCRIdType(false);
         setIdTypeOCRStatus(true);
+        setLoading(false);
       })
       .catch((error) => {
         console.log('OCR_ERR', error);
@@ -672,39 +667,35 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdTypeClickedPhotoText('');
         setIdTypeOCRText('Capture front image');
         setEnableVerifyOCRIdType(false);
+        setLoading(false);
       });
-
-    setLoading(false);
   };
 
-  // setLoading(false);
   const verifyOCRAddressType = (e) => {
+    setAddressProofOCRCount((prev) => prev + 1);
     setLoading(true);
 
-    // success;
-    // setTimeout(() => {
-    //   setEnableOCRAddressProof(false);
-    //   setAddressProofOCRStatus(true);
-    //   setLoading(false);
-    // }, 3000);
+    let ocrDocumentType;
 
-    //error
-    // setTimeout(() => {
-    //   setEnableVerifyOCRAddressProof(false);
-    //   setAddressProofOCRStatus(false);
-    //   setAddressTypeOCRImages([]);
-    //   setAddressTypeClickedPhotoText('');
-    //   setAddressTypeOCRText('Capture front image');
-    //   setEnableVerifyOCRAddressProof(false);
-
-    //   setLoading(false);
-    // }, 1000);
-
-    setAddressProofOCRCount((prev) => prev + 1);
+    if (
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Driving license'
+    ) {
+      ocrDocumentType = 'DL';
+    } else if (
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID'
+    ) {
+      ocrDocumentType = 'VOTER';
+    } else if (
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Passport'
+    ) {
+      ocrDocumentType = 'PASSPORT';
+    } else {
+      ocrDocumentType = 'AADHAR';
+    }
 
     const data = new FormData();
     data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
-    data.append('document_type', 'DL');
+    data.append('document_type', ocrDocumentType);
     data.append('field_name', 'selected_address_proof');
     data.append('file', addressTypeOCRImages[0]);
     if (values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID') {
@@ -718,10 +709,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       },
     })
       .then((data) => {
-        console.log('OCR_RES', data);
+        setValues(data.full_lead);
         setToastMessage('Information fetched Successfully');
         setEnableOCRAddressProof(false);
         setAddressProofOCRStatus(true);
+        setLoading(false);
       })
       .catch((error) => {
         console.log('OCR_ERR', error);
@@ -734,10 +726,32 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setAddressTypeClickedPhotoText('');
         setAddressTypeOCRText('Capture front image');
         setEnableVerifyOCRAddressProof(false);
+        setLoading(false);
       });
-
-    setLoading(false);
   };
+
+  useEffect(() => {
+    if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
+      // setEnableOCRAddressProof(false);
+      setAddressProofOCRStatus(true);
+    }
+  }, [values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type]);
+
+  useEffect(() => {
+    const keysToCheck = ['VOTER', 'PASSPORT', 'DL'];
+
+    if (
+      keysToCheck.some((key) => {
+        if (
+          values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_count?.hasOwnProperty(key)
+        ) {
+          return true;
+        }
+      })
+    ) {
+      setAddressDisableFields(false);
+    }
+  }, [values?.applicants]);
 
   return (
     <>
@@ -797,7 +811,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          (!idTypeOCRStatus && idTypeOCRCount < 3)
+          idDisableFields
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
@@ -991,7 +1005,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           !values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          (!addressProofOCRStatus && addressProofOCRCount < 3)
+          addressDisableFields
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
         onBlur={(e) => {
