@@ -871,14 +871,19 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
           }
           name='terms-agreed'
-          onTouchEnd={(e) => {
+          onTouchEnd={async (e) => {
             if (!e.target.checked) {
               setFieldValue(
                 `applicants[${activeIndex}].personal_details.selected_address_proof`,
                 '',
               );
               setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
-
+              setEkycAddressStatus(false);
+              if (values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR') {
+                if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+                  console.log('remove aadhar pdf from address proof uploads');
+                }
+              }
               setRequiredFieldsStatus((prev) => ({
                 ...prev,
                 selected_address_proof: false,
@@ -908,7 +913,30 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                   `applicants[${activeIndex}].personal_details.address_proof_number`,
                   null,
                 );
-
+                // (id_type AADHAR and ekyc_verified) upload aadharPdf to address_proof_photos
+                if (values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR') {
+                  if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+                    const aadharPdf = values?.applicants[
+                      activeIndex
+                    ]?.applicant_details?.document_meta?.id_proof_photos.find((data) => {
+                      if (data?.document_type === 'EKYC') {
+                        return data;
+                      }
+                    });
+                    // await editFieldsById(
+                    //   values?.applicants[activeIndex]?.applicant_details?.id,
+                    //   'applicant',
+                    //   {
+                    //     document_meta,
+                    //   },
+                    //   {
+                    //     headers: {
+                    //       Authorization: token,
+                    //     },
+                    //   },
+                    // );
+                  }
+                }
                 setRequiredFieldsStatus((prev) => ({
                   ...prev,
                   selected_address_proof: true,
@@ -1434,6 +1462,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           setOpenEkycPopup={setOpenEkycPopup}
           setLoading={setLoading}
           field_name={field_name}
+          setRequiredFieldsStatus={setRequiredFieldsStatus}
         />
       </DynamicDrawer>
     </>

@@ -37,9 +37,11 @@ export default function ValidateScan({
   consent,
   setLoading,
   field_name,
+  setRequiredFieldsStatus,
 }) {
   const { setToastMessage, values, activeIndex, setValues } = useContext(LeadContext);
-  const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
+  const { setErrorToastMessage, setErrorToastSubMessage, token, setFieldValue } =
+    useContext(AuthContext);
   // storing current selected scan meta data
   const [validateScanObj, setValidateScanObj] = useState({});
   const [disableCapture, setdisableCapture] = useState(false);
@@ -168,15 +170,20 @@ export default function ValidateScan({
           },
         },
       );
-      const res = await getDashboardLeadById(
-        values?.applicants[activeIndex]?.applicant_details?.lead_id,
-        {
-          headers: {
-            Authorization: token,
-          },
-        },
+      if (field_name === 'id_type') {
+        setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, maskedAadhar);
+        setRequiredFieldsStatus((prev) => ({ ...prev, id_number: true }));
+      } else {
+        setFieldValue(
+          `applicants[${activeIndex}].personal_details.address_proof_number`,
+          maskedAadhar,
+        );
+        setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: true }));
+      }
+      setFieldValue(
+        `applicants[${activeIndex}].applicant_details.extra_params.is_ekyc_performed`,
+        true,
       );
-      setValues(res);
       setErrorToastMessage(error.response.data.error);
       setErrorToastSubMessage(error.response.data.details.errMsg);
       console.log(error);
@@ -306,4 +313,5 @@ ValidateScan.propTypes = {
   field_name: PropTypes.string,
   setIsAadharInputDrawer: PropTypes.func,
   setAadhaarNo: PropTypes.func,
+  setRequiredFieldsStatus: PropTypes.func,
 };

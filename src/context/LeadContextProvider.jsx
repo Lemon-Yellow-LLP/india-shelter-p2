@@ -475,12 +475,47 @@ const LeadContextProvider = ({ children }) => {
         setAddressDisableFields(true);
       }
     }
-
     if (formik?.values?.applicants?.length !== coApplicants?.length) {
       coApplicantDrawerUpdate(formik?.values?.applicants);
     }
   }, [formik?.values?.applicants]);
 
+  useEffect(() => {
+    if (ekycIDStatus || ekycAddressStatus) {
+      console.log('updating values');
+      const updateProgressAfterEkyc = async () => {
+        Promise.all([
+          await updateProgressApplicantSteps(
+            'applicant_details',
+            formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params
+              ?.required_fields_status,
+            'applicant',
+          ),
+          await updateProgressApplicantSteps(
+            'personal_details',
+            formik?.values?.applicants[activeIndex]?.personal_details?.extra_params
+              ?.required_fields_status,
+            'personal',
+          ),
+          await updateProgressApplicantSteps(
+            'address_detail',
+            formik?.values?.applicants[activeIndex]?.address_detail?.extra_params
+              ?.required_fields_status,
+            'address',
+          ),
+          await updateProgressUploadDocumentSteps(
+            formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params
+              ?.upload_required_fields_status,
+          ),
+        ])
+          .then(() => console.log('updated progress after successful ekyc'))
+          .catch(() => console.log('error updating progress after successful ekyc'));
+      };
+      updateProgressAfterEkyc();
+    } else {
+      console.log('failed ekyc');
+    }
+  }, [ekycIDStatus, ekycAddressStatus]);
   useEffect(() => {
     console.log('Lead Context Values', formik.values);
     console.log(formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count);
