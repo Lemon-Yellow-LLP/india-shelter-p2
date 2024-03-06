@@ -384,31 +384,6 @@ const WorkIncomeDetails = () => {
           setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
         }
       }
-      // else {
-      //   let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
-      //   let addData = { ...clonedCoApplicantValues.work_income_detail, [name]: e.value };
-      //   if (requiredFieldsStatus && !requiredFieldsStatus[name]) {
-      //     setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
-      //   }
-
-      //   await addApi('work-income', {
-      //     ...addData,
-      //     applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
-      //   })
-      //     .then(async (res) => {
-      //       setFieldValue(`applicants[${activeIndex}].work_income_detail.id`, res.id);
-      //       await editFieldsById(
-      //         values?.applicants?.[activeIndex]?.applicant_details?.id,
-      //         'applicant',
-      //         { work_income_detail: res.id },
-      //       );
-      //       return res;
-      //     })
-      //     .catch((err) => {
-      //       console.log(err);
-      //       return err;
-      //     });
-      // }
     },
     [values, requiredFieldsStatus, setRequiredFieldsStatus],
   );
