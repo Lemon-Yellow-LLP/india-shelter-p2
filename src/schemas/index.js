@@ -55,7 +55,7 @@ const applicantSchema = Yup.object().shape({
   }),
 
   personal_details: Yup.object().shape({
-    how_would_you_like_to_proceed: Yup.string().required('This field is mandatory.'),
+    // how_would_you_like_to_proceed: Yup.string().required('This field is mandatory.'),
     id_type: Yup.string().required('This field is mandatory.'),
     id_number: Yup.string().when('id_type', (value, schema) => {
       if (value[0] === 'Passport') {
