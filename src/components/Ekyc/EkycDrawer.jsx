@@ -178,6 +178,9 @@ export default function EkycDrawer({
         },
       );
       setValues(res.lead);
+      setRequiredFieldsStatus(
+        res?.lead?.applicants[activeIndex]?.personal_details?.extra_params?.required_fields_status,
+      );
       setToastMessage('Information fetched Successfully');
     } catch (error) {
       console.log(error);

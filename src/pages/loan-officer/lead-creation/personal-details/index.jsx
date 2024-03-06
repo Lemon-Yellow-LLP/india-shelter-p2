@@ -38,8 +38,7 @@ const PersonalDetails = () => {
   });
 
   const [openExistingPopup, setOpenExistingPopup] = useState(
-    values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
-      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
       !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done
       ? true
       : false,
@@ -246,7 +245,6 @@ const PersonalDetails = () => {
 
   useEffect(() => {
     if (
-      values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
       values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
       !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done
     ) {
@@ -255,7 +253,6 @@ const PersonalDetails = () => {
       setOpenExistingPopup(false);
     }
   }, [
-    values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed,
     values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
     values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done,
   ]);

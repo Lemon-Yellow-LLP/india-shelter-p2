@@ -2037,11 +2037,7 @@ const UploadDocuments = ({ activeIndex }) => {
                     touched?.applicants &&
                     touched.applicants?.[activeIndex]?.personal_details?.id_type
                   }
-                  disabled={
-                    !!isQaulifierActivated ||
-                    (idDisableFields &&
-                      values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR')
-                  }
+                  disabled={!!isQaulifierActivated}
                   disableOption={
                     values?.applicants[activeIndex]?.personal_details?.selected_address_proof
                   }
@@ -2358,12 +2354,7 @@ const UploadDocuments = ({ activeIndex }) => {
                     touched?.applicants &&
                     touched.applicants?.[activeIndex]?.personal_details?.selected_address_proof
                   }
-                  disabled={
-                    !!isQaulifierActivated ||
-                    (addressDisableFields &&
-                      values?.applicants?.[activeIndex]?.personal_details
-                        ?.selected_address_proof === 'AADHAR')
-                  }
+                  disabled={!!isQaulifierActivated}
                   disableOption={values?.applicants?.[activeIndex]?.personal_details?.id_type}
                   onBlur={(e) => {
                     handleBlur(e);

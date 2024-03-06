@@ -64,7 +64,6 @@ export const newCoApplicantValues = {
     },
   },
   personal_details: {
-    how_would_you_like_to_proceed: null,
     id_type: null,
     id_number: '',
     selected_address_proof: null,
@@ -89,7 +88,6 @@ export const newCoApplicantValues = {
       progress: 20,
       is_existing_done: false,
       required_fields_status: {
-        how_would_you_like_to_proceed: false,
         id_type: false,
         id_number: false,
         selected_address_proof: false,
