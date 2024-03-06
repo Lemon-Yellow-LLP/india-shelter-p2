@@ -31,7 +31,9 @@ export const ekycMethods = [
 
 // generate aadhaar otp returns otpTxnId which is required in validate otp
 let otpTxnId;
-
+const biometricKey =
+  import.meta.env.VITE_MANTRA_BIOMETRIC_KEY ||
+  '0635457cb5902550bab01d6a3864deeab3c6cfb8012306d7716311b4b1a20a84f5ad74a58815';
 export default function EkycDrawer({
   setOpenEkycPopup,
   setLoading,
@@ -67,11 +69,7 @@ export default function EkycDrawer({
   const [disableFields, setDisableFields] = useState(false);
 
   useEffect(() => {
-    if (
-      !ecsBioHelper.init(
-        '0929343689fd09b252906caca8612081858126cb315c367ff43462c320559b63b3f9ee1f2dfb',
-      )
-    ) {
+    if (!ecsBioHelper.init(biometricKey)) {
       console.log('ecsBioHelper terminate');
     }
   }, []);
