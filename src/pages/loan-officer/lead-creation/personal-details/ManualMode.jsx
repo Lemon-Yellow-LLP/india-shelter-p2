@@ -23,6 +23,7 @@ import { IconThumb } from '../../../../assets/icons';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
 import EkycDrawer from '../../../../components/Ekyc/EkycDrawer';
 import OCRDropdown from '../../../../components/DropDown/OCRDropdown';
+import generateImageWithTextWatermark from '../../../../utils/GenerateImageWithTextWatermark';
 
 function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields, setLoading }) {
   const {
@@ -70,7 +71,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setValues,
   } = useContext(LeadContext);
 
-  const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
+  const { setErrorToastMessage, setErrorToastSubMessage, token, loAllDetails } =
+    useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
@@ -616,7 +618,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setAddressTypeOCRImages((prev) => [...prev, e.target.files[0]]);
   };
 
-  const verifyOCRIdType = (e) => {
+  const verifyOCRIdType = async (e) => {
     setIdTypeOCRCount((prev) => prev + 1);
     setLoading(true);
 
@@ -638,9 +640,74 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
     data.append('document_type', ocrDocumentType);
     data.append('field_name', 'id_type');
-    data.append('file', idTypeOCRImages[0]);
+    // data.append('file', idTypeOCRImages[0]);
+
+    const filename = idTypeOCRImages[0].name;
+
+    await generateImageWithTextWatermark(
+      values?.lead?.id,
+      loAllDetails?.employee_code,
+      loAllDetails?.first_name,
+      loAllDetails?.middle_name,
+      loAllDetails?.last_name,
+      19.235259,
+      72.986254,
+      idTypeOCRImages[0],
+    )
+      .then(async (image) => {
+        if (image?.fileSize > 5000000) {
+          const options = {
+            maxSizeMB: 4,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+          };
+          const compressedFile = await imageCompression(image, options);
+          const compressedImageFile = new File([compressedFile], filename, {
+            type: compressedFile.type,
+          });
+          data.append('file', compressedImageFile);
+        } else {
+          data.append('file', image);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     if (values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID') {
-      data.append('file', idTypeOCRImages[1]);
+      // data.append('file', idTypeOCRImages[1]);
+
+      const secondfilename = idTypeOCRImages[1].name;
+
+      await generateImageWithTextWatermark(
+        values?.lead?.id,
+        loAllDetails?.employee_code,
+        loAllDetails?.first_name,
+        loAllDetails?.middle_name,
+        loAllDetails?.last_name,
+        19.235259,
+        72.986254,
+        idTypeOCRImages[1],
+      )
+        .then(async (image) => {
+          if (image?.fileSize > 5000000) {
+            const options = {
+              maxSizeMB: 4,
+              maxWidthOrHeight: 1920,
+              useWebWorker: true,
+            };
+            const compressedFile = await imageCompression(image, options);
+            const compressedImageFile = new File([compressedFile], secondfilename, {
+              type: compressedFile.type,
+            });
+            data.append('file', compressedImageFile);
+          } else {
+            data.append('file', image);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
 
     performOcr(data, {
@@ -651,6 +718,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     })
       .then((data) => {
         setValues(data.full_lead);
+        setRequiredFieldsStatus(
+          data.full_lead.applicants?.[activeIndex]?.personal_details.extra_params
+            .required_fields_status,
+        );
         setToastMessage('Information fetched Successfully');
         setEnableOCRIdType(false);
         setIdTypeOCRStatus(true);
@@ -671,7 +742,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       });
   };
 
-  const verifyOCRAddressType = (e) => {
+  const verifyOCRAddressType = async (e) => {
     setAddressProofOCRCount((prev) => prev + 1);
     setLoading(true);
 
@@ -697,9 +768,72 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
     data.append('document_type', ocrDocumentType);
     data.append('field_name', 'selected_address_proof');
-    data.append('file', addressTypeOCRImages[0]);
+    // data.append('file', addressTypeOCRImages[0]);
+
+    const filename = addressTypeOCRImages[0].name;
+
+    await generateImageWithTextWatermark(
+      values?.lead?.id,
+      loAllDetails?.employee_code,
+      loAllDetails?.first_name,
+      loAllDetails?.middle_name,
+      loAllDetails?.last_name,
+      19.235259,
+      72.986254,
+      addressTypeOCRImages[0],
+    )
+      .then(async (image) => {
+        if (image?.fileSize > 5000000) {
+          const options = {
+            maxSizeMB: 4,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+          };
+          const compressedFile = await imageCompression(image, options);
+          const compressedImageFile = new File([compressedFile], filename, {
+            type: compressedFile.type,
+          });
+          data.append('file', compressedImageFile);
+        } else {
+          data.append('file', image);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     if (values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID') {
-      data.append('file', addressTypeOCRImages[1]);
+      const secondfilename = addressTypeOCRImages[1].name;
+
+      await generateImageWithTextWatermark(
+        values?.lead?.id,
+        loAllDetails?.employee_code,
+        loAllDetails?.first_name,
+        loAllDetails?.middle_name,
+        loAllDetails?.last_name,
+        19.235259,
+        72.986254,
+        addressTypeOCRImages[1],
+      )
+        .then(async (image) => {
+          if (image?.fileSize > 5000000) {
+            const options = {
+              maxSizeMB: 4,
+              maxWidthOrHeight: 1920,
+              useWebWorker: true,
+            };
+            const compressedFile = await imageCompression(image, options);
+            const compressedImageFile = new File([compressedFile], secondfilename, {
+              type: compressedFile.type,
+            });
+            data.append('file', compressedImageFile);
+          } else {
+            data.append('file', image);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
 
     performOcr(data, {
@@ -710,6 +844,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     })
       .then((data) => {
         setValues(data.full_lead);
+        setRequiredFieldsStatus(
+          data.full_lead.applicants?.[activeIndex]?.personal_details.extra_params
+            .required_fields_status,
+        );
         setToastMessage('Information fetched Successfully');
         setEnableOCRAddressProof(false);
         setAddressProofOCRStatus(true);
@@ -811,7 +949,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          idDisableFields
+          (!idTypeOCRStatus && idTypeOCRCount < 3)
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
@@ -926,7 +1064,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             );
           }}
           disabled={
-            idDisableFields || !values?.applicants?.[activeIndex]?.personal_details?.id_type
+            values?.applicants[activeIndex]?.applicant_details.selected_address_ocr_status ||
+            idDisableFields ||
+            !values?.applicants?.[activeIndex]?.personal_details?.id_type
               ? true
               : values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN'
               ? true
@@ -1005,7 +1145,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           !values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          addressDisableFields
+          (!addressProofOCRStatus && addressProofOCRCount < 3)
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
         onBlur={(e) => {
