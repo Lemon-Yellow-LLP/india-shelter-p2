@@ -1234,7 +1234,7 @@ export default function AddressDetails() {
                     >
                       <span
                         className={`${
-                          index ==
+                          data.value ==
                           values?.applicants?.[activeIndex]?.address_detail
                             ?.current_no_of_year_residing
                             ? 'text-secondary-green font-semibold'
@@ -1786,7 +1786,7 @@ export default function AddressDetails() {
                     >
                       <span
                         className={`${
-                          index ==
+                          data.value ==
                           values?.applicants?.[activeIndex]?.address_detail
                             ?.additional_no_of_year_residing
                             ? values?.applicants?.[activeIndex]?.address_detail?.extra_params

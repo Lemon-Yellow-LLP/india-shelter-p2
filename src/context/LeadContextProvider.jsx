@@ -419,14 +419,12 @@ const LeadContextProvider = ({ children }) => {
       ) {
         // successful Ekyc (default is_ekyc_verified=false)
         if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
-          console.log('successfull ekyc');
           setEnableEkycIdtype(false);
           setEkycIDStatus(true);
           setIdDisableFields(true);
           setAddressDisableFields(true);
         } else {
           // unsuccessful Ekyc
-          console.log('unsuccessful ekyc from leadContext');
           setEnableEkycIdtype(true);
           setEkycIDStatus(false);
           setIdDisableFields(false);
@@ -434,7 +432,6 @@ const LeadContextProvider = ({ children }) => {
         }
       } else {
         // ekyc didn't perfomed
-        console.log('first time ekyc');
         setEnableEkycIdtype(true);
         setEkycIDStatus(false);
         setIdDisableFields(true);
@@ -453,14 +450,12 @@ const LeadContextProvider = ({ children }) => {
       ) {
         // successful Ekyc (default is_ekyc_verified=false)
         if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
-          console.log('successfull ekyc');
           setEnableEKYCAddressProof(false);
           setEkycAddressStatus(true);
           setIdDisableFields(true);
           setAddressDisableFields(true);
         } else {
           // unsuccessful Ekyc
-          console.log('unsuccessful ekyc from leadContext');
           setEnableEKYCAddressProof(true);
           setEkycAddressStatus(false);
           setIdDisableFields(false);
@@ -468,7 +463,6 @@ const LeadContextProvider = ({ children }) => {
         }
       } else {
         // ekyc didn't perfomed
-        console.log('first time ekyc');
         setEnableEKYCAddressProof(true);
         setEkycAddressStatus(false);
         setIdDisableFields(true);
@@ -518,17 +512,6 @@ const LeadContextProvider = ({ children }) => {
   }, [ekycIDStatus, ekycAddressStatus]);
   useEffect(() => {
     console.log('Lead Context Values', formik.values);
-    console.log(formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count);
-    if (!!formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count) {
-      let ocrData = formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count;
-
-      let ocrCount;
-      for (let i in ocrData) {
-        console.log(ocrData[i]);
-        ocrCount = ocrCount + Number(ocrData[i]);
-      }
-      console.log(ocrCount);
-    }
   }, [formik.values]);
 
   return (

@@ -9,12 +9,7 @@ import EkycOtpInput from '../OtpInput/EkycOtpInput';
 import ValidateScan from './ValidateScan';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
-import {
-  editFieldsById,
-  generateEkycOtp,
-  getDashboardLeadById,
-  validateEkycOtp,
-} from '../../global';
+import { editFieldsById, generateEkycOtp, validateEkycOtp } from '../../global';
 import TextInput from '../TextInput';
 
 // Add ekyc methods

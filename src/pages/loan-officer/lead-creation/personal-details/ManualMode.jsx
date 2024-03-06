@@ -92,62 +92,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [openEkycPopup, setOpenEkycPopup] = useState(false);
   const [field_name, setField_name] = useState(null);
 
-  // console.log('enableOCRIdType', enableOCRIdType);
-  // console.log('enableVerifyOCRIdType', enableVerifyOCRIdType);
-  // console.log('idTypeOCRText', idTypeOCRText);
-  // console.log('idTypeClickedPhotoText', idTypeClickedPhotoText);
-  // console.log('idTypeOCRStatus', idTypeOCRStatus);
-  // console.log('idTypeOCRImages', idTypeOCRImages);
-  // console.log('addressTypeOCRImages', addressTypeOCRImages);
-  console.log(idTypeOCRCount, addressProofOCRCount);
-
-  useEffect(() => {
-    console.log('idTypeOcr', enableOCRIdType, 'addressProofOcr', enableOCRAddressProof);
-  }, [enableOCRIdType, enableOCRAddressProof]);
-
-  // useEffect(() => {
-  //   if (
-  //     !(idTypeOCRStatus && addressProofOCRStatus) &&
-  //     (idTypeOCRCount !== 3 || addressProofOCRCount !== 3)
-  //   ) {
-  //     console.log('disable fields from manual mode');
-  //     setDisableFields(true);
-  //   } else {
-  //     console.log('unlock fields from manual mode');
-  //     setDisableFields(false);
-  //   }
-  // }, [
-  //   idTypeOCRStatus,
-  //   addressProofOCRStatus,
-  //   idTypeOCRCount,
-  //   addressProofOCRCount,
-  //   enableOCRIdType,
-  //   enableOCRAddressProof,
-  // ]);
-
-  useEffect(() => {
-    if (!idTypeOCRStatus && idTypeOCRCount !== 3) {
-      setIdDisableFields(true);
-    } else {
-      setIdDisableFields(false);
-    }
-  }, [
-    idTypeOCRStatus,
-    addressProofOCRStatus,
-    idTypeOCRCount,
-    addressProofOCRCount,
-    enableOCRIdType,
-    enableOCRAddressProof,
-  ]);
-
-  useEffect(() => {
-    if (!addressProofOCRStatus && addressProofOCRCount !== 3) {
-      setAddressDisableFields(true);
-    } else {
-      setAddressDisableFields(false);
-    }
-  }, []);
-
   useEffect(() => {
     if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
       var dateParts = values?.applicants[activeIndex]?.applicant_details?.date_of_birth.split('-');
@@ -237,27 +181,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       }
 
       if (e === 'PAN' || e === 'Driving license' || e === 'Voter ID' || e === 'Passport') {
-        setEnableVerifyOCRIdType(false);
-        setIdTypeOCRStatus(false);
-        setIdTypeOCRImages([]);
-        setIdTypeClickedPhotoText('');
-        setIdTypeOCRText('Capture front image');
-        setEnableVerifyOCRIdType(false);
-
-        setEnableOCRIdType(true);
-
         setEnableEkycIdtype(false);
       } else if (e === 'AADHAR') {
-        setEnableVerifyOCRIdType(false);
-        setIdTypeOCRStatus(false);
-        setIdTypeOCRImages([]);
-        setIdTypeClickedPhotoText('');
-        setIdTypeOCRText('Capture front image');
-        setEnableVerifyOCRIdType(false);
-
         setEnableEkycIdtype(true);
-
-        setEnableOCRIdType(false);
       }
     },
     [requiredFieldsStatus],
@@ -276,20 +202,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       }));
       if (e === 'Driving license' || e === 'Voter ID' || e === 'Passport') {
         setEnableEKYCAddressProof(false);
-        setAddressProofOCRStatus(false);
-        setAddressTypeOCRImages([]);
-        setAddressTypeClickedPhotoText('');
-        setAddressTypeOCRText('Capture front image');
-        setEnableVerifyOCRAddressProof(false);
-        setEnableOCRAddressProof(true);
       } else if (e === 'AADHAR') {
         setEnableEKYCAddressProof(false);
-        setAddressProofOCRStatus(false);
-        setAddressTypeOCRImages([]);
-        setAddressTypeClickedPhotoText('');
-        setAddressTypeOCRText('Capture front image');
-        setEnableVerifyOCRAddressProof(false);
-        setEnableOCRAddressProof(false);
       }
     },
     [requiredFieldsStatus],
@@ -807,8 +721,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          (!idTypeOCRStatus && idTypeOCRCount < 3) ||
-          values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAAR'
+          values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR'
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
@@ -872,16 +785,45 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
           name='terms-agreed'
           onTouchEnd={async (e) => {
-            if (!e.target.checked) {
+            const value = e.target.checked;
+            if (!value) {
               setFieldValue(
                 `applicants[${activeIndex}].personal_details.selected_address_proof`,
                 '',
               );
               setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
               setEkycAddressStatus(false);
+              setEnableEKYCAddressProof(false);
+              // (id_type AADHAR and ekyc_verified) remove uploaded aadharPdf from address_proof_photos
               if (values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR') {
                 if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
-                  console.log('remove aadhar pdf from address proof uploads');
+                  const document_meta =
+                    values?.applicants[activeIndex]?.applicant_details?.document_meta;
+                  const address_proof_photos_WithoutAadharPdf =
+                    document_meta.address_proof_photos.filter((data) => {
+                      if (data?.document_type !== 'EKYC') return data;
+                    });
+                  document_meta.address_proof_photos = address_proof_photos_WithoutAadharPdf;
+                  await editFieldsById(
+                    values?.applicants[activeIndex]?.applicant_details?.id,
+                    'applicant',
+                    {
+                      document_meta,
+                      extra_params: {
+                        ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                        upload_required_fields_status: {
+                          ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                            .upload_required_fields_status,
+                          address_proof: false,
+                        },
+                      },
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
                 }
               }
               setRequiredFieldsStatus((prev) => ({
@@ -923,18 +865,35 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                         return data;
                       }
                     });
-                    // await editFieldsById(
-                    //   values?.applicants[activeIndex]?.applicant_details?.id,
-                    //   'applicant',
-                    //   {
-                    //     document_meta,
-                    //   },
-                    //   {
-                    //     headers: {
-                    //       Authorization: token,
-                    //     },
-                    //   },
-                    // );
+                    const document_meta =
+                      values?.applicants[activeIndex]?.applicant_details?.document_meta;
+                    if (document_meta.hasOwnProperty('address_proof_photos')) {
+                      document_meta['address_proof_photos'].push(aadharPdf);
+                    } else {
+                      document_meta['address_proof_photos'] = [aadharPdf];
+                    }
+                    console.log('uploading pdf', value);
+                    await editFieldsById(
+                      values?.applicants[activeIndex]?.applicant_details?.id,
+                      'applicant',
+                      {
+                        document_meta,
+                        extra_params: {
+                          ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                          upload_required_fields_status: {
+                            ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                              .upload_required_fields_status,
+                            address_proof: true,
+                          },
+                        },
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+                    console.log('upload pdf done', value);
                   }
                 }
                 setRequiredFieldsStatus((prev) => ({
@@ -944,10 +903,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                 }));
               }
             }
-
             setFieldValue(
               `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
-              e.target.checked,
+              value,
             );
           }}
           disabled={
@@ -1032,8 +990,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           !values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAAR' ||
-          (!addressProofOCRStatus && addressProofOCRCount < 3)
+          values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR'
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
         onBlur={(e) => {
