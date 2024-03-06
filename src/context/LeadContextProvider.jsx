@@ -395,13 +395,13 @@ const LeadContextProvider = ({ children }) => {
         (e, index) => index === activeIndex || e.applicant_details.is_mobile_verified,
       );
 
-      // setIdTypeOCRStatus(false);
+      //Reset id type ocr states
       setIdTypeOCRImages([]);
       setIdTypeClickedPhotoText('');
       setIdTypeOCRText('Capture front image');
       setEnableVerifyOCRIdType(false);
 
-      // setAddressProofOCRStatus(false);
+      //Reset address type ocr states
       setAddressTypeOCRImages([]);
       setAddressTypeClickedPhotoText('');
       setAddressTypeOCRText('Capture front image');
@@ -412,7 +412,7 @@ const LeadContextProvider = ({ children }) => {
   }, [activeIndex, location.pathname]);
 
   useEffect(() => {
-    if (!!formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count) {
+    if (!!formik.values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_count) {
       let ocrData = formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_count;
 
       let ocrCount = 0;
@@ -424,16 +424,16 @@ const LeadContextProvider = ({ children }) => {
       setIdTypeOCRCount(0);
     }
 
-    if (formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_status) {
+    if (formik.values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status) {
       setIdTypeOCRStatus(true);
     } else {
       setIdTypeOCRStatus(false);
     }
 
     if (
-      formik.values?.applicants[activeIndex]?.personal_details.id_type &&
-      formik.values?.applicants[activeIndex]?.personal_details.id_type !== 'AADHAR' &&
-      !formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_status
+      formik.values?.applicants[activeIndex]?.personal_details?.id_type &&
+      formik.values?.applicants[activeIndex]?.personal_details?.id_type !== 'AADHAR' &&
+      !formik.values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status
     ) {
       setEnableOCRIdType(true);
     } else {
@@ -441,7 +441,7 @@ const LeadContextProvider = ({ children }) => {
     }
 
     if (
-      !!formik.values?.applicants[activeIndex]?.applicant_details.selected_address_proof_ocr_count
+      !!formik.values?.applicants[activeIndex]?.applicant_details?.selected_address_proof_ocr_count
     ) {
       let ocrData =
         formik.values?.applicants[activeIndex]?.applicant_details.selected_address_proof_ocr_count;
@@ -455,7 +455,7 @@ const LeadContextProvider = ({ children }) => {
       setAddressProofOCRCount(0);
     }
 
-    if (formik.values?.applicants[activeIndex]?.applicant_details.selected_address_ocr_status) {
+    if (formik.values?.applicants[activeIndex]?.applicant_details?.selected_address_ocr_status) {
       setAddressProofOCRStatus(true);
     } else {
       if (
@@ -466,10 +466,10 @@ const LeadContextProvider = ({ children }) => {
     }
 
     if (
-      formik.values?.applicants[activeIndex]?.personal_details.selected_address_proof &&
-      formik.values?.applicants[activeIndex]?.personal_details.selected_address_proof !==
+      formik.values?.applicants[activeIndex]?.personal_details?.selected_address_proof &&
+      formik.values?.applicants[activeIndex]?.personal_details?.selected_address_proof !==
         'AADHAR' &&
-      !formik.values?.applicants[activeIndex]?.applicant_details.selected_address_ocr_status &&
+      !formik.values?.applicants[activeIndex]?.applicant_details?.selected_address_ocr_status &&
       !formik.values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
     ) {
       setEnableOCRAddressProof(true);
@@ -483,7 +483,46 @@ const LeadContextProvider = ({ children }) => {
   }, [formik?.values?.applicants]);
 
   useEffect(() => {
-    // console.log('Lead Context Values', formik.values);
+    if (idTypeOCRStatus || addressProofOCRStatus) {
+      const updateCompleteProgress = async () => {
+        Promise.all([
+          await updateProgressApplicantSteps(
+            'applicant_details',
+            formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params
+              ?.required_fields_status,
+            'applicant',
+          ),
+          await updateProgressApplicantSteps(
+            'personal_details',
+            formik?.values?.applicants[activeIndex]?.personal_details?.extra_params
+              ?.required_fields_status,
+            'personal',
+          ),
+          await updateProgressApplicantSteps(
+            'address_detail',
+            formik?.values?.applicants[activeIndex]?.address_detail?.extra_params
+              ?.required_fields_status,
+            'address',
+          ),
+          await updateProgressUploadDocumentSteps(
+            formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params
+              ?.upload_required_fields_status,
+          ),
+        ])
+          .then(() => console.log('updated progress after successful ekyc'))
+          .catch(() => console.log('error updating progress after successful ekyc'));
+      };
+      updateCompleteProgress();
+    } else {
+      console.log('Ocr failed');
+    }
+  }, [
+    formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_status ||
+      formik.values?.applicants[activeIndex]?.applicant_details.selected_address_ocr_status,
+  ]);
+
+  useEffect(() => {
+    console.log('Lead Context Values', formik.values);
   }, [formik.values]);
 
   return (
