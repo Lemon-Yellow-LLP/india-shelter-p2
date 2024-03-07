@@ -51,6 +51,8 @@ const UploadDocuments = ({ activeIndex }) => {
     setFieldError,
     updateProgressUploadDocumentSteps,
     setCurrentStepIndex,
+    idDisableFields,
+    addressDisableFields,
   } = useContext(LeadContext);
   const [disablePhoneNumber, setDisablePhoneNumber] = useState(false);
   const [customerPhotos, setCustomerPhotos] = useState([]);
@@ -61,6 +63,7 @@ const UploadDocuments = ({ activeIndex }) => {
   const [idProofPhotos, setIdProofPhotos] = useState([]);
   const [idProofPhotosFile, setIdProofPhotosFile] = useState(null);
   const [idProofUploads, setIdProofUploads] = useState(null);
+  const [idProofPdf, setIdProofPdf] = useState(null);
   const [editIdProof, setEditIdProof] = useState({
     file: {},
     id: null,
@@ -70,6 +73,7 @@ const UploadDocuments = ({ activeIndex }) => {
   const [addressProofPhotos, setAddressProofPhotos] = useState([]);
   const [addressProofPhotosFile, setAddressProofPhotosFile] = useState(null);
   const [addressProofUploads, setAddressProofUploads] = useState(null);
+  const [addressProofPdf, setAddressProofPdf] = useState(null);
   const [editAddressProof, setEditAddressProof] = useState({
     file: {},
     id: null,
@@ -1749,19 +1753,31 @@ const UploadDocuments = ({ activeIndex }) => {
         setCustomerPhotos([]);
       }
       if (res.document_meta.id_proof_photos) {
-        const active_uploads = res.document_meta.id_proof_photos.filter((data) => {
-          if (data !== null)
-            return (
-              data.active === true &&
-              data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
-            );
+        const pdf = res.document_meta.id_proof_photos.find((data) => {
+          if (data !== null) {
+            if (data?.document_meta?.mimetype === 'application/pdf' && data.active === true) {
+              return data;
+            }
+          }
         });
-        if (active_uploads.length) {
-          setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
-          setIdProofPhotos(active_uploads);
+        if (pdf) {
+          setIdProofPdf(pdf);
+          setIdProofPhotos([1]);
         } else {
-          setIdProofUploads(null);
-          setIdProofPhotos([]);
+          const active_uploads = res.document_meta.id_proof_photos.filter((data) => {
+            if (data !== null)
+              return (
+                data.active === true &&
+                data.document_type == values?.applicants?.[activeIndex]?.personal_details?.id_type
+              );
+          });
+          if (active_uploads.length) {
+            setIdProofUploads({ type: 'id_proof_photos', data: active_uploads });
+            setIdProofPhotos(active_uploads);
+          } else {
+            setIdProofUploads(null);
+            setIdProofPhotos([]);
+          }
         }
       } else {
         setIdProofUploads(null);
@@ -1794,20 +1810,32 @@ const UploadDocuments = ({ activeIndex }) => {
         setPropertyPapers([]);
       }
       if (res.document_meta.address_proof_photos) {
-        const active_uploads = res.document_meta.address_proof_photos.filter((data) => {
-          if (data !== null)
-            return (
-              data.active === true &&
-              data.document_type ==
-                values?.applicants[activeIndex]?.personal_details?.selected_address_proof
-            );
+        const pdf = res.document_meta.address_proof_photos.find((data) => {
+          if (data !== null) {
+            if (data?.document_meta?.mimetype === 'application/pdf' && data.active === true) {
+              return data;
+            }
+          }
         });
-        if (active_uploads.length) {
-          setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
-          setAddressProofPhotos(active_uploads);
+        if (pdf) {
+          setAddressProofPdf(pdf);
+          setAddressProofPhotos([1]);
         } else {
-          setAddressProofUploads(null);
-          setAddressProofPhotos([]);
+          const active_uploads = res.document_meta.address_proof_photos.filter((data) => {
+            if (data !== null)
+              return (
+                data.active === true &&
+                data.document_type ==
+                  values?.applicants[activeIndex]?.personal_details?.selected_address_proof
+              );
+          });
+          if (active_uploads.length) {
+            setAddressProofUploads({ type: 'address_proof_photos', data: active_uploads });
+            setAddressProofPhotos(active_uploads);
+          } else {
+            setAddressProofUploads(null);
+            setAddressProofPhotos([]);
+          }
         }
       } else {
         setAddressProofUploads(null);
@@ -2018,99 +2046,114 @@ const UploadDocuments = ({ activeIndex }) => {
                   }}
                 />
 
-                <div>
-                  <label className='flex gap-0.5 items-center text-primary-black font-medium'>
-                    ID proof
-                    <span className='text-primary-red text-sm'>*</span>
-                  </label>
-                  <span
-                    className='mb-1.5 text-light-grey text-xs font-normal'
-                    dangerouslySetInnerHTML={{
-                      __html: 'File size should be less than 5MB',
-                    }}
+                {idDisableFields &&
+                values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified ? (
+                  <PdfAndImageUpload
+                    files={idProofPhotos}
+                    setFile={setIdProofPhotos}
+                    uploads={idProofUploads}
+                    setUploads={setIdProofUploads}
+                    setEdit={setEditIdProof}
+                    pdf={idProofPdf}
+                    setPdf={setPropertyPdf}
+                    label='ID proof'
+                    required
+                    setSingleFile={setIdProofPhotosFile}
+                    setLatLong={setIdProofLatLong}
+                    imageArrayBorder={true}
+                    errorMessage={
+                      preview === location.pathname &&
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                        ?.upload_required_fields_status?.id_proof == false
+                        ? 'This field is mandatory'
+                        : ''
+                    }
+                    message={idProofError}
+                    setMessage={setIdProofError}
+                    loader={idProofLoader}
+                    setLoader={setIdProofLoader}
+                    hideDeletePdf={true}
+                    viewPdf={true}
                   />
+                ) : (
+                  <div>
+                    <label className='flex gap-0.5 items-center text-primary-black font-medium'>
+                      ID proof
+                      <span className='text-primary-red text-sm'>*</span>
+                    </label>
+                    <span
+                      className='mb-1.5 text-light-grey text-xs font-normal'
+                      dangerouslySetInnerHTML={{
+                        __html: 'File size should be less than 5MB',
+                      }}
+                    />
 
-                  {isQaulifierActivated ? (
-                    <div
-                      className={`bg-white mt-1 border-x border-y rounded-lg px-2 pb-2 ${
-                        preview === location.pathname &&
-                        values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                          ?.upload_required_fields_status?.id_proof == false
-                          ? 'border-primary-red border-2'
-                          : 'border-stroke  border-1'
-                      }`}
-                    >
-                      <ImageUpload
-                        files={idProofPhotos}
-                        setFile={setIdProofPhotos}
-                        setSingleFile={setIdProofPhotosFile}
-                        uploads={idProofUploads}
-                        setUploads={setIdProofUploads}
-                        noBorder={true}
-                        setEdit={setEditIdProof}
-                        setLatLong={setIdProofLatLong}
-                        error={
+                    {isQaulifierActivated ? (
+                      <div
+                        className={`bg-white mt-1 border-x border-y rounded-lg px-2 pb-2 ${
                           preview === location.pathname &&
                           values?.applicants?.[activeIndex]?.applicant_details?.extra_params
                             ?.upload_required_fields_status?.id_proof == false
-                            ? 'This field is mandatory'
-                            : ''
-                        }
-                        message={idProofError}
-                        setMessage={setIdProofError}
-                        loader={idProofLoader}
-                        setLoader={setIdProofLoader}
-                      />
-
-                      <div
-                        className={`flex gap-2 justify-between border-x border-y ${
-                          editIdNumber ? '' : 'border-stroke'
-                        }  p-2 rounded`}
+                            ? 'border-primary-red border-2'
+                            : 'border-stroke  border-1'
+                        }`}
                       >
-                        <div className='flex gap-2 w-full'>
-                          <p className='text-dark-grey text-xs font-normal self-center'>
-                            {values?.applicants?.[activeIndex]?.personal_details?.id_type}:
-                          </p>
-                          <UploadDocsInput
-                            name={`applicants[${activeIndex}].personal_details.id_number`}
-                            value={values?.applicants?.[activeIndex]?.personal_details?.id_number}
-                            onChange={(e) => {
-                              e.target.value = e.target.value.toUpperCase();
-                              handleTextInputChange(e);
-                            }}
-                            error={errors.applicants?.[activeIndex]?.personal_details?.id_number}
-                            touched={
-                              touched?.applicants &&
-                              touched?.applicants?.[activeIndex]?.personal_details?.id_number
-                            }
-                            ref={idRef}
-                            disabled={editIdNumber ? false : true}
-                            onBlur={(e) => {
-                              handleBlur(e);
+                        <ImageUpload
+                          files={idProofPhotos}
+                          setFile={setIdProofPhotos}
+                          setSingleFile={setIdProofPhotosFile}
+                          uploads={idProofUploads}
+                          setUploads={setIdProofUploads}
+                          noBorder={true}
+                          setEdit={setEditIdProof}
+                          setLatLong={setIdProofLatLong}
+                          error={
+                            preview === location.pathname &&
+                            values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                              ?.upload_required_fields_status?.id_proof == false
+                              ? 'This field is mandatory'
+                              : ''
+                          }
+                          message={idProofError}
+                          setMessage={setIdProofError}
+                          loader={idProofLoader}
+                          setLoader={setIdProofLoader}
+                        />
 
-                              if (!errors.applicants?.[activeIndex]?.personal_details?.id_number) {
-                                editFieldsById(
-                                  values?.applicants?.[activeIndex]?.personal_details?.id,
-                                  'personal',
-                                  {
-                                    id_number: e.target.value,
-                                  },
-                                  {
-                                    headers: {
-                                      Authorization: token,
-                                    },
-                                  },
-                                );
+                        <div
+                          className={`flex gap-2 justify-between border-x border-y ${
+                            editIdNumber ? '' : 'border-stroke'
+                          }  p-2 rounded`}
+                        >
+                          <div className='flex gap-2 w-full'>
+                            <p className='text-dark-grey text-xs font-normal self-center'>
+                              {values?.applicants?.[activeIndex]?.personal_details?.id_type}:
+                            </p>
+                            <UploadDocsInput
+                              name={`applicants[${activeIndex}].personal_details.id_number`}
+                              value={values?.applicants?.[activeIndex]?.personal_details?.id_number}
+                              onChange={(e) => {
+                                e.target.value = e.target.value.toUpperCase();
+                                handleTextInputChange(e);
+                              }}
+                              error={errors.applicants?.[activeIndex]?.personal_details?.id_number}
+                              touched={
+                                touched?.applicants &&
+                                touched?.applicants?.[activeIndex]?.personal_details?.id_number
+                              }
+                              ref={idRef}
+                              disabled={editIdNumber ? false : true}
+                              onBlur={(e) => {
+                                handleBlur(e);
 
                                 if (
-                                  values?.applicants?.[activeIndex]?.personal_details?.id_type ===
-                                  'PAN'
+                                  !errors.applicants?.[activeIndex]?.personal_details?.id_number
                                 ) {
                                   editFieldsById(
-                                    values?.applicants?.[activeIndex]?.work_income_detail?.id,
-                                    'work-income',
+                                    values?.applicants?.[activeIndex]?.personal_details?.id,
+                                    'personal',
                                     {
-                                      pan_number: e.target.value,
+                                      id_number: e.target.value,
                                     },
                                     {
                                       headers: {
@@ -2118,163 +2161,181 @@ const UploadDocuments = ({ activeIndex }) => {
                                       },
                                     },
                                   );
-                                }
-                              }
-                            }}
-                            inputClasses='text-xs capitalize h-3'
-                            onKeyDown={(e) => {
-                              if (
-                                values?.applicants?.[activeIndex]?.personal_details?.id_type ===
-                                  'AADHAR' &&
-                                (e.key === 'ArrowUp' ||
-                                  e.key === 'ArrowDown' ||
-                                  e.key === 'ArrowLeft' ||
-                                  e.key === 'ArrowRight' ||
-                                  e.key === ' ' ||
-                                  e.keyCode === 32 ||
-                                  (e.keyCode >= 65 && e.keyCode <= 90))
-                              ) {
-                                e.preventDefault();
-                              }
-                            }}
-                          />
-                        </div>
-                        {idStatus !== 'Valid Match' &&
-                          (!editIdNumber ? (
-                            <p className='flex gap-1 items-center'>
-                              <svg
-                                width='16'
-                                height='16'
-                                viewBox='0 0 16 16'
-                                fill='none'
-                                xmlns='http://www.w3.org/2000/svg'
-                              >
-                                <path
-                                  d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
-                                  stroke='#E33439'
-                                  strokeLinecap='round'
-                                />
-                              </svg>
 
+                                  if (
+                                    values?.applicants?.[activeIndex]?.personal_details?.id_type ===
+                                    'PAN'
+                                  ) {
+                                    editFieldsById(
+                                      values?.applicants?.[activeIndex]?.work_income_detail?.id,
+                                      'work-income',
+                                      {
+                                        pan_number: e.target.value,
+                                      },
+                                      {
+                                        headers: {
+                                          Authorization: token,
+                                        },
+                                      },
+                                    );
+                                  }
+                                }
+                              }}
+                              inputClasses='text-xs capitalize h-3'
+                              onKeyDown={(e) => {
+                                if (
+                                  values?.applicants?.[activeIndex]?.personal_details?.id_type ===
+                                    'AADHAR' &&
+                                  (e.key === 'ArrowUp' ||
+                                    e.key === 'ArrowDown' ||
+                                    e.key === 'ArrowLeft' ||
+                                    e.key === 'ArrowRight' ||
+                                    e.key === ' ' ||
+                                    e.keyCode === 32 ||
+                                    (e.keyCode >= 65 && e.keyCode <= 90))
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            />
+                          </div>
+                          {idStatus !== 'Valid Match' &&
+                            (!editIdNumber ? (
+                              <p className='flex gap-1 items-center'>
+                                <svg
+                                  width='16'
+                                  height='16'
+                                  viewBox='0 0 16 16'
+                                  fill='none'
+                                  xmlns='http://www.w3.org/2000/svg'
+                                >
+                                  <path
+                                    d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
+                                    stroke='#E33439'
+                                    strokeLinecap='round'
+                                  />
+                                </svg>
+
+                                <span
+                                  className='text-primary-red text-xs font-normal'
+                                  onClick={() => setEditIdNumber(!editIdNumber)}
+                                >
+                                  Edit
+                                </span>
+                              </p>
+                            ) : (
                               <span
-                                className='text-primary-red text-xs font-normal'
+                                className='text-primary-red text-xs font-normal flex items-center'
                                 onClick={() => setEditIdNumber(!editIdNumber)}
                               >
-                                Edit
+                                Save
                               </span>
-                            </p>
-                          ) : (
-                            <span
-                              className='text-primary-red text-xs font-normal flex items-center'
-                              onClick={() => setEditIdNumber(!editIdNumber)}
-                            >
-                              Save
-                            </span>
-                          ))}
-                      </div>
-
-                      <div className='flex justify-between mt-1'>
-                        <div className='flex items-center gap-1'>
-                          {idStatus === 'Valid Match' ? (
-                            <>
-                              <svg
-                                width='18'
-                                height='18'
-                                viewBox='0 0 18 18'
-                                fill='none'
-                                xmlns='http://www.w3.org/2000/svg'
-                              >
-                                <path
-                                  d='M15 4.5L6.75 12.75L3 9'
-                                  stroke='#147257'
-                                  strokeWidth='1.5'
-                                  strokeLinecap='round'
-                                  strokeLinejoin='round'
-                                />
-                              </svg>
-                              <span className='text-secondary-green leading-5 text-xs font-normal'>
-                                Verified
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <svg
-                                width='16'
-                                height='16'
-                                viewBox='0 0 16 16'
-                                fill='none'
-                                xmlns='http://www.w3.org/2000/svg'
-                              >
-                                <g clipPath='url(#clip0_3732_51311)'>
-                                  <path
-                                    d='M8 5.28003V8.3867'
-                                    stroke='#E33439'
-                                    strokeWidth='1.5'
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                  />
-                                  <path
-                                    d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
-                                    fill='#E33439'
-                                  />
-                                  <path
-                                    d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
-                                    stroke='#E33439'
-                                    strokeWidth='1.5'
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                  />
-                                </g>
-                                <defs>
-                                  <clipPath id='clip0_3732_51311'>
-                                    <rect width='16' height='16' fill='white' />
-                                  </clipPath>
-                                </defs>
-                              </svg>
-                              <span className='text-primary-red leading-5 text-xs font-normal'>
-                                Not Verified
-                              </span>
-                            </>
-                          )}
+                            ))}
                         </div>
 
-                        {idStatus !== 'Valid Match' && (
-                          <p className='text-light-grey leading-5 text-xs font-normal'>
-                            Photo mandatory
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <ImageUpload
-                      files={idProofPhotos}
-                      setFile={setIdProofPhotos}
-                      setSingleFile={setIdProofPhotosFile}
-                      uploads={idProofUploads}
-                      setUploads={setIdProofUploads}
-                      setEdit={setEditIdProof}
-                      setLatLong={setIdProofLatLong}
-                      errorMessage={
-                        preview === location.pathname &&
-                        values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                          ?.upload_required_fields_status?.id_proof == false
-                          ? 'This field is mandatory'
-                          : ''
-                      }
-                      imageArrayBorder={true}
-                      message={idProofError}
-                      setMessage={setIdProofError}
-                      loader={idProofLoader}
-                      setLoader={setIdProofLoader}
-                    />
-                  )}
+                        <div className='flex justify-between mt-1'>
+                          <div className='flex items-center gap-1'>
+                            {idStatus === 'Valid Match' ? (
+                              <>
+                                <svg
+                                  width='18'
+                                  height='18'
+                                  viewBox='0 0 18 18'
+                                  fill='none'
+                                  xmlns='http://www.w3.org/2000/svg'
+                                >
+                                  <path
+                                    d='M15 4.5L6.75 12.75L3 9'
+                                    stroke='#147257'
+                                    strokeWidth='1.5'
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
+                                  />
+                                </svg>
+                                <span className='text-secondary-green leading-5 text-xs font-normal'>
+                                  Verified
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <svg
+                                  width='16'
+                                  height='16'
+                                  viewBox='0 0 16 16'
+                                  fill='none'
+                                  xmlns='http://www.w3.org/2000/svg'
+                                >
+                                  <g clipPath='url(#clip0_3732_51311)'>
+                                    <path
+                                      d='M8 5.28003V8.3867'
+                                      stroke='#E33439'
+                                      strokeWidth='1.5'
+                                      strokeLinecap='round'
+                                      strokeLinejoin='round'
+                                    />
+                                    <path
+                                      d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
+                                      fill='#E33439'
+                                    />
+                                    <path
+                                      d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
+                                      stroke='#E33439'
+                                      strokeWidth='1.5'
+                                      strokeLinecap='round'
+                                      strokeLinejoin='round'
+                                    />
+                                  </g>
+                                  <defs>
+                                    <clipPath id='clip0_3732_51311'>
+                                      <rect width='16' height='16' fill='white' />
+                                    </clipPath>
+                                  </defs>
+                                </svg>
+                                <span className='text-primary-red leading-5 text-xs font-normal'>
+                                  Not Verified
+                                </span>
+                              </>
+                            )}
+                          </div>
 
-                  {isQaulifierActivated && idStatus !== 'Valid Match' && (
-                    <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
-                      To be verified during the eligibility step
-                    </p>
-                  )}
-                </div>
+                          {idStatus !== 'Valid Match' && (
+                            <p className='text-light-grey leading-5 text-xs font-normal'>
+                              Photo mandatory
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <ImageUpload
+                        files={idProofPhotos}
+                        setFile={setIdProofPhotos}
+                        setSingleFile={setIdProofPhotosFile}
+                        uploads={idProofUploads}
+                        setUploads={setIdProofUploads}
+                        setEdit={setEditIdProof}
+                        setLatLong={setIdProofLatLong}
+                        errorMessage={
+                          preview === location.pathname &&
+                          values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                            ?.upload_required_fields_status?.id_proof == false
+                            ? 'This field is mandatory'
+                            : ''
+                        }
+                        imageArrayBorder={true}
+                        message={idProofError}
+                        setMessage={setIdProofError}
+                        loader={idProofLoader}
+                        setLoader={setIdProofLoader}
+                      />
+                    )}
+
+                    {isQaulifierActivated && idStatus !== 'Valid Match' && (
+                      <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
+                        To be verified during the eligibility step
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className='flex flex-col gap-5'>
@@ -2300,28 +2361,254 @@ const UploadDocuments = ({ activeIndex }) => {
                   }}
                 />
 
-                <div>
-                  <label className='flex gap-0.5 items-center text-primary-black font-medium'>
-                    Address proof
-                    <span className='text-primary-red text-sm'>*</span>
-                  </label>
-                  <span
-                    className='mb-1.5 text-light-grey text-xs font-normal'
-                    dangerouslySetInnerHTML={{
-                      __html: 'File size should be less than 5MB',
-                    }}
+                {addressDisableFields &&
+                values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified ? (
+                  <PdfAndImageUpload
+                    files={addressProofPhotos}
+                    setFile={setAddressProofPhotos}
+                    uploads={addressProofUploads}
+                    setUploads={setAddressProofUploads}
+                    setEdit={setEditAddressProof}
+                    pdf={addressProofPdf}
+                    setPdf={setAddressProofPdf}
+                    label='Address proof'
+                    required
+                    setSingleFile={setAddressProofPhotosFile}
+                    setLatLong={setAddressProofLatLong}
+                    imageArrayBorder={true}
+                    errorMessage={
+                      preview === location.pathname &&
+                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                        ?.upload_required_fields_status?.id_proof == false
+                        ? 'This field is mandatory'
+                        : ''
+                    }
+                    message={addressProofError}
+                    setMessage={setAddressProofError}
+                    loader={addressProofLoader}
+                    setLoader={setAddressProofLoader}
+                    hideDeletePdf={true}
+                    viewPdf={true}
                   />
+                ) : (
+                  <div>
+                    <label className='flex gap-0.5 items-center text-primary-black font-medium'>
+                      Address proof
+                      <span className='text-primary-red text-sm'>*</span>
+                    </label>
+                    <span
+                      className='mb-1.5 text-light-grey text-xs font-normal'
+                      dangerouslySetInnerHTML={{
+                        __html: 'File size should be less than 5MB',
+                      }}
+                    />
 
-                  {isQaulifierActivated ? (
-                    <div
-                      className={`bg-white mt-1 border-x border-y rounded-lg px-2 pb-2 ${
-                        preview === location.pathname &&
-                        values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                          ?.upload_required_fields_status?.address_proof == false
-                          ? 'border-primary-red border-2'
-                          : 'border-stroke border-1'
-                      }`}
-                    >
+                    {isQaulifierActivated ? (
+                      <div
+                        className={`bg-white mt-1 border-x border-y rounded-lg px-2 pb-2 ${
+                          preview === location.pathname &&
+                          values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                            ?.upload_required_fields_status?.address_proof == false
+                            ? 'border-primary-red border-2'
+                            : 'border-stroke border-1'
+                        }`}
+                      >
+                        <ImageUpload
+                          files={addressProofPhotos}
+                          setFile={setAddressProofPhotos}
+                          setSingleFile={setAddressProofPhotosFile}
+                          setEdit={setEditAddressProof}
+                          uploads={addressProofUploads}
+                          setUploads={setAddressProofUploads}
+                          setLatLong={setAddressProofLatLong}
+                          noBorder={true}
+                          message={addressProofError}
+                          setMessage={setAddressProofError}
+                          loader={addressProofLoader}
+                          setLoader={setAddressProofLoader}
+                        />
+
+                        <div
+                          className={`flex gap-2 justify-between border-x border-y ${
+                            editAddressNumber ? '' : 'border-stroke'
+                          }  p-2 rounded`}
+                        >
+                          <div className='flex gap-2 w-full'>
+                            <p className='text-dark-grey text-xs font-normal self-center'>
+                              {
+                                values?.applicants?.[activeIndex]?.personal_details
+                                  ?.selected_address_proof
+                              }
+                              :
+                            </p>
+                            <UploadDocsInput
+                              name={`applicants[${activeIndex}].personal_details.address_proof_number`}
+                              value={
+                                values?.applicants?.[activeIndex]?.personal_details
+                                  ?.address_proof_number
+                              }
+                              onChange={(e) => {
+                                e.target.value = e.target.value.toUpperCase();
+                                handleTextInputChange(e);
+                              }}
+                              error={
+                                errors.applicants?.[activeIndex]?.personal_details
+                                  ?.address_proof_number
+                              }
+                              touched={
+                                touched?.applicants &&
+                                touched?.applicants?.[activeIndex]?.personal_details
+                                  ?.address_proof_number
+                              }
+                              ref={addressRef}
+                              disabled={editAddressNumber ? false : true}
+                              onBlur={(e) => {
+                                handleBlur(e);
+
+                                if (
+                                  !errors.applicants?.[activeIndex]?.personal_details
+                                    ?.address_proof_number
+                                ) {
+                                  editFieldsById(
+                                    values?.applicants?.[activeIndex]?.personal_details?.id,
+                                    'personal',
+                                    {
+                                      address_proof_number: e.target.value,
+                                    },
+                                    {
+                                      headers: {
+                                        Authorization: token,
+                                      },
+                                    },
+                                  );
+                                }
+                              }}
+                              inputClasses='text-xs capitalize h-3'
+                              onKeyDown={(e) => {
+                                if (
+                                  values?.applicants?.[activeIndex]?.personal_details
+                                    ?.selected_address_proof === 'AADHAR' &&
+                                  (e.key === 'ArrowUp' ||
+                                    e.key === 'ArrowDown' ||
+                                    e.key === 'ArrowLeft' ||
+                                    e.key === 'ArrowRight' ||
+                                    e.key === ' ' ||
+                                    e.keyCode === 32 ||
+                                    (e.keyCode >= 65 && e.keyCode <= 90))
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            />
+                          </div>
+
+                          {addressStatus !== 'Valid Match' &&
+                            (!editAddressNumber ? (
+                              <p className='flex gap-1 items-center'>
+                                <svg
+                                  width='16'
+                                  height='16'
+                                  viewBox='0 0 16 16'
+                                  fill='none'
+                                  xmlns='http://www.w3.org/2000/svg'
+                                >
+                                  <path
+                                    d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
+                                    stroke='#E33439'
+                                    strokeLinecap='round'
+                                  />
+                                </svg>
+
+                                <span
+                                  className='text-primary-red text-xs font-normal'
+                                  onClick={() => setEditAddressNumber(!editAddressNumber)}
+                                >
+                                  Edit
+                                </span>
+                              </p>
+                            ) : (
+                              <span
+                                className='text-primary-red text-xs font-normal flex items-center'
+                                onClick={() => setEditAddressNumber(!editAddressNumber)}
+                              >
+                                Save
+                              </span>
+                            ))}
+                        </div>
+
+                        <div className='flex justify-between mt-1'>
+                          <div className='flex items-center gap-1'>
+                            {addressStatus === 'Valid Match' ? (
+                              <>
+                                <svg
+                                  width='18'
+                                  height='18'
+                                  viewBox='0 0 18 18'
+                                  fill='none'
+                                  xmlns='http://www.w3.org/2000/svg'
+                                >
+                                  <path
+                                    d='M15 4.5L6.75 12.75L3 9'
+                                    stroke='#147257'
+                                    strokeWidth='1.5'
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
+                                  />
+                                </svg>
+                                <span className='text-secondary-green leading-5 text-xs font-normal'>
+                                  Verified
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <svg
+                                  width='16'
+                                  height='16'
+                                  viewBox='0 0 16 16'
+                                  fill='none'
+                                  xmlns='http://www.w3.org/2000/svg'
+                                >
+                                  <g clipPath='url(#clip0_3732_51311)'>
+                                    <path
+                                      d='M8 5.28003V8.3867'
+                                      stroke='#E33439'
+                                      strokeWidth='1.5'
+                                      strokeLinecap='round'
+                                      strokeLinejoin='round'
+                                    />
+                                    <path
+                                      d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
+                                      fill='#E33439'
+                                    />
+                                    <path
+                                      d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
+                                      stroke='#E33439'
+                                      strokeWidth='1.5'
+                                      strokeLinecap='round'
+                                      strokeLinejoin='round'
+                                    />
+                                  </g>
+                                  <defs>
+                                    <clipPath id='clip0_3732_51311'>
+                                      <rect width='16' height='16' fill='white' />
+                                    </clipPath>
+                                  </defs>
+                                </svg>
+                                <span className='text-primary-red leading-5 text-xs font-normal'>
+                                  Not Verified
+                                </span>
+                              </>
+                            )}
+                          </div>
+
+                          {addressStatus !== 'Valid Match' && (
+                            <p className='text-light-grey leading-5 text-xs font-normal'>
+                              Photo mandatory
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
                       <ImageUpload
                         files={addressProofPhotos}
                         setFile={setAddressProofPhotos}
@@ -2330,223 +2617,28 @@ const UploadDocuments = ({ activeIndex }) => {
                         uploads={addressProofUploads}
                         setUploads={setAddressProofUploads}
                         setLatLong={setAddressProofLatLong}
-                        noBorder={true}
+                        errorMessage={
+                          preview === location.pathname &&
+                          values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                            ?.upload_required_fields_status?.address_proof == false
+                            ? 'This field is mandatory'
+                            : ''
+                        }
+                        imageArrayBorder={true}
                         message={addressProofError}
                         setMessage={setAddressProofError}
                         loader={addressProofLoader}
                         setLoader={setAddressProofLoader}
                       />
+                    )}
 
-                      <div
-                        className={`flex gap-2 justify-between border-x border-y ${
-                          editAddressNumber ? '' : 'border-stroke'
-                        }  p-2 rounded`}
-                      >
-                        <div className='flex gap-2 w-full'>
-                          <p className='text-dark-grey text-xs font-normal self-center'>
-                            {
-                              values?.applicants?.[activeIndex]?.personal_details
-                                ?.selected_address_proof
-                            }
-                            :
-                          </p>
-                          <UploadDocsInput
-                            name={`applicants[${activeIndex}].personal_details.address_proof_number`}
-                            value={
-                              values?.applicants?.[activeIndex]?.personal_details
-                                ?.address_proof_number
-                            }
-                            onChange={(e) => {
-                              e.target.value = e.target.value.toUpperCase();
-                              handleTextInputChange(e);
-                            }}
-                            error={
-                              errors.applicants?.[activeIndex]?.personal_details
-                                ?.address_proof_number
-                            }
-                            touched={
-                              touched?.applicants &&
-                              touched?.applicants?.[activeIndex]?.personal_details
-                                ?.address_proof_number
-                            }
-                            ref={addressRef}
-                            disabled={editAddressNumber ? false : true}
-                            onBlur={(e) => {
-                              handleBlur(e);
-
-                              if (
-                                !errors.applicants?.[activeIndex]?.personal_details
-                                  ?.address_proof_number
-                              ) {
-                                editFieldsById(
-                                  values?.applicants?.[activeIndex]?.personal_details?.id,
-                                  'personal',
-                                  {
-                                    address_proof_number: e.target.value,
-                                  },
-                                  {
-                                    headers: {
-                                      Authorization: token,
-                                    },
-                                  },
-                                );
-                              }
-                            }}
-                            inputClasses='text-xs capitalize h-3'
-                            onKeyDown={(e) => {
-                              if (
-                                values?.applicants?.[activeIndex]?.personal_details
-                                  ?.selected_address_proof === 'AADHAR' &&
-                                (e.key === 'ArrowUp' ||
-                                  e.key === 'ArrowDown' ||
-                                  e.key === 'ArrowLeft' ||
-                                  e.key === 'ArrowRight' ||
-                                  e.key === ' ' ||
-                                  e.keyCode === 32 ||
-                                  (e.keyCode >= 65 && e.keyCode <= 90))
-                              ) {
-                                e.preventDefault();
-                              }
-                            }}
-                          />
-                        </div>
-
-                        {addressStatus !== 'Valid Match' &&
-                          (!editAddressNumber ? (
-                            <p className='flex gap-1 items-center'>
-                              <svg
-                                width='16'
-                                height='16'
-                                viewBox='0 0 16 16'
-                                fill='none'
-                                xmlns='http://www.w3.org/2000/svg'
-                              >
-                                <path
-                                  d='M2.66797 13.3334H13.3346M9.05873 4.03665C9.05873 4.03665 9.05873 5.00532 10.0274 5.97399C10.9961 6.94265 11.9647 6.94265 11.9647 6.94265M5.22775 11.5486L7.26195 11.258C7.55537 11.2161 7.82729 11.0801 8.03688 10.8705L12.9334 5.97398C13.4684 5.439 13.4684 4.57163 12.9334 4.03665L11.9647 3.06798C11.4298 2.533 10.5624 2.533 10.0274 3.06798L5.13088 7.9645C4.92129 8.17409 4.78533 8.44601 4.74341 8.73944L4.45281 10.7736C4.38824 11.2257 4.7757 11.6131 5.22775 11.5486Z'
-                                  stroke='#E33439'
-                                  strokeLinecap='round'
-                                />
-                              </svg>
-
-                              <span
-                                className='text-primary-red text-xs font-normal'
-                                onClick={() => setEditAddressNumber(!editAddressNumber)}
-                              >
-                                Edit
-                              </span>
-                            </p>
-                          ) : (
-                            <span
-                              className='text-primary-red text-xs font-normal flex items-center'
-                              onClick={() => setEditAddressNumber(!editAddressNumber)}
-                            >
-                              Save
-                            </span>
-                          ))}
-                      </div>
-
-                      <div className='flex justify-between mt-1'>
-                        <div className='flex items-center gap-1'>
-                          {addressStatus === 'Valid Match' ? (
-                            <>
-                              <svg
-                                width='18'
-                                height='18'
-                                viewBox='0 0 18 18'
-                                fill='none'
-                                xmlns='http://www.w3.org/2000/svg'
-                              >
-                                <path
-                                  d='M15 4.5L6.75 12.75L3 9'
-                                  stroke='#147257'
-                                  strokeWidth='1.5'
-                                  strokeLinecap='round'
-                                  strokeLinejoin='round'
-                                />
-                              </svg>
-                              <span className='text-secondary-green leading-5 text-xs font-normal'>
-                                Verified
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <svg
-                                width='16'
-                                height='16'
-                                viewBox='0 0 16 16'
-                                fill='none'
-                                xmlns='http://www.w3.org/2000/svg'
-                              >
-                                <g clipPath='url(#clip0_3732_51311)'>
-                                  <path
-                                    d='M8 5.28003V8.3867'
-                                    stroke='#E33439'
-                                    strokeWidth='1.5'
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                  />
-                                  <path
-                                    d='M8 10.72C8.27614 10.72 8.5 10.4961 8.5 10.22C8.5 9.94383 8.27614 9.71997 8 9.71997C7.72386 9.71997 7.5 9.94383 7.5 10.22C7.5 10.4961 7.72386 10.72 8 10.72Z'
-                                    fill='#E33439'
-                                  />
-                                  <path
-                                    d='M7.9987 14.1666C11.4045 14.1666 14.1654 11.4057 14.1654 7.99992C14.1654 4.59416 11.4045 1.83325 7.9987 1.83325C4.59294 1.83325 1.83203 4.59416 1.83203 7.99992C1.83203 11.4057 4.59294 14.1666 7.9987 14.1666Z'
-                                    stroke='#E33439'
-                                    strokeWidth='1.5'
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                  />
-                                </g>
-                                <defs>
-                                  <clipPath id='clip0_3732_51311'>
-                                    <rect width='16' height='16' fill='white' />
-                                  </clipPath>
-                                </defs>
-                              </svg>
-                              <span className='text-primary-red leading-5 text-xs font-normal'>
-                                Not Verified
-                              </span>
-                            </>
-                          )}
-                        </div>
-
-                        {addressStatus !== 'Valid Match' && (
-                          <p className='text-light-grey leading-5 text-xs font-normal'>
-                            Photo mandatory
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <ImageUpload
-                      files={addressProofPhotos}
-                      setFile={setAddressProofPhotos}
-                      setSingleFile={setAddressProofPhotosFile}
-                      setEdit={setEditAddressProof}
-                      uploads={addressProofUploads}
-                      setUploads={setAddressProofUploads}
-                      setLatLong={setAddressProofLatLong}
-                      errorMessage={
-                        preview === location.pathname &&
-                        values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                          ?.upload_required_fields_status?.address_proof == false
-                          ? 'This field is mandatory'
-                          : ''
-                      }
-                      imageArrayBorder={true}
-                      message={addressProofError}
-                      setMessage={setAddressProofError}
-                      loader={addressProofLoader}
-                      setLoader={setAddressProofLoader}
-                    />
-                  )}
-
-                  {isQaulifierActivated && addressStatus !== 'Valid Match' && (
-                    <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
-                      To be verified during the eligibility step
-                    </p>
-                  )}
-                </div>
+                    {isQaulifierActivated && addressStatus !== 'Valid Match' && (
+                      <p className='text-xs leading-[18px] font-normal text-light-grey mt-1'>
+                        To be verified during the eligibility step
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {values?.property_details?.property_identification_is !== 'not-yet' &&

@@ -33,8 +33,8 @@ const LeadContextProvider = ({ children }) => {
   const [showMap, setShowMap] = useState(false);
 
   //p3 states
-  const [idDisableFields, setIdDisableFields] = useState(false);
-  const [addressDisableFields, setAddressDisableFields] = useState(false);
+  const [idDisableFields, setIdDisableFields] = useState(true);
+  const [addressDisableFields, setAddressDisableFields] = useState(true);
 
   //ocr states
   const [enableOCRIdType, setEnableOCRIdType] = useState(false);
@@ -57,6 +57,12 @@ const LeadContextProvider = ({ children }) => {
 
   const [idTypeOCRImages, setIdTypeOCRImages] = useState([]);
   const [addressTypeOCRImages, setAddressTypeOCRImages] = useState([]);
+
+  // ekyc fields
+  const [enableEkycIdtype, setEnableEkycIdtype] = useState(false);
+  const [ekycIDStatus, setEkycIDStatus] = useState(false);
+  const [enableEKYCAddressProof, setEnableEKYCAddressProof] = useState(false);
+  const [ekycAddressStatus, setEkycAddressStatus] = useState(false);
 
   const { token } = useContext(AuthContext);
 
@@ -406,7 +412,12 @@ const LeadContextProvider = ({ children }) => {
       setAddressTypeClickedPhotoText('');
       setAddressTypeOCRText('Capture front image');
       setEnableVerifyOCRAddressProof(false);
-
+      setEnableEkycIdtype(false);
+      setEkycIDStatus(false);
+      setIdDisableFields(true);
+      setEnableEKYCAddressProof(false);
+      setEkycAddressStatus(false);
+      setAddressDisableFields(true);
       formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
     }
   }, [activeIndex, location.pathname]);
@@ -477,6 +488,66 @@ const LeadContextProvider = ({ children }) => {
       setEnableOCRAddressProof(false);
     }
 
+    // did user left on id_type being aadhar
+    if (formik?.values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR') {
+      // did user perfomed ekyc atleast once irrespective of success or fail
+      if (
+        formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
+      ) {
+        setIdDisableFields(false);
+        // successful Ekyc (default is_ekyc_verified=false)
+        if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+          setEnableEkycIdtype(false);
+          setEkycIDStatus(true);
+          setAddressDisableFields(true);
+        } else {
+          // unsuccessful Ekyc
+          setEnableEkycIdtype(true);
+          setEkycIDStatus(false);
+          setAddressDisableFields(true);
+        }
+      } else {
+        // ekyc didn't perfomed
+        setEnableEkycIdtype(true);
+        setEkycIDStatus(false);
+        setIdDisableFields(true);
+        setAddressDisableFields(true);
+      }
+    }
+
+    // did user left on selected_address_proof being aadhar
+    if (
+      formik?.values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ===
+      'AADHAR'
+    ) {
+      // did user perfomed ekyc atleast once irrespective of success or fail
+      if (
+        formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
+      ) {
+        // successful Ekyc (default is_ekyc_verified=false)
+        if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+          setEnableEKYCAddressProof(false);
+          setEkycAddressStatus(true);
+          setAddressDisableFields(true);
+        } else {
+          // unsuccessful Ekyc
+          if (
+            formik?.values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+          ) {
+            setEnableEKYCAddressProof(false);
+          } else {
+            setEnableEKYCAddressProof(true);
+          }
+          setEkycAddressStatus(false);
+          setAddressDisableFields(false);
+        }
+      } else {
+        // ekyc didn't perfomed
+        setEnableEKYCAddressProof(true);
+        setEkycAddressStatus(false);
+        setAddressDisableFields(true);
+      }
+    }
     if (formik?.values?.applicants?.length !== coApplicants?.length) {
       coApplicantDrawerUpdate(formik?.values?.applicants);
     }
@@ -521,6 +592,42 @@ const LeadContextProvider = ({ children }) => {
       formik.values?.applicants[activeIndex]?.applicant_details.selected_address_ocr_status,
   ]);
 
+  useEffect(() => {
+    if (ekycIDStatus || ekycAddressStatus) {
+      console.log('updating values');
+      const updateProgressAfterEkyc = async () => {
+        Promise.all([
+          await updateProgressApplicantSteps(
+            'applicant_details',
+            formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params
+              ?.required_fields_status,
+            'applicant',
+          ),
+          await updateProgressApplicantSteps(
+            'personal_details',
+            formik?.values?.applicants[activeIndex]?.personal_details?.extra_params
+              ?.required_fields_status,
+            'personal',
+          ),
+          await updateProgressApplicantSteps(
+            'address_detail',
+            formik?.values?.applicants[activeIndex]?.address_detail?.extra_params
+              ?.required_fields_status,
+            'address',
+          ),
+          await updateProgressUploadDocumentSteps(
+            formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params
+              ?.upload_required_fields_status,
+          ),
+        ])
+          .then(() => console.log('updated progress after successful ekyc'))
+          .catch(() => console.log('error updating progress after successful ekyc'));
+      };
+      updateProgressAfterEkyc();
+    } else {
+      console.log('failed ekyc');
+    }
+  }, [ekycIDStatus, ekycAddressStatus]);
   useEffect(() => {
     console.log('Lead Context Values', formik.values);
   }, [formik.values]);
@@ -601,6 +708,14 @@ const LeadContextProvider = ({ children }) => {
         setIdTypeOCRImages,
         addressTypeOCRImages,
         setAddressTypeOCRImages,
+        enableEkycIdtype,
+        setEnableEkycIdtype,
+        ekycIDStatus,
+        setEkycIDStatus,
+        enableEKYCAddressProof,
+        setEnableEKYCAddressProof,
+        ekycAddressStatus,
+        setEkycAddressStatus,
       }}
     >
       {children}
