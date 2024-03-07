@@ -6,18 +6,10 @@ import Fingerprint_scanning from '../../assets/anim/Fingerprint_Scanning.json';
 import Fingerprint_success from '../../assets/anim/Fingerprint_Success.json';
 import Fingerprint_failure from '../../assets/anim/Fingerprint_Failure.json';
 
-import Iris_scanning from '../../assets/anim/Iris_Scanning.json';
-import Iris_success from '../../assets/anim/Iris_Success.json';
-import Iris_failure from '../../assets/anim/Iris_Failure.json';
-
-import FaceAuth_scanning from '../../assets/anim/FaceAuth_Scanning.json';
-import FaceAuth_success from '../../assets/anim/FaceAuth_Success.json';
-import FaceAuth_failure from '../../assets/anim/FaceAuth_Failure.json';
-
 import { useContext, useEffect, useState } from 'react';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
-import { performBiometric } from '../../global';
+import { editFieldsById, performBiometric } from '../../global';
 
 // biometric screen meta based on type
 let obj = [
@@ -30,24 +22,6 @@ let obj = [
     scanSuccessAnimation: Fingerprint_success,
     scanFailureAnimation: Fingerprint_failure,
   },
-  {
-    title: 'IRIS scan',
-    scanLoadingMsg: 'Place your EYE in front of machine',
-    scanSuccessMsg: 'Successfully captured information, validating Aadhar details',
-    scanFailureMsg: 'Unable to capture information, Place your EYE in front of machine',
-    scanLoadingAnimation: Iris_scanning,
-    scanSuccessAnimation: Iris_success,
-    scanFailureAnimation: Iris_failure,
-  },
-  {
-    title: 'Face Authentication',
-    scanLoadingMsg: 'Place your Face in front of Machine',
-    scanSuccessMsg: 'Successfully captured information, validating Aadhar details',
-    scanFailureMsg: 'Unable to capture information, Place your Face in front of Machine',
-    scanLoadingAnimation: FaceAuth_scanning,
-    scanSuccessAnimation: FaceAuth_success,
-    scanFailureAnimation: FaceAuth_failure,
-  },
 ];
 
 // type = "FMR", "iris", "faceAuth"
@@ -58,14 +32,19 @@ export default function ValidateScan({
   setOpenEkycPopup,
   ecsBioHelper,
   aadhaarNo,
+  setAadhaarNo,
+  setIsAadharInputDrawer,
   consent,
   setLoading,
+  field_name,
+  setRequiredFieldsStatus,
 }) {
-  const { setToastMessage, values } = useContext(LeadContext);
-  const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
+  const { setToastMessage, values, activeIndex, setValues } = useContext(LeadContext);
+  const { setErrorToastMessage, setErrorToastSubMessage, token, setFieldValue } =
+    useContext(AuthContext);
   // storing current selected scan meta data
   const [validateScanObj, setValidateScanObj] = useState({});
-  const [disableFields, setDisableFields] = useState(false);
+  const [disableCapture, setdisableCapture] = useState(false);
 
   // capture biometric
   const [isCapturing, SetIsCapturing] = useState(true);
@@ -75,16 +54,12 @@ export default function ValidateScan({
   useEffect(() => {
     if (type === 'FMR') {
       setValidateScanObj(obj[0]);
-    } else if (type === 'iris') {
-      setValidateScanObj(obj[1]);
-    } else {
-      setValidateScanObj(obj[2]);
     }
   }, [type]);
 
   // capture biometric
   const captureScan = async () => {
-    setDisableFields(true);
+    setdisableCapture(true);
 
     // setting it to 0 for FMR
     var deviceSelectedIndex = 0;
@@ -105,20 +80,20 @@ export default function ValidateScan({
         otpValue,
         wadh,
         function (responseXml) {
+          console.log(responseXml, ' data from mantra device');
           if (responseXml.includes('errCode="0"')) {
             setBiometricData(responseXml);
             SetIsCapturing(false);
-            setDisableFields(false);
+            setdisableCapture(false);
             setIsCaptureSuccessful(true);
           } else {
             SetIsCapturing(false);
-            setDisableFields(false);
+            setdisableCapture(false);
             setIsCaptureSuccessful(false);
           }
-          // performKyc(aadhaarNumber, consent, responseXml, 'FMR', fType, otpValue != null);
         },
         function (errorMessage) {
-          setDisableFields(false);
+          setdisableCapture(false);
           setIsCaptureSuccessful(false);
           SetIsCapturing(false);
           console.log(errorMessage);
@@ -131,6 +106,26 @@ export default function ValidateScan({
   const validateCapturedScan = async () => {
     try {
       setLoading(true);
+      const data =
+        field_name === 'id_type'
+          ? { is_ekyc_performed_id: true }
+          : { is_ekyc_performed_address: true };
+
+      await editFieldsById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+        'applicant',
+        {
+          extra_params: {
+            ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+            ...data,
+          },
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
       const res = await performBiometric(
         {
           aadhaar_number: aadhaarNo, //<---- Enter aadhar number here
@@ -139,7 +134,8 @@ export default function ValidateScan({
           bio_type: 'FMR',
           fmr_type: '2',
           uses_otp: 'false',
-          applicant_id: values?.lead?.id,
+          applicant_id: values?.applicants[activeIndex]?.applicant_details?.id,
+          field_name,
         },
         {
           headers: {
@@ -148,8 +144,66 @@ export default function ValidateScan({
         },
       );
       console.log(res);
+      setValues(res.lead);
+      setRequiredFieldsStatus(
+        res?.lead?.applicants[activeIndex]?.personal_details?.extra_params?.required_fields_status,
+      );
       setToastMessage('Information fetched Successfully');
     } catch (error) {
+      const maskedPortion = aadhaarNo.slice(0, 8).replace(/\d/g, '*');
+      const maskedAadhar = maskedPortion + aadhaarNo.slice(8);
+      let data =
+        field_name === 'id_type'
+          ? {
+              id_number: maskedAadhar,
+              extra_params: {
+                ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                required_fields_status: {
+                  ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                    .required_fields_status,
+                  id_number: true,
+                },
+              },
+            }
+          : {
+              address_proof_number: maskedAadhar,
+              extra_params: {
+                ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                required_fields_status: {
+                  ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                    .required_fields_status,
+                  address_proof_number: true,
+                },
+              },
+            };
+      await editFieldsById(
+        values?.applicants?.[activeIndex]?.personal_details?.id,
+        'personal',
+        data,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      if (field_name === 'id_type') {
+        setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, maskedAadhar);
+        setRequiredFieldsStatus((prev) => ({ ...prev, id_number: true }));
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.extra_params.is_ekyc_performed_id`,
+          true,
+        );
+      } else {
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.extra_params.is_ekyc_performed_address`,
+          true,
+        );
+        setFieldValue(
+          `applicants[${activeIndex}].personal_details.address_proof_number`,
+          maskedAadhar,
+        );
+        setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: true }));
+      }
       setErrorToastMessage(error.response.data.error);
       setErrorToastSubMessage(error.response.data.details.errMsg);
       console.log(error);
@@ -157,6 +211,9 @@ export default function ValidateScan({
       setOpenEkycPopup(false);
       setPerformVerification(false);
       setLoading(false);
+      setBiometricData(null);
+      setAadhaarNo('');
+      setIsAadharInputDrawer(true);
     }
   };
 
@@ -212,7 +269,7 @@ export default function ValidateScan({
             />
             <Button
               primary
-              disabled={disableFields}
+              disabled={disableCapture}
               onClick={captureScan}
               inputClasses='!py-3 mt-6 w-full'
             >
@@ -273,4 +330,8 @@ ValidateScan.propTypes = {
   aadhaarNo: PropTypes.string,
   consent: PropTypes.string,
   setLoading: PropTypes.func,
+  field_name: PropTypes.string,
+  setIsAadharInputDrawer: PropTypes.func,
+  setAadhaarNo: PropTypes.func,
+  setRequiredFieldsStatus: PropTypes.func,
 };

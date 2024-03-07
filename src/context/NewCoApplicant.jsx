@@ -40,6 +40,8 @@ export const newCoApplicantValues = {
       voter_ran: null,
       pf_ran: null,
       gst_ran: null,
+      is_ekyc_performed_id: false,
+      is_ekyc_performed_address: false,
       upload_required_fields_status: {
         customer_photo: false,
         id_proof: false,

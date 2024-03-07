@@ -9,7 +9,7 @@ import EkycOtpInput from '../OtpInput/EkycOtpInput';
 import ValidateScan from './ValidateScan';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
-import { generateEkycOtp, validateEkycOtp } from '../../global';
+import { editFieldsById, generateEkycOtp, validateEkycOtp } from '../../global';
 import TextInput from '../TextInput';
 
 // Add ekyc methods
@@ -22,22 +22,22 @@ export const ekycMethods = [
     label: 'Biometrics',
     value: 'FMR',
   },
-  {
-    label: 'IRIS',
-    value: 'iris',
-  },
-  {
-    label: 'Face Authentication',
-    value: 'faceAuthentication',
-  },
 ];
 
 // generate aadhaar otp returns otpTxnId which is required in validate otp
 let otpTxnId;
-
-export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
+const biometricKey =
+  import.meta.env.VITE_MANTRA_BIOMETRIC_KEY ||
+  '0635457cb5902550bab01d6a3864deeab3c6cfb8012306d7716311b4b1a20a84f5ad74a58815';
+export default function EkycDrawer({
+  setOpenEkycPopup,
+  setLoading,
+  field_name,
+  setRequiredFieldsStatus,
+}) {
   const ecsBioHelper = window.ecsBioHelper;
-  const { setToastMessage, values } = useContext(LeadContext);
+  const { setToastMessage, values, setValues, activeIndex, setFieldValue } =
+    useContext(LeadContext);
   const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
 
   // aadharInputDrawser states
@@ -64,11 +64,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   const [disableFields, setDisableFields] = useState(false);
 
   useEffect(() => {
-    if (
-      !ecsBioHelper.init(
-        '0929343689fd09b252906caca8612081858126cb315c367ff43462c320559b63b3f9ee1f2dfb',
-      )
-    ) {
+    if (!ecsBioHelper.init(biometricKey)) {
       console.log('ecsBioHelper terminate');
     }
   }, []);
@@ -146,13 +142,19 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
   const handleVerifyAadharOtp = async () => {
     try {
       setLoading(true);
-      const res = await validateEkycOtp(
+      const data =
+        field_name === 'id_type'
+          ? { is_ekyc_performed_id: true }
+          : { is_ekyc_performed_address: true };
+
+      await editFieldsById(
+        values?.applicants?.[activeIndex]?.applicant_details?.id,
+        'applicant',
         {
-          aadhaar_number: aadhaarNo,
-          // consent: consent,
-          otp_txn_id: otpTxnId,
-          otp_value: otp,
-          applicant_id: values?.lead?.id,
+          extra_params: {
+            ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+            ...data,
+          },
         },
         {
           headers: {
@@ -160,17 +162,95 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
           },
         },
       );
-      console.log(res);
+      const res = await validateEkycOtp(
+        {
+          aadhaar_number: aadhaarNo,
+          consent: consent,
+          otp_txn_id: otpTxnId,
+          otp_value: otp,
+          applicant_id: values?.applicants[activeIndex]?.applicant_details?.id,
+          field_name,
+          // remove condition after adding ekyc credentials
+          fail: otp === '123456' && true,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      setValues(res.lead);
+      setRequiredFieldsStatus(
+        res?.lead?.applicants[activeIndex]?.personal_details?.extra_params?.required_fields_status,
+      );
       setToastMessage('Information fetched Successfully');
     } catch (error) {
       console.log(error);
-      setErrorToastMessage(error.response.data.error);
-      setErrorToastSubMessage(error.response.data.details.errMsg);
+      const maskedPortion = aadhaarNo.slice(0, 8).replace(/\d/g, '*');
+      const maskedAadhar = maskedPortion + aadhaarNo.slice(8);
+      let data =
+        field_name === 'id_type'
+          ? {
+              id_number: maskedAadhar,
+              extra_params: {
+                ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                required_fields_status: {
+                  ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                    .required_fields_status,
+                  id_number: true,
+                },
+              },
+            }
+          : {
+              address_proof_number: maskedAadhar,
+              extra_params: {
+                ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+                required_fields_status: {
+                  ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                    .required_fields_status,
+                  address_proof_number: true,
+                },
+              },
+            };
+      await editFieldsById(
+        values?.applicants?.[activeIndex]?.personal_details?.id,
+        'personal',
+        data,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+      if (field_name === 'id_type') {
+        setFieldValue(`applicants[${activeIndex}].personal_details.id_number`, maskedAadhar);
+        setRequiredFieldsStatus((prev) => ({ ...prev, id_number: true }));
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.extra_params.is_ekyc_performed_id`,
+          true,
+        );
+      } else {
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.extra_params.is_ekyc_performed_address`,
+          true,
+        );
+        setFieldValue(
+          `applicants[${activeIndex}].personal_details.address_proof_number`,
+          maskedAadhar,
+        );
+        setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: true }));
+      }
+
+      setErrorToastMessage(error?.response?.data?.error);
+      setErrorToastSubMessage(error?.response?.data?.details?.errMsg);
     } finally {
       setLoading(false);
       setOpenEkycPopup(false);
       setPerformVerification(false);
       setIsAadharInputDrawer(true);
+      setAadhaarNo('');
+      setIsConsentChecked(false);
+      setOtp('');
     }
   };
 
@@ -205,7 +285,12 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
     <div className='w-full px-4 py-6 flex flex-col gap-3'>
       <div className='flex justify-between items-center'>
         <p className='font-semibold'>Enter Aadhar No</p>
-        <button onClick={() => setOpenEkycPopup(false)}>
+        <button
+          onClick={() => {
+            setOpenEkycPopup(false);
+            setAadhaarNo('');
+          }}
+        >
           <IconClose />
         </button>
       </div>
@@ -294,7 +379,7 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
             required
             onSendOTPClick={sendMobileOtp}
             setIsVerifyOtp={setIsVerifyOtp}
-            defaultResendTime={10}
+            defaultResendTime={30}
             otp={otp}
             setOtp={setOtp}
           />
@@ -317,14 +402,18 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
         setOpenEkycPopup={setOpenEkycPopup}
         ecsBioHelper={ecsBioHelper}
         aadhaarNo={aadhaarNo}
+        setAadhaarNo={setAadhaarNo}
         consent={consent}
         setLoading={setLoading}
+        field_name={field_name}
+        setIsAadharInputDrawer={setIsAadharInputDrawer}
+        setRequiredFieldsStatus={setRequiredFieldsStatus}
       />
     )
   ) : (
     <>
       <div className='relative'>
-        <div className='w-full h-[550px] flex flex-col'>
+        <div className='w-full h-[494px] flex flex-col'>
           <div className='flex justify-between px-4 py-2 border-b border-lighter-grey'>
             <p className='font-semibold'>Select verification method</p>
             <button
@@ -410,4 +499,5 @@ export default function EkycDrawer({ setOpenEkycPopup, setLoading }) {
 EkycDrawer.propTypes = {
   setOpenEkycPopup: PropTypes.func,
   setLoading: PropTypes.func,
+  field_name: PropTypes.string,
 };

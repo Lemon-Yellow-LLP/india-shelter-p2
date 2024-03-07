@@ -53,7 +53,11 @@ const ApplicantDetails = () => {
     removeCoApplicant,
     coApplicantDrawerUpdate,
   } = useContext(LeadContext);
-
+  console.log(
+    values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified,
+    activeIndex,
+    ' from applicant_details',
+  );
   const { setOtpFailCount, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
 
   const { loData } = useContext(AuthContext);
@@ -427,7 +431,7 @@ const ApplicantDetails = () => {
       }).then(async (res) => {
         setShowOTPInput(true);
         setHasSentOTPOnce(true);
-        setToastMessage('OTP has been sent to your mail id');
+        // setToastMessage('OTP has been sent to your mail id');
 
         await axios
           .post(
@@ -926,7 +930,8 @@ const ApplicantDetails = () => {
             }}
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+              values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified
             }
             onChange={handleFirstNameChange}
             inputClasses='capitalize'
@@ -943,7 +948,8 @@ const ApplicantDetails = () => {
             }
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+              values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified
             }
             onBlur={async (e) => {
               handleBlur(e);
@@ -1001,7 +1007,8 @@ const ApplicantDetails = () => {
             placeholder='Eg: Swami, Singh'
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+              values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified
             }
             name={`applicants[${activeIndex}].applicant_details.last_name`}
             onChange={handleTextInputChange}
@@ -1059,7 +1066,11 @@ const ApplicantDetails = () => {
               touched?.applicants &&
               touched?.applicants[activeIndex]?.applicant_details?.date_of_birth
             }
-            disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+            disabled={
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+              (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+                values?.applicants?.[activeIndex]?.applicant_details.date_of_birth !== '')
+            }
             value={date}
             onAccept={(e) => {
               checkDate(e);

@@ -3,8 +3,7 @@ import Checkbox from '../Checkbox';
 import Audio from '../Audio/index';
 import LanguageDropDown from '../DropDown/LanguageDropDown';
 import PropTypes from 'prop-types';
-// sample mp3 audio file
-import consentEnglishAudioFile from '../../assets/audio/audio1.mp3';
+import consentEnglishAudioFile from '../../assets/audio/consent.m4a';
 
 const consentInMultipleLanguage = [
   {
