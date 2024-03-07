@@ -33,8 +33,8 @@ const LeadContextProvider = ({ children }) => {
   const [showMap, setShowMap] = useState(false);
 
   //p3 states
-  const [idDisableFields, setIdDisableFields] = useState(false);
-  const [addressDisableFields, setAddressDisableFields] = useState(false);
+  const [idDisableFields, setIdDisableFields] = useState(true);
+  const [addressDisableFields, setAddressDisableFields] = useState(true);
 
   //ocr states
   const [enableOCRIdType, setEnableOCRIdType] = useState(false);
@@ -402,10 +402,10 @@ const LeadContextProvider = ({ children }) => {
       );
       setEnableEkycIdtype(false);
       setEkycIDStatus(false);
-      setIdDisableFields(false);
+      setIdDisableFields(true);
       setEnableEKYCAddressProof(false);
       setEkycAddressStatus(false);
-      setAddressDisableFields(false);
+      setAddressDisableFields(true);
       formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
     }
   }, [activeIndex, location.pathname]);
@@ -427,7 +427,7 @@ const LeadContextProvider = ({ children }) => {
           // unsuccessful Ekyc
           setEnableEkycIdtype(true);
           setEkycIDStatus(false);
-          setAddressDisableFields(false);
+          setAddressDisableFields(true);
         }
       } else {
         // ekyc didn't perfomed
@@ -447,7 +447,6 @@ const LeadContextProvider = ({ children }) => {
       if (
         formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
       ) {
-        setIdDisableFields(false);
         // successful Ekyc (default is_ekyc_verified=false)
         if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
           setEnableEKYCAddressProof(false);
@@ -469,7 +468,6 @@ const LeadContextProvider = ({ children }) => {
         // ekyc didn't perfomed
         setEnableEKYCAddressProof(true);
         setEkycAddressStatus(false);
-        setIdDisableFields(true);
         setAddressDisableFields(true);
       }
     }
