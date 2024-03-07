@@ -412,12 +412,17 @@ const LeadContextProvider = ({ children }) => {
       setAddressTypeClickedPhotoText('');
       setAddressTypeOCRText('Capture front image');
       setEnableVerifyOCRAddressProof(false);
+
+      //Reset id type ocr states
       setEnableEkycIdtype(false);
       setEkycIDStatus(false);
-      setIdDisableFields(true);
+      // setIdDisableFields(true);
+
+      //Reset address type ekyc states
       setEnableEKYCAddressProof(false);
       setEkycAddressStatus(false);
-      setAddressDisableFields(true);
+      // setAddressDisableFields(true);
+
       formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
     }
   }, [activeIndex, location.pathname]);
@@ -494,24 +499,24 @@ const LeadContextProvider = ({ children }) => {
       if (
         formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
       ) {
-        setIdDisableFields(false);
+        // setIdDisableFields(false);
         // successful Ekyc (default is_ekyc_verified=false)
         if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
           setEnableEkycIdtype(false);
           setEkycIDStatus(true);
-          setAddressDisableFields(true);
+          // setAddressDisableFields(true);
         } else {
           // unsuccessful Ekyc
           setEnableEkycIdtype(true);
           setEkycIDStatus(false);
-          setAddressDisableFields(true);
+          // setAddressDisableFields(true);
         }
       } else {
         // ekyc didn't perfomed
         setEnableEkycIdtype(true);
         setEkycIDStatus(false);
-        setIdDisableFields(true);
-        setAddressDisableFields(true);
+        // setIdDisableFields(true);
+        // setAddressDisableFields(true);
       }
     }
 
@@ -528,7 +533,7 @@ const LeadContextProvider = ({ children }) => {
         if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
           setEnableEKYCAddressProof(false);
           setEkycAddressStatus(true);
-          setAddressDisableFields(true);
+          // setAddressDisableFields(true);
         } else {
           // unsuccessful Ekyc
           if (
@@ -539,13 +544,13 @@ const LeadContextProvider = ({ children }) => {
             setEnableEKYCAddressProof(true);
           }
           setEkycAddressStatus(false);
-          setAddressDisableFields(false);
+          // setAddressDisableFields(false);
         }
       } else {
         // ekyc didn't perfomed
         setEnableEKYCAddressProof(true);
         setEkycAddressStatus(false);
-        setAddressDisableFields(true);
+        // setAddressDisableFields(true);
       }
     }
     if (formik?.values?.applicants?.length !== coApplicants?.length) {

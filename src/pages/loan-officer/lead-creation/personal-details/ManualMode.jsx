@@ -81,17 +81,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
-
   const [emailVerified, setEmailVerified] = useState(
     values?.applicants?.[activeIndex]?.personal_details?.is_email_verified,
   );
-
   const [showOTPInput, setShowOTPInput] = useState(false);
-
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
-
   const [date, setDate] = useState(null);
-
   const [openEkycPopup, setOpenEkycPopup] = useState(false);
   const [field_name, setField_name] = useState(null);
 
@@ -109,7 +104,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   }, [enableOCRIdType, enableOCRAddressProof]);
 
   useEffect(() => {
-    if (!idTypeOCRStatus && idTypeOCRCount < 3) {
+    if (
+      !idTypeOCRStatus &&
+      idTypeOCRCount < 3 &&
+      !values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
+    ) {
       setIdDisableFields(true);
     } else {
       setIdDisableFields(false);
@@ -124,7 +123,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   ]);
 
   useEffect(() => {
-    if (!addressProofOCRStatus && addressProofOCRCount < 3) {
+    if (
+      !addressProofOCRStatus &&
+      addressProofOCRCount < 3 &&
+      !values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
+    ) {
       setAddressDisableFields(true);
     } else {
       setAddressDisableFields(false);
@@ -236,7 +239,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
         setEnableOCRIdType(true);
 
-        setEnableEKYIdtype(false);
+        setEnableEkycIdtype(false);
       } else if (e === 'AADHAR') {
         setEnableVerifyOCRIdType(false);
         setIdTypeOCRStatus(false);
@@ -245,7 +248,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdTypeOCRText('Capture front image');
         // setEnableVerifyOCRIdType(false);
 
-        setEnableEKYIdtype(true);
+        setEnableEkycIdtype(true);
 
         setEnableOCRIdType(false);
       }
