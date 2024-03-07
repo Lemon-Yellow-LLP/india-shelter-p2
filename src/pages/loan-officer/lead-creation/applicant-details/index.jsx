@@ -53,11 +53,6 @@ const ApplicantDetails = () => {
     removeCoApplicant,
     coApplicantDrawerUpdate,
   } = useContext(LeadContext);
-  console.log(
-    values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified,
-    activeIndex,
-    ' from applicant_details',
-  );
   const { setOtpFailCount, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
 
   const { loData } = useContext(AuthContext);

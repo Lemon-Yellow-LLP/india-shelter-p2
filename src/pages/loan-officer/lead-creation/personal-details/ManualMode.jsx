@@ -105,9 +105,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   useEffect(() => {
     if (
-      !idTypeOCRStatus &&
-      idTypeOCRCount < 3 &&
-      !values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
+      (!idTypeOCRStatus && idTypeOCRCount < 3) ||
+      (!values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed &&
+        values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR')
     ) {
       setIdDisableFields(true);
     } else {
@@ -120,13 +120,14 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     addressProofOCRCount,
     enableOCRIdType,
     enableOCRAddressProof,
+    values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed,
   ]);
 
   useEffect(() => {
     if (
-      !addressProofOCRStatus &&
-      addressProofOCRCount < 3 &&
-      !values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
+      (!addressProofOCRStatus && addressProofOCRCount < 3) ||
+      (!values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed &&
+        values?.applicants[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR')
     ) {
       setAddressDisableFields(true);
     } else {
@@ -139,6 +140,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     addressProofOCRCount,
     enableOCRIdType,
     enableOCRAddressProof,
+    values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed,
   ]);
 
   useEffect(() => {

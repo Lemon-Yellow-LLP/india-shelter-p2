@@ -416,12 +416,12 @@ const LeadContextProvider = ({ children }) => {
       //Reset id type ocr states
       setEnableEkycIdtype(false);
       setEkycIDStatus(false);
-      // setIdDisableFields(true);
+      setIdDisableFields(true);
 
       //Reset address type ekyc states
       setEnableEKYCAddressProof(false);
       setEkycAddressStatus(false);
-      // setAddressDisableFields(true);
+      setAddressDisableFields(true);
 
       formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
     }
