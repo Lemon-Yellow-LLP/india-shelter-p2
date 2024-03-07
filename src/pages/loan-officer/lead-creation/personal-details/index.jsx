@@ -111,6 +111,17 @@ const PersonalDetails = () => {
           },
         )
           .then(async (res) => {
+            await editFieldsById(
+              values?.applicants[activeIndex]?.applicant_details?.id,
+              'applicant',
+              { personal_detail: res.id },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
             setFieldValue(`applicants[${activeIndex}].personal_details`, {
               ...addData,
               applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
@@ -120,16 +131,6 @@ const PersonalDetails = () => {
               ...addData.extra_params.required_fields_status,
               [name]: true,
             }));
-            await editFieldsById(
-              values?.applicants[activeIndex]?.applicant_details?.id,
-              'applicant',
-              { personal_details: res.id },
-              {
-                headers: {
-                  Authorization: token,
-                },
-              },
-            );
           })
           .catch((err) => {
             console.log(err);
