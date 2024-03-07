@@ -165,6 +165,8 @@ export default function EkycDrawer({
           otp_value: otp,
           applicant_id: values?.applicants[activeIndex]?.applicant_details?.id,
           field_name,
+          // remove condition after adding ekyc credentials
+          fail: otp === '123456' && true,
         },
         {
           headers: {
@@ -273,7 +275,12 @@ export default function EkycDrawer({
     <div className='w-full px-4 py-6 flex flex-col gap-3'>
       <div className='flex justify-between items-center'>
         <p className='font-semibold'>Enter Aadhar No</p>
-        <button onClick={() => setOpenEkycPopup(false)}>
+        <button
+          onClick={() => {
+            setOpenEkycPopup(false);
+            setAadhaarNo('');
+          }}
+        >
           <IconClose />
         </button>
       </div>

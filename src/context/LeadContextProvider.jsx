@@ -417,17 +417,16 @@ const LeadContextProvider = ({ children }) => {
       if (
         formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
       ) {
+        setIdDisableFields(false);
         // successful Ekyc (default is_ekyc_verified=false)
         if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
           setEnableEkycIdtype(false);
           setEkycIDStatus(true);
-          setIdDisableFields(true);
           setAddressDisableFields(true);
         } else {
           // unsuccessful Ekyc
           setEnableEkycIdtype(true);
           setEkycIDStatus(false);
-          setIdDisableFields(false);
           setAddressDisableFields(false);
         }
       } else {
@@ -448,17 +447,22 @@ const LeadContextProvider = ({ children }) => {
       if (
         formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed
       ) {
+        setIdDisableFields(false);
         // successful Ekyc (default is_ekyc_verified=false)
         if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
           setEnableEKYCAddressProof(false);
           setEkycAddressStatus(true);
-          setIdDisableFields(true);
           setAddressDisableFields(true);
         } else {
           // unsuccessful Ekyc
-          setEnableEKYCAddressProof(true);
+          if (
+            formik?.values?.applicants[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+          ) {
+            setEnableEKYCAddressProof(false);
+          } else {
+            setEnableEKYCAddressProof(true);
+          }
           setEkycAddressStatus(false);
-          setIdDisableFields(false);
           setAddressDisableFields(false);
         }
       } else {

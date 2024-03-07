@@ -916,7 +916,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               : !values?.applicants?.[activeIndex]?.personal_details?.id_number
               ? true
               : false ||
-                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+                  values?.applicants[activeIndex]?.personal_details?.selected_address_proof ===
+                    'AADHAR')
           }
         />
         <span
@@ -1178,7 +1181,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
+          idDisableFields
         }
       />
 
@@ -1211,7 +1214,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
+          idDisableFields
         }
       />
 
@@ -1230,8 +1233,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               onChange={handleRadioChange}
               disabled={
                 values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-                !values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                  ?.is_ekyc_performed
+                idDisableFields
               }
             >
               {option.icon}
@@ -1283,7 +1285,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }}
           disabled={
             values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-            !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
+            idDisableFields
           }
         />
       ) : null}
@@ -1307,7 +1309,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
+          idDisableFields
         }
       />
 
@@ -1331,7 +1333,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
+          idDisableFields
         }
       />
 
@@ -1354,7 +1356,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }}
         disabled={
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
+          idDisableFields
         }
       />
 
@@ -1377,7 +1379,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           disableEmailInput ||
           emailVerified ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          !values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed
+          idDisableFields
         }
         message={
           emailVerified

@@ -9,7 +9,7 @@ import Fingerprint_failure from '../../assets/anim/Fingerprint_Failure.json';
 import { useContext, useEffect, useState } from 'react';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
-import { editFieldsById, getDashboardLeadById, performBiometric } from '../../global';
+import { editFieldsById, performBiometric } from '../../global';
 
 // biometric screen meta based on type
 let obj = [
@@ -140,6 +140,9 @@ export default function ValidateScan({
       );
       console.log(res);
       setValues(res.lead);
+      setRequiredFieldsStatus(
+        res?.lead?.applicants[activeIndex]?.personal_details?.extra_params?.required_fields_status,
+      );
       setToastMessage('Information fetched Successfully');
     } catch (error) {
       const maskedPortion = aadhaarNo.slice(0, 8).replace(/\d/g, '*');
@@ -150,14 +153,22 @@ export default function ValidateScan({
               id_number: maskedAadhar,
               extra_params: {
                 ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
-                id_number: true,
+                required_fields_status: {
+                  ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                    .required_fields_status,
+                  id_number: true,
+                },
               },
             }
           : {
               address_proof_number: maskedAadhar,
               extra_params: {
                 ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
-                address_proof_number: true,
+                required_fields_status: {
+                  ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+                    .required_fields_status,
+                  address_proof_number: true,
+                },
               },
             };
       await editFieldsById(

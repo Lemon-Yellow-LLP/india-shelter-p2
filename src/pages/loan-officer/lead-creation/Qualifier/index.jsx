@@ -562,6 +562,59 @@ const Qualifier = () => {
     }
   }
 
+  // useEffect(() => {
+  //   const syncAddressProofPhotos = async () => {
+  //     if (values?.applicants[activeIndex]?.personal_details?.extra_params.same_as_id_type) {
+  //       if (
+  //         values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+  //         values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR'
+  //       ) {
+  //         const addressPdfExists = values?.applicants[
+  //           activeIndex
+  //         ]?.applicant_details?.document_meta.some((data) => {
+  //           data.document_type === 'EKYC';
+  //         });
+  //         if (!addressPdfExists) {
+  //           const aadharPdf = values?.applicants[
+  //             activeIndex
+  //           ]?.applicant_details?.document_meta?.id_proof_photos.find((data) => {
+  //             if (data?.document_type === 'EKYC') {
+  //               return data;
+  //             }
+  //           });
+  //           const document_meta = values?.applicants[activeIndex]?.applicant_details?.document_meta;
+  //           if (document_meta.hasOwnProperty('address_proof_photos')) {
+  //             document_meta['address_proof_photos'].push(aadharPdf);
+  //           } else {
+  //             document_meta['address_proof_photos'] = [aadharPdf];
+  //           }
+  //           await editFieldsById(
+  //             values?.applicants[activeIndex]?.applicant_details?.id,
+  //             'applicant',
+  //             {
+  //               document_meta,
+  //               extra_params: {
+  //                 ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
+  //                 upload_required_fields_status: {
+  //                   ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
+  //                     .upload_required_fields_status,
+  //                   address_proof: true,
+  //                 },
+  //               },
+  //             },
+  //             {
+  //               headers: {
+  //                 Authorization: token,
+  //               },
+  //             },
+  //           );
+  //         }
+  //       }
+  //     }
+  //   };
+  //   syncAddressProofPhotos();
+  // }, []);
+
   useEffect(() => {
     if (SpeedoMeterAnimationRef.current && bre101.res);
     create({
