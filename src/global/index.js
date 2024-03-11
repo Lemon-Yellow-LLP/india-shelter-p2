@@ -10,19 +10,19 @@ const bre_timeout = 90000;
 
 axiosRetry(axios, { retries: 0 });
 
-// axios.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     // Handle error globally
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle error globally
 
-//     if (error.response.status == 403 || error.response.status == 401) {
-//       window.location.replace('/login');
-//     }
+    if (error.response.status == 403 || error.response.status == 401) {
+      window.location.replace('/login');
+    }
 
-//     // Pass the error to the next handler
-//     return Promise.reject(error);
-//   },
-// );
+    // Pass the error to the next handler
+    return Promise.reject(error);
+  },
+);
 
 async function pingAPI() {
   const res = await axios.get(`${API_URL}`, {}, requestOptions);
