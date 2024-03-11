@@ -53,6 +53,10 @@ import OverDraftIcon from './overDraftIcon';
 import TostErrorIcon from './TostErrorIcon';
 import IconThumb from './IconThumb.jsx';
 import IconAdminFormClose from './IconAdminFormClose.jsx';
+import CameraIcon from './cameraIcon.jsx';
+import TickGreen from './tickGreen.jsx';
+import VerifyOCRIcon from './verifyOCRIcon.jsx';
+
 export {
   OverDraftIcon,
   CashCreditIcon,
@@ -105,4 +109,7 @@ export {
   IconThumb,
   IconAdminFormClose,
   IconDownArrow,
+  CameraIcon,
+  TickGreen,
+  VerifyOCRIcon,
 };

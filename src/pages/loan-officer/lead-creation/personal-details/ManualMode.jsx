@@ -10,12 +10,22 @@ import TextInputWithSendOtp from '../../../../components/TextInput/TextInputWith
 import { manualModeDropdownOptions } from './manualModeDropdownOptions';
 import OtpInput from '../../../../components/OtpInput/index';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
-import { addApi, editFieldsById, getEmailOtp, verifyEmailOtp } from '../../../../global';
+import {
+  addApi,
+  editFieldsById,
+  getEmailOtp,
+  performOcr,
+  verifyEmailOtp,
+} from '../../../../global';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import { defaultValuesLead } from '../../../../context/defaultValuesLead';
 import { IconThumb } from '../../../../assets/icons';
+import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
+import EkycDrawer from '../../../../components/Ekyc/EkycDrawer';
+import OCRDropdown from '../../../../components/DropDown/OCRDropdown';
+import generateImageWithTextWatermark from '../../../../utils/GenerateImageWithTextWatermark';
 
-function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields }) {
+function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateFields, setLoading }) {
   const {
     values,
     errors,
@@ -26,9 +36,49 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setToastMessage,
     activeIndex,
     setFieldError,
+    idDisableFields,
+    setIdDisableFields,
+    setAddressDisableFields,
+    enableOCRIdType,
+    setEnableOCRIdType,
+    enableOCRAddressProof,
+    setEnableOCRAddressProof,
+    enableVerifyOCRIdType,
+    setEnableVerifyOCRIdType,
+    enableVerifyOCRAddressProof,
+    setEnableVerifyOCRAddressProof,
+    idTypeOCRCount,
+    setIdTypeOCRCount,
+    addressProofOCRCount,
+    setAddressProofOCRCount,
+    idTypeOCRStatus,
+    setIdTypeOCRStatus,
+    addressProofOCRStatus,
+    setAddressProofOCRStatus,
+    idTypeOCRText,
+    setIdTypeOCRText,
+    addressTypeOCRText,
+    setAddressTypeOCRText,
+    idTypeClickedPhotoText,
+    setIdTypeClickedPhotoText,
+    addressTypeClickedPhotoText,
+    setAddressTypeClickedPhotoText,
+    idTypeOCRImages,
+    setIdTypeOCRImages,
+    addressTypeOCRImages,
+    setAddressTypeOCRImages,
+    setValues,
+    enableEkycIdtype,
+    setEnableEkycIdtype,
+    ekycIDStatus,
+    setEkycIDStatus,
+    enableEKYCAddressProof,
+    setEnableEKYCAddressProof,
+    ekycAddressStatus,
+    setEkycAddressStatus,
   } = useContext(LeadContext);
-
-  const { token } = useContext(AuthContext);
+  const { setErrorToastMessage, setErrorToastSubMessage, token, loAllDetails } =
+    useContext(AuthContext);
 
   const [disableEmailInput, setDisableEmailInput] = useState(false);
 
@@ -41,6 +91,81 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [hasSentOTPOnce, setHasSentOTPOnce] = useState(false);
 
   const [date, setDate] = useState(null);
+
+  const [openEkycPopup, setOpenEkycPopup] = useState(false);
+  const [field_name, setField_name] = useState(null);
+
+  useEffect(() => {
+    if (values?.applicants[activeIndex]?.personal_details?.id_type !== 'AADHAR') {
+      if (!idTypeOCRStatus && idTypeOCRCount !== 3) {
+        setIdDisableFields(true);
+      } else {
+        setIdDisableFields(false);
+      }
+    } else {
+      // did user perfomed ekyc atleast once irrespective of success or fail
+      if (values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id) {
+        setIdDisableFields(false);
+        // successful Ekyc (default is_ekyc_verified=false)
+        if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+          setAddressDisableFields(true);
+        } else {
+          // unsuccessful Ekyc
+          setAddressDisableFields(true);
+        }
+      } else {
+        // ekyc didn't perfomed
+        setIdDisableFields(true);
+        setAddressDisableFields(true);
+      }
+    }
+  }, [
+    idTypeOCRStatus,
+    addressProofOCRStatus,
+    idTypeOCRCount,
+    addressProofOCRCount,
+    enableOCRIdType,
+    enableOCRAddressProof,
+    values?.applicants[activeIndex]?.personal_details?.id_type,
+    values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id,
+  ]);
+
+  useEffect(() => {
+    if (values?.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'AADHAR') {
+      if (!addressProofOCRStatus && addressProofOCRCount !== 3) {
+        setAddressDisableFields(true);
+      } else {
+        if (!values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+          setAddressDisableFields(false);
+        }
+      }
+    } else {
+      // did user perfomed ekyc atleast once irrespective of success or fail
+      if (
+        values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_address
+      ) {
+        // successful Ekyc (default is_ekyc_verified=false)
+        if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+          setAddressDisableFields(true);
+        } else {
+          // unsuccessful Ekyc
+          setAddressDisableFields(false);
+        }
+      } else {
+        // ekyc didn't perfomed
+        setAddressDisableFields(true);
+      }
+    }
+  }, [
+    idTypeOCRStatus,
+    addressProofOCRStatus,
+    idTypeOCRCount,
+    addressProofOCRCount,
+    enableOCRIdType,
+    enableOCRAddressProof,
+    values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
+    values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_address,
+  ]);
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.applicant_details?.date_of_birth?.length) {
@@ -129,6 +254,30 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: false }));
         }
       }
+
+      if (e === 'PAN' || e === 'Driving license' || e === 'Voter ID' || e === 'Passport') {
+        setEnableVerifyOCRIdType(false);
+        setIdTypeOCRStatus(false);
+        setIdTypeOCRImages([]);
+        setIdTypeClickedPhotoText('');
+        setIdTypeOCRText('Capture front image');
+        // setEnableVerifyOCRIdType(false);
+
+        setEnableOCRIdType(true);
+
+        setEnableEkycIdtype(false);
+      } else if (e === 'AADHAR') {
+        setEnableVerifyOCRIdType(false);
+        setIdTypeOCRStatus(false);
+        setIdTypeOCRImages([]);
+        setIdTypeClickedPhotoText('');
+        setIdTypeOCRText('Capture front image');
+        // setEnableVerifyOCRIdType(false);
+
+        setEnableEkycIdtype(true);
+
+        setEnableOCRIdType(false);
+      }
     },
     [requiredFieldsStatus],
   );
@@ -144,6 +293,20 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         selected_address_proof: true,
         address_proof_number: false,
       }));
+      if (e === 'Driving license' || e === 'Voter ID' || e === 'Passport') {
+        setEnableEKYCAddressProof(false);
+        setAddressProofOCRStatus(false);
+        setAddressTypeOCRImages([]);
+        setAddressTypeClickedPhotoText('');
+        setAddressTypeOCRText('Capture front image');
+        setEnableVerifyOCRAddressProof(false);
+
+        setEnableOCRAddressProof(true);
+
+        // setEnableEKYCAddressProof(false);
+      } else if (e === 'AADHAR') {
+        setEnableEKYCAddressProof(false);
+      }
     },
     [requiredFieldsStatus],
   );
@@ -322,7 +485,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.personal_details?.id) {
-      // console.log(errors?.applicants?.[activeIndex]);
       if (
         !errors?.applicants?.[activeIndex]?.personal_details?.id_type &&
         !errors?.applicants?.[activeIndex]?.personal_details?.id_number
@@ -437,9 +599,336 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     mobileNumberUpdate();
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
+  const captureIDImages = (e) => {
+    if (
+      idTypeOCRImages.length === 0 &&
+      values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID'
+    ) {
+      setIdTypeOCRText('Capture back image');
+      setIdTypeClickedPhotoText('Front captured');
+    } else if (values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID') {
+      setIdTypeOCRText('Verify with OCR');
+      setIdTypeClickedPhotoText('Front captured');
+      setEnableVerifyOCRIdType(true);
+    } else {
+      setIdTypeOCRText('Verify with OCR');
+      setIdTypeClickedPhotoText('Front & back captured');
+      setEnableVerifyOCRIdType(true);
+    }
+    setIdTypeOCRImages((prev) => [...prev, e.target.files[0]]);
+  };
+
+  const captureAddressImages = (e) => {
+    if (
+      addressTypeOCRImages.length === 0 &&
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID'
+    ) {
+      setAddressTypeOCRText('Capture back image');
+      setAddressTypeClickedPhotoText('Front captured');
+    } else if (
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'Voter ID'
+    ) {
+      setAddressTypeOCRText('Verify with OCR');
+      setAddressTypeClickedPhotoText('Front captured');
+      setEnableVerifyOCRAddressProof(true);
+    } else {
+      setAddressTypeOCRText('Verify with OCR');
+      setAddressTypeClickedPhotoText('Front & back captured');
+      setEnableVerifyOCRAddressProof(true);
+    }
+    setAddressTypeOCRImages((prev) => [...prev, e.target.files[0]]);
+  };
+
+  const verifyOCRIdType = async (e) => {
+    setIdTypeOCRCount((prev) => prev + 1);
+    setLoading(true);
+
+    let ocrDocumentType;
+
+    if (values.applicants[activeIndex]?.personal_details?.id_type === 'Driving license') {
+      ocrDocumentType = 'DL';
+    } else if (values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID') {
+      ocrDocumentType = 'VOTER';
+    } else if (values.applicants[activeIndex]?.personal_details?.id_type === 'Passport') {
+      ocrDocumentType = 'PASSPORT';
+    } else if (values.applicants[activeIndex]?.personal_details?.id_type === 'PAN') {
+      ocrDocumentType = 'PAN';
+    } else {
+      ocrDocumentType = 'AADHAR';
+    }
+
+    const data = new FormData();
+    data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
+    data.append('document_type', ocrDocumentType);
+    data.append('field_name', 'id_type');
+    // data.append('file', idTypeOCRImages[0]);
+
+    const filename = idTypeOCRImages[0].name;
+
+    await generateImageWithTextWatermark(
+      values?.lead?.id,
+      loAllDetails?.employee_code,
+      loAllDetails?.first_name,
+      loAllDetails?.middle_name,
+      loAllDetails?.last_name,
+      19.235259,
+      72.986254,
+      idTypeOCRImages[0],
+    )
+      .then(async (image) => {
+        if (image?.fileSize > 5000000) {
+          const options = {
+            maxSizeMB: 4,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+          };
+          const compressedFile = await imageCompression(image, options);
+          const compressedImageFile = new File([compressedFile], filename, {
+            type: compressedFile.type,
+          });
+          data.append('file', compressedImageFile);
+        } else {
+          data.append('file', image);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    if (values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID') {
+      // data.append('file', idTypeOCRImages[1]);
+
+      const secondfilename = idTypeOCRImages[1].name;
+
+      await generateImageWithTextWatermark(
+        values?.lead?.id,
+        loAllDetails?.employee_code,
+        loAllDetails?.first_name,
+        loAllDetails?.middle_name,
+        loAllDetails?.last_name,
+        19.235259,
+        72.986254,
+        idTypeOCRImages[1],
+      )
+        .then(async (image) => {
+          if (image?.fileSize > 5000000) {
+            const options = {
+              maxSizeMB: 4,
+              maxWidthOrHeight: 1920,
+              useWebWorker: true,
+            };
+            const compressedFile = await imageCompression(image, options);
+            const compressedImageFile = new File([compressedFile], secondfilename, {
+              type: compressedFile.type,
+            });
+            data.append('file', compressedImageFile);
+          } else {
+            data.append('file', image);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+
+    performOcr(data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: token,
+      },
+    })
+      .then((data) => {
+        setValues(data.full_lead);
+        setRequiredFieldsStatus(
+          data.full_lead.applicants?.[activeIndex]?.personal_details.extra_params
+            .required_fields_status,
+        );
+        setToastMessage('Information fetched Successfully');
+        setEnableOCRIdType(false);
+        setIdTypeOCRStatus(true);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log('OCR_ERR', error);
+        setErrorToastMessage('Technical error');
+        setErrorToastSubMessage('Please recapture the images and verify the OCR');
+
+        setEnableVerifyOCRIdType(false);
+        setIdTypeOCRStatus(false);
+        setIdTypeOCRImages([]);
+        setIdTypeClickedPhotoText('');
+        setIdTypeOCRText('Capture front image');
+        setEnableVerifyOCRIdType(false);
+        setLoading(false);
+      });
+  };
+
+  const verifyOCRAddressType = async (e) => {
+    setAddressProofOCRCount((prev) => prev + 1);
+    setLoading(true);
+
+    let ocrDocumentType;
+
+    if (
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Driving license'
+    ) {
+      ocrDocumentType = 'DL';
+    } else if (
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID'
+    ) {
+      ocrDocumentType = 'VOTER';
+    } else if (
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Passport'
+    ) {
+      ocrDocumentType = 'PASSPORT';
+    } else {
+      ocrDocumentType = 'AADHAR';
+    }
+
+    const data = new FormData();
+    data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
+    data.append('document_type', ocrDocumentType);
+    data.append('field_name', 'selected_address_proof');
+    // data.append('file', addressTypeOCRImages[0]);
+
+    const filename = addressTypeOCRImages[0].name;
+
+    await generateImageWithTextWatermark(
+      values?.lead?.id,
+      loAllDetails?.employee_code,
+      loAllDetails?.first_name,
+      loAllDetails?.middle_name,
+      loAllDetails?.last_name,
+      19.235259,
+      72.986254,
+      addressTypeOCRImages[0],
+    )
+      .then(async (image) => {
+        if (image?.fileSize > 5000000) {
+          const options = {
+            maxSizeMB: 4,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+          };
+          const compressedFile = await imageCompression(image, options);
+          const compressedImageFile = new File([compressedFile], filename, {
+            type: compressedFile.type,
+          });
+          data.append('file', compressedImageFile);
+        } else {
+          data.append('file', image);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    if (values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID') {
+      const secondfilename = addressTypeOCRImages[1].name;
+
+      await generateImageWithTextWatermark(
+        values?.lead?.id,
+        loAllDetails?.employee_code,
+        loAllDetails?.first_name,
+        loAllDetails?.middle_name,
+        loAllDetails?.last_name,
+        19.235259,
+        72.986254,
+        addressTypeOCRImages[1],
+      )
+        .then(async (image) => {
+          if (image?.fileSize > 5000000) {
+            const options = {
+              maxSizeMB: 4,
+              maxWidthOrHeight: 1920,
+              useWebWorker: true,
+            };
+            const compressedFile = await imageCompression(image, options);
+            const compressedImageFile = new File([compressedFile], secondfilename, {
+              type: compressedFile.type,
+            });
+            data.append('file', compressedImageFile);
+          } else {
+            data.append('file', image);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+
+    performOcr(data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: token,
+      },
+    })
+      .then((data) => {
+        setValues(data.full_lead);
+        setRequiredFieldsStatus(
+          data.full_lead.applicants?.[activeIndex]?.personal_details.extra_params
+            .required_fields_status,
+        );
+        setToastMessage('Information fetched Successfully');
+        setEnableOCRAddressProof(false);
+        setAddressProofOCRStatus(true);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log('OCR_ERR', error);
+        setErrorToastMessage('Technical error');
+        setErrorToastSubMessage('Please recapture the images and verify the OCR');
+
+        setEnableVerifyOCRAddressProof(false);
+        setAddressProofOCRStatus(false);
+        setAddressTypeOCRImages([]);
+        setAddressTypeClickedPhotoText('');
+        setAddressTypeOCRText('Capture front image');
+        setEnableVerifyOCRAddressProof(false);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    if (
+      values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+      values?.applicants[activeIndex]?.applicant_details.id_type_ocr_status
+    ) {
+      setAddressProofOCRStatus(true);
+    }
+
+    if (
+      values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+      values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+      values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id
+    ) {
+      setEnableEKYCAddressProof(false);
+      setEkycAddressStatus(true);
+      setAddressProofOCRStatus(false);
+    }
+  }, [values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type]);
+
+  useEffect(() => {
+    const keysToCheck = ['VOTER', 'PASSPORT', 'DL'];
+
+    if (
+      keysToCheck.some((key) => {
+        if (
+          values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_count?.hasOwnProperty(key)
+        ) {
+          return true;
+        }
+      })
+    ) {
+      if (!values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+        setAddressDisableFields(false);
+      }
+    }
+  }, [values?.applicants]);
+
   return (
     <>
-      <DropDown
+      <OCRDropdown
         label='Select ID type'
         name={`applicants[${activeIndex}].personal_details.id_type`}
         required
@@ -461,7 +950,22 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             );
           }
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          idTypeOCRStatus ||
+          ekycIDStatus
+        }
+        enableOCR={enableOCRIdType}
+        captureImages={captureIDImages}
+        ocrButtonText={idTypeOCRText}
+        clickedPhotoText={idTypeClickedPhotoText}
+        enableVerify={enableVerifyOCRIdType}
+        verifiedStatus={idTypeOCRStatus}
+        onVerifyClick={verifyOCRIdType}
+        setOpenEkycPopup={setOpenEkycPopup}
+        verifiedEkycStatus={ekycIDStatus}
+        enableEKYC={enableEkycIdtype}
+        setField_name={() => setField_name('id_type')}
       />
 
       <TextInput
@@ -481,9 +985,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
-          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR' ||
+          (!idTypeOCRStatus && idTypeOCRCount < 3)
         }
-        labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
+        // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[2];
@@ -537,25 +1043,16 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }}
       />
-      {/* // if Id type is Aadhar and no errors in id no */}
-      {values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
-        !errors?.applicants?.[activeIndex]?.personal_details?.id_number && (
-          <button
-            className='text-primary-red font-semibold flex justify-end'
-            onClick={() => alert('hello')}
-          >
-            <IconThumb />
-            Verify Aadhar e-KYC
-          </button>
-        )}
+
       <div className='flex items-center gap-2'>
         <Checkbox
           checked={
             values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
           }
           name='terms-agreed'
-          onTouchEnd={(e) => {
-            if (!e.target.checked) {
+          onTouchEnd={async (e) => {
+            const value = e.target.checked;
+            if (!value) {
               setFieldValue(
                 `applicants[${activeIndex}].personal_details.selected_address_proof`,
                 '',
@@ -599,13 +1096,14 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                 }));
               }
             }
-
             setFieldValue(
               `applicants[${activeIndex}].personal_details.extra_params.same_as_id_type`,
-              e.target.checked,
+              value,
             );
           }}
           disabled={
+            values?.applicants[activeIndex]?.applicant_details.selected_address_ocr_status ||
+            idDisableFields ||
             !values?.applicants?.[activeIndex]?.personal_details?.id_type
               ? true
               : values?.applicants?.[activeIndex]?.personal_details?.id_type === 'PAN'
@@ -613,7 +1111,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               : !values?.applicants?.[activeIndex]?.personal_details?.id_number
               ? true
               : false ||
-                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+                  values?.applicants[activeIndex]?.applicant_details?.extra_params
+                    ?.is_ekyc_performed_address &&
+                  values?.applicants[activeIndex]?.personal_details?.selected_address_proof ===
+                    'AADHAR')
           }
         />
         <span
@@ -629,7 +1132,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         </span>
       </div>
 
-      <DropDown
+      <OCRDropdown
         label='Select address proof'
         name={`applicants[${activeIndex}].personal_details.selected_address_proof`}
         required
@@ -646,12 +1149,25 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
         disabled={
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
-          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          addressProofOCRStatus ||
+          ekycAddressStatus
         }
         disableOption={values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
           handleBlur(e);
         }}
+        enableOCR={enableOCRAddressProof}
+        captureImages={captureAddressImages}
+        ocrButtonText={addressTypeOCRText}
+        clickedPhotoText={addressTypeClickedPhotoText}
+        enableVerify={enableVerifyOCRAddressProof}
+        verifiedStatus={addressProofOCRStatus}
+        onVerifyClick={verifyOCRAddressType}
+        setOpenEkycPopup={setOpenEkycPopup}
+        verifiedEkycStatus={ekycAddressStatus}
+        enableEKYC={enableEKYCAddressProof}
+        setField_name={() => setField_name('selected_address_proof')}
       />
 
       <TextInput
@@ -673,9 +1189,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
-          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ===
+            'AADHAR' ||
+          (!addressProofOCRStatus && addressProofOCRCount < 3)
         }
-        labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
+        // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
         onBlur={(e) => {
           handleBlur(e);
           const name = e.target.name.split('.')[2];
@@ -708,17 +1227,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }}
       />
-      {/* // if address proof is Aadhar and no errors in address proof no */}
-      {values?.applicants[activeIndex]?.personal_details?.selected_address_proof === 'AADHAR' &&
-        !errors?.applicants?.[activeIndex]?.personal_details?.address_proof_number && (
-          <button
-            className='text-primary-red font-semibold flex justify-end'
-            onClick={() => alert('hello')}
-          >
-            <IconThumb />
-            Verify Aadhar e-KYC
-          </button>
-        )}
+
       <TextInput
         label='First Name'
         placeholder='Eg: Sanjay'
@@ -771,7 +1280,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               current={values?.applicants?.[activeIndex]?.personal_details?.gender}
               onChange={handleRadioChange}
               disabled={
-                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                idDisableFields ||
+                values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified
               }
             >
               {option.icon}
@@ -868,7 +1379,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             updateFields(name, '');
           }
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          idDisableFields
+        }
       />
 
       <TextInput
@@ -898,7 +1412,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
             updateFields(name, '');
           }
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          idDisableFields
+        }
       />
 
       <div className='flex flex-col gap-2'>
@@ -915,7 +1432,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               current={values?.applicants?.[activeIndex]?.personal_details?.marital_status}
               onChange={handleRadioChange}
               disabled={
-                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                idDisableFields
               }
             >
               {option.icon}
@@ -965,7 +1483,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               updateFields(name, '');
             }
           }}
-          disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+          disabled={
+            values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+            idDisableFields
+          }
         />
       ) : null}
 
@@ -986,7 +1507,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          idDisableFields
+        }
       />
 
       <DropDown
@@ -1007,7 +1531,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          idDisableFields
+        }
       />
 
       <DropDown
@@ -1027,7 +1554,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
-        disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+        disabled={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          idDisableFields
+        }
       />
 
       <TextInputWithSendOtp
@@ -1048,7 +1578,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           disableEmailInput ||
           emailVerified ||
-          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+          idDisableFields
         }
         message={
           emailVerified
@@ -1084,6 +1615,15 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           hasSentOTPOnce={hasSentOTPOnce}
         />
       )}
+
+      <DynamicDrawer open={openEkycPopup} setOpen={setOpenEkycPopup} drawerChildrenClasses='!p-0'>
+        <EkycDrawer
+          setOpenEkycPopup={setOpenEkycPopup}
+          setLoading={setLoading}
+          field_name={field_name}
+          setRequiredFieldsStatus={setRequiredFieldsStatus}
+        />
+      </DynamicDrawer>
     </>
   );
 }

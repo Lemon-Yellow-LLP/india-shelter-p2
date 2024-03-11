@@ -10,19 +10,19 @@ const bre_timeout = 90000;
 
 axiosRetry(axios, { retries: 0 });
 
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Handle error globally
+// axios.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     // Handle error globally
 
-    if (error.response.status == 403 || error.response.status == 401) {
-      window.location.replace('/login');
-    }
+//     if (error.response.status == 403 || error.response.status == 401) {
+//       window.location.replace('/login');
+//     }
 
-    // Pass the error to the next handler
-    return Promise.reject(error);
-  },
-);
+//     // Pass the error to the next handler
+//     return Promise.reject(error);
+//   },
+// );
 
 async function pingAPI() {
   const res = await axios.get(`${API_URL}`, {}, requestOptions);
@@ -569,6 +569,28 @@ async function getUserDepartments(options) {
   }
 }
 
+//EKYC
+async function generateEkycOtp(data, options) {
+  const res = await axios.post(`${API_URL}/ekyc/generate-otp/`, data, options);
+  return res.data;
+}
+
+async function validateEkycOtp(data, options) {
+  const res = await axios.post(`${API_URL}/ekyc/validate-otp/`, data, options);
+  return res.data;
+}
+
+async function performBiometric(data, options) {
+  const res = await axios.post(`${API_URL}/ekyc/perform-ekyc-biometric/`, data, options);
+  return res.data;
+}
+
+//OCR
+async function performOcr(data, options) {
+  const res = await axios.post(`${API_URL}/ocr/r/`, data, options);
+  return res.data;
+}
+
 export {
   API_URL,
   pingAPI,
@@ -618,4 +640,8 @@ export {
   getUserRoles,
   getUserBranches,
   getUserDepartments,
+  generateEkycOtp,
+  validateEkycOtp,
+  performBiometric,
+  performOcr,
 };

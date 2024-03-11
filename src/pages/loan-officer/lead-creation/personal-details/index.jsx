@@ -1,16 +1,16 @@
-import { personalDetailsModeOption } from '../utils';
-import CardRadio from '../../../../components/CardRadio';
 import { memo, useCallback, useContext, useEffect, useState } from 'react';
 import { LeadContext } from '../../../../context/LeadContextProvider';
 import ManualMode from './ManualMode';
 import PreviousNextButtons from '../../../../components/PreviousNextButtons';
 import { addApi, editFieldsById } from '../../../../global';
 import DynamicDrawer from '../../../../components/SwipeableDrawer/DynamicDrawer';
-import { Button } from '../../../../components';
+import { Button, ToastMessage } from '../../../../components';
 import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
 import { AuthContext } from '../../../../context/AuthContextProvider';
+import ErrorTost from '../../../../components/ToastMessage/ErrorTost';
+import LoaderDynamicText from '../../../../components/Loader/LoaderDynamicText';
 
 const PersonalDetails = () => {
   const {
@@ -21,21 +21,30 @@ const PersonalDetails = () => {
     setFieldValue,
     activeIndex,
     setCurrentStepIndex,
+    toastMessage,
+    setToastMessage,
   } = useContext(LeadContext);
 
-  const { token } = useContext(AuthContext);
+  const {
+    token,
+    errorToastMessage,
+    setErrorToastMessage,
+    errorToastSubMessage,
+    setErrorToastSubMessage,
+  } = useContext(AuthContext);
 
   const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
     ...values?.applicants?.[activeIndex]?.personal_details?.extra_params?.required_fields_status,
   });
 
   const [openExistingPopup, setOpenExistingPopup] = useState(
-    values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
-      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
+    values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
       !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done
       ? true
       : false,
   );
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setRequiredFieldsStatus(
@@ -101,6 +110,17 @@ const PersonalDetails = () => {
           },
         )
           .then(async (res) => {
+            await editFieldsById(
+              values?.applicants[activeIndex]?.applicant_details?.id,
+              'applicant',
+              { personal_detail: res.id },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
             setFieldValue(`applicants[${activeIndex}].personal_details`, {
               ...addData,
               applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
@@ -110,16 +130,6 @@ const PersonalDetails = () => {
               ...addData.extra_params.required_fields_status,
               [name]: true,
             }));
-            await editFieldsById(
-              values?.applicants[activeIndex]?.applicant_details?.id,
-              'applicant',
-              { personal_details: res.id },
-              {
-                headers: {
-                  Authorization: token,
-                },
-              },
-            );
           })
           .catch((err) => {
             console.log(err);
@@ -236,7 +246,6 @@ const PersonalDetails = () => {
 
   useEffect(() => {
     if (
-      values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
       values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing &&
       !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done
     ) {
@@ -245,13 +254,20 @@ const PersonalDetails = () => {
       setOpenExistingPopup(false);
     }
   }, [
-    values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed,
     values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.is_existing,
     values?.applicants?.[activeIndex]?.personal_details?.extra_params?.is_existing_done,
   ]);
 
   return (
     <>
+      <ToastMessage message={toastMessage} setMessage={setToastMessage} />
+      <ErrorTost
+        message={errorToastMessage}
+        setMessage={setErrorToastMessage}
+        subMessage={errorToastSubMessage}
+        setSubMessage={setErrorToastSubMessage}
+      />
+
       <div className='overflow-hidden flex flex-col h-[100vh] justify-between'>
         {values?.applicants[activeIndex]?.applicant_details?.is_primary ? (
           <Topbar title='Lead Creation' id={values?.lead?.id} showClose={true} />
@@ -265,57 +281,13 @@ const PersonalDetails = () => {
             coApplicantName={values?.applicants[activeIndex]?.applicant_details?.first_name}
           />
         )}
-        <div className='flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
-          <div className='flex flex-col gap-2'>
-            <label htmlFor='loan-purpose' className='flex gap-0.5 font-medium text-black'>
-              How would you like to proceed <span className='text-primary-red text-xs'>*</span>
-            </label>
-            <div className={`flex gap-4 w-full`}>
-              {personalDetailsModeOption.map((option) => {
-                return (
-                  <CardRadio
-                    key={option.value}
-                    label={option.label}
-                    name={`applicants[${activeIndex}].personal_details.how_would_you_like_to_proceed`}
-                    value={option.value}
-                    current={
-                      values?.applicants?.[activeIndex]?.personal_details
-                        ?.how_would_you_like_to_proceed
-                    }
-                    onChange={handleRadioChange}
-                    containerClasses='flex-1'
-                    disabled={
-                      values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
-                    }
-                  >
-                    {option.icon}
-                  </CardRadio>
-                );
-              })}
-            </div>
-            {errors?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed &&
-            touched?.applicants &&
-            touched?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed ? (
-              <span
-                className='text-xs text-primary-red'
-                dangerouslySetInnerHTML={{
-                  __html:
-                    errors?.applicants[activeIndex]?.personal_details
-                      ?.how_would_you_like_to_proceed,
-                }}
-              />
-            ) : (
-              ''
-            )}
-          </div>
-          {values?.applicants?.[activeIndex]?.personal_details?.how_would_you_like_to_proceed ===
-            'Manual' && (
-            <ManualMode
-              requiredFieldsStatus={requiredFieldsStatus}
-              setRequiredFieldsStatus={setRequiredFieldsStatus}
-              updateFields={updateFields}
-            />
-          )}
+        <div className='overflow-x-hidden flex flex-col bg-medium-grey gap-2 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[150px] flex-1'>
+          <ManualMode
+            requiredFieldsStatus={requiredFieldsStatus}
+            setRequiredFieldsStatus={setRequiredFieldsStatus}
+            updateFields={updateFields}
+            setLoading={setLoading}
+          />
         </div>
 
         <PreviousNextButtons
@@ -326,6 +298,12 @@ const PersonalDetails = () => {
         />
 
         <SwipeableDrawerComponent />
+
+        {loading ? (
+          <div className='absolute w-full h-full bg-[#00000080] z-[8000]'>
+            <LoaderDynamicText text='Validating' textColor='white' height='100vh' />
+          </div>
+        ) : null}
       </div>
 
       {openExistingPopup ? (

@@ -23,6 +23,7 @@ const DashboardRoutes = () => {
     } else {
       return <Navigate to='/login' />;
     }
+    // return children;
   };
 
   const AdminRequireAuth = ({ children }) => {
