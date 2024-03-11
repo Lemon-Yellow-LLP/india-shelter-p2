@@ -15,6 +15,8 @@ import MapInput from './MapInput';
 import Map from './Map';
 import ToastMessage from './ToastMessage';
 import UploadDocsInput from './TextInput/UploadDocsInput';
+import Scanner from './Scanner';
+import EkycOtpInput from './OtpInput/EkycOtpInput';
 
 export {
   TextInput,
@@ -34,4 +36,6 @@ export {
   Map,
   ToastMessage,
   UploadDocsInput,
+  Scanner,
+  EkycOtpInput,
 };

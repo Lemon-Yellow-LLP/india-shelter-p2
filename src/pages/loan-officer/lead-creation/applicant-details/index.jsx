@@ -28,6 +28,7 @@ import {
   loanOptionsLap,
   loanPurposeDataLap,
 } from './ApplicantDropDownData';
+import { newCoApplicantValues } from '../../../../context/NewCoApplicant';
 import { AuthContext } from '../../../../context/AuthContextProvider';
 import Topbar from '../../../../components/Topbar';
 import SwipeableDrawerComponent from '../../../../components/SwipeableDrawer/LeadDrawer';
@@ -52,7 +53,11 @@ const ApplicantDetails = () => {
     removeCoApplicant,
     coApplicantDrawerUpdate,
   } = useContext(LeadContext);
-
+  console.log(
+    values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified,
+    activeIndex,
+    ' from applicant_details',
+  );
   const { setOtpFailCount, phoneNumberList, setPhoneNumberList } = useContext(AuthContext);
 
   const { loData } = useContext(AuthContext);
@@ -371,11 +376,30 @@ const ApplicantDetails = () => {
         setRequiredFieldsStatus((prev) => ({ ...prev, ['date_of_birth']: true }));
       }
       if (values?.applicants?.[activeIndex]?.personal_details?.id) {
+        const required_fields =
+          values?.applicants?.[activeIndex]?.personal_details?.extra_params.required_fields_status;
+
+        const edited_required_fields = {
+          ...required_fields,
+          date_of_birth: true,
+        };
+
+        const edited_extra_params = {
+          ...values?.applicants?.[activeIndex]?.personal_details?.extra_params,
+          required_fields_status: edited_required_fields,
+        };
+
+        setFieldValue(
+          `applicants[${activeIndex}].personal_details.extra_params`,
+          edited_extra_params,
+        );
+
         await editFieldsById(
           values?.applicants[activeIndex]?.personal_details?.id,
           'personal',
           {
             date_of_birth: finalDate,
+            extra_params: edited_extra_params,
           },
           {
             headers: {
@@ -407,7 +431,7 @@ const ApplicantDetails = () => {
       }).then(async (res) => {
         setShowOTPInput(true);
         setHasSentOTPOnce(true);
-        setToastMessage('OTP has been sent to your mail id');
+        // setToastMessage('OTP has been sent to your mail id');
 
         await axios
           .post(
@@ -570,6 +594,148 @@ const ApplicantDetails = () => {
         return false;
       });
   };
+
+  useEffect(() => {
+    async function addAddressAndWorkIncomeDetails() {
+      //add address details
+      if (!values?.applicants?.[activeIndex]?.address_detail?.id) {
+        let clonedCoApplicantValues = structuredClone(newCoApplicantValues);
+        let addData = { ...clonedCoApplicantValues.address_detail };
+
+        await addApi(
+          'address',
+          {
+            ...addData,
+            applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        )
+          .then(async (res) => {
+            setFieldValue(`applicants[${activeIndex}].address_detail`, {
+              ...addData,
+              applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+              id: res.id,
+            });
+
+            await editFieldsById(
+              values?.applicants[activeIndex]?.applicant_details?.id,
+              'applicant',
+              { address_detail: res.id },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            ).then(() => {
+              return res;
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            return err;
+          });
+      }
+
+      //add work income details
+      if (!values?.applicants?.[activeIndex]?.work_income_detail?.id) {
+        const newData = structuredClone(values);
+
+        newData.applicants[activeIndex].work_income_detail = {
+          ...newData.applicants[activeIndex].work_income_detail,
+          applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
+          profession: '',
+          company_name: '',
+          no_of_employees: '',
+          income_proof: '',
+          udyam_number: '',
+          salary_per_month: '',
+          pf_uan: '',
+          no_current_loan: null,
+          ongoing_emi: '',
+          working_since: '',
+          mode_of_salary: '',
+          flat_no_building_name: '',
+          street_area_locality: '',
+          town: '',
+          landmark: '',
+          pincode: '',
+          city: '',
+          state: '',
+          total_family_number: '',
+          total_household_income: '',
+          no_of_dependents: '',
+          business_name: '',
+          industries: '',
+          gst_number: '',
+          pention_amount: '',
+          extra_params: {
+            extra_company_name: '',
+            extra_industries: '',
+            progress: 15,
+            required_fields_status: {
+              profession: false,
+              pan_number: false,
+              company_name: false,
+              salary_per_month: false,
+              working_since: false,
+              mode_of_salary: false,
+              flat_no_building_name: false,
+              street_area_locality: false,
+              town: false,
+              landmark: false,
+              pincode: false,
+              no_current_loan: false,
+              ongoing_emi: false,
+              total_family_number: false,
+              total_household_income: false,
+              no_of_dependents: false,
+            },
+          },
+        };
+
+        await addApi('work-income', newData.applicants[activeIndex].work_income_detail, {
+          headers: {
+            Authorization: token,
+          },
+        })
+          .then(async (res) => {
+            setFieldValue(
+              `applicants[${activeIndex}].work_income_detail`,
+              newData.applicants[activeIndex].work_income_detail,
+            );
+
+            setFieldValue(`applicants[${activeIndex}].work_income_detail`, {
+              ...newData.applicants[activeIndex].work_income_detail,
+              id: res.id,
+            });
+
+            await editFieldsById(
+              values?.applicants?.[activeIndex]?.applicant_details?.id,
+              'applicant',
+              { work_income_detail: res.id },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              },
+            );
+
+            return res;
+          })
+          .catch((err) => {
+            console.log(err);
+            return err;
+          });
+      }
+    }
+    if (values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified) {
+      addAddressAndWorkIncomeDetails();
+    }
+  }, [values?.applicants?.[activeIndex]?.applicant_details?.is_mobile_verified]);
 
   useEffect(() => {
     setRequiredFieldsStatus(
@@ -764,7 +930,8 @@ const ApplicantDetails = () => {
             }}
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+              values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified
             }
             onChange={handleFirstNameChange}
             inputClasses='capitalize'
@@ -781,7 +948,8 @@ const ApplicantDetails = () => {
             }
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+              values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified
             }
             onBlur={async (e) => {
               handleBlur(e);
@@ -839,7 +1007,8 @@ const ApplicantDetails = () => {
             placeholder='Eg: Swami, Singh'
             disabled={
               inputDisabled ||
-              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+              values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified
             }
             name={`applicants[${activeIndex}].applicant_details.last_name`}
             onChange={handleTextInputChange}
@@ -897,7 +1066,11 @@ const ApplicantDetails = () => {
               touched?.applicants &&
               touched?.applicants[activeIndex]?.applicant_details?.date_of_birth
             }
-            disabled={values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier}
+            disabled={
+              values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+              (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+                values?.applicants?.[activeIndex]?.applicant_details.date_of_birth !== '')
+            }
             value={date}
             onAccept={(e) => {
               checkDate(e);

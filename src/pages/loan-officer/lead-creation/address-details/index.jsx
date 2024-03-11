@@ -33,6 +33,7 @@ export default function AddressDetails() {
     pincodeErr,
     setPincodeErr,
     setFieldTouched,
+    addressDisableFields,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
@@ -743,7 +744,8 @@ export default function AddressDetails() {
                 }}
                 disabled={
                   inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                  addressDisableFields
                 }
                 onChange={(e) => {
                   let value = e.currentTarget.value;
@@ -856,7 +858,8 @@ export default function AddressDetails() {
                 }}
                 disabled={
                   inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                  addressDisableFields
                 }
                 onChange={(e) => {
                   let value = e.currentTarget.value;
@@ -959,7 +962,8 @@ export default function AddressDetails() {
                 }}
                 disabled={
                   inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                  addressDisableFields
                 }
                 onChange={(e) => {
                   let value = e.currentTarget.value;
@@ -1060,7 +1064,8 @@ export default function AddressDetails() {
                 }}
                 disabled={
                   inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                  addressDisableFields
                 }
                 onChange={(e) => {
                   let value = e.currentTarget.value;
@@ -1094,7 +1099,8 @@ export default function AddressDetails() {
                 touched={touched?.applicants?.[activeIndex]?.address_detail?.current_pincode}
                 disabled={
                   inputDisabled ||
-                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+                  values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
+                  addressDisableFields
                 }
                 onBlur={(e) => {
                   handleBlur(e);
@@ -1228,7 +1234,7 @@ export default function AddressDetails() {
                     >
                       <span
                         className={`${
-                          index ==
+                          data.value ==
                           values?.applicants?.[activeIndex]?.address_detail
                             ?.current_no_of_year_residing
                             ? 'text-secondary-green font-semibold'
@@ -1780,7 +1786,7 @@ export default function AddressDetails() {
                     >
                       <span
                         className={`${
-                          index ==
+                          data.value ==
                           values?.applicants?.[activeIndex]?.address_detail
                             ?.additional_no_of_year_residing
                             ? values?.applicants?.[activeIndex]?.address_detail?.extra_params
@@ -1809,9 +1815,8 @@ export default function AddressDetails() {
 
         <SwipeableDrawerComponent />
       </div>
-
       {openExistingPopup ? (
-        <DynamicDrawer open={openExistingPopup} setOpen={setOpenExistingPopup} height='80vh'>
+        <DynamicDrawer open={true} setOpen={setOpenExistingPopup} height='80vh'>
           <div className='flex flex-col items-center h-full'>
             <span className='w-full font-semibold text-[14px] leading-[21px]'>
               This is an existing customer.

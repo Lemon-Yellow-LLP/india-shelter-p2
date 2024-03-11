@@ -263,7 +263,9 @@ export default function CoApplicantTab({ toggle, setChangePrimaryAlert, setDelet
                     stepIndex={6}
                     lock={
                       values?.applicants?.[primaryIndex]?.applicant_details?.extra_params
-                        ?.progress !== 100
+                        ?.progress !== 100 ||
+                      !values?.applicants?.[activeCoApplicantIndex]?.applicant_details?.extra_params
+                        ?.qualifier
                     }
                   />
                 </div>

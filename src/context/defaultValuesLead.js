@@ -89,6 +89,14 @@ export const defaultValuesLead = {
         mobile_number: '',
         is_mobile_verified: false,
         bre_101_response: null,
+        id_type_ocr_count: null,
+        id_type_ocr_data: null,
+        id_type_ocr_latest: null,
+        id_type_ocr_status: null,
+        selected_address_proof_ocr_count: null,
+        selected_address_proof_ocr_data: null,
+        selected_address_ocr_latest: null,
+        selected_address_ocr_status: null,
         extra_params: {
           progress: 0,
           banking_progress: 0,
@@ -111,6 +119,8 @@ export const defaultValuesLead = {
           voter_ran: null,
           pf_ran: null,
           gst_ran: null,
+          is_ekyc_performed_id: false,
+          is_ekyc_performed_address: false,
           upload_required_fields_status: {
             customer_photo: false,
             id_proof: false,
@@ -135,7 +145,7 @@ export const defaultValuesLead = {
         },
       },
       personal_details: {
-        how_would_you_like_to_proceed: null,
+        // how_would_you_like_to_proceed: null,
         id_type: null,
         id_number: '',
         selected_address_proof: null,
@@ -160,7 +170,7 @@ export const defaultValuesLead = {
           progress: 20,
           is_existing_done: false,
           required_fields_status: {
-            how_would_you_like_to_proceed: false,
+            // how_would_you_like_to_proceed: false,
             id_type: false,
             id_number: false,
             selected_address_proof: false,

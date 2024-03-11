@@ -1,15 +1,15 @@
 import PropTypes from 'prop-types';
 
-const Radio = ({ label, value, current, onChange }) => {
+const Radio = ({ label, value, current, onChange, disabled }) => {
   return (
-    <div className='flex gap-3 justify-center items-center'>
+    <div className='flex gap-3 items-center'>
       <div
         type='radio'
         className={`${
           current === value ? 'border-red-600' : 'border-black'
         }  border-x border-y w-6 h-6 rounded-full flex justify-center items-center`}
         onTouchStart={() => {
-          onChange({ value, label });
+          !disabled && onChange(value);
         }}
       >
         <span className={`rounded-full w-4 h-4 ${current === value ? ' bg-red-600' : ''}`}></span>
@@ -19,12 +19,13 @@ const Radio = ({ label, value, current, onChange }) => {
   );
 };
 
-Radio.PropTypes = {
+Radio.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string.isRequired,
   current: PropTypes.string,
   onChange: PropTypes.func,
   containerClasses: PropTypes.string,
+  disabled: PropTypes.bool,
 };
 
 export default Radio;
