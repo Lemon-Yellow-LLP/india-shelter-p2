@@ -80,7 +80,7 @@ export default function EkycDrawer({
   const sendMobileOtp = async () => {
     try {
       setLoading(true);
-      const data = await generateEkycOtp(
+      await generateEkycOtp(
         {
           aadhaar_number: aadhaarNo,
           consent: consent,
@@ -93,7 +93,6 @@ export default function EkycDrawer({
           },
         },
       );
-      console.log(data);
     } catch (error) {
       setOpenEkycPopup(false);
       setPerformVerification(false);
@@ -107,7 +106,6 @@ export default function EkycDrawer({
   // send otp on Mobile and email
   const handleVerify = async () => {
     try {
-      console.log('sending otp on mobile no. linked to aadhar');
       setLoading(true);
       const data = await generateEkycOtp(
         {
@@ -256,7 +254,6 @@ export default function EkycDrawer({
 
   // detecting biometric device
   const handleScan = async () => {
-    console.log('searching for device');
     setDisableFields(true);
     setDeviceScanPopup(true);
     ecsBioHelper.detectDevices(function () {
