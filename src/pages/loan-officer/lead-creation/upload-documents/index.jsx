@@ -1999,8 +1999,6 @@ const UploadDocuments = ({ activeIndex }) => {
 
             <ToastMessage message={toastMessage} setMessage={setToastMessage} />
 
-            {console.log(pageLoader)}
-
             <div className='flex flex-col bg-medium-grey gap-9 overflow-auto max-[480px]:no-scrollbar p-[20px] pb-[200px] flex-1'>
               <PhotoUpload
                 files={customerPhotos}
@@ -2046,8 +2044,9 @@ const UploadDocuments = ({ activeIndex }) => {
                   }}
                 />
 
-                {idDisableFields &&
-                values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified ? (
+                {values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+                values?.applicants[activeIndex]?.applicant_details?.extra_params
+                  .is_ekyc_performed_id ? (
                   <PdfAndImageUpload
                     files={idProofPhotos}
                     setFile={setIdProofPhotos}
@@ -2361,8 +2360,9 @@ const UploadDocuments = ({ activeIndex }) => {
                   }}
                 />
 
-                {addressDisableFields &&
-                values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified ? (
+                {values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+                values?.applicants[activeIndex]?.applicant_details?.extra_params
+                  .is_ekyc_performed_address ? (
                   <PdfAndImageUpload
                     files={addressProofPhotos}
                     setFile={setAddressProofPhotos}
