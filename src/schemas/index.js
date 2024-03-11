@@ -37,7 +37,7 @@ const applicantSchema = Yup.object().shape({
     middle_name: Yup.string()
       .trim()
       .nullable()
-      .min(2, 'Middle Name must be atleast 2 characters long')
+      .min(1, 'Middle Name must be atleast one characters long')
       .max(50, 'Middle Name can be max 50 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters'),
     last_name: Yup.string()
@@ -129,7 +129,7 @@ const applicantSchema = Yup.object().shape({
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in First Name'),
     middle_name: Yup.string()
       .nullable()
-      .min(2, 'Middle Name must be atleast 2 characters long')
+      .min(1, 'Middle Name must be atleast one characters long')
       .max(50, 'Middle Name can be max 50 characters long')
       .matches(/^[a-zA-Z]+$/, 'Invalid characters in Middle Name'),
     last_name: Yup.string()
