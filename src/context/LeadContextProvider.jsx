@@ -6,7 +6,12 @@ import { defaultErrorsLead } from './defaultErrorsLead';
 import { defaultValuesLead } from './defaultValuesLead';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { applicantSteps, coApplicantSteps } from './Steps';
-import { editFieldsById, getApplicantById } from '../global';
+import {
+  checkIsValidStatePincode,
+  editAddressById,
+  editFieldsById,
+  getApplicantById,
+} from '../global';
 import { newCoApplicantValues } from './NewCoApplicant';
 import { AuthContext } from './AuthContextProvider';
 
@@ -413,16 +418,6 @@ const LeadContextProvider = ({ children }) => {
       setAddressTypeOCRText('Capture front image');
       setEnableVerifyOCRAddressProof(false);
 
-      //Reset id type ocr states
-      setEnableEkycIdtype(false);
-      setEkycIDStatus(false);
-      // setIdDisableFields(true);
-
-      //Reset address type ekyc states
-      setEnableEKYCAddressProof(false);
-      setEkycAddressStatus(false);
-      // setAddressDisableFields(true);
-
       formik.setFieldValue('applicants', updatedValues, updateCompleteFormProgress());
     }
   }, [activeIndex, location.pathname]);
@@ -500,25 +495,22 @@ const LeadContextProvider = ({ children }) => {
         formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params
           .is_ekyc_performed_id
       ) {
-        // setIdDisableFields(false);
-        // successful Ekyc (default is_ekyc_verified=false)
         if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
           setEnableEkycIdtype(false);
           setEkycIDStatus(true);
-          // setAddressDisableFields(true);
         } else {
           // unsuccessful Ekyc
           setEnableEkycIdtype(true);
           setEkycIDStatus(false);
-          // setAddressDisableFields(true);
         }
       } else {
         // ekyc didn't perfomed
         setEnableEkycIdtype(true);
         setEkycIDStatus(false);
-        // setIdDisableFields(true);
-        // setAddressDisableFields(true);
       }
+    } else {
+      setEnableEkycIdtype(false);
+      setEkycIDStatus(false);
     }
 
     // did user left on selected_address_proof being aadhar
@@ -535,7 +527,6 @@ const LeadContextProvider = ({ children }) => {
         if (formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
           setEnableEKYCAddressProof(false);
           setEkycAddressStatus(true);
-          // setAddressDisableFields(true);
         } else {
           // unsuccessful Ekyc
           if (
@@ -546,22 +537,159 @@ const LeadContextProvider = ({ children }) => {
             setEnableEKYCAddressProof(true);
           }
           setEkycAddressStatus(false);
-          // setAddressDisableFields(false);
         }
       } else {
         // ekyc didn't perfomed
-        setEnableEKYCAddressProof(true);
-        setEkycAddressStatus(false);
-        // setAddressDisableFields(true);
+        if (
+          !formik.values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type
+        ) {
+          setEnableEKYCAddressProof(true);
+          setEkycAddressStatus(false);
+        }
       }
+    } else {
+      setEnableEKYCAddressProof(false);
+      setEkycAddressStatus(false);
     }
+
     if (formik?.values?.applicants?.length !== coApplicants?.length) {
       coApplicantDrawerUpdate(formik?.values?.applicants);
     }
   }, [formik?.values?.applicants]);
 
+  const handleCurrentPincodeChange = async (value) => {
+    if (!value || value.toString().length < 5) {
+      formik.setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, '');
+      formik.setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, '');
+
+      editAddressById(
+        formik?.values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          current_pincode: '',
+          current_city: '',
+          current_state: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+
+      if (
+        formik?.values?.applicants?.[activeIndex]?.address_detail?.extra_params
+          ?.additional_address_same_as_current
+      ) {
+        formik.setFieldValue(`applicants[${activeIndex}].address_detail.additional_pincode`, '');
+        formik.setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, '');
+        formik.setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, '');
+
+        editAddressById(
+          formik?.values?.applicants?.[activeIndex]?.address_detail?.id,
+          {
+            additional_pincode: '',
+            additional_city: '',
+            additional_state: '',
+          },
+          {
+            headers: {
+              Authorization: token,
+            },
+          },
+        );
+      }
+
+      return;
+    }
+
+    const res = await checkIsValidStatePincode(value, {
+      headers: {
+        Authorization: token,
+      },
+    });
+    if (!res) {
+      formik.setFieldError(
+        `applicants[${activeIndex}].address_detail.current_pincode`,
+        'Invalid Pincode',
+      );
+      formik.setFieldTouched(`applicants[${activeIndex}].address_detail.current_pincode`);
+      setPincodeErr((prev) => ({ ...prev, [`address_current_${activeIndex}`]: 'Invalid Pincode' }));
+
+      formik.setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, '');
+      formik.setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, '');
+
+      editAddressById(
+        formik?.values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          current_pincode: '',
+          current_city: '',
+          current_state: '',
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+
+      if (
+        formik?.values?.applicants?.[activeIndex]?.address_detail?.extra_params
+          ?.additional_address_same_as_current
+      ) {
+        formik.setFieldValue(`applicants[${activeIndex}].address_detail.additional_pincode`, '');
+        formik.setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, '');
+        formik.setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, '');
+      }
+
+      return;
+    }
+
+    editAddressById(
+      formik.values?.applicants?.[activeIndex]?.address_detail?.id,
+      {
+        current_pincode: value,
+        current_city: res.city,
+        current_state: res.state,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+
+    formik.setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, res.city);
+    formik.setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, res.state);
+    setPincodeErr((prev) => ({ ...prev, [`address_current_${activeIndex}`]: '' }));
+
+    if (
+      formik.values?.applicants?.[activeIndex]?.address_detail?.extra_params
+        ?.additional_address_same_as_current
+    ) {
+      editAddressById(
+        formik.values?.applicants?.[activeIndex]?.address_detail?.id,
+        {
+          additional_pincode: value,
+          additional_city: res.city,
+          additional_state: res.state,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
+      );
+
+      formik.setFieldValue(`applicants[${activeIndex}].address_detail.additional_pincode`, value);
+      formik.setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, res.city);
+      formik.setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, res.state);
+
+      setPincodeErr((prev) => ({ ...prev, [`address_additional_${activeIndex}`]: '' }));
+    }
+  };
+
   useEffect(() => {
-    if (idTypeOCRStatus || addressProofOCRStatus) {
+    if (idTypeOCRStatus || addressProofOCRStatus || ekycIDStatus || ekycAddressStatus) {
       const updateCompleteProgress = async () => {
         Promise.all([
           await updateProgressApplicantSteps(
@@ -587,53 +715,24 @@ const LeadContextProvider = ({ children }) => {
               ?.upload_required_fields_status,
           ),
         ])
-          .then(() => console.log('updated progress after successful ekyc'))
-          .catch(() => console.log('error updating progress after successful ekyc'));
+          .then(() => {
+            if (idTypeOCRStatus || addressProofOCRStatus) {
+              handleCurrentPincodeChange(
+                formik?.values?.applicants?.[activeIndex]?.address_detail?.current_pincode,
+              );
+            }
+          })
+          .catch((err) => console.log('UPDATE_PROGRESS_ERR', err));
       };
       updateCompleteProgress();
     } else {
-      console.log('OCR FAILED');
+      console.log('OCR/EKYC FAILED');
     }
   }, [
-    formik.values?.applicants[activeIndex]?.applicant_details.id_type_ocr_status ||
-      formik.values?.applicants[activeIndex]?.applicant_details.selected_address_ocr_status,
+    formik?.values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status,
+    formik?.values?.applicants[activeIndex]?.applicant_details?.selected_address_ocr_status,
+    formik?.values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified,
   ]);
-
-  useEffect(() => {
-    if (ekycIDStatus || ekycAddressStatus) {
-      const updateProgressAfterEkyc = async () => {
-        Promise.all([
-          await updateProgressApplicantSteps(
-            'applicant_details',
-            formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params
-              ?.required_fields_status,
-            'applicant',
-          ),
-          await updateProgressApplicantSteps(
-            'personal_details',
-            formik?.values?.applicants[activeIndex]?.personal_details?.extra_params
-              ?.required_fields_status,
-            'personal',
-          ),
-          await updateProgressApplicantSteps(
-            'address_detail',
-            formik?.values?.applicants[activeIndex]?.address_detail?.extra_params
-              ?.required_fields_status,
-            'address',
-          ),
-          await updateProgressUploadDocumentSteps(
-            formik?.values?.applicants[activeIndex]?.applicant_details?.extra_params
-              ?.upload_required_fields_status,
-          ),
-        ])
-          .then(() => console.log('updated progress after successful ekyc'))
-          .catch(() => console.log('error updating progress after successful ekyc'));
-      };
-      updateProgressAfterEkyc();
-    } else {
-      console.log('EKYC FAILED');
-    }
-  }, [formik.values?.applicants[activeIndex]?.applicant_details.is_ekyc_verified]);
 
   useEffect(() => {
     console.log('Lead Context Values', formik.values);
