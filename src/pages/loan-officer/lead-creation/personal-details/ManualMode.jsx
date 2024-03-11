@@ -95,19 +95,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const [openEkycPopup, setOpenEkycPopup] = useState(false);
   const [field_name, setField_name] = useState(null);
 
-  // console.log('enableOCRIdType', enableOCRIdType);
-  // console.log('enableVerifyOCRIdType', enableVerifyOCRIdType);
-  // console.log('idTypeOCRText', idTypeOCRText);
-  // console.log('idTypeClickedPhotoText', idTypeClickedPhotoText);
-  // console.log('idTypeOCRStatus', idTypeOCRStatus);
-  // console.log('idTypeOCRImages', idTypeOCRImages);
-  // console.log('addressTypeOCRImages', addressTypeOCRImages);
-  console.log(idTypeOCRCount, addressProofOCRCount);
-
-  useEffect(() => {
-    console.log('idTypeOcr', enableOCRIdType, 'addressProofOcr', enableOCRAddressProof);
-  }, [enableOCRIdType, enableOCRAddressProof]);
-
   useEffect(() => {
     if (values?.applicants[activeIndex]?.personal_details?.id_type !== 'AADHAR') {
       if (!idTypeOCRStatus && idTypeOCRCount !== 3) {
@@ -117,7 +104,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       }
     } else {
       // did user perfomed ekyc atleast once irrespective of success or fail
-      if (values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed_id) {
+      if (values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id) {
         setIdDisableFields(false);
         // successful Ekyc (default is_ekyc_verified=false)
         if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
@@ -140,16 +127,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     enableOCRIdType,
     enableOCRAddressProof,
     values?.applicants[activeIndex]?.personal_details?.id_type,
-    values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed_id,
+    values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id,
   ]);
-
-  // if (!values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
-  //   setIdDisableFields(false);
-  // }
-
-  // if (!values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
-  //   setAddressDisableFields(false);
-  // }
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'AADHAR') {
@@ -163,7 +142,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     } else {
       // did user perfomed ekyc atleast once irrespective of success or fail
       if (
-        values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed_address
+        values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_address
       ) {
         // successful Ekyc (default is_ekyc_verified=false)
         if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
@@ -185,7 +164,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     enableOCRIdType,
     enableOCRAddressProof,
     values?.applicants[activeIndex]?.personal_details?.selected_address_proof,
-    values?.applicants[activeIndex]?.applicant_details?.extra_params.is_ekyc_performed_address,
+    values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_address,
   ]);
 
   useEffect(() => {
@@ -506,7 +485,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.personal_details?.id) {
-      // console.log(errors?.applicants?.[activeIndex]);
       if (
         !errors?.applicants?.[activeIndex]?.personal_details?.id_type &&
         !errors?.applicants?.[activeIndex]?.personal_details?.id_number
@@ -912,9 +890,21 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   };
 
   useEffect(() => {
-    if (values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type) {
-      // setEnableOCRAddressProof(false);
+    if (
+      values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+      values?.applicants[activeIndex]?.applicant_details.id_type_ocr_status
+    ) {
       setAddressProofOCRStatus(true);
+    }
+
+    if (
+      values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+      values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+      values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id
+    ) {
+      setEnableEKYCAddressProof(false);
+      setEkycAddressStatus(true);
+      setAddressProofOCRStatus(false);
     }
   }, [values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type]);
 
@@ -1068,40 +1058,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                 '',
               );
               setFieldValue(`applicants[${activeIndex}].personal_details.address_proof_number`, '');
-              setEkycAddressStatus(false);
-              setEnableEKYCAddressProof(false);
-              // (id_type AADHAR and ekyc_verified) remove uploaded aadharPdf from address_proof_photos
-              if (values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR') {
-                if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
-                  const document_meta =
-                    values?.applicants[activeIndex]?.applicant_details?.document_meta;
-                  const address_proof_photos_WithoutAadharPdf =
-                    document_meta.address_proof_photos.filter((data) => {
-                      if (data?.document_type !== 'EKYC') return data;
-                    });
-                  document_meta.address_proof_photos = address_proof_photos_WithoutAadharPdf;
-                  await editFieldsById(
-                    values?.applicants[activeIndex]?.applicant_details?.id,
-                    'applicant',
-                    {
-                      document_meta,
-                      extra_params: {
-                        ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
-                        upload_required_fields_status: {
-                          ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                            .upload_required_fields_status,
-                          address_proof: false,
-                        },
-                      },
-                    },
-                    {
-                      headers: {
-                        Authorization: token,
-                      },
-                    },
-                  );
-                }
-              }
+
               setRequiredFieldsStatus((prev) => ({
                 ...prev,
                 selected_address_proof: false,
@@ -1131,47 +1088,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                   `applicants[${activeIndex}].personal_details.address_proof_number`,
                   null,
                 );
-                // (id_type AADHAR and ekyc_verified) upload aadharPdf to address_proof_photos
-                if (values?.applicants[activeIndex]?.personal_details?.id_type === 'AADHAR') {
-                  if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
-                    const aadharPdf = values?.applicants[
-                      activeIndex
-                    ]?.applicant_details?.document_meta?.id_proof_photos.find((data) => {
-                      if (data?.document_type === 'EKYC') {
-                        return data;
-                      }
-                    });
-                    const document_meta =
-                      values?.applicants[activeIndex]?.applicant_details?.document_meta;
-                    if (document_meta.hasOwnProperty('address_proof_photos')) {
-                      document_meta['address_proof_photos'].push(aadharPdf);
-                    } else {
-                      document_meta['address_proof_photos'] = [aadharPdf];
-                    }
-                    console.log('uploading pdf', value);
-                    await editFieldsById(
-                      values?.applicants[activeIndex]?.applicant_details?.id,
-                      'applicant',
-                      {
-                        document_meta,
-                        extra_params: {
-                          ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params,
-                          upload_required_fields_status: {
-                            ...values?.applicants?.[activeIndex]?.applicant_details?.extra_params
-                              .upload_required_fields_status,
-                            address_proof: true,
-                          },
-                        },
-                      },
-                      {
-                        headers: {
-                          Authorization: token,
-                        },
-                      },
-                    );
-                    console.log('upload pdf done', value);
-                  }
-                }
+
                 setRequiredFieldsStatus((prev) => ({
                   ...prev,
                   selected_address_proof: true,
@@ -1196,6 +1113,8 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
               : false ||
                 values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
                 (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+                  values?.applicants[activeIndex]?.applicant_details?.extra_params
+                    ?.is_ekyc_performed_address &&
                   values?.applicants[activeIndex]?.personal_details?.selected_address_proof ===
                     'AADHAR')
           }
