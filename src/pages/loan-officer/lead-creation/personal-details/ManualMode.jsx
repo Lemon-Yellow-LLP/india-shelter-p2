@@ -152,8 +152,16 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           setAddressDisableFields(false);
         }
       } else {
-        // ekyc didn't perfomed
-        setAddressDisableFields(true);
+        if (
+          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+          !values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+          values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id
+        ) {
+          setAddressDisableFields(false);
+        } else {
+          // ekyc didn't perfomed
+          setAddressDisableFields(true);
+        }
       }
     }
   }, [
