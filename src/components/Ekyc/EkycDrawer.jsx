@@ -286,6 +286,7 @@ export default function EkycDrawer({
           onClick={() => {
             setOpenEkycPopup(false);
             setAadhaarNo('');
+            setAadhaarNoError('');
           }}
         >
           <IconClose />
