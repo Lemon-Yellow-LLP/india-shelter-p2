@@ -162,7 +162,7 @@ const OCRDropdown = memo(
           ) : null}
 
           {enableOCR ? (
-            <div className='flex justify-between items-center'>
+            <div className='flex justify-end ml-auto items-center'>
               <div className='flex flex-1 gap-[4px]'>
                 {clickedPhotoText ? (
                   <>
