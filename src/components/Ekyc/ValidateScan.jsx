@@ -204,8 +204,8 @@ export default function ValidateScan({
         );
         setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: true }));
       }
-      setErrorToastMessage(error.response.data.error);
-      setErrorToastSubMessage(error.response.data.details.errMsg);
+      setErrorToastMessage(error?.response?.data?.error);
+      setErrorToastSubMessage(error?.response?.data?.details?.errMsg);
       console.log(error);
     } finally {
       setOpenEkycPopup(false);
