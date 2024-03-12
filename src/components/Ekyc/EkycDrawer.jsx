@@ -29,6 +29,9 @@ let otpTxnId;
 const biometricKey =
   import.meta.env.VITE_MANTRA_BIOMETRIC_KEY ||
   '0635457cb5902550bab01d6a3864deeab3c6cfb8012306d7716311b4b1a20a84f5ad74a58815';
+
+const DISALLOW_CHAR = ['-', '_', '.', '+', 'ArrowUp', 'ArrowDown', 'Unidentified', 'e', 'E'];
+
 export default function EkycDrawer({
   setOpenEkycPopup,
   setLoading,
@@ -309,9 +312,11 @@ export default function EkycDrawer({
             e.key === 'ArrowRight' ||
             e.key === ' ' ||
             e.keyCode === 32 ||
-            (e.keyCode >= 65 && e.keyCode <= 90)
+            (e.keyCode >= 65 && e.keyCode <= 90) ||
+            DISALLOW_CHAR.includes(e.key)
           ) {
             e.preventDefault();
+            return;
           }
         }}
       />
