@@ -39,9 +39,9 @@ export default function ValidateScan({
   field_name,
   setRequiredFieldsStatus,
 }) {
-  const { setToastMessage, values, activeIndex, setValues } = useContext(LeadContext);
-  const { setErrorToastMessage, setErrorToastSubMessage, token, setFieldValue } =
-    useContext(AuthContext);
+  const { setToastMessage, values, activeIndex, setValues, setFieldValue } =
+    useContext(LeadContext);
+  const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
   // storing current selected scan meta data
   const [validateScanObj, setValidateScanObj] = useState({});
   const [disableCapture, setdisableCapture] = useState(false);
@@ -80,7 +80,6 @@ export default function ValidateScan({
         otpValue,
         wadh,
         function (responseXml) {
-          console.log(responseXml, ' data from mantra device');
           if (responseXml.includes('errCode="0"')) {
             setBiometricData(responseXml);
             SetIsCapturing(false);
@@ -143,7 +142,6 @@ export default function ValidateScan({
           },
         },
       );
-      console.log(res);
       setValues(res.lead);
       setRequiredFieldsStatus(
         res?.lead?.applicants[activeIndex]?.personal_details?.extra_params?.required_fields_status,
