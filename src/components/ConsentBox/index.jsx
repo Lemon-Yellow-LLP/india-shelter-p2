@@ -12,18 +12,6 @@ const consentInMultipleLanguage = [
       'I hereby consent to provide my Aadhaar Number and One Time Pin adhaar based authentication for the purpose of establishing my identity and providing demographic details for the loan application. I have no objection in authenticating myself and fully understand that information provided by me shall be used for authenticating my identity through Aadhaar Authentication System for the purpose stated above and no other purpose',
     audioFile: consentEnglishAudioFile,
   },
-  {
-    language: 'hindi',
-    description:
-      'मैं अपनी पहचान स्थापित करने और ऋण आवेदन के लिए जनसांख्यिकीय विवरण प्रदान करने के उद्देश्य से अपना आधार नंबर और वन टाइम पिन आधार आधारित प्रमाणीकरण प्रदान करने के लिए सहमति देता हूं। मुझे खुद को प्रमाणित करने में कोई आपत्ति नहीं है और मैं पूरी तरह से समझता हूं कि मेरे द्वारा प्रदान की गई जानकारी का उपयोग आधार प्रमाणीकरण प्रणाली के माध्यम से मेरी पहचान को प्रमाणित करने के लिए ऊपर बताए गए उद्देश्य के लिए किया जाएगा और किसी अन्य उद्देश्य के लिए नहीं किया जाएगा।',
-    audioFile: consentEnglishAudioFile,
-  },
-  {
-    language: 'marathi',
-    description:
-      'माझी ओळख प्रस्थापित करण्याच्या उद्देशाने आणि कर्जाच्या अर्जासाठी लोकसंख्याशास्त्रीय तपशील प्रदान करण्याच्या उद्देशाने माझा आधार क्रमांक आणि वन टाइम पिन आधार आधारीत प्रमाणीकरण प्रदान करण्यास मी याद्वारे संमती देतो. मला स्वत:चे प्रमाणीकरण करण्यास कोणताही आक्षेप नाही आणि मला पूर्णपणे समजले आहे की माझ्याद्वारे प्रदान केलेली माहिती वर नमूद केलेल्या उद्देशासाठी आधार प्रमाणीकरण प्रणालीद्वारे माझी ओळख प्रमाणित करण्यासाठी वापरली जाईल आणि इतर कोणत्याही हेतूसाठी नाही.',
-    audioFile: consentEnglishAudioFile,
-  },
 ];
 
 const ConsentBox = ({ isChecked, setIsChecked, updateConsent, disabled }) => {
@@ -43,14 +31,6 @@ const ConsentBox = ({ isChecked, setIsChecked, updateConsent, disabled }) => {
     {
       label: 'English',
       value: 'english',
-    },
-    {
-      label: 'Hindi',
-      value: 'hindi',
-    },
-    {
-      label: 'Marathi',
-      value: 'marathi',
     },
   ];
 
