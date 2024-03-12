@@ -2223,12 +2223,14 @@ const UploadDocuments = ({ activeIndex }) => {
                                 </span>
                               </p>
                             ) : (
-                              <span
-                                className='text-primary-red text-xs font-normal flex items-center'
-                                onClick={() => setEditIdNumber(!editIdNumber)}
-                              >
-                                Save
-                              </span>
+                              !errors.applicants?.[activeIndex]?.personal_details?.id_number && (
+                                <span
+                                  className='text-primary-red text-xs font-normal flex items-center'
+                                  onClick={() => setEditIdNumber(!editIdNumber)}
+                                >
+                                  Save
+                                </span>
+                              )
                             ))}
                         </div>
 
@@ -2527,12 +2529,15 @@ const UploadDocuments = ({ activeIndex }) => {
                                 </span>
                               </p>
                             ) : (
-                              <span
-                                className='text-primary-red text-xs font-normal flex items-center'
-                                onClick={() => setEditAddressNumber(!editAddressNumber)}
-                              >
-                                Save
-                              </span>
+                              !errors.applicants?.[activeIndex]?.personal_details
+                                ?.address_proof_number && (
+                                <span
+                                  className='text-primary-red text-xs font-normal flex items-center'
+                                  onClick={() => setEditAddressNumber(!editAddressNumber)}
+                                >
+                                  Save
+                                </span>
+                              )
                             ))}
                         </div>
 
