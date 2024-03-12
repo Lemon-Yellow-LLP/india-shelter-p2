@@ -963,7 +963,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           idTypeOCRStatus ||
           ekycIDStatus
         }
-        enableOCR={enableOCRIdType}
+        enableOCR={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableOCRIdType
+        }
         captureImages={captureIDImages}
         ocrButtonText={idTypeOCRText}
         clickedPhotoText={idTypeClickedPhotoText}
@@ -972,7 +976,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onVerifyClick={verifyOCRIdType}
         setOpenEkycPopup={setOpenEkycPopup}
         verifiedEkycStatus={ekycIDStatus}
-        enableEKYC={enableEkycIdtype}
+        enableEKYC={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableEkycIdtype
+        }
         setField_name={() => setField_name('id_type')}
       />
 
@@ -1165,7 +1173,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
-        enableOCR={enableOCRAddressProof}
+        enableOCR={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableOCRAddressProof
+        }
         captureImages={captureAddressImages}
         ocrButtonText={addressTypeOCRText}
         clickedPhotoText={addressTypeClickedPhotoText}
@@ -1174,7 +1186,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onVerifyClick={verifyOCRAddressType}
         setOpenEkycPopup={setOpenEkycPopup}
         verifiedEkycStatus={ekycAddressStatus}
-        enableEKYC={enableEKYCAddressProof}
+        enableEKYC={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableEKYCAddressProof
+        }
         setField_name={() => setField_name('selected_address_proof')}
       />
 
