@@ -130,6 +130,7 @@ export default function EkycDrawer({
     } catch (error) {
       console.log(error);
       setErrorToastMessage(error.response.data.error);
+      setErrorToastSubMessage(error?.response?.data?.details?.errMsg);
       setOpenEkycPopup(false);
       setIsAadharInputDrawer(true);
       setAadhaarNo('');
@@ -242,7 +243,7 @@ export default function EkycDrawer({
         setRequiredFieldsStatus((prev) => ({ ...prev, address_proof_number: true }));
       }
 
-      setErrorToastMessage(error?.response?.data?.error);
+      setErrorToastMessage(error?.response?.data?.error || error?.response?.data?.message);
       setErrorToastSubMessage(error?.response?.data?.details?.errMsg);
     } finally {
       setLoading(false);
