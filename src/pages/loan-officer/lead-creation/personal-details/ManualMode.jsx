@@ -152,8 +152,16 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           setAddressDisableFields(false);
         }
       } else {
-        // ekyc didn't perfomed
-        setAddressDisableFields(true);
+        if (
+          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+          !values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+          values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id
+        ) {
+          setAddressDisableFields(false);
+        } else {
+          // ekyc didn't perfomed
+          setAddressDisableFields(true);
+        }
       }
     }
   }, [
@@ -920,7 +928,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
       })
     ) {
-      if (!values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+      if (
+        !values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+        values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status
+      ) {
         setAddressDisableFields(false);
       }
     }
@@ -955,7 +966,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           idTypeOCRStatus ||
           ekycIDStatus
         }
-        enableOCR={enableOCRIdType}
+        enableOCR={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableOCRIdType
+        }
         captureImages={captureIDImages}
         ocrButtonText={idTypeOCRText}
         clickedPhotoText={idTypeClickedPhotoText}
@@ -964,7 +979,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onVerifyClick={verifyOCRIdType}
         setOpenEkycPopup={setOpenEkycPopup}
         verifiedEkycStatus={ekycIDStatus}
-        enableEKYC={enableEkycIdtype}
+        enableEKYC={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableEkycIdtype
+        }
         setField_name={() => setField_name('id_type')}
       />
 
@@ -1157,7 +1176,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
-        enableOCR={enableOCRAddressProof}
+        enableOCR={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableOCRAddressProof
+        }
         captureImages={captureAddressImages}
         ocrButtonText={addressTypeOCRText}
         clickedPhotoText={addressTypeClickedPhotoText}
@@ -1166,7 +1189,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onVerifyClick={verifyOCRAddressType}
         setOpenEkycPopup={setOpenEkycPopup}
         verifiedEkycStatus={ekycAddressStatus}
-        enableEKYC={enableEKYCAddressProof}
+        enableEKYC={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableEKYCAddressProof
+        }
         setField_name={() => setField_name('selected_address_proof')}
       />
 
