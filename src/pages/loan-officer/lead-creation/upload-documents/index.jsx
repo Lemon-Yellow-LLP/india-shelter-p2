@@ -2360,11 +2360,11 @@ const UploadDocuments = ({ activeIndex }) => {
                   }}
                 />
 
-                {(values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+                {values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+                (values?.applicants[activeIndex]?.applicant_details?.extra_params
+                  .is_ekyc_performed_address ||
                   values?.applicants[activeIndex]?.applicant_details?.extra_params
-                    .is_ekyc_performed_address) ||
-                values?.applicants[activeIndex]?.applicant_details?.extra_params
-                  .is_ekyc_performed_id ? (
+                    .is_ekyc_performed_id) ? (
                   <PdfAndImageUpload
                     files={addressProofPhotos}
                     setFile={setAddressProofPhotos}
