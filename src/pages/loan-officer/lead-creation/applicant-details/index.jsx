@@ -675,7 +675,7 @@ const ApplicantDetails = () => {
           extra_params: {
             extra_company_name: '',
             extra_industries: '',
-            progress: 15,
+            progress: 0,
             required_fields_status: {
               profession: false,
               pan_number: false,
