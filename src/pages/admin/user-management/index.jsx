@@ -399,13 +399,32 @@ const UserManagement = () => {
   //fetch users
   useEffect(() => {
     const getUsers = async () => {
-      getAllDbUsers({
+      // getAllDbUsers({
+      //   headers: {
+      //     Authorization: token,
+      //   },
+      // })
+      //   .then((data) => setAllDbUsers(data))
+      //   .catch((error) => console.log('FETCH_ALL_USERS_ERR', error));
+
+      const payload = {
+        start_date: '2022-01-01',
+        end_date: moment(selectionRange.endDate).add(1, 'day').format('YYYY-MM-DD'),
+        page: 1,
+        page_size: 10000000,
+      };
+
+      getUsersList(payload, {
         headers: {
           Authorization: token,
         },
       })
-        .then((data) => setAllDbUsers(data))
-        .catch((error) => console.log('FETCH_ALL_USERS_ERR', error));
+        .then((users) => {
+          setAllDbUsers(users.data);
+        })
+        .catch((error) => {
+          console.log('FETCH_ALL_USERS_ERR', error);
+        });
 
       switch (dateState) {
         case 'Last 30 days': {
@@ -675,7 +694,7 @@ const UserManagement = () => {
   // console.log('open', open);
   // console.log('range', range);
   // console.log('dropdown-state', dateState);
-  // console.log(allDbUsers);
+  console.log(allDbUsers);
 
   return (
     <>
