@@ -269,10 +269,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdTypeOCRImages([]);
         setIdTypeClickedPhotoText('');
         setIdTypeOCRText('Capture front image');
-        // setEnableVerifyOCRIdType(false);
-
         setEnableOCRIdType(true);
-
         setEnableEkycIdtype(false);
       } else if (e === 'AADHAR') {
         setEnableVerifyOCRIdType(false);
@@ -280,10 +277,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdTypeOCRImages([]);
         setIdTypeClickedPhotoText('');
         setIdTypeOCRText('Capture front image');
-        // setEnableVerifyOCRIdType(false);
-
         setEnableEkycIdtype(true);
-
         setEnableOCRIdType(false);
       }
     },
@@ -308,10 +302,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setAddressTypeClickedPhotoText('');
         setAddressTypeOCRText('Capture front image');
         setEnableVerifyOCRAddressProof(false);
-
         setEnableOCRAddressProof(true);
-
-        // setEnableEKYCAddressProof(false);
       } else if (e === 'AADHAR') {
         setEnableEKYCAddressProof(false);
       }
@@ -543,7 +534,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   ]);
 
   const sendEmailOTP = () => {
-    // setDisableEmailInput((prev) => !prev);
     setShowOTPInput(true);
     setHasSentOTPOnce(true);
 
