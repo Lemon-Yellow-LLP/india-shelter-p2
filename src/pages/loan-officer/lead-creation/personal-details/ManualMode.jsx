@@ -928,7 +928,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
       })
     ) {
-      if (!values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+      if (
+        !values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+        values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status
+      ) {
         setAddressDisableFields(false);
       }
     }
