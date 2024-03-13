@@ -300,7 +300,7 @@ const PersonalDetails = () => {
         <SwipeableDrawerComponent />
 
         {loading ? (
-          <div className='absolute w-full h-full bg-[#00000080] z-[8000]'>
+          <div className='absolute w-full h-screen bg-[#00000080] z-[99999] pointer-events-none select-none'>
             <LoaderDynamicText text='Validating' textColor='white' height='100vh' />
           </div>
         ) : null}
