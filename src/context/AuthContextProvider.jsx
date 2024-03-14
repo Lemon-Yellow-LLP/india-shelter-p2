@@ -89,7 +89,7 @@ const AuthContextProvider = ({ children }) => {
               return;
             }
             setToastType('error');
-            setUserToastMessage(`Changes couldn't be saved!`);
+            setUserToastMessage(`Changes couldn't be saved! Try refreshing the data`);
             setShowActionControlPopup(false);
             setShow(false);
             formik.setValues(formik.initialValues);
