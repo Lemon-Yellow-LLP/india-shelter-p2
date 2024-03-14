@@ -100,7 +100,7 @@ export default function EkycDrawer({
       setOpenEkycPopup(false);
       setPerformVerification(false);
       setIsAadharInputDrawer(true);
-      setErrorToastMessage(error.response.data.error);
+      setErrorToastMessage(error?.response?.data?.error);
     } finally {
       setLoading(false);
     }
@@ -129,7 +129,7 @@ export default function EkycDrawer({
       setPerformVerification(true);
     } catch (error) {
       console.log(error);
-      setErrorToastMessage(error.response.data.error);
+      setErrorToastMessage(error?.response?.data?.error);
       setErrorToastSubMessage(error?.response?.data?.details?.errMsg);
       setOpenEkycPopup(false);
       setIsAadharInputDrawer(true);
