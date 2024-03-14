@@ -178,11 +178,11 @@ const OCRDropdown = memo(
                   <span className='font-[600] text-[16px] text-primary-red'>{ocrButtonText}</span>
                 </button>
               ) : (
-                <label className={`flex cursor-pointer items-center`}>
+                <label className={`flex cursor-pointer items-center relative`}>
                   <input
                     type='file'
                     onChange={captureImages}
-                    className='opacity-0 w-[0px] h-[0px]'
+                    className='opacity-0 w-[0px] h-[0px] absolute'
                     multiple={true}
                     name='files'
                     capture='user'
