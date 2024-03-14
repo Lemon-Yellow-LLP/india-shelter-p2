@@ -132,11 +132,17 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'AADHAR') {
-      if (!addressProofOCRStatus && addressProofOCRCount !== 3) {
+      if (
+        !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+        !addressProofOCRStatus &&
+        addressProofOCRCount !== 3
+      ) {
         setAddressDisableFields(true);
       } else {
         if (!values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
           setAddressDisableFields(false);
+        } else {
+          setAddressDisableFields(true);
         }
       }
     } else {
