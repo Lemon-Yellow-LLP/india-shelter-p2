@@ -2223,12 +2223,14 @@ const UploadDocuments = ({ activeIndex }) => {
                                 </span>
                               </p>
                             ) : (
-                              <span
-                                className='text-primary-red text-xs font-normal flex items-center'
-                                onClick={() => setEditIdNumber(!editIdNumber)}
-                              >
-                                Save
-                              </span>
+                              !errors.applicants?.[activeIndex]?.personal_details?.id_number && (
+                                <span
+                                  className='text-primary-red text-xs font-normal flex items-center'
+                                  onClick={() => setEditIdNumber(!editIdNumber)}
+                                >
+                                  Save
+                                </span>
+                              )
                             ))}
                         </div>
 
@@ -2361,8 +2363,10 @@ const UploadDocuments = ({ activeIndex }) => {
                 />
 
                 {values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
-                values?.applicants[activeIndex]?.applicant_details?.extra_params
-                  .is_ekyc_performed_address ? (
+                (values?.applicants[activeIndex]?.applicant_details?.extra_params
+                  .is_ekyc_performed_address ||
+                  values?.applicants[activeIndex]?.applicant_details?.extra_params
+                    .is_ekyc_performed_id) ? (
                   <PdfAndImageUpload
                     files={addressProofPhotos}
                     setFile={setAddressProofPhotos}
@@ -2527,12 +2531,15 @@ const UploadDocuments = ({ activeIndex }) => {
                                 </span>
                               </p>
                             ) : (
-                              <span
-                                className='text-primary-red text-xs font-normal flex items-center'
-                                onClick={() => setEditAddressNumber(!editAddressNumber)}
-                              >
-                                Save
-                              </span>
+                              !errors.applicants?.[activeIndex]?.personal_details
+                                ?.address_proof_number && (
+                                <span
+                                  className='text-primary-red text-xs font-normal flex items-center'
+                                  onClick={() => setEditAddressNumber(!editAddressNumber)}
+                                >
+                                  Save
+                                </span>
+                              )
                             ))}
                         </div>
 

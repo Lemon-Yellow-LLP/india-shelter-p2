@@ -132,11 +132,17 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'AADHAR') {
-      if (!addressProofOCRStatus && addressProofOCRCount !== 3) {
+      if (
+        !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+        !addressProofOCRStatus &&
+        addressProofOCRCount !== 3
+      ) {
         setAddressDisableFields(true);
       } else {
         if (!values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
           setAddressDisableFields(false);
+        } else {
+          setAddressDisableFields(true);
         }
       }
     } else {
@@ -152,8 +158,16 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           setAddressDisableFields(false);
         }
       } else {
-        // ekyc didn't perfomed
-        setAddressDisableFields(true);
+        if (
+          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+          !values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+          values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id
+        ) {
+          setAddressDisableFields(false);
+        } else {
+          // ekyc didn't perfomed
+          setAddressDisableFields(true);
+        }
       }
     }
   }, [
@@ -261,10 +275,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdTypeOCRImages([]);
         setIdTypeClickedPhotoText('');
         setIdTypeOCRText('Capture front image');
-        // setEnableVerifyOCRIdType(false);
-
         setEnableOCRIdType(true);
-
         setEnableEkycIdtype(false);
       } else if (e === 'AADHAR') {
         setEnableVerifyOCRIdType(false);
@@ -272,10 +283,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdTypeOCRImages([]);
         setIdTypeClickedPhotoText('');
         setIdTypeOCRText('Capture front image');
-        // setEnableVerifyOCRIdType(false);
-
         setEnableEkycIdtype(true);
-
         setEnableOCRIdType(false);
       }
     },
@@ -300,10 +308,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setAddressTypeClickedPhotoText('');
         setAddressTypeOCRText('Capture front image');
         setEnableVerifyOCRAddressProof(false);
-
         setEnableOCRAddressProof(true);
-
-        // setEnableEKYCAddressProof(false);
       } else if (e === 'AADHAR') {
         setEnableEKYCAddressProof(false);
       }
@@ -535,7 +540,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   ]);
 
   const sendEmailOTP = () => {
-    // setDisableEmailInput((prev) => !prev);
     setShowOTPInput(true);
     setHasSentOTPOnce(true);
 
@@ -600,43 +604,49 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   }, [values?.applicants?.[activeIndex]?.applicant_details?.mobile_number]);
 
   const captureIDImages = (e) => {
-    if (
-      idTypeOCRImages.length === 0 &&
-      values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID'
-    ) {
-      setIdTypeOCRText('Capture back image');
-      setIdTypeClickedPhotoText('Front captured');
-    } else if (values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID') {
-      setIdTypeOCRText('Verify with OCR');
-      setIdTypeClickedPhotoText('Front captured');
-      setEnableVerifyOCRIdType(true);
-    } else {
-      setIdTypeOCRText('Verify with OCR');
-      setIdTypeClickedPhotoText('Front & back captured');
-      setEnableVerifyOCRIdType(true);
+    if (e.target.files[0]) {
+      let idTypeOCRImagesData = [...idTypeOCRImages, e.target.files[0]];
+      if (
+        (idTypeOCRImagesData.length === 0 || idTypeOCRImagesData.length === 1) &&
+        values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID'
+      ) {
+        setIdTypeOCRText('Capture back image');
+        setIdTypeClickedPhotoText('Front captured');
+      } else if (values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID') {
+        setIdTypeOCRText('Verify with OCR');
+        setIdTypeClickedPhotoText('Front captured');
+        setEnableVerifyOCRIdType(true);
+      } else {
+        setIdTypeOCRText('Verify with OCR');
+        setIdTypeClickedPhotoText('Front & back captured');
+        setEnableVerifyOCRIdType(true);
+      }
+      setIdTypeOCRImages(idTypeOCRImagesData);
     }
-    setIdTypeOCRImages((prev) => [...prev, e.target.files[0]]);
   };
 
   const captureAddressImages = (e) => {
-    if (
-      addressTypeOCRImages.length === 0 &&
-      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID'
-    ) {
-      setAddressTypeOCRText('Capture back image');
-      setAddressTypeClickedPhotoText('Front captured');
-    } else if (
-      values.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'Voter ID'
-    ) {
-      setAddressTypeOCRText('Verify with OCR');
-      setAddressTypeClickedPhotoText('Front captured');
-      setEnableVerifyOCRAddressProof(true);
-    } else {
-      setAddressTypeOCRText('Verify with OCR');
-      setAddressTypeClickedPhotoText('Front & back captured');
-      setEnableVerifyOCRAddressProof(true);
+    if (e.target.files[0]) {
+      let addressTypeOCRImagesData = [...addressTypeOCRImages, e.target.files[0]];
+      if (
+        (addressTypeOCRImagesData.length === 0 || addressTypeOCRImagesData.length === 1) &&
+        values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID'
+      ) {
+        setAddressTypeOCRText('Capture back image');
+        setAddressTypeClickedPhotoText('Front captured');
+      } else if (
+        values.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'Voter ID'
+      ) {
+        setAddressTypeOCRText('Verify with OCR');
+        setAddressTypeClickedPhotoText('Front captured');
+        setEnableVerifyOCRAddressProof(true);
+      } else {
+        setAddressTypeOCRText('Verify with OCR');
+        setAddressTypeClickedPhotoText('Front & back captured');
+        setEnableVerifyOCRAddressProof(true);
+      }
+      setAddressTypeOCRImages(addressTypeOCRImagesData);
     }
-    setAddressTypeOCRImages((prev) => [...prev, e.target.files[0]]);
   };
 
   const verifyOCRIdType = async (e) => {
@@ -920,7 +930,10 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
       })
     ) {
-      if (!values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+      if (
+        !values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+        values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status
+      ) {
         setAddressDisableFields(false);
       }
     }
@@ -955,7 +968,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           idTypeOCRStatus ||
           ekycIDStatus
         }
-        enableOCR={enableOCRIdType}
+        enableOCR={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableOCRIdType
+        }
         captureImages={captureIDImages}
         ocrButtonText={idTypeOCRText}
         clickedPhotoText={idTypeClickedPhotoText}
@@ -964,7 +981,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onVerifyClick={verifyOCRIdType}
         setOpenEkycPopup={setOpenEkycPopup}
         verifiedEkycStatus={ekycIDStatus}
-        enableEKYC={enableEkycIdtype}
+        enableEKYC={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableEkycIdtype
+        }
         setField_name={() => setField_name('id_type')}
       />
 
@@ -1157,7 +1178,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onBlur={(e) => {
           handleBlur(e);
         }}
-        enableOCR={enableOCRAddressProof}
+        enableOCR={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableOCRAddressProof
+        }
         captureImages={captureAddressImages}
         ocrButtonText={addressTypeOCRText}
         clickedPhotoText={addressTypeClickedPhotoText}
@@ -1166,7 +1191,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         onVerifyClick={verifyOCRAddressType}
         setOpenEkycPopup={setOpenEkycPopup}
         verifiedEkycStatus={ekycAddressStatus}
-        enableEKYC={enableEKYCAddressProof}
+        enableEKYC={
+          values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier
+            ? false
+            : enableEKYCAddressProof
+        }
         setField_name={() => setField_name('selected_address_proof')}
       />
 

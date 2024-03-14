@@ -400,7 +400,7 @@ const IdentificationDoneFields = ({
         }}
       />
 
-      <MapInput
+      {/* <MapInput
         name='property_details.project_society_colony'
         label='Project/Society/Colony name'
         required
@@ -425,7 +425,7 @@ const IdentificationDoneFields = ({
         maxLength={90}
         onBlur={handleBlur}
         onMapButtonClick={onMapButtonClick}
-      />
+      /> */}
 
       <TextInput
         name='property_details.pincode'

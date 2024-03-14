@@ -64,11 +64,7 @@ const ConsentBox = ({ isChecked, setIsChecked, updateConsent, disabled }) => {
             </button>
           </div>
         </div>
-        <Audio
-          label='Listen audio'
-          hint='To proceed further, kindly listen to the entire audio'
-          audioFile={consent.audioFile}
-        />
+        <Audio label='Listen audio' audioFile={consent.audioFile} />
       </div>
     </div>
   );
