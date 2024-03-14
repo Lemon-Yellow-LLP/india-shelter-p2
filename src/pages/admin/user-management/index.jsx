@@ -650,7 +650,7 @@ const UserManagement = () => {
         .catch((error) => {
           console.log('EDIT_USER_ERROR', error);
           setToastType('error');
-          setUserToastMessage(`Changes couldn't be saved!`);
+          setUserToastMessage(`Changes couldn't be saved! Try refreshing the data`);
         });
 
       setUserStatus(null);
@@ -681,20 +681,12 @@ const UserManagement = () => {
     }
   };
 
-  // console.log(leadList);
-  // console.log(resetDate);
-  // console.log(resetFilter);
-  // console.log(userDropDownData);
-  // console.log(toastType);
-  // console.log(values);
-  // console.log(errors);
-  // console.log(token);
-  // console.log(userDropDownData.roles);
-  // console.log(loData);
-  // console.log('open', open);
-  // console.log('range', range);
-  // console.log('dropdown-state', dateState);
-  console.log(allDbUsers);
+  const handleUsersRefresh = () => {
+    setUseradd([]);
+    setQuery('');
+    setToastType('success');
+    setUserToastMessage(`Data refreshed successfully!`);
+  };
 
   return (
     <>
@@ -715,6 +707,7 @@ const UserManagement = () => {
         buttonText='Add User'
         prompt='Search for emp code, role, branch, mob number'
         handleButtonClick={() => setShow(true)}
+        callback={handleUsersRefresh}
       />
 
       {/* edit/ delete/ active/ inactive action popup */}
@@ -768,7 +761,9 @@ const UserManagement = () => {
 
       <FormPopUp
         title={userAction ? 'Edit user' : 'Add user'}
-        subTitle='Created on: Today'
+        subTitle={`Created on: ${
+          userAction?.createdAt ? moment(userAction?.createdAt).format('DD/MM/YYYY') : 'Today'
+        }`}
         actionMsg={userAction ? 'Save' : 'Confirm'}
         showpopup={show}
         setShowPopUp={setShow}
