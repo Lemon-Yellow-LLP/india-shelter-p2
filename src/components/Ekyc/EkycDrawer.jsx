@@ -278,7 +278,7 @@ export default function EkycDrawer({
     if (aadhaarPattern.test(value)) {
       setAadhaarNoError('');
     } else {
-      setAadhaarNoError('Enter valid 12 digit Aadhaar no.');
+      setAadhaarNoError('Enter valid 12 digit Aadhar no.');
     }
   };
 
