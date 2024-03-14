@@ -165,7 +165,7 @@ const AdminAction = ({ user, isOpen, index, handleAdminActionPopupId, setAdminAc
   const handleSelect = useCallback(
     (option) => {
       setSelectedOption(option);
-      setUserAction({ id: user.id, value: option.value });
+      setUserAction({ id: user.id, value: option.value, createdAt: user.created_at });
       const userMeta = {
         employee_code: user.employee_code,
         username: user.username,
