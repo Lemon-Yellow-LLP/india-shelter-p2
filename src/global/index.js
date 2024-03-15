@@ -535,7 +535,7 @@ async function editUser(id, values, options) {
 
 async function deleteUser(id, options) {
   try {
-    const { data } = await axios.delete(`${API_URL}/account/delete/${id}`, options);
+    const { data } = await axios.post(`${API_URL}/admin/delete-user/${id}`, {}, options);
     return data;
   } catch (error) {
     throw new Error(error);
