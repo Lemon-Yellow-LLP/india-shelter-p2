@@ -2165,6 +2165,14 @@ const UploadDocuments = ({ activeIndex }) => {
                                         },
                                       },
                                     );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.address_proof_number`,
+                                      e.target.value,
+                                    );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.id_number`,
+                                      e.target.value,
+                                    );
                                   } else {
                                     editFieldsById(
                                       values?.applicants?.[activeIndex]?.personal_details?.id,
@@ -2177,6 +2185,10 @@ const UploadDocuments = ({ activeIndex }) => {
                                           Authorization: token,
                                         },
                                       },
+                                    );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.id_number`,
+                                      e.target.value,
                                     );
                                   }
                                   if (
@@ -2508,6 +2520,14 @@ const UploadDocuments = ({ activeIndex }) => {
                                         },
                                       },
                                     );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.address_proof_number`,
+                                      e.target.value,
+                                    );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.id_number`,
+                                      e.target.value,
+                                    );
                                   } else {
                                     editFieldsById(
                                       values?.applicants?.[activeIndex]?.personal_details?.id,
@@ -2520,6 +2540,10 @@ const UploadDocuments = ({ activeIndex }) => {
                                           Authorization: token,
                                         },
                                       },
+                                    );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.address_proof_number`,
+                                      e.target.value,
                                     );
                                   }
                                 }
