@@ -272,13 +272,19 @@ export default function EkycDrawer({
   // aadhaar no validation
   const handleAadhaarNoChange = (e) => {
     const value = e.target.value;
+    if (DISALLOW_CHAR.includes(e.key)) {
+      e.preventDefault();
+      return;
+    }
     const aadhaarPattern = /^\d{12}$/;
     if (value[0] == '0' || value[0] == '1') return;
-    setAadhaarNo(value);
-    if (aadhaarPattern.test(value)) {
-      setAadhaarNoError('');
-    } else {
-      setAadhaarNoError('Enter valid 12 digit Aadhar no.');
+    if (/^\d+$/g.test(value) || !value.length) {
+      setAadhaarNo(value);
+      if (aadhaarPattern.test(value)) {
+        setAadhaarNoError('');
+      } else {
+        setAadhaarNoError('Enter valid 12 digit Aadhar no.');
+      }
     }
   };
 
@@ -298,13 +304,14 @@ export default function EkycDrawer({
       </div>
       <TextInput
         placeholder='Enter Aadhar number'
-        type='number'
+        type='tel'
         name='aadhaarNo'
         value={aadhaarNo}
         onChange={handleAadhaarNoChange}
         error={aadhaarNoError}
         touched={true}
-        min={0} // hanlde mousewheel down
+        pattern='\d*'
+        min='0' // hanlde mousewheel down
         onKeyDown={(e) => {
           if (
             e.key === 'ArrowUp' ||
@@ -313,8 +320,7 @@ export default function EkycDrawer({
             e.key === 'ArrowRight' ||
             e.key === ' ' ||
             e.keyCode === 32 ||
-            (e.keyCode >= 65 && e.keyCode <= 90) ||
-            DISALLOW_CHAR.includes(e.key)
+            (e.keyCode >= 65 && e.keyCode <= 90)
           ) {
             e.preventDefault();
             return;
