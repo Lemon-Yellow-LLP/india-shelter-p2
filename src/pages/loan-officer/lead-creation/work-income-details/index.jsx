@@ -592,7 +592,7 @@ const WorkIncomeDetails = () => {
             !!values?.applicants?.[activeIndex]?.work_income_detail?.profession ? (
               <TextInput
                 label='Enter PAN number'
-                placeholder='EG: ABCDE1234F'
+                placeholder='Eg: ABCDE1234F'
                 required
                 name={`applicants[${activeIndex}].work_income_detail.pan_number`}
                 value={values?.applicants?.[activeIndex]?.work_income_detail?.pan_number}

@@ -2148,19 +2148,49 @@ const UploadDocuments = ({ activeIndex }) => {
                                 if (
                                   !errors.applicants?.[activeIndex]?.personal_details?.id_number
                                 ) {
-                                  editFieldsById(
-                                    values?.applicants?.[activeIndex]?.personal_details?.id,
-                                    'personal',
-                                    {
-                                      id_number: e.target.value,
-                                    },
-                                    {
-                                      headers: {
-                                        Authorization: token,
+                                  if (
+                                    values?.applicants?.[activeIndex]?.personal_details
+                                      ?.extra_params?.same_as_id_type
+                                  ) {
+                                    editFieldsById(
+                                      values?.applicants?.[activeIndex]?.personal_details?.id,
+                                      'personal',
+                                      {
+                                        id_number: e.target.value,
+                                        address_proof_number: e.target.value,
                                       },
-                                    },
-                                  );
-
+                                      {
+                                        headers: {
+                                          Authorization: token,
+                                        },
+                                      },
+                                    );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.address_proof_number`,
+                                      e.target.value,
+                                    );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.id_number`,
+                                      e.target.value,
+                                    );
+                                  } else {
+                                    editFieldsById(
+                                      values?.applicants?.[activeIndex]?.personal_details?.id,
+                                      'personal',
+                                      {
+                                        id_number: e.target.value,
+                                      },
+                                      {
+                                        headers: {
+                                          Authorization: token,
+                                        },
+                                      },
+                                    );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.id_number`,
+                                      e.target.value,
+                                    );
+                                  }
                                   if (
                                     values?.applicants?.[activeIndex]?.personal_details?.id_type ===
                                     'PAN'
@@ -2473,18 +2503,49 @@ const UploadDocuments = ({ activeIndex }) => {
                                   !errors.applicants?.[activeIndex]?.personal_details
                                     ?.address_proof_number
                                 ) {
-                                  editFieldsById(
-                                    values?.applicants?.[activeIndex]?.personal_details?.id,
-                                    'personal',
-                                    {
-                                      address_proof_number: e.target.value,
-                                    },
-                                    {
-                                      headers: {
-                                        Authorization: token,
+                                  if (
+                                    values?.applicants?.[activeIndex]?.personal_details
+                                      ?.extra_params?.same_as_id_type
+                                  ) {
+                                    editFieldsById(
+                                      values?.applicants?.[activeIndex]?.personal_details?.id,
+                                      'personal',
+                                      {
+                                        id_number: e.target.value,
+                                        address_proof_number: e.target.value,
                                       },
-                                    },
-                                  );
+                                      {
+                                        headers: {
+                                          Authorization: token,
+                                        },
+                                      },
+                                    );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.address_proof_number`,
+                                      e.target.value,
+                                    );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.id_number`,
+                                      e.target.value,
+                                    );
+                                  } else {
+                                    editFieldsById(
+                                      values?.applicants?.[activeIndex]?.personal_details?.id,
+                                      'personal',
+                                      {
+                                        address_proof_number: e.target.value,
+                                      },
+                                      {
+                                        headers: {
+                                          Authorization: token,
+                                        },
+                                      },
+                                    );
+                                    setFieldValue(
+                                      `applicants[${activeIndex}].personal_details.address_proof_number`,
+                                      e.target.value,
+                                    );
+                                  }
                                 }
                               }}
                               inputClasses='text-xs capitalize h-3'
