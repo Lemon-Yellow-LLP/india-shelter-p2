@@ -46,6 +46,12 @@ const LanguageDropDown = memo(
       };
     }, []);
 
+    // prevent touch event bubbling to outer div
+    const handleTouchMove = (e) => {
+      e.preventDefault(); // Prevent default touch behavior
+      e.stopPropagation(); // Stop event propagation
+    };
+
     return (
       <div ref={containerRef} className={`dropdown relative ${inputClasses}`}>
         <button
@@ -70,7 +76,8 @@ const LanguageDropDown = memo(
             style={{
               maxHeight: optionsMaxHeight ?? 170,
             }}
-            className='rounded-lg bg-white shadow-secondary p-2 mt-1 absolute top-100 w-full overflow-y-auto z-20'
+            className='rounded-lg bg-white shadow-secondary p-2 mt-1 absolute top-100 w-full overflow-y-auto overscroll-y-contain z-20'
+            onTouchMove={handleTouchMove} // Handle touch move event
           >
             {options.map((option, index) => {
               let optionClasses = `text-sm p-2 text-dark-grey flex justify-between w-full overflow-y-auto transition-colors duration-300 ease-out opacity-100`;

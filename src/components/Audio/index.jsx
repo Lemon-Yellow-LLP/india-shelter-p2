@@ -6,7 +6,7 @@ const Audio = ({ label, hint, audioFile }) => {
     <div>
       {label && <h3 className='text-sm mb-1'>{label}</h3>}
       {hint && <p className='text-xs text-light-grey mb-2'>{hint}</p>}
-      <audio controls controlsList='nodownload noplaybackrate' className='w-full'>
+      <audio key={audioFile} controls controlsList='nodownload noplaybackrate' className='w-full'>
         <source src={audioFile} type='audio/mp4' />
       </audio>
     </div>
