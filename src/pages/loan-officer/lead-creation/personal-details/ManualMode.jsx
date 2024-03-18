@@ -607,18 +607,14 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     if (e.target.files[0]) {
       let idTypeOCRImagesData = [...idTypeOCRImages, e.target.files[0]];
       if (
-        (idTypeOCRImagesData.length === 0 || idTypeOCRImagesData.length === 1) &&
+        idTypeOCRImagesData.length === 1 &&
         (values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID' ||
           values.applicants[activeIndex]?.personal_details?.id_type === 'Driving license' ||
           values.applicants[activeIndex]?.personal_details?.id_type === 'Passport')
       ) {
         setIdTypeOCRText('Capture back image');
         setIdTypeClickedPhotoText('Front captured');
-      } else if (
-        values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID' ||
-        values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID' ||
-        values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID'
-      ) {
+      } else if (values.applicants[activeIndex]?.personal_details?.id_type === 'PAN') {
         setIdTypeOCRText('Verify with OCR');
         setIdTypeClickedPhotoText('Front captured');
         setEnableVerifyOCRIdType(true);
@@ -634,8 +630,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   const captureAddressImages = (e) => {
     if (e.target.files[0]) {
       let addressTypeOCRImagesData = [...addressTypeOCRImages, e.target.files[0]];
+
       if (
-        (addressTypeOCRImagesData.length === 0 || addressTypeOCRImagesData.length === 1) &&
+        addressTypeOCRImagesData.length === 1 &&
         (values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID' ||
           values.applicants[activeIndex]?.personal_details?.selected_address_proof ===
             'Driving license' ||
@@ -643,15 +640,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       ) {
         setAddressTypeOCRText('Capture back image');
         setAddressTypeClickedPhotoText('Front captured');
-      } else if (
-        values.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'Voter ID' ||
-        values.applicants[activeIndex]?.personal_details?.selected_address_proof !==
-          'Driving license' ||
-        values.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'Passport'
-      ) {
-        setAddressTypeOCRText('Verify with OCR');
-        setAddressTypeClickedPhotoText('Front captured');
-        setEnableVerifyOCRAddressProof(true);
       } else {
         setAddressTypeOCRText('Verify with OCR');
         setAddressTypeClickedPhotoText('Front & back captured');
@@ -683,7 +671,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
     data.append('document_type', ocrDocumentType);
     data.append('field_name', 'id_type');
-    // data.append('file', idTypeOCRImages[0]);
 
     const filename = idTypeOCRImages[0].name;
 
@@ -722,8 +709,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       values.applicants[activeIndex]?.personal_details?.id_type === 'Driving license' ||
       values.applicants[activeIndex]?.personal_details?.id_type === 'Passport'
     ) {
-      // data.append('file', idTypeOCRImages[1]);
-
       const secondfilename = idTypeOCRImages[1].name;
 
       await generateImageWithTextWatermark(
@@ -815,7 +800,6 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     data.append('applicant_id', values?.applicants?.[activeIndex]?.applicant_details?.id);
     data.append('document_type', ocrDocumentType);
     data.append('field_name', 'selected_address_proof');
-    // data.append('file', addressTypeOCRImages[0]);
 
     const filename = addressTypeOCRImages[0].name;
 
