@@ -98,7 +98,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
 
   useEffect(() => {
     if (values?.applicants[activeIndex]?.personal_details?.id_type !== 'AADHAR') {
-      if (!idTypeOCRStatus && idTypeOCRCount !== 3) {
+      if (!idTypeOCRStatus && idTypeOCRCount < 3) {
         setIdDisableFields(true);
       } else {
         setIdDisableFields(false);
@@ -142,7 +142,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       if (
         !values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
         !addressProofOCRStatus &&
-        addressProofOCRCount !== 3
+        addressProofOCRCount < 3
       ) {
         setAddressDisableFields(true);
       } else {
@@ -662,7 +662,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   };
 
   const verifyOCRIdType = async (e) => {
-    setIdTypeOCRCount((prev) => prev + 1);
+    setIdTypeOCRCount(idTypeOCRCount + 1);
     setLoading(true);
 
     let ocrDocumentType;
@@ -783,11 +783,31 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdTypeOCRText('Capture front image');
         setEnableVerifyOCRIdType(false);
         setLoading(false);
+        let updateOcrCount;
+        if (values?.applicants[activeIndex].applicant_details.id_type_ocr_count === null) {
+          updateOcrCount = {
+            [ocrDocumentType]: 1,
+          };
+        } else {
+          updateOcrCount = {
+            ...values?.applicants[activeIndex].applicant_details.id_type_ocr_count,
+            [ocrDocumentType]: values?.applicants[activeIndex]?.applicant_details
+              ?.id_type_ocr_count[ocrDocumentType]
+              ? values?.applicants[activeIndex].applicant_details.id_type_ocr_count[
+                  ocrDocumentType
+                ] + 1
+              : 1,
+          };
+        }
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.id_type_ocr_count`,
+          updateOcrCount,
+        );
       });
   };
 
   const verifyOCRAddressType = async (e) => {
-    setAddressProofOCRCount((prev) => prev + 1);
+    setAddressProofOCRCount(addressProofOCRCount + 1);
     setLoading(true);
 
     let ocrDocumentType;
@@ -913,6 +933,29 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setAddressTypeOCRText('Capture front image');
         setEnableVerifyOCRAddressProof(false);
         setLoading(false);
+        let updateOcrCount;
+        if (
+          values?.applicants[activeIndex].applicant_details.selected_address_proof_ocr_count ===
+          null
+        ) {
+          updateOcrCount = {
+            [ocrDocumentType]: 1,
+          };
+        } else {
+          updateOcrCount = {
+            ...values?.applicants[activeIndex].applicant_details.selected_address_proof_ocr_count,
+            [ocrDocumentType]: values?.applicants[activeIndex]?.applicant_details
+              ?.selected_address_proof_ocr_count[ocrDocumentType]
+              ? values?.applicants[activeIndex].applicant_details.selected_address_proof_ocr_count[
+                  ocrDocumentType
+                ] + 1
+              : 1,
+          };
+        }
+        setFieldValue(
+          `applicants[${activeIndex}].applicant_details.selected_address_proof_ocr_count`,
+          updateOcrCount,
+        );
       });
   };
 
