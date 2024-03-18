@@ -76,6 +76,7 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     setEnableEKYCAddressProof,
     ekycAddressStatus,
     setEkycAddressStatus,
+    disableEkycGlobally,
   } = useContext(LeadContext);
   const { setErrorToastMessage, setErrorToastSubMessage, token, loAllDetails } =
     useContext(AuthContext);
@@ -103,20 +104,26 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         setIdDisableFields(false);
       }
     } else {
-      // did user perfomed ekyc atleast once irrespective of success or fail
-      if (values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id) {
+      if (disableEkycGlobally) {
         setIdDisableFields(false);
-        // successful Ekyc (default is_ekyc_verified=false)
-        if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
-          setAddressDisableFields(true);
+      } else {
+        // did user perfomed ekyc atleast once irrespective of success or fail
+        if (
+          values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id
+        ) {
+          setIdDisableFields(false);
+          // successful Ekyc (default is_ekyc_verified=false)
+          if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+            setAddressDisableFields(true);
+          } else {
+            // unsuccessful Ekyc
+            setAddressDisableFields(true);
+          }
         } else {
-          // unsuccessful Ekyc
+          // ekyc didn't perfomed
+          setIdDisableFields(true);
           setAddressDisableFields(true);
         }
-      } else {
-        // ekyc didn't perfomed
-        setIdDisableFields(true);
-        setAddressDisableFields(true);
       }
     }
   }, [
@@ -146,27 +153,32 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         }
       }
     } else {
-      // did user perfomed ekyc atleast once irrespective of success or fail
-      if (
-        values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_address
-      ) {
-        // successful Ekyc (default is_ekyc_verified=false)
-        if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
-          setAddressDisableFields(true);
-        } else {
-          // unsuccessful Ekyc
-          setAddressDisableFields(false);
-        }
+      if (disableEkycGlobally) {
+        setAddressDisableFields(false);
       } else {
         if (
-          values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
-          !values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
-          values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id
+          values?.applicants[activeIndex]?.applicant_details?.extra_params
+            ?.is_ekyc_performed_address
         ) {
-          setAddressDisableFields(false);
+          // did user perfomed ekyc atleast once irrespective of success or fail
+          // successful Ekyc (default is_ekyc_verified=false)
+          if (values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified) {
+            setAddressDisableFields(true);
+          } else {
+            // unsuccessful Ekyc
+            setAddressDisableFields(false);
+          }
         } else {
-          // ekyc didn't perfomed
-          setAddressDisableFields(true);
+          if (
+            values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type &&
+            !values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+            values?.applicants[activeIndex]?.applicant_details?.extra_params?.is_ekyc_performed_id
+          ) {
+            setAddressDisableFields(false);
+          } else {
+            // ekyc didn't perfomed
+            setAddressDisableFields(true);
+          }
         }
       }
     }
@@ -1012,8 +1024,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         disabled={
           !values?.applicants?.[activeIndex]?.personal_details?.id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR' ||
-          (!idTypeOCRStatus && idTypeOCRCount < 3)
+          (values?.applicants?.[activeIndex]?.personal_details?.id_type === 'AADHAR' &&
+            !disableEkycGlobally) ||
+          (values?.applicants?.[activeIndex]?.personal_details?.id_type !== 'AADHAR' &&
+            !idTypeOCRStatus &&
+            idTypeOCRCount < 3)
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.id_type}
         onBlur={(e) => {
@@ -1224,9 +1239,13 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           !values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ||
           values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type ||
           values?.applicants?.[activeIndex]?.applicant_details?.extra_params?.qualifier ||
-          values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ===
-            'AADHAR' ||
-          (!addressProofOCRStatus && addressProofOCRCount < 3)
+          (values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof ===
+            'AADHAR' &&
+            !disableEkycGlobally) ||
+          (values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof !==
+            'AADHAR' &&
+            !addressProofOCRStatus &&
+            addressProofOCRCount < 3)
         }
         // labelDisabled={!values?.applicants?.[activeIndex]?.personal_details?.selected_address_proof}
         onBlur={(e) => {
