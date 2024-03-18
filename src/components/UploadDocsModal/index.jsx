@@ -6,7 +6,15 @@ import { AuthContext } from '../../context/AuthContextProvider';
 import { getUserById } from '../../global';
 import { LeadContext } from '../../context/LeadContextProvider';
 
-const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, singlePhoto }) => {
+const UploadDocsModal = ({
+  showpopup,
+  setShowPopUp,
+  index,
+  callback,
+  photos,
+  singlePhoto,
+  lock,
+}) => {
   const { loData, token } = useContext(AuthContext);
   const { values, activeIndex } = useContext(LeadContext);
   const [activeStep, setActiveStep] = useState(0);
@@ -121,7 +129,8 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, sin
           {photos && !singlePhoto
             ? photos.map(
                 (photo, index) =>
-                  index === activeStep && (
+                  index === activeStep &&
+                  (!lock ? (
                     <div
                       className='p-4 flex gap-4 bg-white rounded-b-lg'
                       key={index}
@@ -131,7 +140,7 @@ const UploadDocsModal = ({ showpopup, setShowPopUp, index, callback, photos, sin
                         Delete
                       </Button>
                     </div>
-                  ),
+                  ) : null),
               )
             : null}
 

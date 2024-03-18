@@ -608,11 +608,17 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       let idTypeOCRImagesData = [...idTypeOCRImages, e.target.files[0]];
       if (
         (idTypeOCRImagesData.length === 0 || idTypeOCRImagesData.length === 1) &&
-        values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID'
+        (values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID' ||
+          values.applicants[activeIndex]?.personal_details?.id_type === 'Driving license' ||
+          values.applicants[activeIndex]?.personal_details?.id_type === 'Passport')
       ) {
         setIdTypeOCRText('Capture back image');
         setIdTypeClickedPhotoText('Front captured');
-      } else if (values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID') {
+      } else if (
+        values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID' ||
+        values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID' ||
+        values.applicants[activeIndex]?.personal_details?.id_type !== 'Voter ID'
+      ) {
         setIdTypeOCRText('Verify with OCR');
         setIdTypeClickedPhotoText('Front captured');
         setEnableVerifyOCRIdType(true);
@@ -630,12 +636,18 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
       let addressTypeOCRImagesData = [...addressTypeOCRImages, e.target.files[0]];
       if (
         (addressTypeOCRImagesData.length === 0 || addressTypeOCRImagesData.length === 1) &&
-        values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID'
+        (values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID' ||
+          values.applicants[activeIndex]?.personal_details?.selected_address_proof ===
+            'Driving license' ||
+          values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Passport')
       ) {
         setAddressTypeOCRText('Capture back image');
         setAddressTypeClickedPhotoText('Front captured');
       } else if (
-        values.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'Voter ID'
+        values.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'Voter ID' ||
+        values.applicants[activeIndex]?.personal_details?.selected_address_proof !==
+          'Driving license' ||
+        values.applicants[activeIndex]?.personal_details?.selected_address_proof !== 'Passport'
       ) {
         setAddressTypeOCRText('Verify with OCR');
         setAddressTypeClickedPhotoText('Front captured');
@@ -705,7 +717,11 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         console.log(err);
       });
 
-    if (values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID') {
+    if (
+      values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID' ||
+      values.applicants[activeIndex]?.personal_details?.id_type === 'Driving license' ||
+      values.applicants[activeIndex]?.personal_details?.id_type === 'Passport'
+    ) {
       // data.append('file', idTypeOCRImages[1]);
 
       const secondfilename = idTypeOCRImages[1].name;
@@ -833,7 +849,12 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
         console.log(err);
       });
 
-    if (values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID') {
+    if (
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Voter ID' ||
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof ===
+        'Driving license' ||
+      values.applicants[activeIndex]?.personal_details?.selected_address_proof === 'Passport'
+    ) {
       const secondfilename = addressTypeOCRImages[1].name;
 
       await generateImageWithTextWatermark(
@@ -1256,6 +1277,14 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
           }
         }}
       />
+
+      {values?.applicants[activeIndex]?.applicant_details?.selected_address_ocr_status ||
+      values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status ? (
+        <p className='flex gap-2 text-[10px] leading-4 not-italic font-normal text-primary-black mt-3 p-1.5 border border-[#E1CE3F] bg-[#FFFAD6] rounded-md'>
+          <span className='text-[10px] leading-4 font-medium'>NOTE:</span>
+          If you want to change the applicant name, then go to previous screen
+        </p>
+      ) : null}
 
       <TextInput
         label='First Name'
