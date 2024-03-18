@@ -23,6 +23,7 @@ function PdfAndImageUpload({
   setMessage,
   loader,
   setLoader,
+  lock,
   ...props
 }) {
   const { activeIndex, values } = useContext(LeadContext);
@@ -402,32 +403,34 @@ function PdfAndImageUpload({
                 {uploads.data.map((upload, index) => {
                   return (
                     <div key={index} className='rounded-lg relative w-[68px]'>
-                      <button className='absolute right-[-4px] top-[-4px] z-20 w-4 h-4'>
-                        <svg
-                          width='16'
-                          height='16'
-                          viewBox='0 0 16 16'
-                          fill='none'
-                          xmlns='http://www.w3.org/2000/svg'
-                        >
-                          <rect width='16' height='16' rx='8' fill='#DDFFE7' />
-                          <path
-                            d='M4 12H12M8.79307 5.02743C8.79307 5.02743 8.79307 5.75393 9.51957 6.48043C10.2461 7.20693 10.9726 7.20693 10.9726 7.20693M5.91983 10.6614L7.44548 10.4434C7.66555 10.412 7.86949 10.31 8.02668 10.1528L11.6991 6.48043C12.1003 6.07919 12.1003 5.42866 11.6991 5.02743L10.9726 4.30093C10.5713 3.89969 9.92081 3.89969 9.51957 4.30093L5.84718 7.97332C5.68999 8.13051 5.58802 8.33445 5.55658 8.55452L5.33863 10.0802C5.2902 10.4192 5.5808 10.7098 5.91983 10.6614Z'
-                            stroke='#147257'
-                            strokeLinecap='round'
-                          />
-                        </svg>
+                      {!lock ? (
+                        <button className='absolute right-[-4px] top-[-4px] z-20 w-4 h-4'>
+                          <svg
+                            width='16'
+                            height='16'
+                            viewBox='0 0 16 16'
+                            fill='none'
+                            xmlns='http://www.w3.org/2000/svg'
+                          >
+                            <rect width='16' height='16' rx='8' fill='#DDFFE7' />
+                            <path
+                              d='M4 12H12M8.79307 5.02743C8.79307 5.02743 8.79307 5.75393 9.51957 6.48043C10.2461 7.20693 10.9726 7.20693 10.9726 7.20693M5.91983 10.6614L7.44548 10.4434C7.66555 10.412 7.86949 10.31 8.02668 10.1528L11.6991 6.48043C12.1003 6.07919 12.1003 5.42866 11.6991 5.02743L10.9726 4.30093C10.5713 3.89969 9.92081 3.89969 9.51957 4.30093L5.84718 7.97332C5.68999 8.13051 5.58802 8.33445 5.55658 8.55452L5.33863 10.0802C5.2902 10.4192 5.5808 10.7098 5.91983 10.6614Z'
+                              stroke='#147257'
+                              strokeLinecap='round'
+                            />
+                          </svg>
 
-                        <input
-                          type='file'
-                          onChange={(e) => editImage(e, upload.id)}
-                          className='absolute bottom-0 right-0 opacity-0 w-full h-full'
-                          multiple={true}
-                          name='files[]'
-                          capture='user'
-                          accept='image/*'
-                        />
-                      </button>
+                          <input
+                            type='file'
+                            onChange={(e) => editImage(e, upload.id)}
+                            className='absolute bottom-0 right-0 opacity-0 w-full h-full'
+                            multiple={true}
+                            name='files[]'
+                            capture='user'
+                            accept='image/*'
+                          />
+                        </button>
+                      ) : null}
 
                       <div className='relative rounded-md h-full w-full'>
                         <div className='absolute h-full w-full bg-black opacity-40 rounded-lg'></div>
@@ -472,6 +475,7 @@ function PdfAndImageUpload({
                 index={previewFile}
                 callback={removeImage}
                 photos={uploads.data}
+                lock={lock}
               />
             </div>
           </div>

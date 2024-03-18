@@ -2117,6 +2117,9 @@ const UploadDocuments = ({ activeIndex }) => {
                           setMessage={setIdProofError}
                           loader={idProofLoader}
                           setLoader={setIdProofLoader}
+                          lock={
+                            values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status
+                          }
                         />
 
                         <div
@@ -2357,6 +2360,9 @@ const UploadDocuments = ({ activeIndex }) => {
                         setMessage={setIdProofError}
                         loader={idProofLoader}
                         setLoader={setIdProofLoader}
+                        lock={
+                          values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status
+                        }
                       />
                     )}
 
@@ -2423,6 +2429,10 @@ const UploadDocuments = ({ activeIndex }) => {
                     setLoader={setAddressProofLoader}
                     hideDeletePdf={true}
                     viewPdf={true}
+                    lock={
+                      values?.applicants[activeIndex]?.applicant_details
+                        ?.selected_address_ocr_status
+                    }
                   />
                 ) : (
                   <div>
@@ -2460,6 +2470,10 @@ const UploadDocuments = ({ activeIndex }) => {
                           setMessage={setAddressProofError}
                           loader={addressProofLoader}
                           setLoader={setAddressProofLoader}
+                          lock={
+                            values?.applicants[activeIndex]?.applicant_details
+                              ?.selected_address_ocr_status
+                          }
                         />
 
                         <div
@@ -2697,6 +2711,10 @@ const UploadDocuments = ({ activeIndex }) => {
                         setMessage={setAddressProofError}
                         loader={addressProofLoader}
                         setLoader={setAddressProofLoader}
+                        lock={
+                          values?.applicants[activeIndex]?.applicant_details
+                            ?.selected_address_ocr_status
+                        }
                       />
                     )}
 
