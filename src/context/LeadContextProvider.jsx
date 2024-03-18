@@ -64,6 +64,7 @@ const LeadContextProvider = ({ children }) => {
   const [addressTypeOCRImages, setAddressTypeOCRImages] = useState([]);
 
   // ekyc fields
+  const [disableEkycGlobally, setDisableEkycGlobally] = useState(true);
   const [enableEkycIdtype, setEnableEkycIdtype] = useState(false);
   const [ekycIDStatus, setEkycIDStatus] = useState(false);
   const [enableEKYCAddressProof, setEnableEKYCAddressProof] = useState(false);
@@ -822,6 +823,7 @@ const LeadContextProvider = ({ children }) => {
         setEnableEKYCAddressProof,
         ekycAddressStatus,
         setEkycAddressStatus,
+        disableEkycGlobally,
       }}
     >
       {children}

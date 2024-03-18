@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, memo, useMemo, useContext } from 'react';
 import PropTypes from 'prop-types';
 import {
   CameraIcon,
@@ -9,6 +9,7 @@ import {
   TickGreen,
   VerifyOCRIcon,
 } from '../../assets/icons';
+import { LeadContext } from '../../context/LeadContextProvider';
 
 const OCRDropdown = memo(
   ({
@@ -41,6 +42,7 @@ const OCRDropdown = memo(
     setField_name,
     ...props
   }) => {
+    const { disableEkycGlobally } = useContext(LeadContext);
     const [showDropDown, setShowDropDown] = useState(false);
     const [selectedOption, setSelectedOption] = useState(() =>
       options?.find((option) => defaultSelected === option.value),
@@ -199,7 +201,7 @@ const OCRDropdown = memo(
             </div>
           ) : null}
 
-          {enableEKYC ? (
+          {!disableEkycGlobally && enableEKYC ? (
             <button
               className='text-primary-red font-semibold flex justify-end ml-auto'
               onClick={() => {
