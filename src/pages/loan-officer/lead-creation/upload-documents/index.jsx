@@ -29,6 +29,7 @@ import Popup from '../../../../components/Popup';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import generateImageWithTextWatermark from '../../../../utils/GenerateImageWithTextWatermark';
 import loading from '../../../../assets/icons/loading.svg';
+import Loader from '../../../../components/Loader';
 
 const UploadDocuments = ({ activeIndex }) => {
   const {
@@ -1967,11 +1968,7 @@ const UploadDocuments = ({ activeIndex }) => {
 
   return (
     <>
-      {pageLoader ? (
-        <div className='h-screen w-screen flex justify-center items-center'>
-          <img src={loading} alt='loading' className='animate-spin duration-300 ease-out h-12' />
-        </div>
-      ) : null}
+      {pageLoader ? <Loader /> : null}
 
       {!pageLoader && (
         <>
