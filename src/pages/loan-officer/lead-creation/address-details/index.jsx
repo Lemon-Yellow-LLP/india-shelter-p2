@@ -34,6 +34,8 @@ export default function AddressDetails() {
     setPincodeErr,
     setFieldTouched,
     addressDisableFields,
+    addressRequiredFieldsStatus,
+    setAddressRequiredFieldsStatus,
   } = useContext(LeadContext);
 
   const { token } = useContext(AuthContext);
@@ -46,19 +48,15 @@ export default function AddressDetails() {
       : false,
   );
 
-  const [requiredFieldsStatus, setRequiredFieldsStatus] = useState({
-    ...values?.applicants?.[activeIndex]?.address_detail?.extra_params?.required_fields_status,
-  });
-
   useEffect(() => {
-    setRequiredFieldsStatus(
+    setAddressRequiredFieldsStatus(
       values?.applicants?.[activeIndex]?.address_detail?.extra_params?.required_fields_status,
     );
   }, [activeIndex]);
 
   useEffect(() => {
-    updateProgressApplicantSteps('address_detail', requiredFieldsStatus, 'address');
-  }, [requiredFieldsStatus]);
+    updateProgressApplicantSteps('address_detail', addressRequiredFieldsStatus, 'address');
+  }, [addressRequiredFieldsStatus]);
 
   const handleRadioChange = useCallback(
     async (e) => {
@@ -105,7 +103,7 @@ export default function AddressDetails() {
               applicant_id: values?.applicants?.[activeIndex]?.applicant_details?.id,
               id: res.id,
             });
-            setRequiredFieldsStatus(() => ({
+            setAddressRequiredFieldsStatus(() => ({
               ...addData.extra_params.required_fields_status,
               [name]: true,
             }));
@@ -151,8 +149,8 @@ export default function AddressDetails() {
         );
       }
 
-      if (!requiredFieldsStatus[name]) {
-        setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+      if (!addressRequiredFieldsStatus[name]) {
+        setAddressRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
       }
     },
     [setFieldValue, values],
@@ -162,7 +160,7 @@ export default function AddressDetails() {
     if (!value || value.toString().length < 5) {
       setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, '');
       setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, '');
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: false }));
+      setAddressRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: false }));
 
       editAddressById(
         values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -216,7 +214,7 @@ export default function AddressDetails() {
 
       setFieldValue(`applicants[${activeIndex}].address_detail.current_city`, '');
       setFieldValue(`applicants[${activeIndex}].address_detail.current_state`, '');
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: false }));
+      setAddressRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: false }));
 
       editAddressById(
         values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -287,8 +285,8 @@ export default function AddressDetails() {
       setPincodeErr((prev) => ({ ...prev, [`address_additional_${activeIndex}`]: '' }));
     }
 
-    if (!requiredFieldsStatus['current_pincode']) {
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: true }));
+    if (!addressRequiredFieldsStatus['current_pincode']) {
+      setAddressRequiredFieldsStatus((prev) => ({ ...prev, ['current_pincode']: true }));
     }
   };
 
@@ -296,7 +294,7 @@ export default function AddressDetails() {
     if (!value || value.toString().length < 5) {
       setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, '');
       setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, '');
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: false }));
+      setAddressRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: false }));
 
       editAddressById(
         values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -333,7 +331,7 @@ export default function AddressDetails() {
 
       setFieldValue(`applicants[${activeIndex}].address_detail.additional_city`, '');
       setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, '');
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: false }));
+      setAddressRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: false }));
 
       editAddressById(
         values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -369,8 +367,8 @@ export default function AddressDetails() {
     setFieldValue(`applicants[${activeIndex}].address_detail.additional_state`, res.state);
     setPincodeErr((prev) => ({ ...prev, [`address_additional_${activeIndex}`]: '' }));
 
-    if (!requiredFieldsStatus['additional_pincode']) {
-      setRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: true }));
+    if (!addressRequiredFieldsStatus['additional_pincode']) {
+      setAddressRequiredFieldsStatus((prev) => ({ ...prev, ['additional_pincode']: true }));
     }
   };
 
@@ -403,7 +401,7 @@ export default function AddressDetails() {
         newData.applicants[activeIndex].address_detail,
       );
 
-      setRequiredFieldsStatus((prev) => ({
+      setAddressRequiredFieldsStatus((prev) => ({
         ...prev,
         additional_flat_no_building_name: true,
         additional_street_area_locality: true,
@@ -438,7 +436,7 @@ export default function AddressDetails() {
         newData.applicants[activeIndex].address_detail,
       );
 
-      setRequiredFieldsStatus((prev) => ({
+      setAddressRequiredFieldsStatus((prev) => ({
         ...prev,
         additional_flat_no_building_name: false,
         additional_street_area_locality: false,
@@ -553,7 +551,7 @@ export default function AddressDetails() {
       }, {});
 
     const updatedRequiredFieldsStatus = Object.fromEntries(
-      Object.entries(requiredFieldsStatus).map(([key, value]) => [
+      Object.entries(addressRequiredFieldsStatus).map(([key, value]) => [
         key,
         key in filteredMappedData ? true : value,
       ]),
@@ -586,7 +584,7 @@ export default function AddressDetails() {
       );
     }
 
-    setRequiredFieldsStatus(updatedRequiredFieldsStatus);
+    setAddressRequiredFieldsStatus(updatedRequiredFieldsStatus);
 
     setOpenExistingPopup(false);
 
@@ -698,7 +696,7 @@ export default function AddressDetails() {
                         },
                       );
 
-                      setRequiredFieldsStatus((prev) => ({
+                      setAddressRequiredFieldsStatus((prev) => ({
                         ...prev,
                         current_flat_no_building_name: true,
                         additional_flat_no_building_name: true,
@@ -718,13 +716,13 @@ export default function AddressDetails() {
                         },
                       );
 
-                      setRequiredFieldsStatus((prev) => ({
+                      setAddressRequiredFieldsStatus((prev) => ({
                         ...prev,
                         current_flat_no_building_name: true,
                       }));
                     }
                   } else {
-                    setRequiredFieldsStatus((prev) => ({
+                    setAddressRequiredFieldsStatus((prev) => ({
                       ...prev,
                       current_flat_no_building_name: false,
                     }));
@@ -812,7 +810,7 @@ export default function AddressDetails() {
                           },
                         },
                       );
-                      setRequiredFieldsStatus((prev) => ({
+                      setAddressRequiredFieldsStatus((prev) => ({
                         ...prev,
                         current_street_area_locality: true,
                         additional_street_area_locality: true,
@@ -832,13 +830,13 @@ export default function AddressDetails() {
                         },
                       );
 
-                      setRequiredFieldsStatus((prev) => ({
+                      setAddressRequiredFieldsStatus((prev) => ({
                         ...prev,
                         current_street_area_locality: true,
                       }));
                     }
                   } else {
-                    setRequiredFieldsStatus((prev) => ({
+                    setAddressRequiredFieldsStatus((prev) => ({
                       ...prev,
                       current_street_area_locality: false,
                     }));
@@ -917,7 +915,7 @@ export default function AddressDetails() {
                         },
                       );
 
-                      setRequiredFieldsStatus((prev) => ({
+                      setAddressRequiredFieldsStatus((prev) => ({
                         ...prev,
                         current_town: true,
                         additional_town: true,
@@ -936,13 +934,13 @@ export default function AddressDetails() {
                         },
                       );
 
-                      setRequiredFieldsStatus((prev) => ({
+                      setAddressRequiredFieldsStatus((prev) => ({
                         ...prev,
                         current_town: true,
                       }));
                     }
                   } else {
-                    setRequiredFieldsStatus((prev) => ({
+                    setAddressRequiredFieldsStatus((prev) => ({
                       ...prev,
                       current_town: false,
                     }));
@@ -1019,7 +1017,7 @@ export default function AddressDetails() {
                         },
                       );
 
-                      setRequiredFieldsStatus((prev) => ({
+                      setAddressRequiredFieldsStatus((prev) => ({
                         ...prev,
                         current_landmark: true,
                         additional_landmark: true,
@@ -1039,12 +1037,12 @@ export default function AddressDetails() {
                       );
                     }
 
-                    setRequiredFieldsStatus((prev) => ({
+                    setAddressRequiredFieldsStatus((prev) => ({
                       ...prev,
                       current_landmark: true,
                     }));
                   } else {
-                    setRequiredFieldsStatus((prev) => ({
+                    setAddressRequiredFieldsStatus((prev) => ({
                       ...prev,
                       current_landmark: false,
                     }));
@@ -1361,13 +1359,13 @@ export default function AddressDetails() {
                     );
 
                     const name = e.target.name.split('.')[2];
-                    if (!requiredFieldsStatus[name]) {
-                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    if (!addressRequiredFieldsStatus[name]) {
+                      setAddressRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                     }
                   } else {
                     const name = e.target.name.split('.')[2];
-                    if (!requiredFieldsStatus[name]) {
-                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                    if (!addressRequiredFieldsStatus[name]) {
+                      setAddressRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                     }
                     editAddressById(
                       values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -1443,13 +1441,13 @@ export default function AddressDetails() {
                     );
 
                     const name = e.target.name.split('.')[2];
-                    if (!requiredFieldsStatus[name]) {
-                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    if (!addressRequiredFieldsStatus[name]) {
+                      setAddressRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                     }
                   } else {
                     const name = e.target.name.split('.')[2];
-                    if (!requiredFieldsStatus[name]) {
-                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                    if (!addressRequiredFieldsStatus[name]) {
+                      setAddressRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                     }
                     editAddressById(
                       values?.applicants?.[activeIndex]?.address_detail?.id,
@@ -1515,8 +1513,8 @@ export default function AddressDetails() {
                     );
 
                     const name = e.target.name.split('.')[2];
-                    if (!requiredFieldsStatus[name]) {
-                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    if (!addressRequiredFieldsStatus[name]) {
+                      setAddressRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                     }
                   } else {
                     editAddressById(
@@ -1532,8 +1530,8 @@ export default function AddressDetails() {
                     );
 
                     const name = e.target.name.split('.')[2];
-                    if (!requiredFieldsStatus[name]) {
-                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                    if (!addressRequiredFieldsStatus[name]) {
+                      setAddressRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                     }
                   }
                 }}
@@ -1588,13 +1586,13 @@ export default function AddressDetails() {
                     );
 
                     const name = e.target.name.split('.')[2];
-                    if (!requiredFieldsStatus[name]) {
-                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
+                    if (!addressRequiredFieldsStatus[name]) {
+                      setAddressRequiredFieldsStatus((prev) => ({ ...prev, [name]: true }));
                     }
                   } else {
                     const name = e.target.name.split('.')[2];
-                    if (!requiredFieldsStatus[name]) {
-                      setRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
+                    if (!addressRequiredFieldsStatus[name]) {
+                      setAddressRequiredFieldsStatus((prev) => ({ ...prev, [name]: false }));
                     }
 
                     editAddressById(
