@@ -12,6 +12,7 @@ import OtpInput from '../../../../components/OtpInput/index';
 import otpVerified from '../../../../assets/icons/otp-verified.svg';
 import {
   addApi,
+  editAddressById,
   editFieldsById,
   getEmailOtp,
   performOcr,
@@ -77,6 +78,9 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
     ekycAddressStatus,
     setEkycAddressStatus,
     disableEkycGlobally,
+    addressRequiredFieldsStatus,
+    setAddressRequiredFieldsStatus,
+    handleCurrentPincodeChange,
   } = useContext(LeadContext);
   const { setErrorToastMessage, setErrorToastSubMessage, token, loAllDetails } =
     useContext(AuthContext);
@@ -936,25 +940,29 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
   }, [values?.applicants?.[activeIndex]?.personal_details?.extra_params?.same_as_id_type]);
 
   useEffect(() => {
-    const keysToCheck = ['VOTER', 'PASSPORT', 'DL'];
+    updateProgressApplicantSteps('address_detail', addressRequiredFieldsStatus, 'address');
+  }, [addressRequiredFieldsStatus]);
 
-    if (
-      keysToCheck.some((key) => {
-        if (
-          values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_count?.hasOwnProperty(key)
-        ) {
-          return true;
-        }
-      })
-    ) {
-      if (
-        !values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
-        values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status
-      ) {
-        setAddressDisableFields(false);
-      }
-    }
-  }, [values?.applicants]);
+  // useEffect(() => {
+  //   const keysToCheck = ['VOTER', 'PASSPORT', 'DL'];
+
+  //   if (
+  //     keysToCheck.some((key) => {
+  //       if (
+  //         values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_count?.hasOwnProperty(key)
+  //       ) {
+  //         return true;
+  //       }
+  //     })
+  //   ) {
+  //     if (
+  //       !values?.applicants[activeIndex]?.applicant_details?.is_ekyc_verified &&
+  //       values?.applicants[activeIndex]?.applicant_details?.id_type_ocr_status
+  //     ) {
+  //       setAddressDisableFields(false);
+  //     }
+  //   }
+  // }, [values?.applicants]);
 
   return (
     <>
@@ -1135,6 +1143,315 @@ function ManualMode({ requiredFieldsStatus, setRequiredFieldsStatus, updateField
                   selected_address_proof: true,
                   address_proof_number: true,
                 }));
+              }
+
+              if (values?.applicants[activeIndex]?.applicant_details.id_type_ocr_status) {
+                if (
+                  values.applicants[activeIndex]?.personal_details?.id_type === 'Driving license'
+                ) {
+                  if (
+                    values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.DL.response
+                      .result.splitAddress.pincode
+                  ) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].address_detail.current_pincode`,
+                      values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.DL
+                        .response.result.splitAddress.pincode,
+                    );
+
+                    handleCurrentPincodeChange(
+                      values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.DL
+                        .response.result.splitAddress.pincode,
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      ['current_pincode']: true,
+                    }));
+                  }
+
+                  let inputString =
+                    values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.DL.response
+                      .result.splitAddress.addressLine;
+
+                  // Dividing the string into three variables
+                  let var1 = inputString.substring(0, 90);
+                  let var2 = inputString.substring(90, 180);
+                  let var3 = inputString.substring(180);
+
+                  if (var1.length) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].address_detail.current_flat_no_building_name`,
+                      var1,
+                    );
+
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_flat_no_building_name: var1,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_flat_no_building_name: true,
+                    }));
+                  }
+
+                  if (var2.length) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].address_detail.current_street_area_locality`,
+                      var2,
+                    );
+
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_street_area_locality: var2,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_street_area_locality: true,
+                    }));
+                  }
+
+                  if (var3.length) {
+                    setFieldValue(`applicants[${activeIndex}].address_detail.current_town`, var3);
+
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_town: var3,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_town: true,
+                    }));
+                  }
+                } else if (
+                  values.applicants[activeIndex]?.personal_details?.id_type === 'Voter ID'
+                ) {
+                  if (
+                    values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.VOTER
+                      .response.result.splitAddress.pincode
+                  ) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].address_detail.current_pincode`,
+                      values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.VOTER
+                        .response.result.splitAddress.pincode,
+                    );
+
+                    handleCurrentPincodeChange(
+                      values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.VOTER
+                        .response.result.splitAddress.pincode,
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      ['current_pincode']: true,
+                    }));
+                  }
+
+                  let inputString =
+                    values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.VOTER
+                      .response.result.splitAddress.addressLine;
+
+                  // Dividing the string into three variables
+                  let var1 = inputString.substring(0, 90);
+                  let var2 = inputString.substring(90, 180);
+                  let var3 = inputString.substring(180);
+
+                  if (var1.length) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].address_detail.current_flat_no_building_name`,
+                      var1,
+                    );
+
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_flat_no_building_name: var1,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_flat_no_building_name: true,
+                    }));
+                  }
+
+                  if (var2.length) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].address_detail.current_street_area_locality`,
+                      var2,
+                    );
+
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_street_area_locality: var2,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_street_area_locality: true,
+                    }));
+                  }
+
+                  if (var3.length) {
+                    setFieldValue(`applicants[${activeIndex}].address_detail.current_town`, var3);
+
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_town: var3,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_town: true,
+                    }));
+                  }
+                } else if (
+                  values.applicants[activeIndex]?.personal_details?.id_type === 'Passport'
+                ) {
+                  if (
+                    values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.PASSPORT
+                      .response.result.splitAddress.pincode
+                  ) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].address_detail.current_pincode`,
+                      values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.PASSPORT
+                        .response.result.splitAddress.pincode,
+                    );
+
+                    handleCurrentPincodeChange(
+                      values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.PASSPORT
+                        .response.result.splitAddress.pincode,
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      ['current_pincode']: true,
+                    }));
+                  }
+
+                  let inputString =
+                    values?.applicants[activeIndex]?.applicant_details.id_type_ocr_data.PASSPORT
+                      .response.result.splitAddress.addressLine;
+
+                  // Dividing the string into three variables
+                  let var1 = inputString.substring(0, 90);
+                  let var2 = inputString.substring(90, 180);
+                  let var3 = inputString.substring(180);
+
+                  if (var1.length) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].address_detail.current_flat_no_building_name`,
+                      var1,
+                    );
+
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_flat_no_building_name: var1,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_flat_no_building_name: true,
+                    }));
+                  }
+
+                  if (var2.length) {
+                    setFieldValue(
+                      `applicants[${activeIndex}].address_detail.current_street_area_locality`,
+                      var2,
+                    );
+
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_street_area_locality: var2,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_street_area_locality: true,
+                    }));
+                  }
+
+                  if (var3.length) {
+                    setFieldValue(`applicants[${activeIndex}].address_detail.current_town`, var3);
+
+                    editAddressById(
+                      values?.applicants?.[activeIndex]?.address_detail?.id,
+                      {
+                        current_town: var3,
+                      },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      },
+                    );
+
+                    setAddressRequiredFieldsStatus((prev) => ({
+                      ...prev,
+                      current_town: true,
+                    }));
+                  }
+                } else {
+                  console.log('skip');
+                }
               }
             }
             setFieldValue(
