@@ -84,6 +84,11 @@ const LeadContextProvider = ({ children }) => {
     },
   });
 
+  const [addressRequiredFieldsStatus, setAddressRequiredFieldsStatus] = useState({
+    ...formik?.values?.applicants?.[activeIndex]?.address_detail?.extra_params
+      ?.required_fields_status,
+  });
+
   // Function to recursively count keys and calculate the sum of values
   const countKeysAndValues = (obj, result = { totalKeys: 0, valuesSum: 0 }) => {
     for (const key in obj) {
@@ -401,6 +406,11 @@ const LeadContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (!location.pathname.includes('dashboard')) {
+      setAddressRequiredFieldsStatus({
+        ...formik?.values?.applicants?.[activeIndex]?.address_detail?.extra_params
+          ?.required_fields_status,
+      });
+
       let newApplicants = structuredClone(formik.values);
 
       const updatedValues = newApplicants.applicants.filter(
@@ -824,6 +834,9 @@ const LeadContextProvider = ({ children }) => {
         ekycAddressStatus,
         setEkycAddressStatus,
         disableEkycGlobally,
+        addressRequiredFieldsStatus,
+        setAddressRequiredFieldsStatus,
+        handleCurrentPincodeChange,
       }}
     >
       {children}
