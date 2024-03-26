@@ -71,8 +71,8 @@ const applicantSchema = Yup.object().shape({
           .required('Enter a valid ID number');
       } else if (value[0] === 'AADHAR') {
         return schema
-          .min(12, 'Enter Valid 12 digit Aadhar number')
-          .max(12, 'Enter Valid 12 digit Aadhar number')
+          .min(12, 'Enter Valid 12 digit number')
+          .max(16, 'Enter Valid 16 digit number')
           .required('Enter a valid ID number');
       } else if (value[0] === 'Driving license') {
         return schema
@@ -104,8 +104,8 @@ const applicantSchema = Yup.object().shape({
           .required('Enter a valid address proof number');
       } else if (value[0] === 'AADHAR') {
         return schema
-          .min(12, 'Enter Valid 12 digit Aadhar number')
-          .max(12, 'Enter Valid 12 digit Aadhar number')
+          .min(12, 'Enter Valid 12 digit number')
+          .max(16, 'Enter Valid 16 digit number')
           .required('Enter a valid address proof number');
       } else if (value[0] === 'Driving license') {
         return schema

@@ -7,7 +7,7 @@ export const manualModeDropdownOptions = [
         value: 'PAN',
       },
       {
-        label: 'Aadhar',
+        label: 'Aadhaar/VID',
         value: 'AADHAR',
       },
       {
@@ -28,7 +28,7 @@ export const manualModeDropdownOptions = [
     title: 'Address Proof',
     options: [
       {
-        label: 'Aadhar',
+        label: 'Aadhaar/VID',
         value: 'AADHAR',
       },
       {
