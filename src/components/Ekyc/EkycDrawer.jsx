@@ -10,7 +10,7 @@ import ValidateScan from './ValidateScan';
 import { LeadContext } from '../../context/LeadContextProvider';
 import { AuthContext } from '../../context/AuthContextProvider';
 import { editFieldsById, generateEkycOtp, validateEkycOtp } from '../../global';
-import TextInput from '../TextInput';
+import TextInputWithEyeIcon from '../TextInput/TextInputWithEyeIcon';
 
 // Add ekyc methods
 export const ekycMethods = [
@@ -21,6 +21,17 @@ export const ekycMethods = [
   {
     label: 'Biometrics',
     value: 'FMR',
+  },
+];
+
+const idNumberOptions = [
+  {
+    label: 'Aadhaar',
+    value: 'Aadhaar',
+  },
+  {
+    label: 'VID',
+    value: 'vid',
   },
 ];
 
@@ -44,9 +55,11 @@ export default function EkycDrawer({
   const { setErrorToastMessage, setErrorToastSubMessage, token } = useContext(AuthContext);
 
   // aadharInputDrawser states
+  const [selectedIdOption, setSelectedIdOption] = useState('Aadhaar');
   const [isAadharInputDrawer, setIsAadharInputDrawer] = useState(true);
   const [aadhaarNo, setAadhaarNo] = useState('');
   const [aadhaarNoError, setAadhaarNoError] = useState('');
+  const [show, setShow] = useState(false);
 
   // select kyc method screen states
   // otp will be default selected for ekyc
@@ -71,6 +84,11 @@ export default function EkycDrawer({
       console.log('ecsBioHelper terminate');
     }
   }, []);
+
+  useEffect(() => {
+    setAadhaarNo('');
+    setAadhaarNoError('');
+  }, [selectedIdOption]);
 
   const updateConsent = useCallback(
     (consent) => {
@@ -188,8 +206,14 @@ export default function EkycDrawer({
       setToastMessage('Information fetched Successfully');
     } catch (error) {
       console.log(error);
-      const maskedPortion = aadhaarNo.slice(0, 8).replace(/\d/g, '*');
-      const maskedAadhar = maskedPortion + aadhaarNo.slice(8);
+      let maskedAadhar;
+      if (selectedIdOption === 'Aadhaar') {
+        const maskedPortion = aadhaarNo.slice(0, 8).replace(/\d/g, '*');
+        maskedAadhar = maskedPortion + aadhaarNo.slice(8);
+      } else {
+        const maskedPortion = aadhaarNo.slice(0, 12).replace(/\d/g, '*');
+        maskedAadhar = maskedPortion + aadhaarNo.slice(12);
+      }
       let data =
         field_name === 'id_type'
           ? {
@@ -277,21 +301,33 @@ export default function EkycDrawer({
       return;
     }
     const aadhaarPattern = /^\d{12}$/;
-    if (value[0] == '0' || value[0] == '1') return;
-    if (/^\d+$/g.test(value) || !value.length) {
-      setAadhaarNo(value);
-      if (aadhaarPattern.test(value)) {
-        setAadhaarNoError('');
-      } else {
-        setAadhaarNoError('Enter valid 12 digit Aadhar no.');
+    const vidPattern = /^\d{16}$/;
+    if (selectedIdOption === 'Aadhaar') {
+      if (value[0] == '0' || value[0] == '1') return;
+      if (/^\d+$/g.test(value) || !value.length) {
+        setAadhaarNo(value);
+        if (aadhaarPattern.test(value)) {
+          setAadhaarNoError('');
+        } else {
+          setAadhaarNoError('Enter valid 12 digit Aadhar no.');
+        }
+      }
+    } else {
+      if (/^\d+$/g.test(value) || !value.length) {
+        setAadhaarNo(value);
+        if (vidPattern.test(value)) {
+          setAadhaarNoError('');
+        } else {
+          setAadhaarNoError('Enter valid 16 digit VID no.');
+        }
       }
     }
   };
 
   return isAadharInputDrawer ? (
-    <div className='w-full px-4 py-6 flex flex-col gap-3'>
-      <div className='flex justify-between items-center'>
-        <p className='font-semibold'>Enter Aadhar No</p>
+    <div className='w-full flex flex-col'>
+      <div className='flex justify-between items-center px-4 py-2 border-b border-lighter-grey'>
+        <p className='font-semibold'>Enter ID number</p>
         <button
           onClick={() => {
             setOpenEkycPopup(false);
@@ -302,39 +338,79 @@ export default function EkycDrawer({
           <IconClose />
         </button>
       </div>
-      <TextInput
-        placeholder='Enter Aadhar number'
-        type='tel'
-        name='aadhaarNo'
-        value={aadhaarNo}
-        onChange={handleAadhaarNoChange}
-        error={aadhaarNoError}
-        touched={true}
-        pattern='\d*'
-        min='0' // hanlde mousewheel down
-        onKeyDown={(e) => {
-          if (
-            e.key === 'ArrowUp' ||
-            e.key === 'ArrowDown' ||
-            e.key === 'ArrowLeft' ||
-            e.key === 'ArrowRight' ||
-            e.key === ' ' ||
-            e.keyCode === 32 ||
-            (e.keyCode >= 65 && e.keyCode <= 90)
-          ) {
-            e.preventDefault();
-            return;
-          }
-        }}
-      />
-      <Button
-        primary
-        inputClasses='!py-3'
-        disabled={aadhaarNoError || !aadhaarNo}
-        onClick={() => setIsAadharInputDrawer(false)}
-      >
-        Next
-      </Button>
+      <div className='px-4 pt-4 pb-6'>
+        <div className='flex mb-4'>
+          {idNumberOptions.map((method) => {
+            return (
+              <Radio
+                key={method.label}
+                label={method.label}
+                value={method.value}
+                current={selectedIdOption}
+                onChange={async (value) => {
+                  await editFieldsById(
+                    values?.applicants?.[activeIndex]?.personal_details?.id,
+                    'personal',
+                    {
+                      extra_params: {
+                        ...values?.applicants?.[activeIndex]?.personal_details?.extra_params,
+                        ekyc_option: value,
+                      },
+                    },
+                    {
+                      headers: {
+                        Authorization: token,
+                      },
+                    },
+                  );
+                  setFieldValue(
+                    `applicants[${activeIndex}].personal_details.extra_params.ekyc_option`,
+                    value,
+                  );
+                  setSelectedIdOption(value);
+                }}
+              />
+            );
+          })}
+        </div>
+        <TextInputWithEyeIcon
+          label={selectedIdOption === 'Aadhaar' ? 'Enter Aadhaar number' : 'Enter VID number'}
+          placeholder={selectedIdOption === 'Aadhaar' ? 'Eg: 123456789012' : 'Eg: 1234567890123456'}
+          type={show ? 'tel' : 'password'}
+          name='aadhaarNo'
+          value={aadhaarNo}
+          inputmode='numeric'
+          onChange={handleAadhaarNoChange}
+          error={aadhaarNoError}
+          touched={true}
+          pattern='\d*'
+          min='0' // hanlde mousewheel down
+          onKeyDown={(e) => {
+            if (
+              e.key === 'ArrowUp' ||
+              e.key === 'ArrowDown' ||
+              e.key === 'ArrowLeft' ||
+              e.key === 'ArrowRight' ||
+              e.key === ' ' ||
+              e.keyCode === 32 ||
+              (e.keyCode >= 65 && e.keyCode <= 90)
+            ) {
+              e.preventDefault();
+              return;
+            }
+          }}
+          show={show}
+          setShow={setShow}
+        />
+        <Button
+          primary
+          inputClasses='!py-3 mt-3'
+          disabled={aadhaarNoError || !aadhaarNo}
+          onClick={() => setIsAadharInputDrawer(false)}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   ) : performVerification ? (
     selectedEkycMethod === 'otp' ? (
@@ -418,13 +494,14 @@ export default function EkycDrawer({
         field_name={field_name}
         setIsAadharInputDrawer={setIsAadharInputDrawer}
         setRequiredFieldsStatus={setRequiredFieldsStatus}
+        selectedIdOption={selectedIdOption}
       />
     )
   ) : (
     <>
       <div className='relative'>
         <div className='w-full h-[494px] flex flex-col'>
-          <div className='flex justify-between px-4 py-2 border-b border-lighter-grey'>
+          <div className='flex justify-between items-center px-4 py-2 border-b border-lighter-grey'>
             <p className='font-semibold'>Select verification method</p>
             <button
               onClick={() => {

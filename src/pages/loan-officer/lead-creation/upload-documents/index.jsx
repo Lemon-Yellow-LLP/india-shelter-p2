@@ -413,15 +413,31 @@ const UploadDocuments = ({ activeIndex }) => {
             e.target.selectionStart = e.target.selectionEnd = value.length;
             return;
           }
-          let aadharPattern = /^\d$/;
-          if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
-            const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
-            const maskedAadhar = maskedPortion + value.slice(8);
-            setFieldValue(e.target.name, maskedAadhar);
-          } else if (
-            value.length < values?.applicants?.[activeIndex]?.personal_details?.id_number.length
+          if (
+            values?.applicants?.[activeIndex]?.personal_details?.extra_params?.ekyc_option ===
+            'Aadhaar'
           ) {
-            setFieldValue(e.target.name, value);
+            let aadharPattern = /^\d$/;
+            if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
+              const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
+              const maskedAadhar = maskedPortion + value.slice(8);
+              setFieldValue(e.target.name, maskedAadhar);
+            } else if (
+              value.length < values?.applicants?.[activeIndex]?.personal_details?.id_number.length
+            ) {
+              setFieldValue(e.target.name, value);
+            }
+          } else {
+            let vidPattern = /^\d+$/;
+            if (vidPattern.exec(value[value.length - 1])) {
+              const maskedPortion = value.slice(0, 12).replace(/\d/g, '*');
+              const maskedVid = maskedPortion + value.slice(12);
+              setFieldValue(e.target.name, maskedVid);
+            } else if (
+              value.length < values?.applicants?.[activeIndex]?.personal_details?.id_number.length
+            ) {
+              setFieldValue(e.target.name, value);
+            }
           }
         } else if (
           e.target.name === `applicants[${activeIndex}].personal_details.address_proof_number` &&
@@ -431,16 +447,32 @@ const UploadDocuments = ({ activeIndex }) => {
             e.target.selectionStart = e.target.selectionEnd = value.length;
             return;
           }
-          let aadharPattern = /^\d$/;
-          if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
-            const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
-            const maskedAadhar = maskedPortion + value.slice(8);
-            setFieldValue(e.target.name, maskedAadhar);
-          } else if (
-            value.length <
-            values?.applicants?.[activeIndex]?.personal_details?.address_proof_number.length
+          if (
+            values?.applicants?.[activeIndex]?.personal_details?.extra_params?.ekyc_option ===
+            'Aadhaar'
           ) {
-            setFieldValue(e.target.name, value);
+            let aadharPattern = /^\d$/;
+            if (aadharPattern.exec(value[value.length - 1]) && value[0] != '0' && value[0] != '1') {
+              const maskedPortion = value.slice(0, 8).replace(/\d/g, '*');
+              const maskedAadhar = maskedPortion + value.slice(8);
+              setFieldValue(e.target.name, maskedAadhar);
+            } else if (
+              value.length <
+              values?.applicants?.[activeIndex]?.personal_details?.address_proof_number.length
+            ) {
+              setFieldValue(e.target.name, value);
+            }
+          } else {
+            let vidPattern = /^\d+$/;
+            if (vidPattern.exec(value[value.length - 1])) {
+              const maskedPortion = value.slice(0, 12).replace(/\d/g, '*');
+              const maskedVid = maskedPortion + value.slice(12);
+              setFieldValue(e.target.name, maskedVid);
+            } else if (
+              value.length < values?.applicants?.[activeIndex]?.personal_details?.id_number.length
+            ) {
+              setFieldValue(e.target.name, value);
+            }
           }
         } else {
           const pattern2 = /^[A-Za-z0-9]+$/;

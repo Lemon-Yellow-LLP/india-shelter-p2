@@ -38,6 +38,7 @@ export default function ValidateScan({
   setLoading,
   field_name,
   setRequiredFieldsStatus,
+  selectedIdOption,
 }) {
   const { setToastMessage, values, activeIndex, setValues, setFieldValue } =
     useContext(LeadContext);
@@ -148,8 +149,14 @@ export default function ValidateScan({
       );
       setToastMessage('Information fetched Successfully');
     } catch (error) {
-      const maskedPortion = aadhaarNo.slice(0, 8).replace(/\d/g, '*');
-      const maskedAadhar = maskedPortion + aadhaarNo.slice(8);
+      let maskedAadhar;
+      if (selectedIdOption === 'Aadhaar') {
+        const maskedPortion = aadhaarNo.slice(0, 8).replace(/\d/g, '*');
+        maskedAadhar = maskedPortion + aadhaarNo.slice(8);
+      } else {
+        const maskedPortion = aadhaarNo.slice(0, 12).replace(/\d/g, '*');
+        maskedAadhar = maskedPortion + aadhaarNo.slice(12);
+      }
       let data =
         field_name === 'id_type'
           ? {
@@ -332,4 +339,5 @@ ValidateScan.propTypes = {
   setIsAadharInputDrawer: PropTypes.func,
   setAadhaarNo: PropTypes.func,
   setRequiredFieldsStatus: PropTypes.func,
+  selectedIdOption: PropTypes.string,
 };
