@@ -327,7 +327,9 @@ export default function EkycDrawer({
   return isAadharInputDrawer ? (
     <div className='w-full flex flex-col'>
       <div className='flex justify-between items-center px-4 py-2 border-b border-lighter-grey'>
-        <p className='font-semibold'>Enter ID number</p>
+        <p className='font-semibold'>
+          {field_name === 'id_type' ? 'Enter ID number' : 'Enter address proof number'}
+        </p>
         <button
           onClick={() => {
             setOpenEkycPopup(false);
