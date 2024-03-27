@@ -57,7 +57,7 @@ const applicantSchema = Yup.object().shape({
   personal_details: Yup.object().shape({
     // how_would_you_like_to_proceed: Yup.string().required('This field is mandatory.'),
     id_type: Yup.string().required('This field is mandatory.'),
-    id_number: Yup.string().when('id_type', (value, schema) => {
+    id_number: Yup.string().when(['id_type', 'extra_params.ekyc_option'], (value, schema) => {
       if (value[0] === 'Passport') {
         return schema
           .matches(
@@ -70,10 +70,17 @@ const applicantSchema = Yup.object().shape({
           .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid Pan number. Format should be AAAPB2117A')
           .required('Enter a valid ID number');
       } else if (value[0] === 'AADHAR') {
-        return schema
-          .min(12, 'Enter Valid 12 digit number')
-          .max(16, 'Enter Valid 16 digit number')
-          .required('Enter a valid ID number');
+        if (value[1] === 'Aadhaar') {
+          return schema
+            .min(12, 'Enter Valid 12 digit Aadhar number')
+            .max(12, 'Enter Valid 12 digit Aadhar number')
+            .required('Enter a valid ID number');
+        } else {
+          return schema
+            .min(16, 'Enter Valid 16 digit VID number')
+            .max(16, 'Enter Valid 16 digit VID number')
+            .required('Enter a valid ID number');
+        }
       } else if (value[0] === 'Driving license') {
         return schema
           .matches(
@@ -90,38 +97,51 @@ const applicantSchema = Yup.object().shape({
       }
     }),
     selected_address_proof: Yup.string().required('This field is mandatory.'),
-    address_proof_number: Yup.string().when('selected_address_proof', (value, schema) => {
-      if (value[0] === 'Passport') {
-        return schema
-          .matches(
-            /^[A-PR-WY-Za-pr-wy-z][0-9]{7}$/,
-            'Invalid Passport number. Format should be J1234567',
-          )
-          .required('Enter a valid address proof number');
-      } else if (value[0] === 'PAN Card') {
-        return schema
-          .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid Pan number. Format should be AAAPB2117A')
-          .required('Enter a valid address proof number');
-      } else if (value[0] === 'AADHAR') {
-        return schema
-          .min(12, 'Enter Valid 12 digit number')
-          .max(16, 'Enter Valid 16 digit number')
-          .required('Enter a valid address proof number');
-      } else if (value[0] === 'Driving license') {
-        return schema
-          .matches(
-            /^[A-Za-z]{2}\d{13}$/,
-            'Enter Valid Driving license number. Format should be DL1234567891012',
-          )
-          .required('Enter a valid address proof number');
-      } else if (value[0] === 'Voter ID') {
-        return schema
-          .matches(/^[A-Za-z]{3}\d{7}$/, 'Enter Valid Voter ID number. Format should be XGS1234567')
-          .required('Enter a valid address proof number');
-      } else {
-        return schema.required('This field is mandatory.');
-      }
-    }),
+    address_proof_number: Yup.string().when(
+      ['selected_address_proof', 'extra_params.ekyc_option'],
+      (value, schema) => {
+        if (value[0] === 'Passport') {
+          return schema
+            .matches(
+              /^[A-PR-WY-Za-pr-wy-z][0-9]{7}$/,
+              'Invalid Passport number. Format should be J1234567',
+            )
+            .required('Enter a valid address proof number');
+        } else if (value[0] === 'PAN Card') {
+          return schema
+            .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid Pan number. Format should be AAAPB2117A')
+            .required('Enter a valid address proof number');
+        } else if (value[0] === 'AADHAR') {
+          if (value[1] === 'Aadhaar') {
+            return schema
+              .min(12, 'Enter Valid 12 digit Aadhar number')
+              .max(12, 'Enter Valid 12 digit Aadhar number')
+              .required('Enter a valid address proof number');
+          } else {
+            return schema
+              .min(16, 'Enter Valid 16 digit VID number')
+              .max(16, 'Enter Valid 16 digit VID number')
+              .required('Enter a valid address proof number');
+          }
+        } else if (value[0] === 'Driving license') {
+          return schema
+            .matches(
+              /^[A-Za-z]{2}\d{13}$/,
+              'Enter Valid Driving license number. Format should be DL1234567891012',
+            )
+            .required('Enter a valid address proof number');
+        } else if (value[0] === 'Voter ID') {
+          return schema
+            .matches(
+              /^[A-Za-z]{3}\d{7}$/,
+              'Enter Valid Voter ID number. Format should be XGS1234567',
+            )
+            .required('Enter a valid address proof number');
+        } else {
+          return schema.required('This field is mandatory.');
+        }
+      },
+    ),
     first_name: Yup.string()
       .min(2, 'First Name must be atleast 2 characters long')
       .max(50, 'First Name can be max 50 characters long')
