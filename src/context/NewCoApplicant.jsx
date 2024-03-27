@@ -87,6 +87,7 @@ export const newCoApplicantValues = {
     email: '',
     is_email_verified: false,
     extra_params: {
+      ekyc_option: 'Aadhaar',
       same_as_id_type: false,
       progress: 20,
       is_existing_done: false,
