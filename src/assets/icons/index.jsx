@@ -56,6 +56,8 @@ import IconAdminFormClose from './IconAdminFormClose.jsx';
 import CameraIcon from './cameraIcon.jsx';
 import TickGreen from './tickGreen.jsx';
 import VerifyOCRIcon from './verifyOCRIcon.jsx';
+import EyeIcon from './eyeIcon.jsx';
+import EyeOffIcon from './eyeOffIcon.jsx';
 
 export {
   OverDraftIcon,
@@ -112,4 +114,6 @@ export {
   CameraIcon,
   TickGreen,
   VerifyOCRIcon,
+  EyeIcon,
+  EyeOffIcon,
 };
